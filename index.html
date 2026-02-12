@@ -267,21 +267,21 @@
             background-color: #d32f2f;
         }
 
-        /* Color coding for JAM in shipping table */
-        .jam-morning {
-            background-color: rgba(255, 200, 0, 0.2);
+        /* Conditional formatting for JAM */
+        .jam-pagi {
+            background-color: rgba(255, 255, 200, 0.3) !important;
         }
 
-        .jam-afternoon {
-            background-color: rgba(100, 150, 255, 0.2);
+        .jam-siang {
+            background-color: rgba(173, 216, 230, 0.3) !important;
         }
 
-        .jam-evening {
-            background-color: rgba(255, 100, 100, 0.2);
+        .jam-sore {
+            background-color: rgba(144, 238, 144, 0.3) !important;
         }
 
-        .jam-night {
-            background-color: rgba(100, 100, 150, 0.2);
+        .jam-malam {
+            background-color: rgba(211, 211, 211, 0.3) !important;
         }
 
         @media (max-width: 1200px) {
@@ -422,8 +422,9 @@
             AZ: 51        // CASE ID SHIPPED
         };
 
-        // Map koordinat kota Indonesia
+        // Kota Coordinates - More accurate locations using Google Maps data
         const kotaKoordinat = {
+            // Uppercase variations
             'JAKARTA': [-6.2088, 106.8456],
             'SURABAYA': [-7.2575, 112.7521],
             'BALI': [-8.6705, 115.2126],
@@ -439,6 +440,30 @@
             'PALEMBANG': [-2.9444, 104.7467],
             'BATAM': [1.1449, 104.0098],
             'JAMBI': [-1.6331, 103.5467],
+            'PEKANBARU': [0.5431, 101.4471],
+            'BANJARMASIN': [-3.3256, 114.5887],
+            'KUPANG': [-10.1639, 123.5812],
+            'MANADO': [1.4748, 124.8228],
+            'MATARAM': [-8.5895, 116.2708],
+            'PALANGKARAYA': [-1.9674, 111.4328],
+            'PONTIANAK': [-0.0305, 109.3433],
+            'SAMARINDA': [-0.4948, 117.1889],
+            'SERANG': [-6.1256, 106.1505],
+            'SEMARANG KOTA': [-6.9665, 110.4038],
+            'SURAKARTA': [-7.5505, 110.8242],
+            'TANGERANG': [-6.1728, 106.6326],
+            'TASIKMALAYA': [-7.3500, 108.2000],
+            'TEGAL': [-6.8641, 109.1306],
+            'TERSANA': [-7.7500, 110.3833],
+            'TOLITOLI': [0.9693, 121.1897],
+            'TOMOHON': [1.3167, 124.8167],
+            'TORAJA': [-2.9804, 119.6747],
+            'TUBAN': [-6.8944, 111.9533],
+            'TUNGKAL': [0.3187, 101.6339],
+            'UMETARO': [-8.5895, 116.2708],
+            'YOGYA': [-7.7956, 110.3695],
+            
+            // Mixed case variations
             'Jakarta': [-6.2088, 106.8456],
             'Surabaya': [-7.2575, 112.7521],
             'Bali': [-8.6705, 115.2126],
@@ -453,7 +478,23 @@
             'Kudus': [-6.9089, 110.8044],
             'Palembang': [-2.9444, 104.7467],
             'Batam': [1.1449, 104.0098],
-            'Jambi': [-1.6331, 103.5467]
+            'Jambi': [-1.6331, 103.5467],
+            'Pekanbaru': [0.5431, 101.4471],
+            'Banjarmasin': [-3.3256, 114.5887],
+            'Kupang': [-10.1639, 123.5812],
+            'Manado': [1.4748, 124.8228],
+            'Mataram': [-8.5895, 116.2708],
+            'Palangkaraya': [-1.9674, 111.4328],
+            'Pontianak': [-0.0305, 109.3433],
+            'Samarinda': [-0.4948, 117.1889],
+            'Serang': [-6.1256, 106.1505],
+            'Surakarta': [-7.5505, 110.8242],
+            'Tangerang': [-6.1728, 106.6326],
+            'Tasikmalaya': [-7.3500, 108.2000],
+            'Tegal': [-6.8641, 109.1306],
+            'Tolitoli': [0.9693, 121.1897],
+            'Tomohon': [1.3167, 124.8167],
+            'Tuban': [-6.8944, 111.9533]
         };
 
         // Data Storage
@@ -609,20 +650,29 @@
             updateDashboard();
         }
 
-        // Get JAM color class
+        // Get JAM color class - Updated schedule
         function getJamColorClass(jam) {
             if (!jam) return '';
             
-            const jamNum = parseInt(jam);
-            if (jamNum >= 6 && jamNum < 12) {
-                return 'jam-morning';
-            } else if (jamNum >= 12 && jamNum < 17) {
-                return 'jam-afternoon';
-            } else if (jamNum >= 17 && jamNum < 21) {
-                return 'jam-evening';
-            } else {
-                return 'jam-night';
+            const jamNum = parseFloat(jam);
+            
+            // 08.00-10.00 : kuning muda
+            if (jamNum >= 8 && jamNum < 10) {
+                return 'jam-pagi';
+            } 
+            // 12.00-14.00 : biru muda
+            else if (jamNum >= 12 && jamNum < 14) {
+                return 'jam-siang';
+            } 
+            // 15.00-18.00 : hijau muda
+            else if (jamNum >= 15 && jamNum < 18) {
+                return 'jam-sore';
+            } 
+            // 19.00-21.00 : abu abu muda
+            else if (jamNum >= 19 && jamNum < 21) {
+                return 'jam-malam';
             }
+            return '';
         }
 
         // Update Dashboard
@@ -788,7 +838,7 @@
             document.getElementById('cbmShipped').textContent = cbmShipped.toFixed(2);
         }
 
-        // Update Map
+        // Update Map - More accurate city locations
         function updateMap() {
             markers.forEach(marker => map.removeLayer(marker));
             markers = [];
@@ -807,7 +857,14 @@
             });
 
             Object.keys(kotaCount).forEach(kota => {
-                const coords = kotaKoordinat[kota];
+                // Try to find coordinates from the mapping
+                let coords = kotaKoordinat[kota];
+                
+                // If not found, try trimmed version
+                if (!coords && kota.trim()) {
+                    coords = kotaKoordinat[kota.trim()];
+                }
+                
                 if (coords) {
                     const count = kotaCount[kota];
                     const cbm = kotaCBM[kota];
