@@ -166,6 +166,43 @@ table tbody tr:nth-child(even) {
     background-color: rgba(58, 58, 58, 0.3);
 }
 
+/* ==================== CONDITIONAL FORMATTING FOR JAM ==================== */
+/* 08.00-10.00 : Kuning Muda */
+.jam-pagi {
+    background-color: rgba(255, 255, 200, 0.3) !important;
+}
+
+.jam-pagi:hover {
+    background-color: rgba(255, 255, 150, 0.4) !important;
+}
+
+/* 12.00-14.00 : Biru Muda */
+.jam-siang {
+    background-color: rgba(173, 216, 230, 0.3) !important;
+}
+
+.jam-siang:hover {
+    background-color: rgba(135, 206, 250, 0.4) !important;
+}
+
+/* 15.00-18.00 : Hijau Muda */
+.jam-sore {
+    background-color: rgba(144, 238, 144, 0.3) !important;
+}
+
+.jam-sore:hover {
+    background-color: rgba(102, 205, 170, 0.4) !important;
+}
+
+/* 19.00-21.00 : Abu-abu Muda */
+.jam-malam {
+    background-color: rgba(211, 211, 211, 0.3) !important;
+}
+
+.jam-malam:hover {
+    background-color: rgba(169, 169, 169, 0.4) !important;
+}
+
 /* ==================== KPI CARDS ==================== */
 .kpi-container {
     display: grid;
@@ -452,5 +489,22 @@ input:focus {
 
     #map {
         display: none;
+    }
+
+    /* Maintain colors when printing */
+    .jam-pagi {
+        background-color: #ffffc8 !important;
+    }
+
+    .jam-siang {
+        background-color: #add8e6 !important;
+    }
+
+    .jam-sore {
+        background-color: #90ee90 !important;
+    }
+
+    .jam-malam {
+        background-color: #d3d3d3 !important;
     }
 }
