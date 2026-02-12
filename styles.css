@@ -1,0 +1,14 @@
+/* Additional responsive styles */
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.8em;
+    }
+
+    .filter-section {
+        grid-template-columns: 1fr;
+    }
+
+    .kpi-value {
+        font-size: 1.8em;
+    }
+}
