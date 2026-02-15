@@ -506,6 +506,12 @@
         let map;
         let markers = [];
 
+        // Helper Function: Parse number with comma separator
+        function parseNumberWithComma(value) {
+            if (!value) return 0;
+            return parseFloat(String(value).replace(/,/g, '')) || 0;
+        }
+
         // Initialize Map
         function initMap() {
             map = L.map('map').setView([-2.5489, 118.0149], 5);
@@ -700,7 +706,7 @@
             filteredData.forEach(row => {
                 const kota = row.AR;
                 const date = row.AO;
-                const cbm = parseFloat(row.Z) || 0;
+                const cbm = parseNumberWithComma(row.Z);
 
                 // Skip if kota is empty
                 if (!kota || kota.trim() === '') {
@@ -780,6 +786,8 @@
             pageData.forEach((row, index) => {
                 const rowNum = start + index + 1;
                 const jamColorClass = getJamColorClass(row.AP);
+                // Parse dengan fungsi helper untuk menghapus koma
+                const estimasiCaseId = parseNumberWithComma(row.BA);
 
                 html += `
                     <tr class="${jamColorClass}">
@@ -790,10 +798,10 @@
                         <td>${row.AO || '-'}</td>
                         <td>${row.AP || '-'}</td>
                         <td>${row.M || '-'}</td>
-                        <td>${parseFloat(row.Z).toFixed(2) || '-'}</td>
-                        <td>${parseFloat(row.AY).toFixed(2) || '-'}</td>
-                        <td>${parseFloat(row.AQ).toFixed(0) || '-'}</td>
-                        <td>${parseFloat(row.BA).toFixed(0) || '-'}</td>
+                        <td>${parseNumberWithComma(row.Z).toFixed(2) || '-'}</td>
+                        <td>${parseNumberWithComma(row.AY).toFixed(2) || '-'}</td>
+                        <td>${parseNumberWithComma(row.AQ).toFixed(0) || '-'}</td>
+                        <td>${estimasiCaseId.toFixed(0) || '-'}</td>
                     </tr>
                 `;
             });
@@ -831,10 +839,10 @@
 
         // Update KPIs
         function updateKPIs() {
-            const caseIdShipped = filteredData.reduce((sum, r) => sum + (parseFloat(r.AZ) || 0), 0);
-            const caseIdPlan = filteredData.reduce((sum, r) => sum + (parseFloat(r.AQ) || 0), 0);
-            const cbmPlan = filteredData.reduce((sum, r) => sum + (parseFloat(r.Z) || 0), 0);
-            const cbmShipped = filteredData.reduce((sum, r) => sum + (parseFloat(r.AY) || 0), 0);
+            const caseIdShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AZ), 0);
+            const caseIdPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AQ), 0);
+            const cbmPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.Z), 0);
+            const cbmShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AY), 0);
 
             document.getElementById('caseIdShipped').textContent = caseIdShipped.toLocaleString('id-ID', {maximumFractionDigits: 0});
             document.getElementById('caseIdPlan').textContent = caseIdPlan.toLocaleString('id-ID', {maximumFractionDigits: 0});
@@ -852,7 +860,7 @@
 
             filteredData.forEach(row => {
                 const kota = row.AR;
-                const cbm = parseFloat(row.Z) || 0;
+                const cbm = parseNumberWithComma(row.Z);
 
                 if (kota) {
                     kotaCount[kota] = (kotaCount[kota] || 0) + 1;
