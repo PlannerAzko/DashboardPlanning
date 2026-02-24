@@ -583,37 +583,45 @@
                 const values = allRows[i];
 
                 if (values.length > Math.max(...Object.values(COLUMNS))) {
-                    const id = values[COLUMNS.A] || '';
+                    const id = (values[COLUMNS.A] || '').trim();
+                    const stuffingDate = (values[COLUMNS.AO] || '').trim();
+                    const kota = (values[COLUMNS.AR] || '').trim();
+                    
                     const cbmPlan = parseNumberWithComma(values[COLUMNS.Z]);
                     const caseIdPlan = parseNumberWithComma(values[COLUMNS.BB]);
                     const cbmShipped = parseNumberWithComma(values[COLUMNS.AY]);
                     const caseIdShipped = parseNumberWithComma(values[COLUMNS.BF]);
                     
-                    // VALIDASI KETAT:
-                    // 1. Lewati jika ID kosong
-                    // 2. Lewati jika baris header yang berulang (berisi teks "LC/ID")
-                    // 3. Lewati jika mengandung kata "TOTAL", "GRAND", "SUBTOTAL", atau "JUMLAH"
                     const idLower = id.toLowerCase();
-                    const rowString = values.join('|').toLowerCase();
-                    
-                    if (!id || id.trim() === '' || 
-                        idLower === 'lc/id' || 
-                        idLower === 'id' ||
-                        rowString.includes('total') || 
-                        rowString.includes('grand') || 
-                        rowString.includes('subtotal') ||
-                        rowString.includes('jumlah')) {
+                    const kotaLower = kota.toLowerCase();
+                    const dateLower = stuffingDate.toLowerCase();
+
+                    // VALIDASI KETAT:
+                    // 1. Baris data WAJIB memiliki ID, Tanggal Stuffing, dan Kota
+                    if (!id || !stuffingDate || !kota) {
                         continue;
                     }
 
-                    // 4. Lewati jika baris kosong/dekoratif (semua angka nol)
-                    // Juga cek jika kota kosong, biasanya baris total tidak punya kota
-                    const kota = values[COLUMNS.AR] || '';
-                    if (cbmPlan === 0 && caseIdPlan === 0 && cbmShipped === 0 && caseIdShipped === 0) {
+                    // 2. Lewati jika baris header yang berulang
+                    if (idLower === 'lc/id' || idLower === 'id' || dateLower.includes('date')) {
                         continue;
                     }
+
+                    // 3. Lewati jika baris ringkasan (Total/Jumlah/Subtotal/Summary)
+                    // Kita periksa kolom ID, KOTA, dan TANGGAL
+                    const summaryKeywords = ['total', 'jumlah', 'grand', 'subtotal', 'summary'];
+                    const isSummary = summaryKeywords.some(k => 
+                        idLower.includes(k) || 
+                        kotaLower.includes(k) || 
+                        dateLower.includes(k)
+                    );
                     
-                    if (!kota || kota.trim() === '') {
+                    if (isSummary) {
+                        continue;
+                    }
+
+                    // 4. Lewati jika baris kosong/dekoratif (semua angka nol penting)
+                    if (cbmPlan === 0 && caseIdPlan === 0 && cbmShipped === 0 && caseIdShipped === 0) {
                         continue;
                     }
 
