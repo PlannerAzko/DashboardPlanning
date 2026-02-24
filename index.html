@@ -123,6 +123,20 @@
             background-color: #1a1a1a;
             position: sticky;
             top: 0;
+            z-index: 10;
+        }
+
+        table tfoot {
+            background-color: #1a1a1a;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        table tfoot td {
+            font-weight: bold;
+            color: #ffd700;
+            border-top: 2px solid #d32f2f;
         }
 
         table th {
@@ -779,6 +793,8 @@
 
             // Sort dates from newest to oldest
             const sortedDates = Array.from(dates).sort().reverse().slice(0, 4);
+            const dateTotals = {};
+            sortedDates.forEach(date => dateTotals[date] = 0);
 
             let html = `
                 <table>
@@ -794,13 +810,26 @@
             Object.keys(kotaData).sort().forEach(kota => {
                 html += `<tr><td>${kota}</td>`;
                 sortedDates.forEach(date => {
-                    const cbm = kotaData[kota][date];
+                    const cbm = kotaData[kota][date] || 0;
                     html += `<td>${cbm ? cbm.toFixed(2) : '-'}</td>`;
+                    dateTotals[date] += cbm;
                 });
                 html += `</tr>`;
             });
 
-            html += `</tbody></table>`;
+            html += `</tbody>`;
+
+            // Add Total Row
+            html += `
+                <tfoot>
+                    <tr>
+                        <td>TOTAL</td>
+                        ${sortedDates.map(date => `<td>${dateTotals[date].toFixed(2)}</td>`).join('')}
+                    </tr>
+                </tfoot>
+            `;
+
+            html += `</table>`;
             container.innerHTML = html;
         }
 
