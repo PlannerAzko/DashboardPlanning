@@ -420,7 +420,8 @@
             AX: 49,       // BULAN
             AY: 50,       // CBM SHIPPED
             AZ: 51,       // CASE ID SHIPPED
-            BA: 52        // ESTIMASI CASE ID
+            BA: 52,       // ESTIMASI CASE ID
+            BB: 53        // CASE ID PLAN (BB)
         };
 
         // Kota Coordinates - More accurate locations using Google Maps data
@@ -561,7 +562,8 @@
                         AX: values[COLUMNS.AX] || '',
                         AY: values[COLUMNS.AY] || '0',
                         AZ: values[COLUMNS.AZ] || '0',
-                        BA: values[COLUMNS.BA] || '0'
+                        BA: values[COLUMNS.BA] || '0',
+                        BB: values[COLUMNS.BB] || '0'
                     });
                 }
             }
@@ -800,7 +802,7 @@
                         <td>${row.M || '-'}</td>
                         <td>${parseNumberWithComma(row.Z).toFixed(2) || '-'}</td>
                         <td>${parseNumberWithComma(row.AY).toFixed(2) || '-'}</td>
-                        <td>${parseNumberWithComma(row.AQ).toFixed(0) || '-'}</td>
+                        <td>${parseNumberWithComma(row.BB).toFixed(0) || '-'}</td>
                         <td>${estimasiCaseId.toFixed(0) || '-'}</td>
                     </tr>
                 `;
@@ -840,7 +842,7 @@
         // Update KPIs
         function updateKPIs() {
             const caseIdShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AZ), 0);
-            const caseIdPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AQ), 0);
+            const caseIdPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BB), 0);
             const cbmPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.Z), 0);
             const cbmShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AY), 0);
 
