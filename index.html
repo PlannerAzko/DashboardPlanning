@@ -511,7 +511,9 @@
         // Helper Function: Parse number with comma separator
         function parseNumberWithComma(value) {
             if (!value) return 0;
-            return parseFloat(String(value).replace(/,/g, '')) || 0;
+            // Hapus pemisah ribuan (koma) dan bersihkan spasi
+            const cleaned = String(value).replace(/,/g, '').trim();
+            return parseFloat(cleaned) || 0;
         }
 
         // Initialize Map
@@ -548,8 +550,17 @@
                 const values = parseCSVLine(line);
 
                 if (values.length > Math.max(...Object.values(COLUMNS))) {
+                    const id = values[COLUMNS.A] || '';
+                    
+                    // VALIDASI: Lewati baris jika ID kosong atau baris tersebut adalah baris TOTAL
+                    if (!id || id.trim() === '' || 
+                        id.toLowerCase().includes('total') || 
+                        id.toLowerCase().includes('grand')) {
+                        continue;
+                    }
+
                     allData.push({
-                        A: values[COLUMNS.A] || '',
+                        A: id,
                         D: values[COLUMNS.D] || '',
                         I: values[COLUMNS.I] || '',
                         M: values[COLUMNS.M] || '',
