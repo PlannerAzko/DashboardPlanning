@@ -421,7 +421,8 @@
             AY: 50,       // CBM SHIPPED
             AZ: 51,       // CASE ID SHIPPED
             BA: 52,       // ESTIMASI CASE ID
-            BB: 53        // CASE ID PLAN (BB)
+            BB: 53,       // CASE ID PLAN (BB)
+            BF: 57        // CASE ID SHIPPED (BF)
         };
 
         // Kota Coordinates - More accurate locations using Google Maps data
@@ -563,7 +564,8 @@
                         AY: values[COLUMNS.AY] || '0',
                         AZ: values[COLUMNS.AZ] || '0',
                         BA: values[COLUMNS.BA] || '0',
-                        BB: values[COLUMNS.BB] || '0'
+                        BB: values[COLUMNS.BB] || '0',
+                        BF: values[COLUMNS.BF] || '0'
                     });
                 }
             }
@@ -704,29 +706,27 @@
 
             const kotaData = {};
             const dates = new Set();
+            const dateTotals = {};
 
             filteredData.forEach(row => {
                 const kota = row.AR;
                 const date = row.AO;
                 const cbm = parseNumberWithComma(row.Z);
 
-                // Skip if kota is empty
-                if (!kota || kota.trim() === '') {
-                    return;
-                }
+                if (!kota || kota.trim() === '') return;
 
-                if (!kotaData[kota]) {
-                    kotaData[kota] = {};
-                }
-                if (!kotaData[kota][date]) {
-                    kotaData[kota][date] = 0;
-                }
+                if (!kotaData[kota]) kotaData[kota] = {};
+                if (!kotaData[kota][date]) kotaData[kota][date] = 0;
+                
                 kotaData[kota][date] += cbm;
                 dates.add(date);
+
+                if (!dateTotals[date]) dateTotals[date] = 0;
+                dateTotals[date] += cbm;
             });
 
-            // Sort dates from newest to oldest
-            const sortedDates = Array.from(dates).sort().reverse().slice(0, 4);
+            // Sort dates from newest to oldest, take up to 50
+            const sortedDates = Array.from(dates).sort().reverse().slice(0, 50);
 
             let html = `
                 <table>
@@ -734,19 +734,37 @@
                         <tr>
                             <th>KOTA</th>
                             ${sortedDates.map(date => `<th>${date}</th>`).join('')}
+                            <th>TOTAL</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
 
+            let overallTotal = 0;
+
             Object.keys(kotaData).sort().forEach(kota => {
+                let rowTotal = 0;
                 html += `<tr><td>${kota}</td>`;
                 sortedDates.forEach(date => {
-                    const cbm = kotaData[kota][date];
+                    const cbm = kotaData[kota][date] || 0;
                     html += `<td>${cbm ? cbm.toFixed(2) : '-'}</td>`;
+                    rowTotal += cbm;
                 });
-                html += `</tr>`;
+                html += `<td style="font-weight: bold; color: #ffd700;">${rowTotal.toFixed(2)}</td></tr>`;
+                overallTotal += rowTotal;
             });
+
+            // Grand Total Row
+            html += `
+                <tr style="background-color: #1a1a1a; font-weight: bold; border-top: 2px solid #d32f2f;">
+                    <td style="color: #ffd700;">GRAND TOTAL</td>
+                    ${sortedDates.map(date => {
+                        const total = dateTotals[date] || 0;
+                        return `<td style="color: #ffd700;">${total.toFixed(2)}</td>`;
+                    }).join('')}
+                    <td style="color: #ffd700;">${overallTotal.toFixed(2)}</td>
+                </tr>
+            `;
 
             html += `</tbody></table>`;
             container.innerHTML = html;
@@ -841,7 +859,7 @@
 
         // Update KPIs
         function updateKPIs() {
-            const caseIdShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AZ), 0);
+            const caseIdShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BF), 0);
             const caseIdPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BB), 0);
             const cbmPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.Z), 0);
             const cbmShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AY), 0);
