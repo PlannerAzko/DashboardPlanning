@@ -542,20 +542,68 @@
 
         // Parse CSV
         function parseCSV(csv) {
-            const lines = csv.trim().split('\n');
-            allData = [];
+            const allRows = [];
+            let currentRow = [];
+            let currentField = '';
+            let inQuotes = false;
 
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i];
-                const values = parseCSVLine(line);
+            // Robust CSV parsing handling quotes and newlines within cells
+            for (let i = 0; i < csv.length; i++) {
+                const char = csv[i];
+                const nextChar = csv[i + 1];
+
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        currentField += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                } else if ((char === '\n' || (char === '\r' && nextChar === '\n')) && !inQuotes) {
+                    currentRow.push(currentField.trim());
+                    allRows.push(currentRow);
+                    currentRow = [];
+                    currentField = '';
+                    if (char === '\r') i++; // Skip \n
+                } else {
+                    currentField += char;
+                }
+            }
+            if (currentField || currentRow.length > 0) {
+                currentRow.push(currentField.trim());
+                allRows.push(currentRow);
+            }
+
+            allData = [];
+            // Start from i=1 to skip header
+            for (let i = 1; i < allRows.length; i++) {
+                const values = allRows[i];
 
                 if (values.length > Math.max(...Object.values(COLUMNS))) {
                     const id = values[COLUMNS.A] || '';
+                    const cbmPlan = parseNumberWithComma(values[COLUMNS.Z]);
+                    const caseIdPlan = parseNumberWithComma(values[COLUMNS.BB]);
+                    const cbmShipped = parseNumberWithComma(values[COLUMNS.AY]);
+                    const caseIdShipped = parseNumberWithComma(values[COLUMNS.BF]);
                     
-                    // VALIDASI: Lewati baris jika ID kosong atau baris tersebut adalah baris TOTAL
+                    // VALIDASI KETAT:
+                    // 1. Lewati jika ID kosong
+                    // 2. Lewati jika baris header yang berulang (berisi teks "LC/ID")
+                    // 3. Lewati jika mengandung kata "TOTAL" atau "GRAND"
+                    const idLower = id.toLowerCase();
                     if (!id || id.trim() === '' || 
-                        id.toLowerCase().includes('total') || 
-                        id.toLowerCase().includes('grand')) {
+                        idLower === 'lc/id' || 
+                        idLower === 'id' ||
+                        idLower.includes('total') || 
+                        idLower.includes('grand')) {
+                        continue;
+                    }
+
+                    // 4. Lewati jika baris kosong/dekoratif (semua angka nol)
+                    if (cbmPlan === 0 && caseIdPlan === 0 && cbmShipped === 0 && caseIdShipped === 0) {
                         continue;
                     }
 
