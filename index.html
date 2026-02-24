@@ -592,18 +592,28 @@
                     // VALIDASI KETAT:
                     // 1. Lewati jika ID kosong
                     // 2. Lewati jika baris header yang berulang (berisi teks "LC/ID")
-                    // 3. Lewati jika mengandung kata "TOTAL" atau "GRAND"
+                    // 3. Lewati jika mengandung kata "TOTAL", "GRAND", "SUBTOTAL", atau "JUMLAH"
                     const idLower = id.toLowerCase();
+                    const rowString = values.join('|').toLowerCase();
+                    
                     if (!id || id.trim() === '' || 
                         idLower === 'lc/id' || 
                         idLower === 'id' ||
-                        idLower.includes('total') || 
-                        idLower.includes('grand')) {
+                        rowString.includes('total') || 
+                        rowString.includes('grand') || 
+                        rowString.includes('subtotal') ||
+                        rowString.includes('jumlah')) {
                         continue;
                     }
 
                     // 4. Lewati jika baris kosong/dekoratif (semua angka nol)
+                    // Juga cek jika kota kosong, biasanya baris total tidak punya kota
+                    const kota = values[COLUMNS.AR] || '';
                     if (cbmPlan === 0 && caseIdPlan === 0 && cbmShipped === 0 && caseIdShipped === 0) {
+                        continue;
+                    }
+                    
+                    if (!kota || kota.trim() === '') {
                         continue;
                     }
 
@@ -628,33 +638,6 @@
                     });
                 }
             }
-        }
-
-        // Parse CSV Line handling quoted values
-        function parseCSVLine(line) {
-            const result = [];
-            let current = '';
-            let inQuotes = false;
-
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-
-                if (char === '"') {
-                    if (inQuotes && line[i + 1] === '"') {
-                        current += '"';
-                        i++;
-                    } else {
-                        inQuotes = !inQuotes;
-                    }
-                } else if (char === ',' && !inQuotes) {
-                    result.push(current.trim());
-                    current = '';
-                } else {
-                    current += char;
-                }
-            }
-            result.push(current.trim());
-            return result;
         }
 
         // Populate Filter Options
