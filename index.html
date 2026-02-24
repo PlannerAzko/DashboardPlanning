@@ -419,9 +419,10 @@
             AT: 45,       // REGIONAL
             AX: 49,       // BULAN
             AY: 50,       // CBM SHIPPED
-            AZ: 51,       // CASE ID SHIPPED
+            AZ: 51,       // CASE ID SHIPPED (OLD)
             BA: 52,       // ESTIMASI CASE ID
-            BB: 53        // CASE ID PLAN (BB)
+            BB: 53,       // CASE ID PLAN (BB)
+            BF: 57        // CASE ID SHIPPED (BF)
         };
 
         // Kota Coordinates - More accurate locations using Google Maps data
@@ -563,7 +564,8 @@
                         AY: values[COLUMNS.AY] || '0',
                         AZ: values[COLUMNS.AZ] || '0',
                         BA: values[COLUMNS.BA] || '0',
-                        BB: values[COLUMNS.BB] || '0'
+                        BB: values[COLUMNS.BB] || '0',
+                        BF: values[COLUMNS.BF] || '0'
                     });
                 }
             }
@@ -841,7 +843,7 @@
 
         // Update KPIs
         function updateKPIs() {
-            const caseIdShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AZ), 0);
+            const caseIdShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BF), 0);
             const caseIdPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BB), 0);
             const cbmPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.Z), 0);
             const cbmShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AY), 0);
