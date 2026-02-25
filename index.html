@@ -648,15 +648,34 @@
         // Fetch Data dari Google Sheets
         async function fetchData() {
             try {
-                const response = await fetch(CSV_URL);
+                // Menggunakan credentials: 'omit' untuk menghindari masalah CORS/Cookies di dalam iframe
+                const response = await fetch(CSV_URL, { credentials: 'omit' });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const csv = await response.text();
+                
+                // Cek apakah yang diterima benar-benar data (bukan halaman login HTML)
+                if (csv.trim().startsWith('<!DOCTYPE')) {
+                    throw new Error("Diterima format HTML, bukan CSV. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
+                }
+
                 parseCSV(csv);
                 populateFilters();
                 applyFilters();
             } catch (error) {
                 console.error('Error fetching data:', error);
+                const errorMsg = error.message.includes('fetch') ? 
+                    'Gagal terhubung ke Google Sheets. Periksa koneksi internet atau status sharing file.' : 
+                    error.message;
+                
                 document.getElementById('crm-table-container').innerHTML = 
-                    '<div class="loading">Error loading data. Please check console.</div>';
+                    `<div class="loading" style="color: #ff6b6b;">
+                        <i class="fas fa-exclamation-triangle"></i><br/>
+                        Error: ${errorMsg}
+                    </div>`;
             }
         }
 
