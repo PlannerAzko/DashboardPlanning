@@ -3,75 +3,411 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLANNING SUPPORT 2026 - Stabilized</title>
+    <title>PLANNING SUPPORT 2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a1a; color: #fff; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
 
         .header {
             background: linear-gradient(90deg, #d32f2f 0%, #c62828 100%);
-            padding: 15px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
-        .container { max-width: 1600px; margin: 0 auto; padding: 15px; }
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
         .filter-section {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
-        .filter-group label { font-size: 0.75em; font-weight: 600; color: #aaa; margin-bottom: 5px; display: block; }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #aaa;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            background-color: #2a2a2a;
+            color: #fff;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
 
         /* Multi-select styling */
-        .multi-select-container { position: relative; background-color: #2a2a2a; border-radius: 4px; border-bottom: 2px solid transparent; }
+        .multi-select-container {
+            position: relative;
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            cursor: pointer;
+            min-height: 45px;
+        }
+
         .multi-select-display {
-            padding: 10px; color: #fff; font-size: 0.9em; cursor: pointer;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px;
+            color: #fff;
+            font-size: 0.95em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .multi-select-display::after { content: '\f0d7'; font-family: 'Font Awesome 6 Free'; font-weight: 900; margin-left: 8px; color: #d32f2f; }
-        
+
+        .multi-select-display::after {
+            content: '\f0d7';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-left: 10px;
+            color: #aaa;
+        }
+
         .multi-select-options {
-            display: none; position: absolute; top: 100%; left: 0; right: 0;
-            background-color: #2a2a2a; border: 1px solid #444; z-index: 9999;
-            max-height: 250px; overflow-y: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            z-index: 2000; /* Ditingkatkan agar di atas elemen peta */
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border-radius: 0 0 4px 4px;
         }
-        .multi-select-options.show { display: block; }
-        .option-item { padding: 8px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #333; cursor: pointer; transition: 0.2s; }
-        .option-item:hover { background: #3a3a3a; }
-        .option-item input { width: 16px; height: 16px; accent-color: #d32f2f; cursor: pointer; }
-        .option-item label { flex: 1; cursor: pointer; margin: 0; color: #eee; font-size: 0.85em; }
 
-        .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .table-section, .right-panel, .bottom-table { background-color: #2a2a2a; border-radius: 4px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-        .table-header { background-color: #111; padding: 12px; font-weight: 600; color: #ffd700; border-bottom: 2px solid #d32f2f; font-size: 0.9em; }
+        .multi-select-options.show {
+            display: block;
+        }
 
-        #map { width: 100%; height: 500px; z-index: 1; }
+        .option-item {
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.2s;
+            border-bottom: 1px solid #333;
+            font-size: 0.9em;
+        }
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
-        th { background-color: #111; padding: 10px; text-align: left; color: #ffd700; position: sticky; top: 0; z-index: 2; }
-        td { padding: 8px 10px; border-bottom: 1px solid #333; }
-        tbody tr:hover { background-color: #333; }
+        .option-item:hover {
+            background-color: #3a3a3a;
+        }
 
-        .kpi-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px; }
-        .kpi-card { padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .kpi-card.yellow { background: linear-gradient(135deg, #ffd700 0%, #ccac00 100%); color: #000; }
-        .kpi-card.red { background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%); color: #fff; }
-        .kpi-value { font-size: 1.8em; font-weight: bold; }
-        .kpi-label { font-size: 0.7em; font-weight: bold; text-transform: uppercase; opacity: 0.8; }
+        .option-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #d32f2f;
+        }
 
-        .jam-pagi { background-color: rgba(255, 235, 59, 0.1) !important; }
-        .jam-siang { background-color: rgba(33, 150, 243, 0.1) !important; }
-        .jam-sore { background-color: rgba(76, 175, 80, 0.1) !important; }
-        .jam-malam { background-color: rgba(158, 158, 158, 0.1) !important; }
+        .option-item label {
+            margin-bottom: 0;
+            cursor: pointer;
+            color: #fff;
+            flex: 1;
+        }
 
-        .pagination { padding: 10px; text-align: center; background: #1a1a1a; display: flex; justify-content: center; align-items: center; gap: 15px; }
-        .pagination button { background: #d32f2f; color: white; border: none; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .pagination button:disabled { background: #555; cursor: not-allowed; }
+        .select-all-btn {
+            background-color: #1a1a1a;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            font-weight: bold;
+            color: #ffd700;
+        }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #d32f2f; border-radius: 10px; }
+        .filter-group select:hover,
+        .filter-group input:hover,
+        .filter-group select:focus,
+        .filter-group input:focus {
+            background-color: #3a3a3a;
+            outline: none;
+            border-bottom: 2px solid #d32f2f;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .table-section {
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .table-header {
+            background-color: #1a1a1a;
+            padding: 15px;
+            font-weight: 600;
+            color: #ffd700;
+            border-bottom: 2px solid #d32f2f;
+        }
+
+        .table-content {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        table thead {
+            background-color: #1a1a1a;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        table tfoot {
+            background-color: #1a1a1a;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        table tfoot td {
+            font-weight: bold;
+            color: #ffd700;
+            /* REVISI 1: Spacer ditingkatkan ke 10px agar baris lebih turun */
+            border-top: 10px solid #2a2a2a; 
+            /* Garis merah tetap presisi di atas baris hitam */
+            box-shadow: inset 0 2px 0 0 #d32f2f;
+            /* REVISI 3: Padding disesuaikan agar teks presisi di tengah */
+            padding: 15px 12px; 
+            border-bottom: none;
+        }
+
+        table th {
+            padding: 12px;
+            text-align: left;
+            color: #ffd700;
+            border-bottom: 1px solid #444;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #333;
+        }
+
+        table tbody tr:hover {
+            background-color: #3a3a3a;
+        }
+
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .kpi-card {
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .kpi-card.yellow {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #000;
+        }
+
+        .kpi-card.red {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff4444 100%);
+            color: #fff;
+        }
+
+        .kpi-label {
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .kpi-value {
+            font-size: 2.2em;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .right-panel {
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        #map {
+            width: 100%;
+            height: 600px;
+            border-radius: 4px;
+        }
+
+        .bottom-table {
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .table-content-large {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d32f2f;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff6b6b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #ffd700;
+        }
+
+        .spinner {
+            border: 4px solid #3a3a3a;
+            border-top: 4px solid #d32f2f;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pagination {
+            text-align: center;
+            padding: 15px;
+            color: #aaa;
+        }
+
+        .pagination button {
+            background-color: #3a3a3a;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pagination button:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Conditional formatting for JAM */
+        .jam-pagi {
+            background-color: rgba(255, 255, 200, 0.3) !important;
+        }
+
+        .jam-siang {
+            background-color: rgba(173, 216, 230, 0.3) !important;
+        }
+
+        .jam-sore {
+            background-color: rgba(144, 238, 144, 0.3) !important;
+        }
+
+        .jam-malam {
+            background-color: rgba(211, 211, 211, 0.3) !important;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-section {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filter-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .kpi-container {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -84,35 +420,35 @@
             <div class="filter-group">
                 <label>BULAN</label>
                 <div class="multi-select-container" id="bulan-container">
-                    <div class="multi-select-display" id="bulan-display">-- Pilih --</div>
+                    <div class="multi-select-display" id="bulan-display">-- Semua Bulan --</div>
                     <div class="multi-select-options" id="bulan-options"></div>
                 </div>
             </div>
             <div class="filter-group">
                 <label>STUFFING DATE</label>
                 <div class="multi-select-container" id="stuffingDate-container">
-                    <div class="multi-select-display" id="stuffingDate-display">-- Pilih --</div>
+                    <div class="multi-select-display" id="stuffingDate-display">-- Semua Tanggal --</div>
                     <div class="multi-select-options" id="stuffingDate-options"></div>
                 </div>
             </div>
             <div class="filter-group">
                 <label>KOTA</label>
                 <div class="multi-select-container" id="kota-container">
-                    <div class="multi-select-display" id="kota-display">-- Pilih --</div>
+                    <div class="multi-select-display" id="kota-display">-- Semua Kota --</div>
                     <div class="multi-select-options" id="kota-options"></div>
                 </div>
             </div>
             <div class="filter-group">
                 <label>REGIONAL</label>
                 <div class="multi-select-container" id="regional-container">
-                    <div class="multi-select-display" id="regional-display">-- Pilih --</div>
+                    <div class="multi-select-display" id="regional-display">-- Semua Regional --</div>
                     <div class="multi-select-options" id="regional-options"></div>
                 </div>
             </div>
             <div class="filter-group">
                 <label>AREA</label>
                 <div class="multi-select-container" id="area-container">
-                    <div class="multi-select-display" id="area-display">-- Pilih --</div>
+                    <div class="multi-select-display" id="area-display">-- Semua Area --</div>
                     <div class="multi-select-options" id="area-options"></div>
                 </div>
             </div>
@@ -121,278 +457,701 @@
         <div class="main-content">
             <div class="left-panel">
                 <div class="table-section">
-                    <div class="table-header"><i class="fas fa-calendar-day"></i> CBM SUMMARY PER DATE</div>
-                    <div style="max-height: 250px; overflow-y: auto;" id="crm-table-container"></div>
+                    <div class="table-header">
+                        <i class="fas fa-table"></i> STUFFING DATE / CBM
+                    </div>
+                    <div class="table-content" id="crm-table-container">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading data...
+                        </div>
+                    </div>
                 </div>
+
                 <div class="kpi-container">
-                    <div class="kpi-card yellow"><div class="kpi-label">CASE ID SHIPPED</div><div class="kpi-value" id="caseIdShipped">0</div></div>
-                    <div class="kpi-card yellow"><div class="kpi-label">CASE ID PLAN</div><div class="kpi-value" id="caseIdPlan">0</div></div>
-                    <div class="kpi-card red"><div class="kpi-label">CBM SHIPPED</div><div class="kpi-value" id="cbmShipped">0</div></div>
-                    <div class="kpi-card red"><div class="kpi-label">CBM PLAN</div><div class="kpi-value" id="cbmPlan">0</div></div>
+                    <div class="kpi-card yellow">
+                        <div class="kpi-label">CASE ID SHIPPED</div>
+                        <div class="kpi-value" id="caseIdShipped">0</div>
+                    </div>
+                    <div class="kpi-card yellow">
+                        <div class="kpi-label">CASE ID PLAN</div>
+                        <div class="kpi-value" id="caseIdPlan">0</div>
+                    </div>
+                    <div class="kpi-card red">
+                        <div class="kpi-label">CBM SHIPPED</div>
+                        <div class="kpi-value" id="cbmShipped">0</div>
+                    </div>
+                    <div class="kpi-card red">
+                        <div class="kpi-label">CBM PLAN</div>
+                        <div class="kpi-value" id="cbmPlan">0</div>
+                    </div>
                 </div>
             </div>
+
             <div class="right-panel">
                 <div id="map"></div>
             </div>
         </div>
 
         <div class="bottom-table">
-            <div class="table-header"><i class="fas fa-truck-loading"></i> SHIPPING LINE DETAILS</div>
-            <div style="max-height: 400px; overflow-y: auto;" id="shipping-table-container"></div>
+            <div class="table-header">
+                <i class="fas fa-ship"></i> SHIPPING LINE DETAILS
+            </div>
+            <div class="table-content-large" id="shipping-table-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading data...
+                </div>
+            </div>
             <div class="pagination" id="pagination"></div>
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/1ylgWBQJQgv0HjRiV9Ay-GYs__ywWUk8ZTSeb0KwaPsM/export?format=csv&gid=1144899065`;
-        
-        // Kolom Mapping
-        const COL = { LC:0, SL:8, CBMP:25, DATE:40, JAM:41, KOTA:43, AREA:44, REG:45, BLN:49, CBMS:50, CASEP:53, CASES:57 };
+        // Google Sheets Configuration
+        const SHEET_ID = '1ylgWBQJQgv0HjRiV9Ay-GYs__ywWUk8ZTSeb0KwaPsM';
+        const SHEET_GID = '1144899065';
+        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
 
+        // Column Index Mapping (0-based)
+        const COLUMNS = {
+            A: 0,         // LC/ID
+            D: 3,         // CARRIER
+            I: 8,         // SHIPPINGLINE
+            M: 12,        // JALUR
+            Z: 25,        // CBM PLAN
+            AN: 39,       // CASE ID PLAN (OLD)
+            AO: 40,       // STUFFING DATE
+            AP: 41,       // JAM
+            AQ: 42,       // CASE ID PLAN (NEW)
+            AR: 43,       // KOTA
+            AS: 44,       // AREA
+            AT: 45,       // REGIONAL
+            AX: 49,       // BULAN
+            AY: 50,       // CBM SHIPPED
+            AZ: 51,       // CASE ID SHIPPED (OLD)
+            BA: 52,       // ESTIMASI CASE ID
+            BB: 53,       // CASE ID PLAN (BB)
+            BF: 57        // CASE ID SHIPPED (BF)
+        };
+
+        // Kota Coordinates - More accurate locations using Google Maps data
+        const kotaKoordinat = {
+            // Uppercase variations
+            'JAKARTA': [-6.2088, 106.8456],
+            'SURABAYA': [-7.2575, 112.7521],
+            'BALI': [-8.6705, 115.2126],
+            'SEMARANG': [-6.9665, 110.4038],
+            'BANDUNG': [-6.9175, 107.6191],
+            'MEDAN': [3.5952, 98.6722],
+            'MAKASSAR': [-5.3520, 119.5215],
+            'YOGYAKARTA': [-7.7956, 110.3695],
+            'KENDARI': [-3.9456, 122.5144],
+            'SOLO': [-7.5505, 110.8242],
+            'LOMBOK': [-8.6363, 116.3150],
+            'KUDUS': [-6.9089, 110.8044],
+            'PALEMBANG': [-2.9444, 104.7467],
+            'BATAM': [1.1449, 104.0098],
+            'JAMBI': [-1.6331, 103.5467],
+            'PEKANBARU': [0.5431, 101.4471],
+            'BANJARMASIN': [-3.3256, 114.5887],
+            'KUPANG': [-10.1639, 123.5812],
+            'MANADO': [1.4748, 124.8228],
+            'MATARAM': [-8.5895, 116.2708],
+            'PALANGKARAYA': [-1.9674, 111.4328],
+            'PONTIANAK': [-0.0305, 109.3433],
+            'SAMARINDA': [-0.4948, 117.1889],
+            'SERANG': [-6.1256, 106.1505],
+            'SEMARANG KOTA': [-6.9665, 110.4038],
+            'SURAKARTA': [-7.5505, 110.8242],
+            'TANGERANG': [-6.1728, 106.6326],
+            'TASIKMALAYA': [-7.3500, 108.2000],
+            'TEGAL': [-6.8641, 109.1306],
+            'TERSANA': [-7.7500, 110.3833],
+            'TOLITOLI': [0.9693, 121.1897],
+            'TOMOHON': [1.3167, 124.8167],
+            'TORAJA': [-2.9804, 119.6747],
+            'TUBAN': [-6.8944, 111.9533],
+            'TUNGKAL': [0.3187, 101.6339],
+            'UMETARO': [-8.5895, 116.2708],
+            'YOGYA': [-7.7956, 110.3695],
+            
+            // Mixed case variations
+            'Jakarta': [-6.2088, 106.8456],
+            'Surabaya': [-7.2575, 112.7521],
+            'Bali': [-8.6705, 115.2126],
+            'Semarang': [-6.9665, 110.4038],
+            'Bandung': [-6.9175, 107.6191],
+            'Medan': [3.5952, 98.6722],
+            'Makassar': [-5.3520, 119.5215],
+            'Yogyakarta': [-7.7956, 110.3695],
+            'Kendari': [-3.9456, 122.5144],
+            'Solo': [-7.5505, 110.8242],
+            'Lombok': [-8.6363, 116.3150],
+            'Kudus': [-6.9089, 110.8044],
+            'Palembang': [-2.9444, 104.7467],
+            'Batam': [1.1449, 104.0098],
+            'Jambi': [-1.6331, 103.5467],
+            'Pekanbaru': [0.5431, 101.4471],
+            'Banjarmasin': [-3.3256, 114.5887],
+            'Kupang': [-10.1639, 123.5812],
+            'Manado': [1.4748, 124.8228],
+            'Mataram': [-8.5895, 116.2708],
+            'Palangkaraya': [-1.9674, 111.4328],
+            'Pontianak': [-0.0305, 109.3433],
+            'Samarinda': [-0.4948, 117.1889],
+            'Serang': [-6.1256, 106.1505],
+            'Surakarta': [-7.5505, 110.8242],
+            'Tangerang': [-6.1728, 106.6326],
+            'Tasikmalaya': [-7.3500, 108.2000],
+            'Tegal': [-6.8641, 109.1306],
+            'Tolitoli': [0.9693, 121.1897],
+            'Tomohon': [1.3167, 124.8167],
+            'Tuban': [-6.8944, 111.9533]
+        };
+
+        // Data Storage
         let allData = [];
         let filteredData = [];
         let currentPage = 1;
-        const itemsPerPage = 50;
-        let map, markers = [];
-        let isInitialLoad = true;
-        let selectedFilters = { bulan: [], stuffingDate: [], kota: [], regional: [], area: [] };
+        const itemsPerPage = 100;
+        let map;
+        let markers = [];
 
-        const kotaKoordinat = {
-            'JAKARTA': [-6.2088, 106.8456], 'SURABAYA': [-7.2575, 112.7521], 'BALI': [-8.6705, 115.2126],
-            'SEMARANG': [-6.9665, 110.4038], 'BANDUNG': [-6.9175, 107.6191], 'MEDAN': [3.5952, 98.6722],
-            'MAKASSAR': [-5.3520, 119.5215], 'YOGYAKARTA': [-7.7956, 110.3695], 'KENDARI': [-3.9456, 122.5144],
-            'SOLO': [-7.5505, 110.8242], 'PALEMBANG': [-2.9444, 104.7467]
+        // Filter State (Arrays for multi-select)
+        let selectedFilters = {
+            bulan: [],
+            stuffingDate: [],
+            kota: [],
+            regional: [],
+            area: []
         };
 
-        // Initialize App
-        async function init() {
-            initMap();
-            await fetchData();
-            // Auto refresh data saja, bukan UI filternya
-            setInterval(fetchData, 30000);
+        // Helper Function: Parse number with comma separator
+        function parseNumberWithComma(value) {
+            if (!value) return 0;
+            // Hapus pemisah ribuan (koma) dan bersihkan spasi
+            const cleaned = String(value).replace(/,/g, '').trim();
+            return parseFloat(cleaned) || 0;
         }
 
+        // Initialize Map
+        function initMap() {
+            map = L.map('map').setView([-2.5489, 118.0149], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+        }
+
+        // Fetch Data dari Google Sheets
         async function fetchData() {
             try {
                 const response = await fetch(CSV_URL);
-                const csvText = await response.text();
-                parseCSV(csvText);
-                
-                if (isInitialLoad) {
-                    populateFilters();
-                    isInitialLoad = false;
-                }
-                
+                const csv = await response.text();
+                parseCSV(csv);
+                populateFilters();
                 applyFilters();
             } catch (error) {
-                console.error("Gagal mengambil data:", error);
+                console.error('Error fetching data:', error);
+                document.getElementById('crm-table-container').innerHTML = 
+                    '<div class="loading">Error loading data. Please check console.</div>';
             }
         }
 
-        function parseCSV(text) {
-            const rows = text.split('\n');
-            const dataTemp = [];
-            for (let i = 1; i < rows.length; i++) {
-                const cols = rows[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                if (cols.length < 50 || !cols[COL.LC]) continue;
+        // Parse CSV
+        function parseCSV(csv) {
+            const allRows = [];
+            let currentRow = [];
+            let currentField = '';
+            let inQuotes = false;
 
-                dataTemp.push({
-                    lc: cols[COL.LC], sl: cols[COL.SL], 
-                    cbmp: parseFloat(cols[COL.CBMP]) || 0,
-                    date: cols[COL.DATE], jam: cols[COL.JAM],
-                    kota: cols[COL.KOTA], area: cols[COL.AREA],
-                    reg: cols[COL.REG], bln: cols[COL.BLN],
-                    cbms: parseFloat(cols[COL.CBMS]) || 0,
-                    casep: parseFloat(cols[COL.CASEP]) || 0,
-                    cases: parseFloat(cols[COL.CASES]) || 0
-                });
+            // Robust CSV parsing handling quotes and newlines within cells
+            for (let i = 0; i < csv.length; i++) {
+                const char = csv[i];
+                const nextChar = csv[i + 1];
+
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        currentField += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                } else if ((char === '\n' || (char === '\r' && nextChar === '\n')) && !inQuotes) {
+                    currentRow.push(currentField.trim());
+                    allRows.push(currentRow);
+                    currentRow = [];
+                    currentField = '';
+                    if (char === '\r') i++; // Skip \n
+                } else {
+                    currentField += char;
+                }
             }
-            allData = dataTemp;
+            if (currentField || currentRow.length > 0) {
+                currentRow.push(currentField.trim());
+                allRows.push(currentRow);
+            }
+
+            allData = [];
+            // Start from i=1 to skip header
+            for (let i = 1; i < allRows.length; i++) {
+                const values = allRows[i];
+
+                if (values.length > Math.max(...Object.values(COLUMNS))) {
+                    const id = (values[COLUMNS.A] || '').trim();
+                    const stuffingDate = (values[COLUMNS.AO] || '').trim();
+                    const kota = (values[COLUMNS.AR] || '').trim();
+                    
+                    const cbmPlan = parseNumberWithComma(values[COLUMNS.Z]);
+                    const caseIdPlan = parseNumberWithComma(values[COLUMNS.BB]);
+                    const cbmShipped = parseNumberWithComma(values[COLUMNS.AY]);
+                    const caseIdShipped = parseNumberWithComma(values[COLUMNS.BF]);
+                    
+                    const idLower = id.toLowerCase();
+                    const kotaLower = kota.toLowerCase();
+                    const dateLower = stuffingDate.toLowerCase();
+
+                    // VALIDASI KETAT:
+                    // 1. Baris data WAJIB memiliki ID, Tanggal Stuffing, dan Kota
+                    if (!id || !stuffingDate || !kota) {
+                        continue;
+                    }
+
+                    // 2. Lewati jika baris header yang berulang
+                    if (idLower === 'lc/id' || idLower === 'id' || dateLower.includes('date')) {
+                        continue;
+                    }
+
+                    // 3. Lewati jika baris ringkasan (Total/Jumlah/Subtotal/Summary)
+                    // Kita periksa kolom ID, KOTA, dan TANGGAL
+                    const summaryKeywords = ['total', 'jumlah', 'grand', 'subtotal', 'summary'];
+                    const isSummary = summaryKeywords.some(k => 
+                        idLower.includes(k) || 
+                        kotaLower.includes(k) || 
+                        dateLower.includes(k)
+                    );
+                    
+                    if (isSummary) {
+                        continue;
+                    }
+
+                    // 4. Lewati jika baris kosong/dekoratif (semua angka nol penting)
+                    if (cbmPlan === 0 && caseIdPlan === 0 && cbmShipped === 0 && caseIdShipped === 0) {
+                        continue;
+                    }
+
+                    allData.push({
+                        A: id,
+                        D: values[COLUMNS.D] || '',
+                        I: values[COLUMNS.I] || '',
+                        M: values[COLUMNS.M] || '',
+                        Z: values[COLUMNS.Z] || '0',
+                        AO: values[COLUMNS.AO] || '',
+                        AP: values[COLUMNS.AP] || '',
+                        AQ: values[COLUMNS.AQ] || '0',
+                        AR: kota,
+                        AS: values[COLUMNS.AS] || '',
+                        AT: values[COLUMNS.AT] || '',
+                        AX: values[COLUMNS.AX] || '',
+                        AY: values[COLUMNS.AY] || '0',
+                        AZ: values[COLUMNS.AZ] || '0',
+                        BA: values[COLUMNS.BA] || '0',
+                        BB: values[COLUMNS.BB] || '0',
+                        BF: values[COLUMNS.BF] || '0'
+                    });
+                }
+            }
         }
 
+        // Populate Filter Options
         function populateFilters() {
-            const getUnik = (key) => [...new Set(allData.map(item => item[key]))].filter(Boolean).sort();
-            
-            setupMultiSelect('bulan', getUnik('bln'));
-            setupMultiSelect('stuffingDate', getUnik('date').reverse());
-            setupMultiSelect('kota', getUnik('kota'));
-            setupMultiSelect('regional', getUnik('reg'));
-            setupMultiSelect('area', getUnik('area'));
+            const bulanSet = new Set();
+            const kotaSet = new Set();
+            const regionalSet = new Set();
+            const areaSet = new Set();
+            const stuffingDateSet = new Set();
+
+            allData.forEach(row => {
+                if (row.AX) bulanSet.add(row.AX);
+                if (row.AR) kotaSet.add(row.AR);
+                if (row.AT) regionalSet.add(row.AT);
+                if (row.AS) areaSet.add(row.AS);
+                if (row.AO) stuffingDateSet.add(row.AO);
+            });
+
+            populateMultiSelect('bulan', Array.from(bulanSet).sort(), 'Bulan');
+            populateMultiSelect('kota', Array.from(kotaSet).sort(), 'Kota');
+            populateMultiSelect('regional', Array.from(regionalSet).sort(), 'Regional');
+            populateMultiSelect('area', Array.from(areaSet).sort(), 'Area');
+            populateMultiSelect('stuffingDate', Array.from(stuffingDateSet).sort().reverse(), 'Tanggal');
         }
 
-        function setupMultiSelect(filterId, options) {
-            const container = document.getElementById(`${filterId}-options`);
-            const display = document.getElementById(`${filterId}-display`);
+        function populateMultiSelect(filterId, options, label) {
+            const optionsContainer = document.getElementById(`${filterId}-options`);
+            const displayElement = document.getElementById(`${filterId}-display`);
             
-            let html = `
-                <div class="option-item" style="background:#111; position:sticky; top:0;">
-                    <input type="checkbox" id="${filterId}-all">
-                    <label for="${filterId}-all" style="color:#ffd700; font-weight:bold;">PILIH SEMUA</label>
-                </div>
+            optionsContainer.innerHTML = '';
+
+            // Add "Select All" option
+            const selectAllDiv = document.createElement('div');
+            selectAllDiv.className = 'option-item select-all-btn';
+            selectAllDiv.innerHTML = `
+                <input type="checkbox" id="${filterId}-all">
+                <label for="${filterId}-all">PILIH SEMUA</label>
             `;
-            
-            options.forEach(opt => {
-                html += `
-                    <div class="option-item">
-                        <input type="checkbox" class="${filterId}-cb" value="${opt}" id="${filterId}-${opt}">
-                        <label for="${filterId}-${opt}">${opt}</label>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
+            optionsContainer.appendChild(selectAllDiv);
 
-            // Toggle Dropdown
-            display.addEventListener('click', (e) => {
-                e.stopPropagation();
-                document.querySelectorAll('.multi-select-options').forEach(el => {
-                    if (el.id !== `${filterId}-options`) el.classList.remove('show');
-                });
-                container.classList.toggle('show');
+            const allCheckbox = selectAllDiv.querySelector('input');
+
+            options.forEach(option => {
+                if (option) {
+                    const div = document.createElement('div');
+                    div.className = 'option-item';
+                    div.innerHTML = `
+                        <input type="checkbox" value="${option}" id="${filterId}-${option}" class="${filterId}-checkbox">
+                        <label for="${filterId}-${option}">${option}</label>
+                    `;
+                    optionsContainer.appendChild(div);
+                }
             });
 
-            // Handle Checkbox Logic
-            const masterCb = document.getElementById(`${filterId}-all`);
-            const itemCbs = document.querySelectorAll(`.${filterId}-cb`);
-
-            masterCb.addEventListener('change', () => {
-                itemCbs.forEach(cb => cb.checked = masterCb.checked);
+            // Event Listeners for checkboxes
+            const checkboxes = optionsContainer.querySelectorAll(`.${filterId}-checkbox`);
+            
+            allCheckbox.addEventListener('change', () => {
+                checkboxes.forEach(cb => cb.checked = allCheckbox.checked);
                 updateFilterState(filterId);
             });
 
-            itemCbs.forEach(cb => {
+            checkboxes.forEach(cb => {
                 cb.addEventListener('change', () => {
-                    masterCb.checked = [...itemCbs].every(c => c.checked);
+                    const allChecked = Array.from(checkboxes).every(c => c.checked);
+                    allCheckbox.checked = allChecked;
                     updateFilterState(filterId);
                 });
             });
+
+            // Toggle dropdown
+            const container = document.getElementById(`${filterId}-container`);
+            displayElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Close other dropdowns
+                document.querySelectorAll('.multi-select-options').forEach(opt => {
+                    if (opt.id !== `${filterId}-options`) opt.classList.remove('show');
+                });
+                optionsContainer.classList.toggle('show');
+            });
         }
 
-        function updateFilterState(id) {
-            const checked = [...document.querySelectorAll(`.${id}-cb:checked`)].map(c => c.value);
-            selectedFilters[id] = checked;
+        function updateFilterState(filterId) {
+            const checkboxes = document.querySelectorAll(`.${filterId}-checkbox:checked`);
+            selectedFilters[filterId] = Array.from(checkboxes).map(cb => cb.value);
             
-            const display = document.getElementById(`${id}-display`);
-            display.innerText = checked.length === 0 ? '-- Pilih --' : 
-                                checked.length === document.querySelectorAll(`.${id}-cb`).length ? 'Semua' : 
-                                `${checked.length} Terpilih`;
+            const displayElement = document.getElementById(`${filterId}-display`);
+            const count = selectedFilters[filterId].length;
+            
+            if (count === 0) {
+                displayElement.textContent = `-- Semua ${filterId.charAt(0).toUpperCase() + filterId.slice(1)} --`;
+            } else if (count === document.querySelectorAll(`.${filterId}-checkbox`).length) {
+                displayElement.textContent = `Semua Terpilih (${count})`;
+            } else {
+                displayElement.textContent = `${count} Terpilih`;
+            }
             
             applyFilters();
         }
 
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.multi-select-options').forEach(opt => {
+                opt.classList.remove('show');
+            });
+        });
+
+        // Prevent dropdown close when clicking inside options
+        document.querySelectorAll('.multi-select-options').forEach(opt => {
+            opt.addEventListener('click', (e) => e.stopPropagation());
+        });
+
+        // Apply Filters
         function applyFilters() {
-            filteredData = allData.filter(d => {
-                const mBln = selectedFilters.bulan.length === 0 || selectedFilters.bulan.includes(d.bln);
-                const mTgl = selectedFilters.stuffingDate.length === 0 || selectedFilters.stuffingDate.includes(d.date);
-                const mKota = selectedFilters.kota.length === 0 || selectedFilters.kota.includes(d.kota);
-                const mReg = selectedFilters.regional.length === 0 || selectedFilters.regional.includes(d.reg);
-                const mArea = selectedFilters.area.length === 0 || selectedFilters.area.includes(d.area);
-                return mBln && mTgl && mKota && mReg && mArea;
+            filteredData = allData.filter(row => {
+                const matchBulan = selectedFilters.bulan.length === 0 || selectedFilters.bulan.includes(row.AX);
+                const matchDate = selectedFilters.stuffingDate.length === 0 || selectedFilters.stuffingDate.includes(row.AO);
+                const matchKota = selectedFilters.kota.length === 0 || selectedFilters.kota.includes(row.AR);
+                const matchRegional = selectedFilters.regional.length === 0 || selectedFilters.regional.includes(row.AT);
+                const matchArea = selectedFilters.area.length === 0 || selectedFilters.area.includes(row.AS);
+
+                return matchBulan && matchDate && matchKota && matchRegional && matchArea;
             });
 
-            renderDashboard();
+            currentPage = 1;
+            updateDashboard();
         }
 
-        function renderDashboard() {
-            renderCRMTable();
-            renderShippingTable();
-            renderKPIs();
-            updateMapMarkers();
+        // Get JAM color class - Updated schedule
+        function getJamColorClass(jam) {
+            if (!jam) return '';
+            
+            const jamNum = parseFloat(jam);
+            
+            // 08.00-10.00 : kuning muda
+            if (jamNum >= 8 && jamNum < 10) {
+                return 'jam-pagi';
+            } 
+            // 12.00-14.00 : biru muda
+            else if (jamNum >= 12 && jamNum < 14) {
+                return 'jam-siang';
+            } 
+            // 15.00-18.00 : hijau muda
+            else if (jamNum >= 15 && jamNum < 18) {
+                return 'jam-sore';
+            } 
+            // 19.00-21.00 : abu abu muda
+            else if (jamNum >= 19 && jamNum < 21) {
+                return 'jam-malam';
+            }
+            return '';
         }
 
-        function renderCRMTable() {
+        // Update Dashboard
+        function updateDashboard() {
+            updateCRMTable();
+            updateShippingTable();
+            updateKPIs();
+            updateMap();
+        }
+
+        // Update CRM Table
+        function updateCRMTable() {
             const container = document.getElementById('crm-table-container');
-            const dates = [...new Set(filteredData.map(d => d.date))].sort().reverse().slice(0, 5);
+
+            if (filteredData.length === 0) {
+                container.innerHTML = '<div class="loading">No data found</div>';
+                return;
+            }
+
             const kotaData = {};
+            const dates = new Set();
 
-            filteredData.forEach(d => {
-                if (!kotaData[d.kota]) kotaData[d.kota] = {};
-                kotaData[d.kota][d.date] = (kotaData[d.kota][d.date] || 0) + d.cbmp;
+            filteredData.forEach(row => {
+                const kota = row.AR;
+                const date = row.AO;
+                const cbm = parseNumberWithComma(row.Z);
+
+                // Skip if kota is empty
+                if (!kota || kota.trim() === '') {
+                    return;
+                }
+
+                if (!kotaData[kota]) {
+                    kotaData[kota] = {};
+                }
+                if (!kotaData[kota][date]) {
+                    kotaData[kota][date] = 0;
+                }
+                kotaData[kota][date] += cbm;
+                dates.add(date);
             });
 
-            let html = `<table><thead><tr><th>KOTA</th>${dates.map(dt => `<th>${dt}</th>`).join('')}</tr></thead><tbody>`;
-            Object.keys(kotaData).sort().forEach(k => {
-                html += `<tr><td>${k}</td>${dates.map(dt => `<td>${(kotaData[k][dt] || 0).toFixed(1)}</td>`).join('')}</tr>`;
-            });
-            html += `</tbody></table>`;
-            container.innerHTML = html;
-        }
+            // Sort dates from newest to oldest
+            const sortedDates = Array.from(dates).sort().reverse().slice(0, 4);
+            const dateTotals = {};
+            sortedDates.forEach(date => dateTotals[date] = 0);
 
-        function renderShippingTable() {
-            const container = document.getElementById('shipping-table-container');
-            const start = (currentPage - 1) * itemsPerPage;
-            const dataSubset = filteredData.slice(start, start + itemsPerPage);
-
-            let html = `<table><thead><tr><th>LC</th><th>SL</th><th>DATE</th><th>JAM</th><th>PLAN</th><th>SHIPPED</th></tr></thead><tbody>`;
-            dataSubset.forEach(d => {
-                const jamClass = getJamClass(d.jam);
-                html += `<tr class="${jamClass}">
-                    <td>${d.lc}</td><td>${d.sl}</td><td>${d.date}</td><td>${d.jam}</td>
-                    <td>${d.cbmp.toFixed(1)}</td><td>${d.cbms.toFixed(1)}</td>
-                </tr>`;
-            });
-            html += `</tbody></table>`;
-            container.innerHTML = html;
-            renderPagination();
-        }
-
-        function renderPagination() {
-            const total = Math.ceil(filteredData.length / itemsPerPage);
-            document.getElementById('pagination').innerHTML = `
-                <button ${currentPage === 1 ? 'disabled' : ''} onclick="movePage(-1)">Prev</button>
-                <span style="font-size:0.8em">Hal ${currentPage} / ${total || 1}</span>
-                <button ${currentPage >= total ? 'disabled' : ''} onclick="movePage(1)">Next</button>
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>KOTA</th>
+                            ${sortedDates.map(date => `<th>${date}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
             `;
+
+            Object.keys(kotaData).sort((a, b) => a.localeCompare(b)).forEach(kota => {
+                html += `<tr><td>${kota}</td>`;
+                sortedDates.forEach(date => {
+                    const cbm = kotaData[kota][date] || 0;
+                    html += `<td>${cbm ? cbm.toFixed(2) : '-'}</td>`;
+                    dateTotals[date] += cbm;
+                });
+                html += `</tr>`;
+            });
+
+            html += `</tbody>`;
+
+            // Add Total Row
+            html += `
+                <tfoot>
+                    <tr>
+                        <td>TOTAL</td>
+                        ${sortedDates.map(date => `<td>${dateTotals[date].toFixed(2)}</td>`).join('')}
+                    </tr>
+                </tfoot>
+            `;
+
+            html += `</table>`;
+            container.innerHTML = html;
         }
 
-        window.movePage = (step) => { currentPage += step; renderShippingTable(); };
+        // Update Shipping Table
+        function updateShippingTable() {
+            const container = document.getElementById('shipping-table-container');
 
-        function renderKPIs() {
-            const sum = (key) => filteredData.reduce((acc, curr) => acc + curr[key], 0);
-            document.getElementById('caseIdShipped').innerText = sum('cases').toLocaleString();
-            document.getElementById('caseIdPlan').innerText = sum('casep').toLocaleString();
-            document.getElementById('cbmShipped').innerText = sum('cbms').toFixed(1);
-            document.getElementById('cbmPlan').innerText = sum('cbmp').toFixed(1);
+            if (filteredData.length === 0) {
+                container.innerHTML = '<div class="loading">No data found</div>';
+                return;
+            }
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredData.slice(start, end);
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>LC</th>
+                            <th>SHIPPINGLINE</th>
+                            <th>CARRIER</th>
+                            <th>STUFFING</th>
+                            <th>JAM</th>
+                            <th>JALUR</th>
+                            <th>PLAN</th>
+                            <th>SHIPPED</th>
+                            <th>CASE ID PLAN</th>
+                            <th>ESTIMASI CASE ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            pageData.forEach((row, index) => {
+                const rowNum = start + index + 1;
+                const jamColorClass = getJamColorClass(row.AP);
+                // Parse dengan fungsi helper untuk menghapus koma
+                const estimasiCaseId = parseNumberWithComma(row.BA);
+
+                html += `
+                    <tr class="${jamColorClass}">
+                        <td>${rowNum}</td>
+                        <td>${row.A || '-'}</td>
+                        <td>${row.I || '-'}</td>
+                        <td>${row.D || '-'}</td>
+                        <td>${row.AO || '-'}</td>
+                        <td>${row.AP || '-'}</td>
+                        <td>${row.M || '-'}</td>
+                        <td>${parseNumberWithComma(row.Z).toFixed(2) || '-'}</td>
+                        <td>${parseNumberWithComma(row.AY).toFixed(2) || '-'}</td>
+                        <td>${parseNumberWithComma(row.BB).toFixed(0) || '-'}</td>
+                        <td>${estimasiCaseId.toFixed(0) || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            updatePagination(totalPages);
         }
 
-        function initMap() {
-            map = L.map('map').setView([-2.5, 118], 5);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        // Update Pagination
+        function updatePagination(totalPages) {
+            const pagination = document.getElementById('pagination');
+            let html = `Page ${currentPage} / ${totalPages} &nbsp;`;
+
+            if (currentPage > 1) {
+                html += `<button onclick="goToPage(1)">« First</button>
+                         <button onclick="goToPage(${currentPage - 1})">‹ Prev</button>`;
+            }
+
+            if (currentPage < totalPages) {
+                html += `<button onclick="goToPage(${currentPage + 1})">Next ›</button>
+                         <button onclick="goToPage(${totalPages})">Last »</button>`;
+            }
+
+            pagination.innerHTML = html;
         }
 
-        function updateMapMarkers() {
-            markers.forEach(m => map.removeLayer(m));
+        function goToPage(page) {
+            currentPage = page;
+            updateShippingTable();
+            document.querySelector('.table-content-large').scrollTop = 0;
+        }
+
+        // Update KPIs
+        function updateKPIs() {
+            const caseIdShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BF), 0);
+            const caseIdPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BB), 0);
+            const cbmPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.Z), 0);
+            const cbmShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AY), 0);
+
+            document.getElementById('caseIdShipped').textContent = caseIdShipped.toLocaleString('id-ID', {maximumFractionDigits: 0});
+            document.getElementById('caseIdPlan').textContent = caseIdPlan.toLocaleString('id-ID', {maximumFractionDigits: 0});
+            document.getElementById('cbmPlan').textContent = cbmPlan.toFixed(2);
+            document.getElementById('cbmShipped').textContent = cbmShipped.toFixed(2);
+        }
+
+        // Update Map - More accurate city locations
+        function updateMap() {
+            markers.forEach(marker => map.removeLayer(marker));
             markers = [];
-            const kotaCount = {};
-            filteredData.forEach(d => { if(d.kota) kotaCount[d.kota] = (kotaCount[d.kota] || 0) + 1; });
 
-            Object.entries(kotaCount).forEach(([kota, val]) => {
-                const coord = kotaKoordinat[kota.toUpperCase()];
-                if (coord) {
-                    const m = L.circleMarker(coord, { radius: 10, color: '#d32f2f', fillOpacity: 0.6 })
-                        .bindPopup(`<b>${kota}</b><br>Total: ${val} shipping`)
-                        .addTo(map);
-                    markers.push(m);
+            const kotaCount = {};
+            const kotaCBM = {};
+
+            filteredData.forEach(row => {
+                const kota = row.AR;
+                const cbm = parseNumberWithComma(row.Z);
+
+                if (kota) {
+                    kotaCount[kota] = (kotaCount[kota] || 0) + 1;
+                    kotaCBM[kota] = (kotaCBM[kota] || 0) + cbm;
+                }
+            });
+
+            Object.keys(kotaCount).forEach(kota => {
+                // Try to find coordinates from the mapping
+                let coords = kotaKoordinat[kota];
+                
+                // If not found, try trimmed version
+                if (!coords && kota.trim()) {
+                    coords = kotaKoordinat[kota.trim()];
+                }
+                
+                if (coords) {
+                    const count = kotaCount[kota];
+                    const cbm = kotaCBM[kota];
+
+                    const marker = L.circleMarker(coords, {
+                        radius: Math.min(Math.max(count / 2, 8), 25),
+                        fillColor: '#d32f2f',
+                        color: '#fff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).bindPopup(`<strong>${kota}</strong><br/>Jumlah: ${count}<br/>CBM: ${cbm.toFixed(2)}`).addTo(map);
+                    markers.push(marker);
                 }
             });
         }
 
-        function getJamClass(jam) {
-            const h = parseFloat(jam);
-            if (h >= 8 && h < 11) return 'jam-pagi';
-            if (h >= 11 && h < 15) return 'jam-siang';
-            if (h >= 15 && h < 19) return 'jam-sore';
-            if (h >= 19) return 'jam-malam';
-            return '';
-        }
+        // Event Listeners (Removed old listeners, logic handled in checkboxes)
+        
+        // Auto-refresh every 30 seconds
+        setInterval(fetchData, 30000);
 
-        // Close dropdown when clicking outside
-        window.addEventListener('click', () => {
-            document.querySelectorAll('.multi-select-options').forEach(el => el.classList.remove('show'));
-        });
-
-        init();
+        // Initialize
+        initMap();
+        fetchData();
     </script>
 </body>
 </html>
