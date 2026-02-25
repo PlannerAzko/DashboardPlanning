@@ -1365,7 +1365,7 @@
                             <th>JALUR</th>
                             <th>PLAN</th>
                             <th>SHIPPED</th>
-                            <th>CASE ID PLAN</th>
+                            <th>FIX CASE ID</th>
                             <th>ESTIMASI CASE ID</th>
                         </tr>
                     </thead>
@@ -1389,7 +1389,7 @@
                         <td>${row.M || '-'}</td>
                         <td>${parseNumberWithComma(row.Z).toFixed(2) || '-'}</td>
                         <td>${parseNumberWithComma(row.AY).toFixed(2) || '-'}</td>
-                        <td>${parseNumberWithComma(row.BB).toFixed(0) || '-'}</td>
+                        <td>${parseNumberWithComma(row.AQ).toFixed(0) || '-'}</td>
                         <td>${estimasiCaseId.toFixed(0) || '-'}</td>
                     </tr>
                 `;
