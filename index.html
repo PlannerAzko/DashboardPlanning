@@ -255,6 +255,13 @@
             gap: 15px;
         }
 
+        .kpi-container-four {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
         .kpi-card {
             border-radius: 8px;
             padding: 20px;
@@ -274,6 +281,11 @@
 
         .kpi-card.red {
             background: linear-gradient(135deg, #ff6b6b 0%, #ff4444 100%);
+            color: #fff;
+        }
+
+        .kpi-card.blue {
+            background: linear-gradient(135deg, #006994 0%, #00a8e8 100%);
             color: #fff;
         }
 
@@ -415,7 +427,7 @@
         }
 
         @media (max-width: 1200px) {
-            .main-content, .chart-section {
+            .main-content, .chart-section, .kpi-container-four {
                 grid-template-columns: 1fr;
             }
 
@@ -515,6 +527,25 @@
 
             <div class="right-panel">
                 <div id="map"></div>
+            </div>
+        </div>
+
+        <div class="kpi-container-four">
+            <div class="kpi-card blue">
+                <div class="kpi-label">CASE ID PLAN B1</div>
+                <div class="kpi-value" id="caseIdPlanB1">0</div>
+            </div>
+            <div class="kpi-card blue">
+                <div class="kpi-label">CASE ID PLAN B2</div>
+                <div class="kpi-value" id="caseIdPlanB2">0</div>
+            </div>
+            <div class="kpi-card blue">
+                <div class="kpi-label">CASE ID PLAN B3</div>
+                <div class="kpi-value" id="caseIdPlanB3">0</div>
+            </div>
+            <div class="kpi-card blue">
+                <div class="kpi-label">CASE ID PLAN B4</div>
+                <div class="kpi-value" id="caseIdPlanB4">0</div>
             </div>
         </div>
 
@@ -1402,10 +1433,29 @@
             const cbmPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.Z), 0);
             const cbmShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AY), 0);
 
+            // Calculate B1, B2, B3, B4
+            let b1 = 0, b2 = 0, b3 = 0, b4 = 0;
+            
+            filteredData.forEach(row => {
+                const jam = parseFloat(row.AP);
+                const val = parseNumberWithComma(row.BB);
+                if (isNaN(jam)) return;
+
+                if (jam >= 8 && jam <= 10) b1 += val;
+                else if (Math.floor(jam) === 13) b2 += val;
+                else if (jam >= 16 && jam <= 18) b3 += val;
+                else if (jam >= 19 && jam <= 21) b4 += val;
+            });
+
             document.getElementById('caseIdShipped').textContent = caseIdShipped.toLocaleString('id-ID', {maximumFractionDigits: 0});
             document.getElementById('caseIdPlan').textContent = caseIdPlan.toLocaleString('id-ID', {maximumFractionDigits: 0});
             document.getElementById('cbmPlan').textContent = cbmPlan.toFixed(2);
             document.getElementById('cbmShipped').textContent = cbmShipped.toFixed(2);
+
+            document.getElementById('caseIdPlanB1').textContent = b1.toLocaleString('id-ID', {maximumFractionDigits: 0});
+            document.getElementById('caseIdPlanB2').textContent = b2.toLocaleString('id-ID', {maximumFractionDigits: 0});
+            document.getElementById('caseIdPlanB3').textContent = b3.toLocaleString('id-ID', {maximumFractionDigits: 0});
+            document.getElementById('caseIdPlanB4').textContent = b4.toLocaleString('id-ID', {maximumFractionDigits: 0});
         }
 
         // Update Map - More accurate city locations
