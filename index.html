@@ -803,6 +803,8 @@
                 if (row.AO) stuffingDateSet.add(row.AO);
             });
 
+            // Hanya populate jika belum ada opsi (mencegah reset saat auto-refresh)
+            // Atau jika Anda ingin selalu update, pastikan state terjaga (sudah ditangani di populateMultiSelect)
             populateMultiSelect('bulan', Array.from(bulanSet).sort(), 'Bulan');
             populateMultiSelect('kota', Array.from(kotaSet).sort(), 'Kota');
             populateMultiSelect('regional', Array.from(regionalSet).sort(), 'Regional');
@@ -813,6 +815,11 @@
         function populateMultiSelect(filterId, options, label) {
             const optionsContainer = document.getElementById(`${filterId}-options`);
             const displayElement = document.getElementById(`${filterId}-display`);
+            
+            if (!optionsContainer || !displayElement) return;
+
+            // Simpan state yang sedang terpilih sebelum dikosongkan
+            const previouslySelected = selectedFilters[filterId] || [];
             
             optionsContainer.innerHTML = '';
 
@@ -829,10 +836,11 @@
 
             options.forEach(option => {
                 if (option) {
+                    const isChecked = previouslySelected.includes(option);
                     const div = document.createElement('div');
                     div.className = 'option-item';
                     div.innerHTML = `
-                        <input type="checkbox" value="${option}" id="${filterId}-${option}" class="${filterId}-checkbox">
+                        <input type="checkbox" value="${option}" id="${filterId}-${option}" class="${filterId}-checkbox" ${isChecked ? 'checked' : ''}>
                         <label for="${filterId}-${option}">${option}</label>
                     `;
                     optionsContainer.appendChild(div);
@@ -855,16 +863,20 @@
                 });
             });
 
-            // Toggle dropdown
-            const container = document.getElementById(`${filterId}-container`);
-            displayElement.addEventListener('click', (e) => {
+            // Update "Select All" state initially
+            if (checkboxes.length > 0) {
+                allCheckbox.checked = Array.from(checkboxes).every(c => c.checked);
+            }
+
+            // Gunakan onclick untuk memastikan hanya ada SATU listener (mencegah bug klik ganda)
+            displayElement.onclick = (e) => {
                 e.stopPropagation();
                 // Close other dropdowns
                 document.querySelectorAll('.multi-select-options').forEach(opt => {
                     if (opt.id !== `${filterId}-options`) opt.classList.remove('show');
                 });
                 optionsContainer.classList.toggle('show');
-            });
+            };
         }
 
         function updateFilterState(filterId) {
@@ -945,11 +957,15 @@
 
         // Update Dashboard
         function updateDashboard() {
-            // Jalankan update secara berurutan agar tidak membekukan browser
-            updateKPIs();
-            updateCRMTable();
-            updateShippingTable();
-            updateMap();
+            try {
+                // Jalankan update secara berurutan agar tidak membekukan browser
+                updateKPIs();
+                updateCRMTable();
+                updateShippingTable();
+                updateMap();
+            } catch (error) {
+                console.error("Error updating dashboard:", error);
+            }
         }
 
         // Update CRM Table
