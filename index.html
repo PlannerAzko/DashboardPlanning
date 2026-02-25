@@ -409,6 +409,35 @@
             position: relative;
         }
 
+        /* Extra Section Styles */
+        .extra-section {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .extra-left, .extra-right {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .table-content-extra {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .nested-header th {
+            text-align: center;
+            border-bottom: 2px solid #444;
+        }
+
+        .sub-header th {
+            font-size: 0.8em;
+            background-color: #222;
+        }
+
         /* Conditional formatting for JAM */
         .jam-pagi {
             background-color: rgba(255, 255, 200, 0.3) !important;
@@ -580,6 +609,58 @@
                 </div>
             </div>
         </div>
+
+        <!-- Extra Section (New Tables & Charts) -->
+        <div class="extra-section">
+            <div class="extra-left">
+                <!-- Table 1: CBM & City Summary -->
+                <div class="bottom-table">
+                    <div class="table-header" style="color: #ffd700;">
+                        <i class="fas fa-city"></i> CBM & CONTAINER BY CITY : UNSUPPORTED & DELAYED
+                    </div>
+                    <div class="table-content-extra" id="city-summary-table">
+                        <div class="loading">Processing data...</div>
+                    </div>
+                </div>
+                
+                <!-- Percentage Breakdown Charts -->
+                <div class="chart-container" style="margin-top: 20px;">
+                    <div class="table-header" style="color: #ffd700;">
+                        <i class="fas fa-percentage"></i> PERCENTAGE BREAKDOWN
+                    </div>
+                    <div class="chart-body" style="height: 280px;">
+                        <canvas id="vendorResponseChart"></canvas>
+                    </div>
+                    <div class="chart-body" style="height: 280px; border-top: 1px solid #333;">
+                        <canvas id="agingTerlambatChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="extra-right">
+                <!-- Table 2: Vendor Support Not Available -->
+                <div class="bottom-table">
+                    <div class="table-header" style="color: #ffd700;">
+                        <i class="fas fa-exclamation-circle"></i> VENDOR SUPPORT NOT AVAILABLE
+                    </div>
+                    <div class="table-content-extra" id="vendor-unsupported-table">
+                        <div class="loading">Processing data...</div>
+                    </div>
+                    <div class="pagination" id="unsupported-pagination"></div>
+                </div>
+                
+                <!-- Table 3: Vendor Response Delayed -->
+                <div class="bottom-table" style="margin-top: 20px;">
+                    <div class="table-header" style="color: #ffd700;">
+                        <i class="fas fa-clock"></i> VENDOR RESPONSE DELAYED
+                    </div>
+                    <div class="table-content-extra" id="vendor-delayed-table">
+                        <div class="loading">Processing data...</div>
+                    </div>
+                    <div class="pagination" id="delayed-pagination"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -609,7 +690,10 @@
             BB: 53,       // CASE ID PLAN (BB)
             BC: 54,       // SLA CUSTOMER (HISTORIS)
             BD: 55,       // SLA GRW (HISTORIS)
-            BF: 57        // CASE ID SHIPPED (BF)
+            BF: 57,       // CASE ID SHIPPED (BF)
+            AU: 46,       // JENIS ARMADA
+            AV: 47,       // KOTA SUMMARY
+            AW: 48        // AGING LC
         };
 
         // Kota Coordinates - More accurate locations using Google Maps data
@@ -697,6 +781,12 @@
         let filterTimeout; // Untuk debouncing
         let slaChart = null;
         let cbmRatioChart = null;
+        let vendorResponseChart = null;
+        let agingTerlambatChart = null;
+
+        let unsupportedPage = 1;
+        let delayedPage = 1;
+        const extraItemsPerPage = 15;
 
         // Register ChartDataLabels plugin globally
         Chart.register(ChartDataLabels);
@@ -865,7 +955,10 @@
                         BB: values[COLUMNS.BB] || '0',
                         BC: values[COLUMNS.BC] || '0',
                         BD: values[COLUMNS.BD] || '0',
-                        BF: values[COLUMNS.BF] || '0'
+                        BF: values[COLUMNS.BF] || '0',
+                        AU: values[COLUMNS.AU] || '',
+                        AV: values[COLUMNS.AV] || '',
+                        AW: values[COLUMNS.AW] || '0'
                     });
                 }
             }
@@ -1048,6 +1141,7 @@
                 updateShippingTable();
                 updateMap();
                 updateCharts();
+                updateExtraSection();
             } catch (error) {
                 console.error("Error updating dashboard:", error);
             }
@@ -1264,6 +1358,333 @@
                                        currentVal === min && context.dataIndex === data.indexOf(min);
                             }
                         }
+                    }
+                }
+            });
+        }
+
+        // Helper: Calculate Aging
+        function getAgingLC(row) {
+            // Mengambil langsung dari kolom AW sesuai permintaan
+            return row.AW || '0';
+        }
+
+        // Helper: Status Checkers
+        function isBelumSupport(row) {
+            const carrier = (row.D || '').toUpperCase();
+            return !carrier || carrier.includes('BELUM SUPPORT') || carrier.includes('TBA') || carrier.includes('DUMMY');
+        }
+
+        function isTerlambat(row) {
+            if (isBelumSupport(row)) return false;
+            // Kriteria terlambat: Shipped 0 dan ada nilai di Aging LC (asumsi aging > 0 berarti terlambat)
+            const aging = parseInt(row.AW) || 0;
+            const shipped = parseNumberWithComma(row.AY);
+            return aging > 0 && shipped === 0;
+        }
+
+        // Update Extra Section (Tables & Charts from Image)
+        function updateExtraSection() {
+            const cityStats = {};
+            const unsupportedList = [];
+            const delayedList = [];
+            
+            let totalOnTime = 0;
+            let totalTerlambat = 0;
+            let totalBelumSupport = 0;
+            
+            const agingGroups = {
+                '1 Hari': 0,
+                '2 Hari': 0,
+                '3 Hari': 0,
+                '4 Hari': 0,
+                '5 Hari': 0,
+                '> 5 Hari': 0
+            };
+
+            filteredData.forEach(row => {
+                // Gunakan kolom AR untuk ringkasan kota sesuai permintaan terbaru
+                const kotaSummary = row.AR || 'UNKNOWN';
+                const cbm = parseNumberWithComma(row.Z);
+                const aging = parseInt(row.AW) || 0;
+                const armada = (row.AU || '').toUpperCase();
+
+                if (!cityStats[kotaSummary]) {
+                    cityStats[kotaSummary] = { tCbm: 0, tQty: 0, uCbm: 0, uQty: 0 };
+                }
+
+                if (isBelumSupport(row)) {
+                    cityStats[kotaSummary].uCbm += cbm;
+                    cityStats[kotaSummary].uQty++;
+                    unsupportedList.push(row);
+                    totalBelumSupport++;
+                } else if (isTerlambat(row)) {
+                    cityStats[kotaSummary].tCbm += cbm;
+                    cityStats[kotaSummary].tQty++;
+                    
+                    // Filter: Hanya tampilkan jenis armada CONT untuk tabel Delayed
+                    if (armada.includes('CONT')) {
+                        delayedList.push(row);
+                    }
+                    
+                    totalTerlambat++;
+                    
+                    // Aging groups based on AW
+                    if (aging === 1) agingGroups['1 Hari']++;
+                    else if (aging === 2) agingGroups['2 Hari']++;
+                    else if (aging === 3) agingGroups['3 Hari']++;
+                    else if (aging === 4) agingGroups['4 Hari']++;
+                    else if (aging === 5) agingGroups['5 Hari']++;
+                    else if (aging > 5) agingGroups['> 5 Hari']++;
+                } else {
+                    totalOnTime++;
+                }
+            });
+
+            // Sort Unsupported List by LC (A-Z)
+            unsupportedList.sort((a, b) => (a.A || '').localeCompare(b.A || ''));
+
+            renderCitySummaryTable(cityStats);
+            renderVendorUnsupportedTable(unsupportedList);
+            renderVendorDelayedTable(delayedList);
+            renderExtraCharts(totalOnTime, totalTerlambat, totalBelumSupport, agingGroups);
+        }
+
+        function renderCitySummaryTable(stats) {
+            const container = document.getElementById('city-summary-table');
+            let totalTCbm = 0, totalTQty = 0, totalUCbm = 0, totalUQty = 0;
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr class="nested-header">
+                            <th rowspan="2">KOTA</th>
+                            <th colspan="2">TERLAMBAT</th>
+                            <th colspan="2">BELUM SUPPORT</th>
+                        </tr>
+                        <tr class="sub-header">
+                            <th>CBM</th>
+                            <th>JUMLAH</th>
+                            <th>CBM</th>
+                            <th>JUMLAH</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            Object.keys(stats).sort().forEach(kota => {
+                const s = stats[kota];
+                if (s.tQty === 0 && s.uQty === 0) return;
+                
+                totalTCbm += s.tCbm;
+                totalTQty += s.tQty;
+                totalUCbm += s.uCbm;
+                totalUQty += s.uQty;
+
+                html += `
+                    <tr>
+                        <td>${kota}</td>
+                        <td>${s.tCbm.toFixed(2)}</td>
+                        <td>${s.tQty}</td>
+                        <td>${s.uCbm.toFixed(2)}</td>
+                        <td>${s.uQty}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>Total kesel...</td>
+                        <td>${totalTCbm.toFixed(2)}</td>
+                        <td>${totalTQty}</td>
+                        <td>${totalUCbm.toFixed(2)}</td>
+                        <td>${totalUQty}</td>
+                    </tr>
+                </tfoot>
+                </table>
+            `;
+            container.innerHTML = html;
+        }
+
+        function renderVendorUnsupportedTable(list) {
+            const container = document.getElementById('vendor-unsupported-table');
+            const start = (unsupportedPage - 1) * extraItemsPerPage;
+            const end = start + extraItemsPerPage;
+            const pageData = list.slice(start, end);
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>LC</th>
+                            <th>CARRIER</th>
+                            <th>JALUR</th>
+                            <th>LOAD DATE</th>
+                            <th>CBM</th>
+                            <th>AGING LC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            pageData.forEach((row, i) => {
+                const aging = row.AW || '0';
+                html += `
+                    <tr>
+                        <td>${start + i + 1}</td>
+                        <td>${row.A}</td>
+                        <td>${row.D || '-'}</td>
+                        <td>${row.M || '-'}</td>
+                        <td>${row.AO} ${row.AP}</td>
+                        <td>${parseNumberWithComma(row.Z).toFixed(2)}</td>
+                        <td>${aging} HARI</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+            
+            // Simple pagination
+            const totalPages = Math.ceil(list.length / extraItemsPerPage);
+            document.getElementById('unsupported-pagination').innerHTML = `
+                <div style="padding:10px; text-align:right; font-size:0.8em; color:#aaa;">
+                    ${start + 1}-${Math.min(end, list.length)} / ${list.length}
+                    <button onclick="unsupportedPage=Math.max(1, unsupportedPage-1); updateExtraSection()" ${unsupportedPage===1?'disabled':''}>‹</button>
+                    <button onclick="unsupportedPage=Math.min(${totalPages}, unsupportedPage+1); updateExtraSection()" ${unsupportedPage===totalPages?'disabled':''}>›</button>
+                </div>
+            `;
+        }
+
+        function renderVendorDelayedTable(list) {
+            const container = document.getElementById('vendor-delayed-table');
+            const start = (delayedPage - 1) * extraItemsPerPage;
+            const end = start + extraItemsPerPage;
+            const pageData = list.slice(start, end);
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>LC</th>
+                            <th>CARRIER</th>
+                            <th>JALUR</th>
+                            <th>LOAD DATE</th>
+                            <th>CBM</th>
+                            <th>AGING LC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            pageData.forEach((row, i) => {
+                const aging = row.AW || '0';
+                html += `
+                    <tr>
+                        <td>${start + i + 1}</td>
+                        <td>${row.A}</td>
+                        <td>${row.D || '-'}</td>
+                        <td>${row.M || '-'}</td>
+                        <td>${row.AO} ${row.AP}</td>
+                        <td>${parseNumberWithComma(row.Z).toFixed(2)}</td>
+                        <td>${aging} HARI</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+
+            const totalPages = Math.ceil(list.length / extraItemsPerPage);
+            document.getElementById('delayed-pagination').innerHTML = `
+                <div style="padding:10px; text-align:right; font-size:0.8em; color:#aaa;">
+                    ${start + 1}-${Math.min(end, list.length)} / ${list.length}
+                    <button onclick="delayedPage=Math.max(1, delayedPage-1); updateExtraSection()" ${delayedPage===1?'disabled':''}>‹</button>
+                    <button onclick="delayedPage=Math.min(${totalPages}, delayedPage+1); updateExtraSection()" ${delayedPage===totalPages?'disabled':''}>›</button>
+                </div>
+            `;
+        }
+
+        function renderExtraCharts(onTime, terlambat, belumSupport, agingGroups) {
+            const total = onTime + terlambat + belumSupport;
+            const pOnTime = total ? (onTime / total * 100).toFixed(0) : 0;
+            const pTerlambat = total ? (terlambat / total * 100).toFixed(0) : 0;
+            const pBelumSupport = total ? (belumSupport / total * 100).toFixed(0) : 0;
+
+            // Vendor Response Chart
+            const vrCtx = document.getElementById('vendorResponseChart').getContext('2d');
+            if (vendorResponseChart) vendorResponseChart.destroy();
+            vendorResponseChart = new Chart(vrCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['TERLAMBAT', 'ON TIME', 'BELUM SUPPORT'],
+                    datasets: [{
+                        label: 'VENDOR RESPONSE',
+                        data: [pTerlambat, pOnTime, pBelumSupport],
+                        backgroundColor: ['#d32f2f', '#3b82f6', '#555'],
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            color: '#fff',
+                            formatter: (val) => val + '%'
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, grid: { color: '#333' }, ticks: { color: '#aaa' } },
+                        x: { ticks: { color: '#aaa' }, grid: { display: false } }
+                    }
+                }
+            });
+
+            // Aging Terlambat Chart
+            const atCtx = document.getElementById('agingTerlambatChart').getContext('2d');
+            if (agingTerlambatChart) agingTerlambatChart.destroy();
+            
+            const agingLabels = Object.keys(agingGroups);
+            const agingData = Object.values(agingGroups);
+            const totalAging = agingData.reduce((a, b) => a + b, 0);
+
+            agingTerlambatChart = new Chart(atCtx, {
+                type: 'bar',
+                data: {
+                    labels: agingLabels,
+                    datasets: [{
+                        label: 'TERLAMBAT',
+                        data: agingData.map(v => totalAging ? (v / totalAging * 100).toFixed(0) : 0),
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'right',
+                            color: '#fff',
+                            formatter: (val) => val + '%'
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, max: 100, grid: { color: '#333' }, ticks: { color: '#aaa' } },
+                        y: { ticks: { color: '#aaa' }, grid: { display: false } }
                     }
                 }
             });
