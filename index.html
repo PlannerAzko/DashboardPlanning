@@ -108,7 +108,7 @@
             right: 0;
             background-color: #2a2a2a;
             border: 1px solid #444;
-            z-index: 2000; /* Ditingkatkan agar di atas elemen peta */
+            z-index: 3000; /* Ditingkatkan agar pasti di atas peta Leaflet */
             max-height: 300px;
             overflow-y: auto;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
@@ -617,6 +617,7 @@
         const itemsPerPage = 100;
         let map;
         let markers = [];
+        let filterTimeout; // Untuk debouncing
 
         // Filter State (Arrays for multi-select)
         let selectedFilters = {
@@ -853,16 +854,21 @@
             
             const displayElement = document.getElementById(`${filterId}-display`);
             const count = selectedFilters[filterId].length;
+            const totalCount = document.querySelectorAll(`.${filterId}-checkbox`).length;
             
             if (count === 0) {
                 displayElement.textContent = `-- Semua ${filterId.charAt(0).toUpperCase() + filterId.slice(1)} --`;
-            } else if (count === document.querySelectorAll(`.${filterId}-checkbox`).length) {
+            } else if (count === totalCount) {
                 displayElement.textContent = `Semua Terpilih (${count})`;
             } else {
                 displayElement.textContent = `${count} Terpilih`;
             }
             
-            applyFilters();
+            // DEBOUNCING: Tunggu 300ms sebelum apply filter agar lancar
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                applyFilters();
+            }, 300);
         }
 
         // Close dropdowns when clicking outside
@@ -920,9 +926,10 @@
 
         // Update Dashboard
         function updateDashboard() {
+            // Jalankan update secara berurutan agar tidak membekukan browser
+            updateKPIs();
             updateCRMTable();
             updateShippingTable();
-            updateKPIs();
             updateMap();
         }
 
@@ -938,27 +945,23 @@
             const kotaData = {};
             const dates = new Set();
 
-            filteredData.forEach(row => {
+            // Optimasi: Gunakan loop tunggal untuk agregasi
+            for (let i = 0; i < filteredData.length; i++) {
+                const row = filteredData[i];
                 const kota = row.AR;
                 const date = row.AO;
-                const cbm = parseNumberWithComma(row.Z);
+                
+                if (!kota) continue;
 
-                // Skip if kota is empty
-                if (!kota || kota.trim() === '') {
-                    return;
-                }
-
-                if (!kotaData[kota]) {
-                    kotaData[kota] = {};
-                }
+                if (!kotaData[kota]) kotaData[kota] = {};
                 if (!kotaData[kota][date]) {
                     kotaData[kota][date] = 0;
+                    dates.add(date);
                 }
-                kotaData[kota][date] += cbm;
-                dates.add(date);
-            });
+                kotaData[kota][date] += parseNumberWithComma(row.Z);
+            }
 
-            // Sort dates from newest to oldest
+            // Sort dates from newest to oldest (limit to 4 for performance)
             const sortedDates = Array.from(dates).sort().reverse().slice(0, 4);
             const dateTotals = {};
             sortedDates.forEach(date => dateTotals[date] = 0);
