@@ -648,7 +648,7 @@
                         AO: values[COLUMNS.AO] || '',
                         AP: values[COLUMNS.AP] || '',
                         AQ: values[COLUMNS.AQ] || '0',
-                        AR: values[COLUMNS.AR] || '',
+                        AR: kota,
                         AS: values[COLUMNS.AS] || '',
                         AT: values[COLUMNS.AT] || '',
                         AX: values[COLUMNS.AX] || '',
@@ -807,7 +807,7 @@
                     <tbody>
             `;
 
-            Object.keys(kotaData).sort().forEach(kota => {
+            Object.keys(kotaData).sort((a, b) => a.localeCompare(b)).forEach(kota => {
                 html += `<tr><td>${kota}</td>`;
                 sortedDates.forEach(date => {
                     const cbm = kotaData[kota][date] || 0;
