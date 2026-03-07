@@ -836,7 +836,7 @@
 
         // Helper to format numbers like the image (Indo format)
         function formatIndo(val) {
-            return val.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return val.toFixed(2);
         }
 
         // Initialize Map
@@ -1961,15 +1961,15 @@
                 else if (jam >= 19 && jam <= 21) b4 += val;
             });
 
-            document.getElementById('caseIdShipped').textContent = caseIdShipped.toLocaleString('id-ID', {maximumFractionDigits: 0});
-            document.getElementById('caseIdPlan').textContent = caseIdPlan.toLocaleString('id-ID', {maximumFractionDigits: 0});
+            document.getElementById('caseIdShipped').textContent = caseIdShipped.toFixed(0);
+            document.getElementById('caseIdPlan').textContent = caseIdPlan.toFixed(0);
             document.getElementById('cbmPlan').textContent = cbmPlan.toFixed(2);
             document.getElementById('cbmShipped').textContent = cbmShipped.toFixed(2);
 
-            document.getElementById('caseIdPlanB1').textContent = b1.toLocaleString('id-ID', {maximumFractionDigits: 0});
-            document.getElementById('caseIdPlanB2').textContent = b2.toLocaleString('id-ID', {maximumFractionDigits: 0});
-            document.getElementById('caseIdPlanB3').textContent = b3.toLocaleString('id-ID', {maximumFractionDigits: 0});
-            document.getElementById('caseIdPlanB4').textContent = b4.toLocaleString('id-ID', {maximumFractionDigits: 0});
+            document.getElementById('caseIdPlanB1').textContent = b1.toFixed(0);
+            document.getElementById('caseIdPlanB2').textContent = b2.toFixed(0);
+            document.getElementById('caseIdPlanB3').textContent = b3.toFixed(0);
+            document.getElementById('caseIdPlanB4').textContent = b4.toFixed(0);
         }
 
         // Update Map - More accurate city locations
