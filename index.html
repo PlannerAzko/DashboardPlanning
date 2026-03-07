@@ -801,12 +801,42 @@
             area: []
         };
 
-        // Helper Function: Parse number with comma separator
+        // Helper Function: Robust number parsing for both US and Indo formats
         function parseNumberWithComma(value) {
             if (!value) return 0;
-            // Hapus pemisah ribuan (koma) dan bersihkan spasi
-            const cleaned = String(value).replace(/,/g, '').trim();
-            return parseFloat(cleaned) || 0;
+            let s = String(value).trim();
+            if (!s) return 0;
+            
+            const commaCount = (s.match(/,/g) || []).length;
+            const dotCount = (s.match(/\./g) || []).length;
+            
+            if (commaCount > 0 && dotCount > 0) {
+                if (s.indexOf('.') < s.indexOf(',')) {
+                    // Indo: 1.234,56
+                    return parseFloat(s.replace(/\./g, '').replace(',', '.'));
+                } else {
+                    // US: 1,234.56
+                    return parseFloat(s.replace(/,/g, ''));
+                }
+            } else if (commaCount > 0) {
+                if (commaCount === 1) {
+                    const parts = s.split(',');
+                    if (parts[1].length === 3) return parseFloat(s.replace(/,/g, ''));
+                    else return parseFloat(s.replace(',', '.'));
+                } else return parseFloat(s.replace(/,/g, ''));
+            } else if (dotCount > 0) {
+                if (dotCount === 1) {
+                    const parts = s.split('.');
+                    if (parts[1].length === 3) return parseFloat(s.replace(/\./g, ''));
+                    else return parseFloat(s);
+                } else return parseFloat(s.replace(/\./g, ''));
+            }
+            return parseFloat(s) || 0;
+        }
+
+        // Helper to format numbers like the image (Indo format)
+        function formatIndo(val) {
+            return val.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
         // Initialize Map
@@ -1415,16 +1445,20 @@
 
         // Helper: Status Checkers
         function isBelumSupport(row) {
-            const carrier = (row.D || '').toUpperCase();
-            return !carrier || carrier.includes('BELUM SUPPORT') || carrier.includes('TBA') || carrier.includes('DUMMY');
+            const carrier = (row.D || '').trim().toUpperCase();
+            // Belum Support jika Carrier kosong, mengandung kata BELUM, TBA, DUMMY, atau tanda strip
+            return !carrier || 
+                   carrier.includes('BELUM') || 
+                   carrier.includes('TBA') || 
+                   carrier.includes('DUMMY') ||
+                   carrier === '-' ||
+                   carrier === '0';
         }
 
         function isTerlambat(row) {
             if (isBelumSupport(row)) return false;
-            // Kriteria terlambat: Shipped 0 dan ada nilai di Aging LC (asumsi aging > 0 berarti terlambat)
             const aging = parseInt(row.AW) || 0;
-            const shipped = parseNumberWithComma(row.AY);
-            return aging > 0 && shipped === 0;
+            return aging > 0;
         }
 
         // Update Extra Section (Tables & Charts from Image)
@@ -1447,43 +1481,38 @@
             };
 
             filteredData.forEach(row => {
-                // Filter: Hanya menampilkan data cont-20 dan cont-40 pada kolom G
-                const typeG = (row.G || '').toLowerCase().replace(/\s/g, '');
-                if (typeG !== 'cont-20' && typeG !== 'cont-40') return;
+                // Filter: Hanya mengambil data CONT-20 dan CONT-40 saja
+                const typeG = (row.G || '').toLowerCase();
+                const isCont20 = typeG === 'cont-20' || typeG === '20ft';
+                const isCont40 = typeG === 'cont-40' || typeG === '40ft';
+                
+                if (!isCont20 && !isCont40) return;
 
                 // Gunakan kolom AR untuk ringkasan kota sesuai permintaan terbaru
                 const kotaSummary = row.AR || 'UNKNOWN';
                 const cbm = parseNumberWithComma(row.Z);
                 const aging = parseInt(row.AW) || 0;
                 const armada = (row.AU || '').toUpperCase();
-                const lcId = row.A || '';
 
                 if (!cityStats[kotaSummary]) {
                     cityStats[kotaSummary] = { 
                         tCbm: 0, 
                         tQty: 0, 
                         uCbm: 0, 
-                        uQty: 0,
-                        tLCs: new Set(),
-                        uLCs: new Set()
+                        uQty: 0
                     };
                 }
 
                 if (isBelumSupport(row)) {
                     cityStats[kotaSummary].uCbm += cbm;
-                    cityStats[kotaSummary].uLCs.add(lcId);
-                    cityStats[kotaSummary].uQty = cityStats[kotaSummary].uLCs.size;
+                    cityStats[kotaSummary].uQty++; // Menghitung total baris sesuai ekspektasi user
                     unsupportedList.push(row);
                     totalBelumSupport++;
                 } else if (isTerlambat(row)) {
                     cityStats[kotaSummary].tCbm += cbm;
-                    cityStats[kotaSummary].tLCs.add(lcId);
-                    cityStats[kotaSummary].tQty = cityStats[kotaSummary].tLCs.size;
+                    cityStats[kotaSummary].tQty++; // Menghitung total baris sesuai ekspektasi user
                     
-                    // Filter: Hanya tampilkan jenis armada CONT untuk tabel Delayed
-                    if (armada.includes('CONT')) {
-                        delayedList.push(row);
-                    }
+                    delayedList.push(row);
                     
                     totalTerlambat++;
                     
@@ -1515,6 +1544,9 @@
             const container = document.getElementById('city-summary-table');
             let totalTCbm = 0, totalTQty = 0, totalUCbm = 0, totalUQty = 0;
 
+            // Sort by Terlambat CBM Descending
+            const sortedCities = Object.keys(stats).sort((a, b) => stats[b].tCbm - stats[a].tCbm);
+
             let html = `
                 <table>
                     <thead>
@@ -1533,7 +1565,7 @@
                     <tbody>
             `;
 
-            Object.keys(stats).sort().forEach(kota => {
+            sortedCities.forEach(kota => {
                 const s = stats[kota];
                 if (s.tQty === 0 && s.uQty === 0) return;
                 
@@ -1545,10 +1577,10 @@
                 html += `
                     <tr>
                         <td>${kota}</td>
-                        <td>${s.tCbm.toFixed(2)}</td>
-                        <td>${s.tQty}</td>
-                        <td>${s.uCbm.toFixed(2)}</td>
-                        <td>${s.uQty}</td>
+                        <td>${s.tQty > 0 ? formatIndo(s.tCbm) : ''}</td>
+                        <td>${s.tQty > 0 ? s.tQty : ''}</td>
+                        <td>${s.uQty > 0 ? formatIndo(s.uCbm) : ''}</td>
+                        <td>${s.uQty > 0 ? s.uQty : ''}</td>
                     </tr>
                 `;
             });
@@ -1558,9 +1590,9 @@
                 <tfoot>
                     <tr>
                         <td>Total kesel...</td>
-                        <td>${totalTCbm.toFixed(2)}</td>
+                        <td>${formatIndo(totalTCbm)}</td>
                         <td>${totalTQty}</td>
-                        <td>${totalUCbm.toFixed(2)}</td>
+                        <td>${formatIndo(totalUCbm)}</td>
                         <td>${totalUQty}</td>
                     </tr>
                 </tfoot>
