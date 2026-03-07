@@ -693,7 +693,8 @@
             BF: 57,       // CASE ID SHIPPED (BF)
             AU: 46,       // JENIS ARMADA
             AV: 47,       // KOTA SUMMARY
-            AW: 48        // AGING LC
+            AW: 48,       // AGING LC
+            G: 6          // TYPE CONTAINER
         };
 
         // Kota Coordinates - More accurate locations using Google Maps data
@@ -958,7 +959,8 @@
                         BF: values[COLUMNS.BF] || '0',
                         AU: values[COLUMNS.AU] || '',
                         AV: values[COLUMNS.AV] || '',
-                        AW: values[COLUMNS.AW] || '0'
+                        AW: values[COLUMNS.AW] || '0',
+                        G: values[COLUMNS.G] || ''
                     });
                 }
             }
@@ -970,14 +972,12 @@
             const kotaSet = new Set();
             const regionalSet = new Set();
             const areaSet = new Set();
-            const stuffingDateSet = new Set();
 
             allData.forEach(row => {
                 if (row.AX) bulanSet.add(row.AX);
                 if (row.AR) kotaSet.add(row.AR);
                 if (row.AT) regionalSet.add(row.AT);
                 if (row.AS) areaSet.add(row.AS);
-                if (row.AO) stuffingDateSet.add(row.AO);
             });
 
             // Hanya populate jika belum ada opsi (mencegah reset saat auto-refresh)
@@ -986,7 +986,44 @@
             populateMultiSelect('kota', Array.from(kotaSet).sort(), 'Kota');
             populateMultiSelect('regional', Array.from(regionalSet).sort(), 'Regional');
             populateMultiSelect('area', Array.from(areaSet).sort(), 'Area');
-            populateMultiSelect('stuffingDate', Array.from(stuffingDateSet).sort().reverse(), 'Tanggal');
+            
+            // Stuffing Date depends on Bulan
+            updateStuffingDateOptions();
+        }
+
+        function updateStuffingDateOptions() {
+            const stuffingDateSet = new Set();
+            const selectedMonths = selectedFilters.bulan;
+
+            allData.forEach(row => {
+                if (row.AO) {
+                    if (selectedMonths.length === 0 || selectedMonths.includes(row.AX)) {
+                        stuffingDateSet.add(row.AO);
+                    }
+                }
+            });
+
+            const options = Array.from(stuffingDateSet).sort().reverse();
+            
+            // Sync selected filters with new options
+            selectedFilters.stuffingDate = selectedFilters.stuffingDate.filter(date => options.includes(date));
+            
+            populateMultiSelect('stuffingDate', options, 'Tanggal');
+            
+            // Update display text
+            const displayElement = document.getElementById('stuffingDate-display');
+            if (displayElement) {
+                const count = selectedFilters.stuffingDate.length;
+                const totalCount = options.length;
+                
+                if (count === 0) {
+                    displayElement.textContent = `-- Semua Tanggal --`;
+                } else if (count === totalCount && totalCount > 0) {
+                    displayElement.textContent = `Semua Terpilih (${count})`;
+                } else {
+                    displayElement.textContent = `${count} Terpilih`;
+                }
+            }
         }
 
         function populateMultiSelect(filterId, options, label) {
@@ -1065,11 +1102,18 @@
             const totalCount = document.querySelectorAll(`.${filterId}-checkbox`).length;
             
             if (count === 0) {
-                displayElement.textContent = `-- Semua ${filterId.charAt(0).toUpperCase() + filterId.slice(1)} --`;
-            } else if (count === totalCount) {
+                let label = filterId.charAt(0).toUpperCase() + filterId.slice(1);
+                if (filterId === 'stuffingDate') label = 'Tanggal';
+                displayElement.textContent = `-- Semua ${label} --`;
+            } else if (count === totalCount && totalCount > 0) {
                 displayElement.textContent = `Semua Terpilih (${count})`;
             } else {
                 displayElement.textContent = `${count} Terpilih`;
+            }
+
+            // If Bulan filter changes, update Stuffing Date options
+            if (filterId === 'bulan') {
+                updateStuffingDateOptions();
             }
             
             // DEBOUNCING: Tunggu 300ms sebelum apply filter agar lancar
@@ -1403,24 +1447,38 @@
             };
 
             filteredData.forEach(row => {
+                // Filter: Hanya menampilkan data cont-20 dan cont-40 pada kolom G
+                const typeG = (row.G || '').toLowerCase().replace(/\s/g, '');
+                if (typeG !== 'cont-20' && typeG !== 'cont-40') return;
+
                 // Gunakan kolom AR untuk ringkasan kota sesuai permintaan terbaru
                 const kotaSummary = row.AR || 'UNKNOWN';
                 const cbm = parseNumberWithComma(row.Z);
                 const aging = parseInt(row.AW) || 0;
                 const armada = (row.AU || '').toUpperCase();
+                const lcId = row.A || '';
 
                 if (!cityStats[kotaSummary]) {
-                    cityStats[kotaSummary] = { tCbm: 0, tQty: 0, uCbm: 0, uQty: 0 };
+                    cityStats[kotaSummary] = { 
+                        tCbm: 0, 
+                        tQty: 0, 
+                        uCbm: 0, 
+                        uQty: 0,
+                        tLCs: new Set(),
+                        uLCs: new Set()
+                    };
                 }
 
                 if (isBelumSupport(row)) {
                     cityStats[kotaSummary].uCbm += cbm;
-                    cityStats[kotaSummary].uQty++;
+                    cityStats[kotaSummary].uLCs.add(lcId);
+                    cityStats[kotaSummary].uQty = cityStats[kotaSummary].uLCs.size;
                     unsupportedList.push(row);
                     totalBelumSupport++;
                 } else if (isTerlambat(row)) {
                     cityStats[kotaSummary].tCbm += cbm;
-                    cityStats[kotaSummary].tQty++;
+                    cityStats[kotaSummary].tLCs.add(lcId);
+                    cityStats[kotaSummary].tQty = cityStats[kotaSummary].tLCs.size;
                     
                     // Filter: Hanya tampilkan jenis armada CONT untuk tabel Delayed
                     if (armada.includes('CONT')) {
@@ -1443,6 +1501,9 @@
 
             // Sort Unsupported List by LC (A-Z)
             unsupportedList.sort((a, b) => (a.A || '').localeCompare(b.A || ''));
+
+            // Sort Delayed List by Load Date (AO) Z-A
+            delayedList.sort((a, b) => (b.AO || '').localeCompare(a.AO || ''));
 
             renderCitySummaryTable(cityStats);
             renderVendorUnsupportedTable(unsupportedList);
