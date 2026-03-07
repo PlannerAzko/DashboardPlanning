@@ -289,6 +289,11 @@
             color: #fff;
         }
 
+        .kpi-card.green {
+            background: linear-gradient(135deg, #0d9488 0%, #2dd4bf 100%);
+            color: #fff;
+        }
+
         .kpi-label {
             font-size: 0.85em;
             font-weight: 600;
@@ -556,6 +561,16 @@
 
             <div class="right-panel">
                 <div id="map"></div>
+                <div class="kpi-container" style="padding: 15px; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="kpi-card green">
+                        <div class="kpi-label">SLA CUSTOMER</div>
+                        <div class="kpi-value" id="slaCustomerKPI" style="font-size: 1.8em;">0%</div>
+                    </div>
+                    <div class="kpi-card green">
+                        <div class="kpi-label">SLA GRW</div>
+                        <div class="kpi-value" id="slaGrwKPI" style="font-size: 1.8em;">0%</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1947,12 +1962,27 @@
             const cbmPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.Z), 0);
             const cbmShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AY), 0);
 
+            // Calculate SLA Averages
+            let slaCustomerSum = 0;
+            let slaGrwSum = 0;
+            let slaCount = 0;
+
             // Calculate B1, B2, B3, B4
             let b1 = 0, b2 = 0, b3 = 0, b4 = 0;
             
             filteredData.forEach(row => {
                 const jam = parseFloat(row.AP);
                 const val = parseNumberWithComma(row.BB);
+                
+                // SLA Calculation
+                const sCust = parseNumberWithComma(row.BC);
+                const sGrw = parseNumberWithComma(row.BD);
+                if (sCust > 0 || sGrw > 0) {
+                    slaCustomerSum += sCust;
+                    slaGrwSum += sGrw;
+                    slaCount++;
+                }
+
                 if (isNaN(jam)) return;
 
                 if (jam >= 8 && jam <= 10) b1 += val;
@@ -1965,6 +1995,22 @@
             document.getElementById('caseIdPlan').textContent = caseIdPlan.toFixed(0);
             document.getElementById('cbmPlan').textContent = cbmPlan.toFixed(2);
             document.getElementById('cbmShipped').textContent = cbmShipped.toFixed(2);
+
+            // Display SLA KPIs
+            if (slaCount > 0) {
+                const avgCust = slaCustomerSum / slaCount;
+                const avgGrw = slaGrwSum / slaCount;
+                
+                // Handle decimal vs percentage (if < 2 assume decimal 0.98 -> 98%)
+                const finalCust = avgCust < 2 ? avgCust * 100 : avgCust;
+                const finalGrw = avgGrw < 2 ? avgGrw * 100 : avgGrw;
+
+                document.getElementById('slaCustomerKPI').textContent = finalCust.toFixed(1) + '%';
+                document.getElementById('slaGrwKPI').textContent = finalGrw.toFixed(1) + '%';
+            } else {
+                document.getElementById('slaCustomerKPI').textContent = '0%';
+                document.getElementById('slaGrwKPI').textContent = '0%';
+            }
 
             document.getElementById('caseIdPlanB1').textContent = b1.toFixed(0);
             document.getElementById('caseIdPlanB2').textContent = b2.toFixed(0);
