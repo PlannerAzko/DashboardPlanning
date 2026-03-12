@@ -294,6 +294,11 @@
             color: #fff;
         }
 
+        .kpi-card.gray {
+            background: linear-gradient(135deg, #d1d5db 0%, #e5e7eb 100%);
+            color: #1f2937;
+        }
+
         .kpi-label {
             font-size: 0.85em;
             font-weight: 600;
@@ -373,8 +378,9 @@
 
         .pagination {
             text-align: center;
-            padding: 15px;
+            padding: 0.5px; /* Adjust this to change footer height/size */
             color: #aaa;
+            font-size: 0.9em; /* Adjust this to change text size in footer */
         }
 
         .pagination button {
@@ -417,20 +423,41 @@
         /* Extra Section Styles */
         .extra-section {
             display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px; /* Consistent gap */
             margin-top: 25px;
+            align-items: start;
         }
 
         .extra-left, .extra-right {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px; /* Match grid gap for consistency */
+            min-width: 0;
+        }
+
+        /* Fix height of first items to align the second items' titles */
+        .extra-section > div > *:first-child {
+            height: 510px !important; /* Force identical height for top row */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin-bottom: 0 !important;
         }
 
         .table-content-extra {
-            max-height: 450px;
+            flex-grow: 1;
+            height: 400px;
             overflow-y: auto;
+            background-color: #1a1a1a;
+        }
+
+        .extra-section .chart-container {
+            height: auto;
+        }
+
+        .extra-section .chart-body {
+            height: 300px;
         }
 
         .nested-header th {
@@ -549,12 +576,20 @@
                         <div class="kpi-value" id="caseIdPlan">0</div>
                     </div>
                     <div class="kpi-card red">
-                        <div class="kpi-label">CBM SHIPPED<br><span class="sub-label">(Exclude RT)</span></div>
+                        <div class="kpi-label">CBM SHIPPED <span class="sub-label">(Exclude RT)</span></div>
                         <div class="kpi-value" id="cbmShipped">0</div>
                     </div>
                     <div class="kpi-card red">
                         <div class="kpi-label">CBM PLAN</div>
                         <div class="kpi-value" id="cbmPlan">0</div>
+                    </div>
+                    <div class="kpi-card gray">
+                        <div class="kpi-label">CBM PLAN SHIFT 1</div>
+                        <div class="kpi-value" id="cbmPlanShift1">0</div>
+                    </div>
+                    <div class="kpi-card gray">
+                        <div class="kpi-label">CBM PLAN SHIFT 2</div>
+                        <div class="kpi-value" id="cbmPlanShift2">0</div>
                     </div>
                 </div>
             </div>
@@ -614,6 +649,12 @@
                 <div class="chart-body">
                     <canvas id="slaChart"></canvas>
                 </div>
+                <div class="table-header" style="margin-top: 15px; background: #1a1a1a; border-top: 1px solid #333;">
+                    <i class="fas fa-trophy"></i> SUMMARY TOP 10 KOTA (BY CBM)
+                </div>
+                <div class="table-content-extra" id="top-cities-table" style="max-height: 300px;">
+                    <div class="loading">Calculating...</div>
+                </div>
             </div>
             <div class="chart-container">
                 <div class="table-header">
@@ -621,6 +662,12 @@
                 </div>
                 <div class="chart-body">
                     <canvas id="cbmRatioChart"></canvas>
+                </div>
+                <div class="table-header" style="margin-top: 15px; background: #1a1a1a; border-top: 1px solid #333;">
+                    <i class="fas fa-arrow-down"></i> SUMMARY BOTTOM 10 KOTA (BY CBM)
+                </div>
+                <div class="table-content-extra" id="bottom-cities-table" style="max-height: 300px;">
+                    <div class="loading">Calculating...</div>
                 </div>
             </div>
         </div>
@@ -639,7 +686,7 @@
                 </div>
                 
                 <!-- Percentage Breakdown Charts -->
-                <div class="chart-container" style="margin-top: 20px;">
+                <div class="chart-container">
                     <div class="table-header" style="color: #ffd700;">
                         <i class="fas fa-percentage"></i> PERCENTAGE BREAKDOWN
                     </div>
@@ -665,7 +712,7 @@
                 </div>
                 
                 <!-- Table 3: Vendor Response Delayed -->
-                <div class="bottom-table" style="margin-top: 20px;">
+                <div class="bottom-table">
                     <div class="table-header" style="color: #ffd700;">
                         <i class="fas fa-clock"></i> VENDOR RESPONSE DELAYED
                     </div>
@@ -1574,6 +1621,67 @@
             renderVendorUnsupportedTable(unsupportedList);
             renderVendorDelayedTable(delayedList);
             renderExtraCharts(totalOnTime, totalTerlambat, totalBelumSupport, agingGroups);
+            updateTopBottomCityTables();
+        }
+
+        function updateTopBottomCityTables() {
+            const cityCbm = {};
+            let totalCbm = 0;
+
+            filteredData.forEach(row => {
+                const city = row.AR || 'UNKNOWN';
+                const cbm = parseNumberWithComma(row.AY); // Menggunakan CBM SHIPPED (Kolom AY)
+                cityCbm[city] = (cityCbm[city] || 0) + cbm;
+                totalCbm += cbm;
+            });
+
+            const sortedCities = Object.entries(cityCbm)
+                .map(([city, cbm]) => ({ 
+                    city, 
+                    cbm, 
+                    percentage: totalCbm > 0 ? (cbm / totalCbm) * 100 : 0 
+                }))
+                .sort((a, b) => b.cbm - a.cbm);
+
+            const top10 = sortedCities.slice(0, 10);
+            const bottom10 = sortedCities.slice().sort((a, b) => a.cbm - b.cbm).slice(0, 10);
+
+            renderTopBottomTable('top-cities-table', top10);
+            renderTopBottomTable('bottom-cities-table', bottom10);
+        }
+
+        function renderTopBottomTable(elementId, data) {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>KOTA</th>
+                            <th>CBM</th>
+                            <th>%</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.city}</td>
+                        <td>${item.cbm.toFixed(2)}</td>
+                        <td>${item.percentage.toFixed(1)}%</td>
+                    </tr>
+                `;
+            });
+
+            if (data.length === 0) {
+                html += `<tr><td colspan="3" style="text-align:center;">No data available</td></tr>`;
+            }
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
         }
 
         function renderCitySummaryTable(stats) {
@@ -1625,7 +1733,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td>Total kesel...</td>
+                        <td>Total</td>
                         <td>${formatIndo(totalTCbm)}</td>
                         <td>${totalTQty}</td>
                         <td>${formatIndo(totalUCbm)}</td>
@@ -1990,10 +2098,12 @@
 
             // Calculate B1, B2, B3, B4
             let b1 = 0, b2 = 0, b3 = 0, b4 = 0;
+            let cbmShift1 = 0, cbmShift2 = 0;
             
             filteredData.forEach(row => {
                 const jam = parseFloat(row.AP);
                 const val = parseNumberWithComma(row.BB);
+                const cbmVal = parseNumberWithComma(row.Z);
                 
                 // SLA Calculation
                 const sCust = parseNumberWithComma(row.BC);
@@ -2006,6 +2116,10 @@
 
                 if (isNaN(jam)) return;
 
+                // Shift Calculation
+                if (jam >= 8 && jam <= 15) cbmShift1 += cbmVal;
+                else if (jam >= 16 && jam <= 23) cbmShift2 += cbmVal;
+
                 if (jam >= 8 && jam <= 10) b1 += val;
                 else if (Math.floor(jam) === 13) b2 += val;
                 else if (jam >= 16 && jam <= 18) b3 += val;
@@ -2016,6 +2130,8 @@
             document.getElementById('caseIdPlan').textContent = caseIdPlan.toFixed(0);
             document.getElementById('cbmPlan').textContent = cbmPlan.toFixed(2);
             document.getElementById('cbmShipped').textContent = cbmShipped.toFixed(2);
+            document.getElementById('cbmPlanShift1').textContent = cbmShift1.toFixed(2);
+            document.getElementById('cbmPlanShift2').textContent = cbmShift2.toFixed(2);
 
             // Display SLA KPIs
             if (slaCount > 0) {
