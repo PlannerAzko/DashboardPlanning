@@ -861,7 +861,8 @@
         // Google Sheets Configuration
         const SHEET_ID = '1ylgWBQJQgv0HjRiV9Ay-GYs__ywWUk8ZTSeb0KwaPsM';
         const SHEET_GID = '1144899065';
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+        // Menggunakan endpoint gviz yang lebih stabil untuk CORS
+        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`;
 
         // Column Index Mapping (0-based)
         const COLUMNS = {
@@ -1066,8 +1067,14 @@
         // Fetch Data dari Google Sheets
         async function fetchData() {
             try {
-                // Menggunakan credentials: 'omit' untuk menghindari masalah CORS/Cookies di dalam iframe
-                const response = await fetch(CSV_URL, { credentials: 'omit' });
+                // Menambahkan timestamp untuk menghindari cache yang mungkin menyebabkan NetworkError
+                const finalUrl = `${CSV_URL}&t=${Date.now()}`;
+                const response = await fetch(finalUrl, { 
+                    method: 'GET',
+                    credentials: 'omit',
+                    mode: 'cors',
+                    cache: 'no-store'
+                });
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1086,14 +1093,17 @@
                 updateLastUpdateTime();
             } catch (error) {
                 console.error('Error fetching data:', error);
-                const errorMsg = error.message.includes('fetch') ? 
-                    'Gagal terhubung ke Google Sheets. Periksa koneksi internet atau status sharing file.' : 
+                const errorMsg = error.message.includes('fetch') || error.name === 'TypeError' ? 
+                    'Gagal terhubung ke Google Sheets. Periksa koneksi internet atau pastikan Sheet telah di-publish/share.' : 
                     error.message;
                 
                 document.getElementById('crm-table-container').innerHTML = 
                     `<div class="loading" style="color: #ff6b6b;">
                         <i class="fas fa-exclamation-triangle"></i><br/>
-                        Error: ${errorMsg}
+                        Error: ${errorMsg}<br/>
+                        <button onclick="fetchData()" style="margin-top:15px; padding:8px 15px; background:#d32f2f; color:white; border:none; border-radius:4px; cursor:pointer;">
+                            <i class="fas fa-sync"></i> Coba Lagi
+                        </button>
                     </div>`;
             }
         }
@@ -1712,6 +1722,8 @@
 
                 if (!cityStats[kotaSummary]) {
                     cityStats[kotaSummary] = { 
+                        otCbm: 0,
+                        otQty: 0,
                         tCbm: 0, 
                         tQty: 0, 
                         uCbm: 0, 
@@ -1741,6 +1753,8 @@
                     else if (aging > 5) agingGroups['> 5 Hari']++;
                 } else {
                     totalOnTime++;
+                    cityStats[kotaSummary].otCbm += cbm;
+                    cityStats[kotaSummary].otQty++;
                 }
             });
 
@@ -1819,7 +1833,7 @@
 
         function renderCitySummaryTable(stats) {
             const container = document.getElementById('city-summary-table');
-            let totalTCbm = 0, totalTQty = 0, totalUCbm = 0, totalUQty = 0;
+            let totalOTCbm = 0, totalOTQty = 0, totalTCbm = 0, totalTQty = 0, totalUCbm = 0, totalUQty = 0;
 
             // Sort by Terlambat CBM Descending
             const sortedCities = Object.keys(stats).sort((a, b) => stats[b].tCbm - stats[a].tCbm);
@@ -1829,10 +1843,13 @@
                     <thead>
                         <tr class="nested-header">
                             <th rowspan="2">KOTA</th>
+                            <th colspan="2">ON TIME</th>
                             <th colspan="2">TERLAMBAT</th>
                             <th colspan="2">BELUM SUPPORT</th>
                         </tr>
                         <tr class="sub-header">
+                            <th>CBM</th>
+                            <th>JUMLAH</th>
                             <th>CBM</th>
                             <th>JUMLAH</th>
                             <th>CBM</th>
@@ -1844,8 +1861,10 @@
 
             sortedCities.forEach(kota => {
                 const s = stats[kota];
-                if (s.tQty === 0 && s.uQty === 0) return;
+                if (s.otQty === 0 && s.tQty === 0 && s.uQty === 0) return;
                 
+                totalOTCbm += s.otCbm;
+                totalOTQty += s.otQty;
                 totalTCbm += s.tCbm;
                 totalTQty += s.tQty;
                 totalUCbm += s.uCbm;
@@ -1854,6 +1873,8 @@
                 html += `
                     <tr>
                         <td>${kota}</td>
+                        <td>${s.otQty > 0 ? formatIndo(s.otCbm) : ''}</td>
+                        <td>${s.otQty > 0 ? s.otQty : ''}</td>
                         <td>${s.tQty > 0 ? formatIndo(s.tCbm) : ''}</td>
                         <td>${s.tQty > 0 ? s.tQty : ''}</td>
                         <td>${s.uQty > 0 ? formatIndo(s.uCbm) : ''}</td>
@@ -1867,6 +1888,8 @@
                 <tfoot>
                     <tr>
                         <td>Total</td>
+                        <td>${formatIndo(totalOTCbm)}</td>
+                        <td>${totalOTQty}</td>
                         <td>${formatIndo(totalTCbm)}</td>
                         <td>${totalTQty}</td>
                         <td>${formatIndo(totalUCbm)}</td>
@@ -2150,6 +2173,7 @@
                             <th>#</th>
                             <th>LC</th>
                             <th>SHIPPINGLINE</th>
+                            <th>TYPE</th>
                             <th>CARRIER</th>
                             <th>STUFFING</th>
                             <th>JAM</th>
@@ -2174,6 +2198,7 @@
                         <td>${rowNum}</td>
                         <td>${row.A || '-'}</td>
                         <td>${row.I || '-'}</td>
+                        <td>${row.G || '-'}</td>
                         <td>${row.D || '-'}</td>
                         <td>${row.AO || '-'}</td>
                         <td>${row.AP || '-'}</td>
