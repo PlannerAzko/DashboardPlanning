@@ -889,7 +889,8 @@
             AU: 46,       // JENIS ARMADA
             AV: 47,       // KOTA SUMMARY
             AW: 48,       // AGING LC
-            G: 6          // TYPE CONTAINER
+            G: 6,         // TYPE CONTAINER
+            LAST_EDIT: 78 // Kolom CA (Waktu Edit Terakhir dari Script)
         };
 
         // Kota Coordinates - More accurate locations using Google Maps data
@@ -1082,6 +1083,17 @@
 
                 const csv = await response.text();
                 
+                // Mencoba mengambil waktu modifikasi terakhir dari header response
+                const lastModifiedHeader = response.headers.get('Last-Modified');
+                let lastUpdateDate = new Date();
+                
+                if (lastModifiedHeader) {
+                    const parsedDate = new Date(lastModifiedHeader);
+                    if (!isNaN(parsedDate.getTime())) {
+                        lastUpdateDate = parsedDate;
+                    }
+                }
+
                 // Cek apakah yang diterima benar-benar data (bukan halaman login HTML)
                 if (csv.trim().startsWith('<!DOCTYPE')) {
                     throw new Error("Diterima format HTML, bukan CSV. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
@@ -1090,7 +1102,7 @@
                 parseCSV(csv);
                 populateFilters();
                 applyFilters();
-                updateLastUpdateTime();
+                updateLastUpdateTime(lastUpdateDate);
             } catch (error) {
                 console.error('Error fetching data:', error);
                 const errorMsg = error.message.includes('fetch') || error.name === 'TypeError' ? 
@@ -1216,7 +1228,8 @@
                         AU: values[COLUMNS.AU] || '',
                         AV: values[COLUMNS.AV] || '',
                         AW: values[COLUMNS.AW] || '0',
-                        G: values[COLUMNS.G] || ''
+                        G: values[COLUMNS.G] || '',
+                        LAST_EDIT: values[COLUMNS.LAST_EDIT] || ''
                     });
                 }
             }
@@ -2358,8 +2371,17 @@
         }
 
         // Update Last Update Time in Marquee
-        function updateLastUpdateTime() {
-            const now = new Date();
+        function updateLastUpdateTime(fallbackDate) {
+            let now = fallbackDate || new Date();
+            
+            // Coba ambil waktu dari data spreadsheet (Kolom BH)
+            if (allData.length > 0 && allData[0].LAST_EDIT) {
+                const sheetDate = new Date(allData[0].LAST_EDIT);
+                if (!isNaN(sheetDate.getTime())) {
+                    now = sheetDate;
+                }
+            }
+
             const months = [
                 "JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI",
                 "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"
