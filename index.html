@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> LOGISTICS DASHBOARD | ORDER PLANNING – AZKO</title>
-    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2343/2343894.png">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23e31e24'/%3E%3Ctext x='50' y='62' font-family='Arial, sans-serif' font-size='22' font-weight='900' fill='white' text-anchor='middle'%3Eaz•ko%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -939,8 +939,8 @@
         // Google Sheets Configuration
         const SHEET_ID = '1ylgWBQJQgv0HjRiV9Ay-GYs__ywWUk8ZTSeb0KwaPsM';
         const SHEET_GID = '1144899065';
-        // Menggunakan endpoint gviz yang lebih stabil untuk CORS
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`;
+        // Menggunakan endpoint export yang lebih robust untuk CSV
+        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
 
         // Column Index Mapping (0-based)
         const COLUMNS = {
@@ -1153,14 +1153,9 @@
         // Fetch Data dari Google Sheets
         async function fetchData() {
             try {
-                // Menambahkan timestamp untuk menghindari cache yang mungkin menyebabkan NetworkError
+                // Menambahkan timestamp untuk menghindari cache
                 const finalUrl = `${CSV_URL}&t=${Date.now()}`;
-                const response = await fetch(finalUrl, { 
-                    method: 'GET',
-                    credentials: 'omit',
-                    mode: 'cors',
-                    cache: 'no-store'
-                });
+                const response = await fetch(finalUrl);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1191,8 +1186,8 @@
             } catch (error) {
                 console.error('Error fetching data:', error);
                 const errorMsg = error.message.includes('fetch') || error.name === 'TypeError' ? 
-                    'Gagal terhubung ke Google Sheets. Periksa koneksi internet atau pastikan Sheet telah di-publish/share.' : 
-                    error.message;
+                    'Gagal mengambil data. Pastikan Google Sheets telah dibagikan (Share -> Anyone with the link can view) dan koneksi internet stabil.' : 
+                    `Terjadi kesalahan: ${error.message}`;
                 
                 document.getElementById('crm-table-container').innerHTML = 
                     `<div class="loading" style="color: #ff6b6b;">
