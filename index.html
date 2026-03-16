@@ -1619,16 +1619,6 @@
                         pointRadius: 4,
                         pointBackgroundColor: '#3b82f6',
                         tension: 0.4
-                    },
-                    {
-                        label: 'Target (90%)',
-                        data: new Array(cbmRatioData.length).fill(90),
-                        borderColor: '#ff4d4f',
-                        borderWidth: 2,
-                        borderDash: [8, 5],
-                        pointRadius: 0,
-                        fill: false,
-                        tension: 0
                     }]
                 },
                 options: {
@@ -1730,12 +1720,10 @@
             };
 
             filteredData.forEach(row => {
-                // Filter: Hanya mengambil data CONT-20 dan CONT-40 saja
-                const typeG = (row.G || '').toLowerCase();
-                const isCont20 = typeG === 'cont-20' || typeG === '20ft';
-                const isCont40 = typeG === 'cont-40' || typeG === '40ft';
+                const carrier = (row.D || '').trim().toUpperCase();
                 
-                if (!isCont20 && !isCont40) return;
+                // Pengecualian: Jangan tampilkan jika carrier adalah 1D-INTERNAL (SDA) atau AHI
+                if (carrier === '1D-INTERNAL (SDA)' || carrier === 'AHI') return;
 
                 // Gunakan kolom AR untuk ringkasan kota sesuai permintaan terbaru
                 const kotaSummary = row.AR || 'UNKNOWN';
