@@ -300,6 +300,32 @@
             background-color: #3a3a3a;
         }
 
+        /* Summary Table Specific Styles */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .summary-table th {
+            padding: 12px 10px;
+            font-size: 0.8em;
+            background-color: #1a1a1a;
+            color: #ffd700;
+            border-bottom: 2px solid #333;
+        }
+        .summary-table td {
+            padding: 12px 10px; /* Increased padding for fuller look */
+            border-bottom: 1px solid #222;
+            font-size: 0.95em;
+        }
+        .summary-table tbody tr:nth-child(even) {
+            background-color: #222;
+        }
+        .summary-table tbody tr:hover {
+            background-color: #333;
+            box-shadow: inset 0 0 10px rgba(211, 47, 47, 0.2);
+            cursor: default;
+        }
+
         .kpi-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -777,7 +803,7 @@
                 <div class="table-header" style="margin-top: 15px; background: #1a1a1a; border-top: 1px solid #333;">
                     <i class="fas fa-trophy"></i> SUMMARY TOP 10 KOTA (BY CBM)
                 </div>
-                <div class="table-content-extra" id="top-cities-table" style="max-height: 300px;">
+                <div class="table-content-extra" id="top-cities-table" style="height: 430px;">
                     <div class="loading">Calculating...</div>
                 </div>
             </div>
@@ -791,7 +817,7 @@
                 <div class="table-header" style="margin-top: 15px; background: #1a1a1a; border-top: 1px solid #333;">
                     <i class="fas fa-arrow-down"></i> SUMMARY BOTTOM 10 KOTA (BY CBM)
                 </div>
-                <div class="table-content-extra" id="bottom-cities-table" style="max-height: 300px;">
+                <div class="table-content-extra" id="bottom-cities-table" style="height: 430px;">
                     <div class="loading">Calculating...</div>
                 </div>
             </div>
@@ -1947,32 +1973,57 @@
             if (!container) return;
 
             let html = `
-                <table>
+                <table class="summary-table">
                     <thead>
                         <tr>
+                            <th style="width: 40px; text-align: center;">#</th>
                             <th>KOTA</th>
-                            <th>CBM</th>
-                            <th>%</th>
+                            <th style="text-align: right;">CBM</th>
+                            <th style="text-align: right; width: 60px;">%</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
 
-            data.forEach(item => {
+            data.forEach((item, index) => {
+                const rankColor = elementId.includes('top') ? 
+                    (index < 3 ? '#ffd700' : '#eee') : 
+                    (index < 3 ? '#ff6b6b' : '#eee');
+                
                 html += `
                     <tr>
-                        <td>${item.city}</td>
-                        <td>${item.cbm.toFixed(2)}</td>
-                        <td>${item.percentage.toFixed(1)}%</td>
+                        <td style="text-align: center; font-weight: bold; color: ${rankColor};">${index + 1}</td>
+                        <td style="font-weight: 500;">${item.city}</td>
+                        <td style="text-align: right; font-family: 'Courier New', monospace; font-weight: bold;">${item.cbm.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td style="text-align: right; color: #ffd700;">${item.percentage.toFixed(1)}%</td>
                     </tr>
                 `;
             });
 
-            if (data.length === 0) {
-                html += `<tr><td colspan="3" style="text-align:center;">No data available</td></tr>`;
+            // Fill empty rows to maintain height if less than 10
+            for (let i = data.length; i < 10; i++) {
+                html += `
+                    <tr style="height: 45px;">
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                `;
             }
 
-            html += `</tbody></table>`;
+            if (data.length === 0) {
+                html = `
+                    <table class="summary-table">
+                        <tbody>
+                            <tr><td colspan="4" style="text-align:center; padding: 50px;">No data available</td></tr>
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                html += `</tbody></table>`;
+            }
+            
             container.innerHTML = html;
         }
 
