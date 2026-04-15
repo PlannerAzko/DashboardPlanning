@@ -286,6 +286,43 @@
             display: none;
         }
 
+        /* Pivot Table Styles */
+        .pivot-section {
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            border: 1px solid #444;
+        }
+
+        .pivot-table th {
+            padding: 12px 8px;
+            border: 1px solid #444;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .pivot-table td {
+            border: 1px solid #333;
+            padding: 8px;
+        }
+
+        .pivot-table tr:hover td {
+            background-color: #333 !important;
+        }
+
+        .pivot-table .sub-header th {
+            font-size: 0.85em;
+            background-color: #1a1a1a;
+            color: #aaa;
+        }
+
+        .pivot-filter select:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+        }
+
         /* Store View visibility */
         .view-store .main-content,
         .view-store .kpi-container-four,
@@ -1258,6 +1295,53 @@
                 </div>
             </div>
         </div>
+
+        <!-- Pivot Table Section (Unit Distribution Center Only) -->
+        <div id="pivot-section" class="pivot-section" style="margin-top: 40px; display: none;">
+            <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+                <span><i class="fas fa-th"></i> MONITORING ORDER AGING DC AHI SIDOARJO</span>
+                <div class="pivot-filter" style="display: flex; align-items: center; gap: 15px;">
+                    <a id="whatsapp-btn" href="https://wa.me/6285973792145?text=Halo%20Tim%20Inventory%20Planner%2C%0A%0AKami%20ingin%20menginformasikan%20bahwa%20saat%20ini%20STOREBOOKING%20kami%20mengalami%20kekurangan%20kuota.%20Sehubungan%20dengan%20hal%20tersebut%2C%20kami%20mohon%20bantuannya%20untuk%20penambahan%20kuota%20agar%20proses%20operasional%20dapat%20berjalan%20dengan%20lancar.%0A%0AMohon%20dapat%20ditindaklanjuti%20secepatnya.%20Terima%20kasih%20atas%20perhatian%20dan%20kerjasamanya.%0A%0ABest%20regards%2C%0A%5BTim%20Planner%20DC%20Sidoarjo%5D" 
+                       target="_blank" 
+                       style="background: #25D366; color: #fff; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 0.8em; display: flex; align-items: center; gap: 8px; font-weight: bold; transition: opacity 0.2s;"
+                       onmouseover="this.style.opacity='0.8'" 
+                       onmouseout="this.style.opacity='1'">
+                        <i class="fab fa-whatsapp" style="font-size: 1.2em;"></i> KIRIM DATA KURANG KUOTA
+                    </a>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label style="font-size: 0.8em; color: #ccc;">PILIH AREA:</label>
+                        <select id="pivot-area-filter" style="background: #222; color: #fff; border: 1px solid #444; padding: 5px 10px; border-radius: 4px; outline: none;">
+                            <option value="ALL">-- Semua Area --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="table-content-large" style="overflow-x: auto; background: #1a1a1a;">
+                <table id="pivot-table" class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
+                    <thead>
+                        <tr class="nested-header">
+                            <th rowspan="2" style="width: 80px;">STOREBOOKING</th>
+                            <th rowspan="2" style="width: 200px;">SHIP TO</th>
+                            <th colspan="5" style="background: #2c3e50; color: #ecf0f1;">AGING SUDAH PLAN (CBM)</th>
+                            <th colspan="5" style="background: #27ae60; color: #fff;">AGING BELUM PLAN (CBM)</th>
+                        </tr>
+                        <tr class="sub-header">
+                            <!-- Aging Order -->
+                            <th>0</th><th>1-3</th><th>4-7</th><th>7 UP</th><th style="background: #34495e;">TOTAL</th>
+                            <!-- Sebaran Order -->
+                            <th>0</th><th>1-3</th><th>4-7</th><th>7 UP</th><th style="background: #219150;">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pivot-table-body">
+                        <tr>
+                            <td colspan="20" style="text-align: center; padding: 40px; color: #666;">
+                                <div class="loading"><div class="spinner" style="margin: 0 auto 10px;"></div>Processing Pivot Data...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- Scrolling Marquee Footer -->
@@ -1273,6 +1357,11 @@
         const SHEET_GID = '1144899065';
         // Menggunakan endpoint export yang lebih robust untuk CSV
         const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+
+        // New Spreadsheet for Pivot Table (Unit Distribution Center)
+        const PIVOT_SHEET_ID = '1noBpxmLuT3XQAYzO2Bdv_LrXqzDTqw1ugPN4ST_AYtg';
+        const PIVOT_SHEET_GID = '1075426956';
+        const PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${PIVOT_SHEET_ID}/export?format=csv&gid=${PIVOT_SHEET_GID}`;
 
         // Column Index Mapping (0-based)
         const COLUMNS = {
@@ -1443,11 +1532,24 @@
 
         function handleCategoryChoice(category) {
             selectedCategory = category;
+            document.body.className = category === 'store' ? 'view-store' : 'view-dc';
+            
+            // Toggle Pivot Section
+            const pivotSection = document.getElementById('pivot-section');
+            if (pivotSection) {
+                pivotSection.style.display = category === 'dc' ? 'block' : 'none';
+            }
+
             document.getElementById('welcome-step-1').classList.add('hidden');
             document.getElementById('welcome-step-2').classList.remove('hidden');
             
             // Request full screen on first interaction
             toggleFullScreen();
+
+            // If DC is selected, fetch pivot data
+            if (category === 'dc') {
+                fetchPivotData();
+            }
         }
 
         function toggleFullScreen() {
@@ -1574,7 +1676,7 @@
         // Helper Function: Robust number parsing for both US and Indo formats
         function parseNumberWithComma(value) {
             if (!value) return 0;
-            let s = String(value).trim();
+            let s = String(value).trim().replace(/\s/g, '');
             if (!s) return 0;
             
             const commaCount = (s.match(/,/g) || []).length;
@@ -1589,24 +1691,25 @@
                     return parseFloat(s.replace(/,/g, ''));
                 }
             } else if (commaCount > 0) {
-                if (commaCount === 1) {
-                    const parts = s.split(',');
-                    if (parts[1].length === 3) return parseFloat(s.replace(/,/g, ''));
-                    else return parseFloat(s.replace(',', '.'));
-                } else return parseFloat(s.replace(/,/g, ''));
+                // If multiple commas, it's thousands: 1,234,567
+                if (commaCount > 1) return parseFloat(s.replace(/,/g, ''));
+                // One comma: 1,234 or 1,23. 
+                // In CBM context, we assume it's a decimal separator.
+                return parseFloat(s.replace(',', '.'));
             } else if (dotCount > 0) {
-                if (dotCount === 1) {
-                    const parts = s.split('.');
-                    if (parts[1].length === 3) return parseFloat(s.replace(/\./g, ''));
-                    else return parseFloat(s);
-                } else return parseFloat(s.replace(/\./g, ''));
+                // If multiple dots, it's thousands: 1.234.567
+                if (dotCount > 1) return parseFloat(s.replace(/\./g, ''));
+                // One dot: 1.234 or 1.23. Standard JS parseFloat handles this.
+                return parseFloat(s);
             }
             return parseFloat(s) || 0;
         }
 
         // Helper to format numbers like the image (Indo format)
         function formatIndo(val) {
-            return val.toFixed(2);
+            if (val === 0) return '0';
+            // Show up to 2 decimal places, but remove trailing zeros. Use dot as requested in prompt "33.5"
+            return parseFloat(val.toFixed(2)).toString();
         }
 
         // Initialize Map
@@ -1618,12 +1721,326 @@
             }).addTo(map);
         }
 
+        // Pivot Data Storage
+        let rawPivotData = [];
+        let pivotAreaOptions = new Set();
+
+        async function fetchPivotData(retries = 2) {
+            try {
+                const finalUrl = `${PIVOT_CSV_URL}&t=${Date.now()}`;
+                const response = await fetch(finalUrl, { cache: "no-store" });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const csv = await response.text();
+                
+                if (csv.trim().startsWith('<!DOCTYPE')) {
+                    throw new Error("Diterima format HTML. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
+                }
+                
+                parsePivotCSV(csv);
+            } catch (error) {
+                console.error("Error fetching pivot data:", error);
+                if (retries > 0) {
+                    console.log(`Retrying pivot data fetch... (${retries} left)`);
+                    setTimeout(() => fetchPivotData(retries - 1), 2000);
+                    return;
+                }
+                const tbody = document.getElementById('pivot-table-body');
+                if (tbody) {
+                    const isNetworkError = error.name === 'TypeError' || error.message.includes('fetch');
+                    tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: #d32f2f; padding: 20px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2em; margin-bottom: 10px;"></i><br/>
+                        <strong>Gagal mengambil data pivot.</strong><br/>
+                        <span style="font-size: 0.9em; color: #bbb; display: block; margin-top: 10px;">
+                            ${isNetworkError ? 'Penyebab Umum: Koneksi internet terputus, AdBlocker terlalu ketat, atau Google Sheet belum di-share publik.' : error.message}
+                        </span>
+                        <button onclick="fetchPivotData()" style="margin-top:15px; padding:8px 20px; background:#ffd700; color:#000; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">
+                            <i class="fas fa-sync"></i> COBA LAGI
+                        </button>
+                    </td></tr>`;
+                }
+            }
+        }
+
+        function parsePivotCSV(csv) {
+            const lines = csv.split(/\r?\n/);
+            if (lines.length < 2) return;
+
+            // Detect delimiter
+            let delimiter = ',';
+            if (lines[0].includes(';')) delimiter = ';';
+
+            // Specific column indices based on user request:
+            // J=9, K=10, AI=34, BA=52, BC=54, BE=56
+            const idx = {
+                storeBooking: 9,
+                storeBookingName: 10,
+                cbm: 34,
+                area: 52,
+                status: 54,
+                aging: 56
+            };
+
+            rawPivotData = [];
+            pivotAreaOptions = new Set();
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                // Robust CSV parser
+                const values = [];
+                let current = '';
+                let inQuotes = false;
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    if (char === '"') {
+                        if (inQuotes && line[j+1] === '"') {
+                            current += '"';
+                            j++;
+                        } else {
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (char === delimiter && !inQuotes) {
+                        values.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                values.push(current.trim());
+
+                if (values.length <= Math.max(...Object.values(idx))) continue;
+
+                const storeBooking = (values[idx.storeBooking] || '').trim();
+                const storeBookingName = (values[idx.storeBookingName] || '').trim();
+                
+                // Skip summary/total rows
+                const summaryKeywords = ['total', 'jumlah', 'grand', 'subtotal', 'summary'];
+                const isSummary = summaryKeywords.some(k => 
+                    storeBooking.toLowerCase().includes(k) || 
+                    storeBookingName.toLowerCase().includes(k)
+                );
+                if (isSummary) continue;
+
+                const agingRaw = (values[idx.aging] || '').toString().toUpperCase();
+                let agingVal = 0;
+                if (agingRaw.includes('UP') || agingRaw.includes('>')) {
+                    agingVal = 8; // Force to 7 UP bucket
+                } else {
+                    agingVal = parseInt(agingRaw) || 0;
+                }
+
+                const row = {
+                    storeBooking: storeBooking,
+                    storeBookingName: storeBookingName,
+                    area: values[idx.area] || '',
+                    cbm: parseNumberWithComma(values[idx.cbm]),
+                    aging: agingVal,
+                    status: (values[idx.status] || '').trim()
+                };
+
+                if (row.area) pivotAreaOptions.add(row.area);
+                rawPivotData.push(row);
+            }
+
+            populatePivotAreaFilter();
+            renderPivotTable();
+        }
+
+        function populatePivotAreaFilter() {
+            const filter = document.getElementById('pivot-area-filter');
+            if (!filter) return;
+
+            // Keep "ALL" option
+            filter.innerHTML = '<option value="ALL">-- Semua Area --</option>';
+            
+            const sortedAreas = Array.from(pivotAreaOptions).sort();
+            sortedAreas.forEach(area => {
+                const opt = document.createElement('option');
+                opt.value = area;
+                opt.textContent = area;
+                filter.appendChild(opt);
+            });
+
+            filter.onchange = () => renderPivotTable();
+        }
+
+        function updateWhatsAppLink() {
+            const btn = document.getElementById('whatsapp-btn');
+            if (!btn || !rawPivotData || rawPivotData.length === 0) return;
+
+            const introMessage = "Halo Tim Inventory Planner,\n\nKami ingin menginformasikan bahwa saat ini STOREBOOKING kami mengalami kekurangan kuota. Sehubungan dengan hal tersebut, kami mohon bantuannya untuk penambahan kuota agar proses operasional dapat berjalan dengan lancar.\n\nMohon dapat ditindaklanjuti secepatnya. Terima kasih atas perhatian dan kerjasamanya.";
+            const closingMessage = "\n\nBest regards,\n[Tim Planner DC Sidoarjo]";
+            
+            // Aggregate ALL data for Maluku, Papua, Sulawesi
+            const targetAreas = ["MALUKU", "PAPUA", "SULAWESI"];
+            const stores = {};
+            
+            rawPivotData.forEach(row => {
+                const storeArea = (row.area || "").toUpperCase();
+                const isTarget = targetAreas.some(area => storeArea.includes(area));
+                
+                if (isTarget && row.status === 'Belum Plan') {
+                    const key = row.storeBooking;
+                    if (!stores[key]) {
+                        stores[key] = {
+                            code: row.storeBooking,
+                            name: row.storeBookingName,
+                            totalUnplanned: 0
+                        };
+                    }
+                    stores[key].totalUnplanned += row.cbm;
+                }
+            });
+
+            let additionalInfo = "";
+            const sortedStores = Object.values(stores).sort((a, b) => a.code.localeCompare(b.code));
+            
+            sortedStores.forEach(store => {
+                if (store.totalUnplanned < 20) {
+                    const diff = (20 - store.totalUnplanned).toFixed(2);
+                    additionalInfo += `\n${store.code} ${store.name} ${diff} CBM`;
+                }
+            });
+
+            let finalMessage = introMessage;
+            if (additionalInfo) {
+                finalMessage += "\n\nData Kekurangan Kuota Sebagai Berikut:" + additionalInfo;
+            }
+            finalMessage += closingMessage;
+
+            const encodedMessage = encodeURIComponent(finalMessage);
+            btn.href = `https://wa.me/6285973792145?text=${encodedMessage}`;
+        }
+
+        function renderPivotTable() {
+            const tbody = document.getElementById('pivot-table-body');
+            const areaFilter = document.getElementById('pivot-area-filter').value;
+            if (!tbody) return;
+
+            // Filter data by area
+            const filtered = areaFilter === 'ALL' 
+                ? rawPivotData 
+                : rawPivotData.filter(d => d.area === areaFilter);
+
+            // Aggregate data by StoreBooking
+            const stores = {};
+            filtered.forEach(row => {
+                const key = row.storeBooking;
+                const name = row.storeBookingName;
+                
+                // Skip if StoreBooking or Ship To is empty
+                if (!key || !name || key.trim() === "" || name.trim() === "") return;
+
+                if (!stores[key]) {
+                    stores[key] = {
+                        code: row.storeBooking,
+                        name: row.storeBookingName,
+                        agingCbm: Array(4).fill(0), // 0, 1-3, 4-7, 7 UP
+                        unplannedCbm: Array(4).fill(0)
+                    };
+                }
+
+                // Determine Bucket Index based on Column BE (row.aging)
+                let agingIdx = 0;
+                if (row.aging === 0) agingIdx = 0;
+                else if (row.aging >= 1 && row.aging <= 3) agingIdx = 1;
+                else if (row.aging >= 4 && row.aging <= 7) agingIdx = 2;
+                else if (row.aging > 7) agingIdx = 3;
+                
+                // AGING SUDAH PLAN (CBM) - Filter: "Sudah Plan" in Column BC
+                if (row.status === 'Sudah Plan') {
+                    stores[key].agingCbm[agingIdx] += row.cbm;
+                }
+
+                // AGING BELUM PLAN (CBM) - Filter: "Belum Plan" in Column BC
+                if (row.status === 'Belum Plan') {
+                    stores[key].unplannedCbm[agingIdx] += row.cbm;
+                }
+            });
+
+            const storeList = Object.values(stores).sort((a, b) => a.code.localeCompare(b.code));
+
+            if (storeList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; padding: 20px; color: #666;">Tidak ada data untuk area ini.</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            let totals = {
+                aging: Array(4).fill(0),
+                unplanned: Array(4).fill(0),
+                agingTotal: 0,
+                unplannedTotal: 0
+            };
+
+            storeList.forEach(store => {
+                let rowAgingTotal = 0;
+                let rowUnplannedTotal = 0;
+
+                html += `<tr>
+                    <td style="background: #222; border: 1px solid #333; padding: 8px; text-align: center;">${store.code}</td>
+                    <td style="background: #222; border: 1px solid #333; padding: 8px;">${store.name}</td>`;
+                
+                // Aging Order Columns
+                store.agingCbm.forEach((val, i) => {
+                    const displayVal = val > 0 ? formatIndo(val) : '-';
+                    const color = val > 0 ? '#fff' : '#444';
+                    // 0 (i=0), 1-3 (i=1) -> Green; 4-7 (i=2), 7 UP (i=3) -> Red
+                    const bgColor = i < 2 ? (val > 0 ? '#1b5e20' : 'transparent') : (val > 0 ? '#b71c1c' : 'transparent');
+                    
+                    html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; background: ${bgColor};">${displayVal}</td>`;
+                    totals.aging[i] += val;
+                    rowAgingTotal += val;
+                });
+                // Row Total for Aging
+                html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #34495e; font-weight: bold;">${rowAgingTotal > 0 ? formatIndo(rowAgingTotal) : '-'}</td>`;
+                totals.agingTotal += rowAgingTotal;
+
+                // Unplanned Order Columns
+                store.unplannedCbm.forEach((val, i) => {
+                    const displayVal = val > 0 ? formatIndo(val) : '-';
+                    const color = val > 0 ? '#fff' : '#444';
+                    // 0 (i=0), 1-3 (i=1) -> Green; 4-7 (i=2), 7 UP (i=3) -> Red
+                    const bgColor = i < 2 ? (val > 0 ? '#1b5e20' : 'transparent') : (val > 0 ? '#b71c1c' : 'transparent');
+
+                    html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; font-weight: ${val > 0 ? 'bold' : 'normal'}; background: ${bgColor};">${displayVal}</td>`;
+                    totals.unplanned[i] += val;
+                    rowUnplannedTotal += val;
+                });
+                // Row Total for Unplanned
+                html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #219150; font-weight: bold;">${rowUnplannedTotal > 0 ? formatIndo(rowUnplannedTotal) : '-'}</td>`;
+                totals.unplannedTotal += rowUnplannedTotal;
+
+                html += `</tr>`;
+            });
+
+            // Add Grand Total Row
+            html += `<tr style="background: #2c3e50; font-weight: bold; color: #ffd700;">
+                <td colspan="2" style="padding: 10px; text-align: right; border: 1px solid #444;">GRAND TOTAL</td>`;
+            
+            totals.aging.forEach(val => {
+                html += `<td style="padding: 10px; text-align: right; border: 1px solid #444;">${val > 0 ? formatIndo(val) : '0'}</td>`;
+            });
+            html += `<td style="padding: 10px; text-align: right; border: 1px solid #444; background: #1a252f;">${totals.agingTotal > 0 ? formatIndo(totals.agingTotal) : '0'}</td>`;
+            
+            totals.unplanned.forEach(val => {
+                html += `<td style="padding: 10px; text-align: right; border: 1px solid #444;">${val > 0 ? formatIndo(val) : '0'}</td>`;
+            });
+            html += `<td style="padding: 10px; text-align: right; border: 1px solid #444; background: #166534;">${totals.unplannedTotal > 0 ? formatIndo(totals.unplannedTotal) : '0'}</td>`;
+            
+            html += `</tr>`;
+
+            tbody.innerHTML = html;
+            updateWhatsAppLink();
+        }
+
         // Fetch Data dari Google Sheets
-        async function fetchData() {
+        async function fetchData(retries = 2) {
             try {
                 // Menambahkan timestamp untuk menghindari cache
                 const finalUrl = `${CSV_URL}&t=${Date.now()}`;
-                const response = await fetch(finalUrl);
+                const response = await fetch(finalUrl, { cache: "no-store" });
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1670,16 +2087,26 @@
                 }, 1500); // Give it a bit of time to show the animation
             } catch (error) {
                 console.error('Error fetching data:', error);
-                const errorMsg = error.message.includes('fetch') || error.name === 'TypeError' ? 
-                    'Gagal mengambil data. Pastikan Google Sheets telah dibagikan (Share -> Anyone with the link can view) dan koneksi internet stabil.' : 
+                
+                const isNetworkError = error.name === 'TypeError' || error.message.includes('fetch');
+
+                if (retries > 0 && isNetworkError) {
+                    console.log(`Retrying main data fetch... (${retries} left)`);
+                    setTimeout(() => fetchData(retries - 1), 2000);
+                    return;
+                }
+
+                const errorMsg = isNetworkError ? 
+                    'Gagal mengambil data (Network Error). Pastikan Google Sheets telah dibagikan (Anyone with the link can view) dan tidak diblokir oleh ekstensi browser (AdBlock/VPN).' : 
                     `Terjadi kesalahan: ${error.message}`;
                 
                 document.getElementById('crm-table-container').innerHTML = 
-                    `<div class="loading" style="color: #ff6b6b;">
-                        <i class="fas fa-exclamation-triangle"></i><br/>
-                        Error: ${errorMsg}<br/>
-                        <button onclick="fetchData()" style="margin-top:15px; padding:8px 15px; background:#d32f2f; color:white; border:none; border-radius:4px; cursor:pointer;">
-                            <i class="fas fa-sync"></i> Coba Lagi
+                    `<div class="loading" style="color: #ff6b6b; padding: 40px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2.5em; margin-bottom: 15px;"></i><br/>
+                        <strong style="font-size: 1.2em;">Koneksi Gagal</strong><br/>
+                        <p style="margin: 15px 0; font-size: 0.9em; line-height: 1.5;">${errorMsg}</p>
+                        <button onclick="location.reload()" style="margin-top:10px; padding:10px 20px; background:#d32f2f; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">
+                            <i class="fas fa-sync"></i> REFRESH HALAMAN
                         </button>
                     </div>`;
             }
