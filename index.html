@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> LOGISTICS DASHBOARD | ORDER PLANNING – AZKO</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23e31e24'/%3E%3Ctext x='50' y='62' font-family='Arial, sans-serif' font-size='22' font-weight='900' fill='white' text-anchor='middle'%3Eaz•ko%3C/text%3E%3C/svg%3E">
+    <title> LOGISTICS DASHBOARD | ORDER PLANNING</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23d32f2f'/%3E%3Cpath d='M30 50 L70 50 M50 30 L50 70' stroke='white' stroke-width='8'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -91,6 +91,296 @@
 
         @keyframes pageLoad {
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Welcome Overlay Styles */
+        #welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #welcome-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Initializing Dashboard Overlay */
+        #init-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+            overflow: hidden;
+        }
+
+        #init-loader::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background-image: 
+                linear-gradient(rgba(211, 47, 47, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(211, 47, 47, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(500px) rotateX(60deg) translateY(-100px);
+            animation: gridMove 10s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+
+        .tech-loader {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            z-index: 2;
+        }
+
+        .tech-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid transparent;
+            border-radius: 50%;
+        }
+
+        .tech-circle-1 {
+            width: 180px;
+            height: 180px;
+            border-top-color: #d32f2f;
+            border-bottom-color: #d32f2f;
+            animation: techRotate 4s linear infinite;
+        }
+
+        .tech-circle-2 {
+            width: 140px;
+            height: 140px;
+            border-left-color: #ffd700;
+            border-right-color: #ffd700;
+            animation: techRotate 2s linear infinite reverse;
+        }
+
+        .tech-circle-3 {
+            width: 100px;
+            height: 100px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            animation: techRotate 8s linear infinite;
+        }
+
+        .tech-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: #d32f2f;
+            border-radius: 50%;
+            box-shadow: 0 0 30px #d32f2f;
+            animation: corePulse 1.5s ease-in-out infinite;
+        }
+
+        .scanning-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            box-shadow: 0 0 15px #ffd700;
+            z-index: 3;
+            animation: scanMove 3s ease-in-out infinite;
+        }
+
+        @keyframes scanMove {
+            0%, 100% { top: 20%; opacity: 0; }
+            50% { top: 80%; opacity: 1; }
+        }
+
+        .system-status {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8em;
+            text-align: center;
+            z-index: 2;
+        }
+
+        @keyframes techRotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes corePulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+        }
+
+        #init-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-text {
+            position: relative;
+            z-index: 2;
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: 300;
+            letter-spacing: 8px;
+            margin-top: 40px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .loader-text span {
+            display: inline-block;
+            animation: letterBounce 1.5s infinite;
+        }
+
+        @keyframes letterBounce {
+            0%, 100% { transform: translateY(0); opacity: 0.5; }
+            50% { transform: translateY(-5px); opacity: 1; color: #ffd700; }
+        }
+
+        .welcome-content {
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            padding: 40px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            border: 2px solid #d32f2f;
+            box-shadow: 0 0 50px rgba(211, 47, 47, 0.3);
+            animation: welcomePop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .welcome-step.hidden {
+            display: none;
+        }
+
+        /* Store View visibility */
+        .view-store .main-content,
+        .view-store .kpi-container-four,
+        .view-store .chart-body,
+        .view-store .chart-container > .table-header:first-child,
+        .view-store .extra-left {
+            display: none !important;
+        }
+
+        .view-store .chart-section {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .view-store .chart-container {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .view-store .extra-section {
+            grid-template-columns: 1fr;
+        }
+
+        @keyframes welcomePop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .welcome-logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 25px;
+            animation: logoPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(211, 47, 47, 0.5)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 20px rgba(211, 47, 47, 0.8)); }
+        }
+
+        .welcome-title {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #fff;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .welcome-question {
+            font-size: 1.2em;
+            margin-bottom: 35px;
+            color: #ccc;
+            font-style: italic;
+        }
+
+        .welcome-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .welcome-btn {
+            padding: 14px 45px;
+            border-radius: 30px;
+            border: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-iya {
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
+        }
+
+        .btn-iya:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(211, 47, 47, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .btn-tidak {
+            background: #333;
+            color: #eee;
+            border: 1px solid #444;
+        }
+
+        .btn-tidak:hover {
+            background: #444;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
         .filter-section {
@@ -661,8 +951,50 @@
     </style>
 </head>
 <body>
+    <!-- Initializing Dashboard Loader -->
+    <div id="init-loader">
+        <div class="scanning-bar"></div>
+        <div class="tech-loader">
+            <div class="tech-circle tech-circle-1"></div>
+            <div class="tech-circle tech-circle-2"></div>
+            <div class="tech-circle tech-circle-3"></div>
+            <div class="tech-core"></div>
+        </div>
+        <div class="loader-text">
+            <span>I</span><span>N</span><span>I</span><span>T</span><span>I</span><span>A</span><span>L</span><span>I</span><span>Z</span><span>I</span><span>N</span><span>G</span>
+            &nbsp;
+            <span>D</span><span>A</span><span>S</span><span>H</span><span>B</span><span>O</span><span>A</span><span>R</span><span>D</span>
+        </div>
+        <div class="system-status" id="system-status">ESTABLISHING SECURE CONNECTION...</div>
+    </div>
+
+    <!-- Welcome Overlay -->
+    <div id="welcome-overlay">
+        <div class="welcome-content">
+            <h2 class="welcome-title">Selamat Datang di Dashboard Planning 2026</h2>
+            
+            <!-- Step 1: Category Selection -->
+            <div id="welcome-step-1" class="welcome-step">
+                <p class="welcome-question">Mohon pilih kategori unit operasional Anda:</p>
+                <div class="welcome-buttons">
+                    <button class="welcome-btn btn-iya" onclick="handleCategoryChoice('dc')">Distribution Center</button>
+                    <button class="welcome-btn btn-tidak" onclick="handleCategoryChoice('store')">Store</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Plan Update Selection -->
+            <div id="welcome-step-2" class="welcome-step hidden">
+                <p class="welcome-question">Apakah anda ingin melihat Plan Update terbaru?</p>
+                <div class="welcome-buttons">
+                    <button class="welcome-btn btn-iya" onclick="handleWelcomeChoice('iya')">Iya</button>
+                    <button class="welcome-btn btn-tidak" onclick="handleWelcomeChoice('tidak')">Tidak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="header">
-        <h1>LOGISTICS DASHBOARD | ORDER PLANNING – AZKO</h1>
+        <h1>LOGISTICS DASHBOARD | ORDER PLANNING</h1>
     </div>
 
     <div class="container">
@@ -931,7 +1263,7 @@
     <!-- Scrolling Marquee Footer -->
     <div class="footer-marquee">
         <div class="marquee-content" id="last-update-text">
-            DATA LOGISTICS DASHBOARD UPDATE TERAKHIR PADA [TANGGAL] PUKUL [JAM], JIKA INGIN MENDAPATKAN DATA TERKINI, SILAHKAN HUBUNGI TIM PLANNER AZKO SIDOARJO. TERIMA KASIH
+            DATA LOGISTICS DASHBOARD UPDATE TERAKHIR PADA [TANGGAL] PUKUL [JAM], JIKA INGIN MENDAPATKAN DATA TERKINI, SILAHKAN HUBUNGI TIM PLANNER SIDOARJO. TERIMA KASIH
         </div>
     </div>
 
@@ -948,6 +1280,7 @@
             D: 3,         // CARRIER
             I: 8,         // SHIPPINGLINE
             M: 12,        // JALUR
+            R: 58,        // NOPOL (Column BG)
             Z: 25,        // CBM PLAN
             AN: 39,       // CASE ID PLAN (OLD)
             AO: 40,       // STUFFING DATE
@@ -1103,6 +1436,139 @@
             agingLc: []
         };
 
+        let welcomeChoice = null;
+        let selectedCategory = 'dc'; // Default to dc
+
+        function handleCategoryChoice(category) {
+            selectedCategory = category;
+            document.getElementById('welcome-step-1').classList.add('hidden');
+            document.getElementById('welcome-step-2').classList.remove('hidden');
+            
+            // Request full screen on first interaction
+            toggleFullScreen();
+        }
+
+        function toggleFullScreen() {
+            try {
+                if (!document.fullscreenElement) {
+                    const docElm = document.documentElement;
+                    if (docElm.requestFullscreen) {
+                        docElm.requestFullscreen();
+                    } else if (docElm.mozRequestFullScreen) {
+                        docElm.mozRequestFullScreen();
+                    } else if (docElm.webkitRequestFullScreen) {
+                        docElm.webkitRequestFullScreen();
+                    } else if (docElm.msRequestFullscreen) {
+                        docElm.msRequestFullscreen();
+                    }
+                }
+            } catch (e) {
+                console.warn("Fullscreen request failed:", e);
+            }
+        }
+
+        function handleWelcomeChoice(choice) {
+            welcomeChoice = choice;
+            const overlay = document.getElementById('welcome-overlay');
+            overlay.classList.add('hidden');
+            
+            // Apply layout changes based on category
+            applyCategoryLayout();
+
+            // Jika data sudah ada, langsung eksekusi
+            if (allData.length > 0) {
+                applyWelcomeChoice();
+            }
+        }
+
+        function applyCategoryLayout() {
+            const body = document.body;
+            if (selectedCategory === 'store') {
+                body.classList.add('view-store');
+            } else {
+                body.classList.remove('view-store');
+            }
+        }
+
+        function applyWelcomeChoice() {
+            if (!welcomeChoice) return;
+
+            if (welcomeChoice === 'iya') {
+                // Cari Stuffing Date terbaru
+                const dates = Array.from(new Set(allData.map(row => row.AO))).filter(d => d && d !== '-' && d.trim() !== '');
+                if (dates.length > 0) {
+                    // Sort tanggal secara robust
+                    const sortedDates = dates.sort((a, b) => {
+                        const parseDate = (s) => {
+                            if (!s) return new Date(0);
+                            // Coba format YYYY-MM-DD
+                            if (s.includes('-')) {
+                                const d = new Date(s);
+                                if (!isNaN(d)) return d;
+                            }
+                            // Coba format DD/MM/YYYY
+                            if (s.includes('/')) {
+                                const parts = s.split('/');
+                                if (parts.length === 3) return new Date(parts[2], parts[1]-1, parts[0]);
+                            }
+                            // Fallback ke Date constructor
+                            const d = new Date(s);
+                            return isNaN(d) ? new Date(0) : d;
+                        };
+                        return parseDate(b) - parseDate(a);
+                    });
+                    
+                    const latestDate = sortedDates[0];
+                    
+                    // Reset semua filter
+                    Object.keys(selectedFilters).forEach(k => selectedFilters[k] = []);
+                    
+                    // Pilih tanggal terbaru
+                    selectedFilters.stuffingDate = [latestDate];
+                    
+                    // Update UI
+                    updateStuffingDateOptions();
+                    
+                    // Trigger apply
+                    applyFilters();
+                }
+            } else if (welcomeChoice === 'tidak') {
+                // Cari Bulan terbaru
+                const months = Array.from(new Set(allData.map(row => row.AX))).filter(m => m && m !== '-' && m.trim() !== '');
+                if (months.length > 0) {
+                    // Sort bulan secara kronologis
+                    const monthOrder = {
+                        'january': 1, 'february': 2, 'march': 3, 'april': 4, 'may': 5, 'june': 6,
+                        'july': 7, 'august': 8, 'september': 9, 'october': 10, 'november': 11, 'december': 12,
+                        'januari': 1, 'februari': 2, 'maret': 3, 'mei': 5, 'juni': 6, 'juli': 7, 'agustus': 8,
+                        'september': 9, 'oktober': 10, 'nopember': 11, 'desember': 12
+                    };
+                    
+                    const sortedMonths = months.sort((a, b) => {
+                        const orderA = monthOrder[a.toLowerCase()] || 0;
+                        const orderB = monthOrder[b.toLowerCase()] || 0;
+                        return orderB - orderA; // Descending
+                    });
+                    
+                    const latestMonth = sortedMonths[0];
+                    
+                    // Reset semua filter
+                    Object.keys(selectedFilters).forEach(k => selectedFilters[k] = []);
+                    
+                    // Pilih bulan terbaru
+                    selectedFilters.bulan = [latestMonth];
+                    
+                    // Update UI
+                    populateFilters();
+                    
+                    // Trigger apply
+                    applyFilters();
+                }
+            }
+            
+            welcomeChoice = null;
+        }
+
         // Helper Function: Robust number parsing for both US and Indo formats
         function parseNumberWithComma(value) {
             if (!value) return 0;
@@ -1181,8 +1647,25 @@
 
                 parseCSV(csv);
                 populateFilters();
-                applyFilters();
+                
+                // Jika user sudah memilih di welcome screen sebelum data beres
+                if (welcomeChoice) {
+                    applyWelcomeChoice();
+                } else {
+                    applyFilters();
+                }
+                
                 updateLastUpdateTime(lastUpdateDate);
+                
+                // Update system status
+                const statusEl = document.getElementById('system-status');
+                if (statusEl) statusEl.innerText = "DATA SYNCHRONIZATION COMPLETE. READY.";
+
+                // Hide Initial Loader
+                setTimeout(() => {
+                    const loader = document.getElementById('init-loader');
+                    if (loader) loader.classList.add('hidden');
+                }, 1500); // Give it a bit of time to show the animation
             } catch (error) {
                 console.error('Error fetching data:', error);
                 const errorMsg = error.message.includes('fetch') || error.name === 'TypeError' ? 
@@ -1200,14 +1683,13 @@
             }
         }
 
-        // Parse CSV
-        function parseCSV(csv) {
+        // Helper for robust CSV parsing
+        function robustCSVParser(csv) {
             const allRows = [];
             let currentRow = [];
             let currentField = '';
             let inQuotes = false;
 
-            // Robust CSV parsing handling quotes and newlines within cells
             for (let i = 0; i < csv.length; i++) {
                 const char = csv[i];
                 const nextChar = csv[i + 1];
@@ -1227,7 +1709,7 @@
                     allRows.push(currentRow);
                     currentRow = [];
                     currentField = '';
-                    if (char === '\r') i++; // Skip \n
+                    if (char === '\r') i++;
                 } else {
                     currentField += char;
                 }
@@ -1236,6 +1718,12 @@
                 currentRow.push(currentField.trim());
                 allRows.push(currentRow);
             }
+            return allRows;
+        }
+
+        // Parse CSV
+        function parseCSV(csv) {
+            const allRows = robustCSVParser(csv);
 
             allData = [];
             // Start from i=1 to skip header
@@ -1290,6 +1778,7 @@
                         D: values[COLUMNS.D] || '',
                         I: values[COLUMNS.I] || '',
                         M: values[COLUMNS.M] || '',
+                        R: values[COLUMNS.R] || '',
                         Z: values[COLUMNS.Z] || '0',
                         AO: values[COLUMNS.AO] || '',
                         AP: values[COLUMNS.AP] || '',
@@ -1362,7 +1851,21 @@
                 }
             });
 
-            const options = Array.from(stuffingDateSet).sort().reverse();
+            const parseDate = (s) => {
+                if (!s) return new Date(0);
+                if (s.includes('-')) {
+                    const d = new Date(s);
+                    if (!isNaN(d)) return d;
+                }
+                if (s.includes('/')) {
+                    const parts = s.split('/');
+                    if (parts.length === 3) return new Date(parts[2], parts[1]-1, parts[0]);
+                }
+                const d = new Date(s);
+                return isNaN(d) ? new Date(0) : d;
+            };
+
+            const options = Array.from(stuffingDateSet).sort((a, b) => parseDate(b) - parseDate(a));
             
             // Sync selected filters with new options
             selectedFilters.stuffingDate = selectedFilters.stuffingDate.filter(date => options.includes(date));
@@ -2334,50 +2837,94 @@
             const end = start + itemsPerPage;
             const pageData = filteredData.slice(start, end);
 
-            let html = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>LC</th>
-                            <th>SHIPPINGLINE</th>
-                            <th>TYPE</th>
-                            <th>CARRIER</th>
-                            <th>STUFFING</th>
-                            <th>JAM</th>
-                            <th>JALUR</th>
-                            <th>PLAN</th>
-                            <th>SHIPPED</th>
-                            <th>FIX CASE ID</th>
-                            <th>ESTIMASI CASE ID</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            pageData.forEach((row, index) => {
-                const rowNum = start + index + 1;
-                const jamColorClass = getJamColorClass(row.AP);
-                // Parse dengan fungsi helper untuk menghapus koma
-                const estimasiCaseId = parseNumberWithComma(row.BA);
-
-                html += `
-                    <tr class="${jamColorClass}">
-                        <td>${rowNum}</td>
-                        <td>${row.A || '-'}</td>
-                        <td>${row.I || '-'}</td>
-                        <td>${row.G || '-'}</td>
-                        <td>${row.D || '-'}</td>
-                        <td>${row.AO || '-'}</td>
-                        <td>${row.AP || '-'}</td>
-                        <td>${row.M || '-'}</td>
-                        <td>${parseNumberWithComma(row.Z).toFixed(2) || '-'}</td>
-                        <td>${parseNumberWithComma(row.AY).toFixed(2) || '-'}</td>
-                        <td>${parseNumberWithComma(row.AQ).toFixed(0) || '-'}</td>
-                        <td>${estimasiCaseId.toFixed(0) || '-'}</td>
-                    </tr>
+            let html = '';
+            if (selectedCategory === 'store') {
+                html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>LC</th>
+                                <th>SHIPPINGLINE</th>
+                                <th>TYPE</th>
+                                <th>VENDOR</th>
+                                <th>STUFFING</th>
+                                <th>JAM</th>
+                                <th>JALUR</th>
+                                <th>NOPOL</th>
+                                <th>PLAN</th>
+                                <th>ESTIMASI KOLI</th>
+                                <th>SHIPPED</th>
+                                <th>KOLI SIAP KIRIM</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                 `;
-            });
+                pageData.forEach((row, index) => {
+                    const rowNum = start + index + 1;
+                    const jamColorClass = getJamColorClass(row.AP);
+                    const estimasiKoli = parseNumberWithComma(row.BA);
+                    html += `
+                        <tr class="${jamColorClass}">
+                            <td>${rowNum}</td>
+                            <td>${row.A || '-'}</td>
+                            <td>${row.I || '-'}</td>
+                            <td>${row.G || '-'}</td>
+                            <td>${row.D || '-'}</td>
+                            <td>${row.AO || '-'}</td>
+                            <td>${row.AP || '-'}</td>
+                            <td>${row.M || '-'}</td>
+                            <td>${row.R || '-'}</td>
+                            <td>${parseNumberWithComma(row.Z).toFixed(2) || '-'}</td>
+                            <td>${estimasiKoli.toFixed(0) || '-'}</td>
+                            <td>${parseNumberWithComma(row.AY).toFixed(2) || '-'}</td>
+                            <td>${parseNumberWithComma(row.AQ).toFixed(0) || '-'}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>LC</th>
+                                <th>SHIPPINGLINE</th>
+                                <th>TYPE</th>
+                                <th>CARRIER</th>
+                                <th>STUFFING</th>
+                                <th>JAM</th>
+                                <th>JALUR</th>
+                                <th>PLAN</th>
+                                <th>SHIPPED</th>
+                                <th>FIX CASE ID</th>
+                                <th>ESTIMASI CASE ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                pageData.forEach((row, index) => {
+                    const rowNum = start + index + 1;
+                    const jamColorClass = getJamColorClass(row.AP);
+                    const estimasiCaseId = parseNumberWithComma(row.BA);
+                    html += `
+                        <tr class="${jamColorClass}">
+                            <td>${rowNum}</td>
+                            <td>${row.A || '-'}</td>
+                            <td>${row.I || '-'}</td>
+                            <td>${row.G || '-'}</td>
+                            <td>${row.D || '-'}</td>
+                            <td>${row.AO || '-'}</td>
+                            <td>${row.AP || '-'}</td>
+                            <td>${row.M || '-'}</td>
+                            <td>${parseNumberWithComma(row.Z).toFixed(2) || '-'}</td>
+                            <td>${parseNumberWithComma(row.AY).toFixed(2) || '-'}</td>
+                            <td>${parseNumberWithComma(row.AQ).toFixed(0) || '-'}</td>
+                            <td>${estimasiCaseId.toFixed(0) || '-'}</td>
+                        </tr>
+                    `;
+                });
+            }
 
             html += `</tbody></table>`;
             container.innerHTML = html;
@@ -2552,7 +3099,7 @@
             const timeStr = `${hours}:${minutes}`;
             
             // Format teks sesuai permintaan user
-            const text = `DATA LOGISTICS DASHBOARD UPDATE TERAKHIR PADA ${dateStr} PUKUL ${timeStr}, JIKA INGIN MENDAPATKAN DATA TERKINI, SILAHKAN HUBUNGI TIM PLANNER AZKO SIDOARJO. TERIMA KASIH`;
+            const text = `DATA LOGISTICS DASHBOARD UPDATE TERAKHIR PADA ${dateStr} PUKUL ${timeStr}, JIKA INGIN MENDAPATKAN DATA TERKINI, SILAHKAN HUBUNGI TIM PLANNER SIDOARJO. TERIMA KASIH`;
             document.getElementById('last-update-text').textContent = text;
         }
 
