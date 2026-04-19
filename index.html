@@ -1311,6 +1311,45 @@
                         <div class="loading">Processing data...</div>
                     </div>
                     <div class="pagination" id="delayed-pagination"></div>
+                    <div class="adt-wrap" id="aging-delay-carrier-section">
+  <div class="adt-header">
+    <i class="fas fa-clock" style="color:#ffd700; font-size:14px;"></i>
+    <span class="adt-title">Aging Delay Per Carrier</span>
+  </div>
+  <div style="overflow-x:auto;">
+    <table class="adt-table">
+      <thead>
+        <tr>
+          <th class="adt-th-label" rowspan="2" style="width:40px;">NO</th>
+          <th class="adt-th-label" rowspan="2" style="width:180px;">CARRIER</th>
+          <th class="adt-th-aging" colspan="6">AGING DELAY</th>
+          <th class="adt-th-total" rowspan="2">TOTAL DELAY ▼</th>
+        </tr>
+        <tr>
+          <th class="adt-th-sub">1</th>
+          <th class="adt-th-sub">2</th>
+          <th class="adt-th-sub">3</th>
+          <th class="adt-th-sub">4</th>
+          <th class="adt-th-sub">5</th>
+          <th class="adt-th-sub">5 UP</th>
+        </tr>
+      </thead>
+      <tbody id="adt-body"></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2" style="text-align:left;letter-spacing:1px;">TOTAL</td>
+          <td id="adt-ft1">-</td>
+          <td id="adt-ft2">-</td>
+          <td id="adt-ft3">-</td>
+          <td id="adt-ft4">-</td>
+          <td id="adt-ft5">-</td>
+          <td id="adt-ft6">-</td>
+          <td><span class="adt-badge" id="adt-ft-total">0</span></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
                 </div>
             </div>
         </div>
