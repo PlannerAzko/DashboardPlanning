@@ -985,6 +985,25 @@
             0% { transform: translate(0, 0); }
             100% { transform: translate(-100%, 0); }
         }
+        
+        /* ===== AGING DELAY PER CARRIER ===== */
+        .adt-wrap { background: #1a1a1a; border-radius: 4px; overflow: hidden; margin-top: 12px; }
+        .adt-header { background: #111; padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #d32f2f; }
+        .adt-title { font-size: 0.85em; font-weight: 700; color: #ffd700; letter-spacing: 1.5px; text-transform: uppercase; }
+        .adt-table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+        .adt-table th { padding: 9px 10px; text-align: center; font-weight: 700; font-size: 0.8em; letter-spacing: 0.5px; color: #fff; }
+        .adt-table td { padding: 9px 10px; border-bottom: 1px solid #222; color: #ccc; text-align: center; }
+        .adt-table td.carrier-name { text-align: left; color: #fff; font-weight: 500; }
+        .adt-table td.no-col { color: #555; font-size: 0.85em; }
+        .adt-table td.dash { color: #444; }
+        .adt-table tbody tr:hover td { background: #222; }
+        .adt-table tfoot td { background: #111; color: #ffd700; font-weight: 700; border-top: 2px solid #d32f2f; border-bottom: none; padding: 11px 10px; }
+        .adt-badge { display: inline-block; background: #b71c1c; color: #fff; font-weight: 700; font-size: 0.9em; padding: 3px 10px; border-radius: 4px; min-width: 26px; text-align: center; }
+        .adt-badge.zero { background: #4a1515; color: #888; }
+        .adt-th-aging { background: #185FA5; }
+        .adt-th-total { background: #7f1d1d; color: #ffd700 !important; }
+        .adt-th-sub { background: #0c3a6e; color: #93c5fd !important; }
+        .adt-th-label { background: #111; color: #ffd700 !important; text-align: left !important; }
     </style>
 </head>
 <body>
