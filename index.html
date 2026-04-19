@@ -1334,6 +1334,37 @@
                         <div class="loading">Processing data...</div>
                     </div>
                     <div class="pagination" id="delayed-pagination"></div>
+                    <div class="carrier-grid">
+<div class="vpp-wrap" id="vendor-performance-section">
+  <div class="vpp-header">
+    <i class="fas fa-star" style="color:#ffd700; font-size:14px;"></i>
+    <span class="vpp-title">Vendor Performance Percentage</span>
+  </div>
+  <div class="vpp-scroll">
+    <table class="vpp-table">
+      <thead>
+        <tr>
+          <th class="vpp-th-label" style="width:35px;">NO</th>
+          <th class="vpp-th-label" style="text-align:left;">CARRIER</th>
+          <th class="vpp-th-blue">ON TIME</th>
+          <th class="vpp-th-red">DELAY</th>
+          <th class="vpp-th-dark">TOTAL</th>
+          <th class="vpp-th-label" style="text-align:center;">ACHIEVEMENT</th>
+        </tr>
+      </thead>
+      <tbody id="vpp-body"></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2" style="text-align:left;letter-spacing:1px;">TOTAL</td>
+          <td id="vpp-ft-ontime" style="color:#4ade80;">-</td>
+          <td id="vpp-ft-delay" style="color:#f87171;">-</td>
+          <td id="vpp-ft-total">-</td>
+          <td id="vpp-ft-achieve">-</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
                     <div class="adt-wrap" id="aging-delay-carrier-section">
   <div class="adt-header">
     <i class="fas fa-clock" style="color:#ffd700; font-size:14px;"></i>
