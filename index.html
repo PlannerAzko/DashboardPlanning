@@ -1392,9 +1392,9 @@
                             <tr style="background: #111;">
                                 <th style="width: 100px; text-align: center; border: 1px solid #333; padding: 10px;">STOREBOOKING</th>
                                 <th style="text-align: left; padding: 10px 20px; border: 1px solid #333;">SHIP TO</th>
-                                <th style="width: 120px; text-align: center; border: 1px solid #333; background: #450a0a; color: #f87171;">AGING 4-7</th>
-                                <th style="width: 120px; text-align: center; border: 1px solid #333; background: #450a0a; color: #f87171;">AGING 7 UP</th>
-                                <th style="width: 150px; text-align: center; border: 1px solid #333; background: #b71c1c; color: #fff; font-weight: bold;">TOTAL UNPLANNED</th>
+                                <th style="width: 120px; text-align: center; border: 1px solid #333; background: #450a0a; color: #f87171; cursor: pointer;" onclick="sortPriority('aging4_7')">AGING 4-7 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th style="width: 120px; text-align: center; border: 1px solid #333; background: #450a0a; color: #f87171; cursor: pointer;" onclick="sortPriority('aging7up')">AGING 7 UP <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th style="width: 150px; text-align: center; border: 1px solid #333; background: #b71c1c; color: #fff; font-weight: bold; cursor: pointer;" onclick="sortPriority('totalUnplanned')">TOTAL UNPLANNED <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.8;"></i></th>
                             </tr>
                         </thead>
                         <tbody id="planning-priority-body">
@@ -1650,6 +1650,7 @@
         let selectedCategory = 'dc'; // Default to dc
         let vendorPerformanceSort = { field: 'achievement', direction: 'desc' };
         let pivotSort = { key: 'code', dir: 'asc' }; // Options: code, name, aging0, aging1_3, aging4_7, aging7up, unplanned0...
+        let prioritySort = { key: 'totalUnplanned', dir: 'desc' };
 
         function handleCategoryChoice(category) {
             selectedCategory = category;
@@ -2043,6 +2044,16 @@
             renderPivotTable();
         }
 
+        function sortPriority(field) {
+            if (prioritySort.key === field) {
+                prioritySort.dir = prioritySort.dir === 'asc' ? 'desc' : 'asc';
+            } else {
+                prioritySort.key = field;
+                prioritySort.dir = 'desc';
+            }
+            renderPivotTable();
+        }
+
         function renderPivotTable() {
             const tbody = document.getElementById('pivot-table-body');
             const priorityBody = document.getElementById('planning-priority-body');
@@ -2202,8 +2213,17 @@
             let priorityHtml = '';
             const priorityList = storeList.filter(s => s.unplannedCbm[2] > 0 || s.unplannedCbm[3] > 0);
             
-            // Sort priority by total unplanned (Highest first)
-            priorityList.sort((a, b) => (b.unplannedCbm[2] + b.unplannedCbm[3]) - (a.unplannedCbm[2] + a.unplannedCbm[3]));
+            // Sort priority based on user selection
+            priorityList.sort((a, b) => {
+                const k = prioritySort.key;
+                const d = prioritySort.dir === 'asc' ? 1 : -1;
+                
+                if (k === 'aging4_7') return (a.unplannedCbm[2] - b.unplannedCbm[2]) * d;
+                if (k === 'aging7up') return (a.unplannedCbm[3] - b.unplannedCbm[3]) * d;
+                if (k === 'totalUnplanned') return ((a.unplannedCbm[2] + a.unplannedCbm[3]) - (b.unplannedCbm[2] + b.unplannedCbm[3])) * d;
+                
+                return 0;
+            });
 
             if (priorityList.length > 0) {
                 priorityList.forEach(s => {
