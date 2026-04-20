@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> LOGISTICS DASHBOARD | ORDER PLANNING</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23d32f2f'/%3E%3Cpath d='M30 50 L70 50 M50 30 L50 70' stroke='white' stroke-width='8'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/x-icon" href="https://share.google/TA72WlvPE4LtJC3Tt">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -18,7 +19,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0a0a0a 100%);
             background-attachment: fixed;
             color: #fff;
@@ -656,7 +657,7 @@
 
         .kpi-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
         }
 
@@ -864,7 +865,7 @@
 
         .chart-body {
             padding: 20px;
-            height: 350px; /* Tinggi tetap agar tidak bergerak */
+            height: 420px; /* Ditingkatkan agar lebih proporsional */
             position: relative;
         }
 
@@ -985,26 +986,6 @@
             0% { transform: translate(0, 0); }
             100% { transform: translate(-100%, 0); }
         }
-        
-        /* ===== AGING DELAY PER CARRIER ===== */
-        .adt-wrap { background: #1a1a1a; border-radius: 4px; overflow: hidden; margin-top: 12px; }
-        .adt-table-scroll { overflow: auto; max-height: 520px; }
-        .adt-header { background: #111; padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #d32f2f; }
-        .adt-title { font-size: 0.85em; font-weight: 700; color: #ffd700; letter-spacing: 1.5px; text-transform: uppercase; }
-        .adt-table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
-        .adt-table th { padding: 9px 10px; text-align: center; font-weight: 700; font-size: 0.8em; letter-spacing: 0.5px; color: #fff; }
-        .adt-table td { padding: 9px 10px; border-bottom: 1px solid #222; color: #ccc; text-align: center; }
-        .adt-table td.carrier-name { text-align: left; color: #fff; font-weight: 500; }
-        .adt-table td.no-col { color: #555; font-size: 0.85em; }
-        .adt-table td.dash { color: #444; }
-        .adt-table tbody tr:hover td { background: #222; }
-        .adt-table tfoot td { background: #111; color: #ffd700; font-weight: 700; border-top: 2px solid #d32f2f; border-bottom: none; padding: 11px 10px; }
-        .adt-badge { display: inline-block; background: #b71c1c; color: #fff; font-weight: 700; font-size: 0.9em; padding: 3px 10px; border-radius: 4px; min-width: 26px; text-align: center; }
-        .adt-badge.zero { background: #4a1515; color: #888; }
-        .adt-th-aging { background: #185FA5; }
-        .adt-th-total { background: #7f1d1d; color: #ffd700 !important; }
-        .adt-th-sub { background: #0c3a6e; color: #93c5fd !important; }
-        .adt-th-label { background: #111; color: #ffd700 !important; text-align: left !important; }
     </style>
 </head>
 <body>
@@ -1113,6 +1094,10 @@
                         <div class="kpi-value" id="caseIdShipped">0</div>
                     </div>
                     <div class="kpi-card yellow">
+                        <div class="kpi-label">CASE ID RATIO SHIPPED</div>
+                        <div class="kpi-value" id="caseIdRatioShipped">0%</div>
+                    </div>
+                    <div class="kpi-card yellow">
                         <div class="kpi-label">CASE ID PLAN</div>
                         <div class="kpi-value" id="caseIdPlan">0</div>
                     </div>
@@ -1121,32 +1106,37 @@
                         <div class="kpi-value" id="cbmShipped">0</div>
                     </div>
                     <div class="kpi-card red">
+                        <div class="kpi-label">CBM RATIO SHIPPED</div>
+                        <div class="kpi-value" id="cbmRatioShipped">0%</div>
+                    </div>
+                    <div class="kpi-card red">
                         <div class="kpi-label">CBM PLAN</div>
                         <div class="kpi-value" id="cbmPlan">0</div>
-                    </div>
-                    <div class="kpi-card gray">
-                        <div class="kpi-label">CBM PLAN SHIFT 1</div>
-                        <div class="kpi-value" id="cbmPlanShift1">0</div>
-                    </div>
-                    <div class="kpi-card gray">
-                        <div class="kpi-label">CBM PLAN SHIFT 2</div>
-                        <div class="kpi-value" id="cbmPlanShift2">0</div>
                     </div>
                 </div>
             </div>
 
             <div class="right-panel">
                 <div id="map"></div>
-                <div class="kpi-container" style="padding: 15px; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="kpi-card green">
-                        <div class="kpi-label">SLA CUSTOMER</div>
-                        <div class="kpi-value" id="slaCustomerKPI" style="font-size: 1.8em;">0%</div>
-                    </div>
-                    <div class="kpi-card green">
-                        <div class="kpi-label">SLA GRW</div>
-                        <div class="kpi-value" id="slaGrwKPI" style="font-size: 1.8em;">0%</div>
-                    </div>
-                </div>
+            </div>
+        </div>
+
+        <div class="kpi-container-four" style="margin-top: 25px;">
+            <div class="kpi-card gray">
+                <div class="kpi-label">CBM PLAN SHIFT 1</div>
+                <div class="kpi-value" id="cbmPlanShift1">0</div>
+            </div>
+            <div class="kpi-card gray">
+                <div class="kpi-label">CBM PLAN SHIFT 2</div>
+                <div class="kpi-value" id="cbmPlanShift2">0</div>
+            </div>
+            <div class="kpi-card green">
+                <div class="kpi-label">SLA CUSTOMER</div>
+                <div class="kpi-value" id="slaCustomerKPI">0%</div>
+            </div>
+            <div class="kpi-card green">
+                <div class="kpi-label">SLA GRW</div>
+                <div class="kpi-value" id="slaGrwKPI">0%</div>
             </div>
         </div>
 
@@ -1312,53 +1302,114 @@
                         <div class="loading">Processing data...</div>
                     </div>
                     <div class="pagination" id="delayed-pagination"></div>
-                    <div class="adt-wrap" id="aging-delay-carrier-section">
-  <div class="adt-header">
-    <i class="fas fa-clock" style="color:#ffd700; font-size:14px;"></i>
-    <span class="adt-title">Aging Delay Per Carrier</span>
-  </div>
-  <div class="adt-table-scroll">
-    <table class="adt-table">
-      <thead>
-        <tr>
-          <th class="adt-th-label" rowspan="2" style="width:40px;">NO</th>
-          <th class="adt-th-label" rowspan="2" style="width:180px;">CARRIER</th>
-          <th class="adt-th-aging" colspan="6">AGING DELAY</th>
-          <th class="adt-th-total" rowspan="2">TOTAL DELAY ▼</th>
-        </tr>
-        <tr>
-          <th class="adt-th-sub">1</th>
-          <th class="adt-th-sub">2</th>
-          <th class="adt-th-sub">3</th>
-          <th class="adt-th-sub">4</th>
-          <th class="adt-th-sub">5</th>
-          <th class="adt-th-sub">5 UP</th>
-        </tr>
-      </thead>
-      <tbody id="adt-body"></tbody>
-      <tfoot>
-        <tr>
-          <td colspan="2" style="text-align:left;letter-spacing:1px;">TOTAL</td>
-          <td id="adt-ft1">-</td>
-          <td id="adt-ft2">-</td>
-          <td id="adt-ft3">-</td>
-          <td id="adt-ft4">-</td>
-          <td id="adt-ft5">-</td>
-          <td id="adt-ft6">-</td>
-          <td><span class="adt-badge" id="adt-ft-total">0</span></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-</div>
                 </div>
             </div>
         </div>
 
         <!-- Pivot Table Section (Unit Distribution Center Only) -->
         <div id="pivot-section" class="pivot-section" style="margin-top: 40px; display: none;">
+            
+            <!-- Table: Aging Delay Per Carrier -->
+            <div id="carrier-aging-container" style="margin-bottom: 30px; border-bottom: 2px solid #333;">
+                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em;">
+                    <i class="fas fa-history" style="margin-right: 10px; color: #ffd700;"></i> AGING DELAY PER CARRIER
+                </div>
+                <div class="table-content-large" style="overflow-x: auto; background: #1a1a1a; padding: 0;">
+                    <table class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em; background: #1a1a1a; color: #fff;">
+                        <thead>
+                            <tr class="nested-header">
+                                <th rowspan="2" style="width: 50px; background: #1a1a1a; border-right: 1px solid #333;">NO</th>
+                                <th rowspan="2" style="width: 250px; background: #1a1a1a; text-align: left; padding-left: 20px; border-right: 1px solid #333;">CARRIER</th>
+                                <th colspan="6" style="background: #006994; color: #fff; font-weight: bold; border-right: 1px solid #333;">AGING DELAY</th>
+                                <th rowspan="2" style="width: 120px; background: #8b0000; color: #fff; font-weight: bold;">TOTAL DELAY <i class="fas fa-sort-down"></i></th>
+                            </tr>
+                            <tr class="sub-header">
+                                <th style="background: #111; color: #00a8e8; width: 60px;">1</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px;">2</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px;">3</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px;">4</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px;">5</th>
+                                <th style="background: #111; color: #00a8e8; width: 80px; border-right: 1px solid #333;">5 UP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="carrier-aging-body">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                        <tfoot id="carrier-aging-foot">
+                            <!-- Totals will be populated here -->
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table: Vendor Performance % -->
+            <div id="vendor-performance-container" style="margin-bottom: 30px; border-bottom: 2px solid #333;">
+                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em;">
+                    <i class="fas fa-medal" style="margin-right: 10px; color: #ffd700;"></i> VENDOR PERFORMANCE %
+                </div>
+                <div class="table-content-large" style="overflow-x: auto; background: #1a1a1a; padding: 0;">
+                    <table class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em; background: #1a1a1a; color: #fff;">
+                        <thead>
+                            <tr style="background: #222;">
+                                <th style="width: 50px; text-align: center; border: 1px solid #333; padding: 10px;">NO</th>
+                                <th onclick="sortVendorPerformance('carrier')" style="text-align: left; padding: 10px 20px; border: 1px solid #333; cursor: pointer; position: relative;">
+                                    CARRIER <i class="fas fa-sort" style="font-size: 0.8em; margin-left: 5px; opacity: 0.5;"></i>
+                                </th>
+                                <th onclick="sortVendorPerformance('onTime')" style="width: 100px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative;">
+                                    ON TIME <i class="fas fa-sort" style="font-size: 0.8em; margin-left: 5px; opacity: 0.5;"></i>
+                                </th>
+                                <th onclick="sortVendorPerformance('terlambat')" style="width: 120px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative;">
+                                    TERLAMBAT <i class="fas fa-sort" style="font-size: 0.8em; margin-left: 5px; opacity: 0.5;"></i>
+                                </th>
+                                <th onclick="sortVendorPerformance('total')" style="width: 100px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative;">
+                                    TOTAL <i class="fas fa-sort" style="font-size: 0.8em; margin-left: 5px; opacity: 0.5;"></i>
+                                </th>
+                                <th onclick="sortVendorPerformance('achievement')" style="width: 150px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative; color: #ffd700;">
+                                    ACHIEVEMENT % <i class="fas fa-sort" style="font-size: 0.8em; margin-left: 5px; opacity: 0.8;"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="vendor-performance-body">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                        <tfoot id="vendor-performance-foot">
+                            <!-- Totals will be populated here -->
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Table: Planning Priority Summary -->
+            <div id="planning-priority-container" style="margin-bottom: 30px; border-bottom: 2px solid #333; display: none;">
+                <div class="table-header" style="background: linear-gradient(90deg, #d32f2f 0%, #333 100%); border-left: 4px solid #ffd700; color: #fff; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-bullseye" style="margin-right: 10px; color: #ffd700;"></i> PLANNING PRIORITY (AGING 4-7 & 7 UP)</span>
+                    <span style="font-size: 0.8em; opacity: 0.8;">Action Required: SEGERA PLANNING</span>
+                </div>
+                <div class="table-content-large" style="overflow-x: auto; background: #1a1a1a; padding: 0; max-height: 400px;">
+                    <table class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em; background: #1a1a1a; color: #fff;">
+                        <thead>
+                            <tr style="background: #111;">
+                                <th style="width: 100px; text-align: center; border: 1px solid #333; padding: 10px;">STOREBOOKING</th>
+                                <th style="text-align: left; padding: 10px 20px; border: 1px solid #333;">SHIP TO</th>
+                                <th style="width: 120px; text-align: center; border: 1px solid #333; background: #450a0a; color: #f87171;">AGING 4-7</th>
+                                <th style="width: 120px; text-align: center; border: 1px solid #333; background: #450a0a; color: #f87171;">AGING 7 UP</th>
+                                <th style="width: 150px; text-align: center; border: 1px solid #333; background: #b71c1c; color: #fff; font-weight: bold;">TOTAL UNPLANNED</th>
+                            </tr>
+                        </thead>
+                        <tbody id="planning-priority-body">
+                            <!-- Data populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
-                <span><i class="fas fa-th"></i> MONITORING ORDER AGING DC AHI SIDOARJO</span>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span><i class="fas fa-th"></i> MONITORING ORDER AGING DC AHI SIDOARJO</span>
+                    <div id="pivot-grand-total-display" style="background: rgba(255,215,0,0.1); border: 1px solid #ffd700; color: #ffd700; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em; display: none;">
+                        BACKLOG ORDERS: <span id="pivot-grand-total-value">0</span> CBM
+                    </div>
+                </div>
                 <div class="pivot-filter" style="display: flex; align-items: center; gap: 15px;">
                     <a id="whatsapp-btn" href="https://wa.me/6285973792145?text=Halo%20Tim%20Inventory%20Planner%2C%0A%0AKami%20ingin%20menginformasikan%20bahwa%20saat%20ini%20STOREBOOKING%20kami%20mengalami%20kekurangan%20kuota.%20Sehubungan%20dengan%20hal%20tersebut%2C%20kami%20mohon%20bantuannya%20untuk%20penambahan%20kuota%20agar%20proses%20operasional%20dapat%20berjalan%20dengan%20lancar.%0A%0AMohon%20dapat%20ditindaklanjuti%20secepatnya.%20Terima%20kasih%20atas%20perhatian%20dan%20kerjasamanya.%0A%0ABest%20regards%2C%0A%5BTim%20Planner%20DC%20Sidoarjo%5D" 
                        target="_blank" 
@@ -1379,16 +1430,24 @@
                 <table id="pivot-table" class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
                     <thead>
                         <tr class="nested-header">
-                            <th rowspan="2" style="width: 80px;">STOREBOOKING</th>
-                            <th rowspan="2" style="width: 200px;">SHIP TO</th>
+                            <th rowspan="2" onclick="sortPivot('code')" style="width: 80px; cursor: pointer;">STOREBOOKING <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            <th rowspan="2" onclick="sortPivot('name')" style="width: 200px; cursor: pointer;">SHIP TO <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
                             <th colspan="5" style="background: #2c3e50; color: #ecf0f1;">AGING SUDAH PLAN (CBM)</th>
                             <th colspan="5" style="background: #27ae60; color: #fff;">AGING BELUM PLAN (CBM)</th>
                         </tr>
                         <tr class="sub-header">
                             <!-- Aging Order -->
-                            <th>0</th><th>1-3</th><th>4-7</th><th>7 UP</th><th style="background: #34495e;">TOTAL</th>
+                            <th onclick="sortPivot('aging0')" style="cursor: pointer;">0 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            <th onclick="sortPivot('aging1_3')" style="cursor: pointer;">1-3 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            <th onclick="sortPivot('aging4_7')" style="cursor: pointer;">4-7 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            <th onclick="sortPivot('aging7up')" style="cursor: pointer;">7 UP <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            <th onclick="sortPivot('agingTotal')" style="background: #34495e; cursor: pointer;">TOTAL <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
                             <!-- Sebaran Order -->
-                            <th>0</th><th>1-3</th><th>4-7</th><th>7 UP</th><th style="background: #219150;">TOTAL</th>
+                            <th onclick="sortPivot('unplanned0')" style="cursor: pointer;">0 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            <th onclick="sortPivot('unplanned1_3')" style="cursor: pointer;">1-3 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            <th onclick="sortPivot('unplanned4_7')" style="cursor: pointer;">4-7 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            <th onclick="sortPivot('unplanned7up')" style="cursor: pointer;">7 UP <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            <th onclick="sortPivot('unplannedTotal')" style="background: #219150; cursor: pointer;">TOTAL <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
                         </tr>
                     </thead>
                     <tbody id="pivot-table-body">
@@ -1494,7 +1553,6 @@
             'TUNGKAL': [0.3187, 101.6339],
             'UMETARO': [-8.5895, 116.2708],
             'YOGYA': [-7.7956, 110.3695],
-            'TIMIKA': [-4.5500, 136.8833],
             
             // Mixed case variations
             'Jakarta': [-6.2088, 106.8456],
@@ -1548,9 +1606,7 @@
             'PALU': [-0.8917, 119.8707],
             'Palopo': [-3.0050, 120.1980],
             'Pare-Pare': [-4.0167, 119.6236],
-            'SIDOARJO': [-7.4478, 112.7183],
-            'TIMIKA': [-4.5500, 136.8833],
-            'KOTA PASURUAN': [-7.6450, 112.9075]
+            'SIDOARJO': [-7.4478, 112.7183]
         };
 
         // Data Storage
@@ -1591,6 +1647,8 @@
 
         let welcomeChoice = null;
         let selectedCategory = 'dc'; // Default to dc
+        let vendorPerformanceSort = { field: 'achievement', direction: 'desc' };
+        let pivotSort = { key: 'code', dir: 'asc' }; // Options: code, name, aging0, aging1_3, aging4_7, aging7up, unplanned0...
 
         function handleCategoryChoice(category) {
             selectedCategory = category;
@@ -1974,11 +2032,26 @@
             const encodedMessage = encodeURIComponent(finalMessage);
             btn.href = `https://wa.me/6285973792145?text=${encodedMessage}`;
         }
+        function sortPivot(field) {
+            if (pivotSort.key === field) {
+                pivotSort.dir = pivotSort.dir === 'asc' ? 'desc' : 'asc';
+            } else {
+                pivotSort.key = field;
+                pivotSort.dir = 'desc'; // Default to desc for numeric values
+            }
+            renderPivotTable();
+        }
 
         function renderPivotTable() {
             const tbody = document.getElementById('pivot-table-body');
+            const priorityBody = document.getElementById('planning-priority-body');
+            const priorityContainer = document.getElementById('planning-priority-container');
             const areaFilter = document.getElementById('pivot-area-filter').value;
             if (!tbody) return;
+
+            // Clear previous data
+            priorityBody.innerHTML = '';
+            priorityContainer.style.display = 'none';
 
             // Filter data by area
             const filtered = areaFilter === 'ALL' 
@@ -1999,7 +2072,9 @@
                         code: row.storeBooking,
                         name: row.storeBookingName,
                         agingCbm: Array(4).fill(0), // 0, 1-3, 4-7, 7 UP
-                        unplannedCbm: Array(4).fill(0)
+                        unplannedCbm: Array(4).fill(0),
+                        agingTotal: 0,
+                        unplannedTotal: 0
                     };
                 }
 
@@ -2013,18 +2088,44 @@
                 // AGING SUDAH PLAN (CBM) - Filter: "Sudah Plan" in Column BC
                 if (row.status === 'Sudah Plan') {
                     stores[key].agingCbm[agingIdx] += row.cbm;
+                    stores[key].agingTotal += row.cbm;
                 }
 
                 // AGING BELUM PLAN (CBM) - Filter: "Belum Plan" in Column BC
                 if (row.status === 'Belum Plan') {
                     stores[key].unplannedCbm[agingIdx] += row.cbm;
+                    stores[key].unplannedTotal += row.cbm;
                 }
             });
 
-            const storeList = Object.values(stores).sort((a, b) => a.code.localeCompare(b.code));
+            const storeList = Object.values(stores);
+            
+            // Apply sorting logic
+            storeList.sort((a, b) => {
+                const k = pivotSort.key;
+                const d = pivotSort.dir === 'asc' ? 1 : -1;
+                
+                if (k === 'code') return a.code.localeCompare(b.code) * d;
+                if (k === 'name') return a.name.localeCompare(b.name) * d;
+                
+                if (k === 'aging0') return (a.agingCbm[0] - b.agingCbm[0]) * d;
+                if (k === 'aging1_3') return (a.agingCbm[1] - b.agingCbm[1]) * d;
+                if (k === 'aging4_7') return (a.agingCbm[2] - b.agingCbm[2]) * d;
+                if (k === 'aging7up') return (a.agingCbm[3] - b.agingCbm[3]) * d;
+                if (k === 'agingTotal') return (a.agingTotal - b.agingTotal) * d;
+                
+                if (k === 'unplanned0') return (a.unplannedCbm[0] - b.unplannedCbm[0]) * d;
+                if (k === 'unplanned1_3') return (a.unplannedCbm[1] - b.unplannedCbm[1]) * d;
+                if (k === 'unplanned4_7') return (a.unplannedCbm[2] - b.unplannedCbm[2]) * d;
+                if (k === 'unplanned7up') return (a.unplannedCbm[3] - b.unplannedCbm[3]) * d;
+                if (k === 'unplannedTotal') return (a.unplannedTotal - b.unplannedTotal) * d;
+                
+                return 0;
+            });
 
             if (storeList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="12" style="text-align: center; padding: 20px; color: #666;">Tidak ada data untuk area ini.</td></tr>`;
+                document.getElementById('pivot-grand-total-display').style.display = 'none';
                 return;
             }
 
@@ -2037,9 +2138,6 @@
             };
 
             storeList.forEach(store => {
-                let rowAgingTotal = 0;
-                let rowUnplannedTotal = 0;
-
                 html += `<tr>
                     <td style="background: #222; border: 1px solid #333; padding: 8px; text-align: center;">${store.code}</td>
                     <td style="background: #222; border: 1px solid #333; padding: 8px;">${store.name}</td>`;
@@ -2048,34 +2146,38 @@
                 store.agingCbm.forEach((val, i) => {
                     const displayVal = val > 0 ? formatIndo(val) : '-';
                     const color = val > 0 ? '#fff' : '#444';
-                    // 0 (i=0), 1-3 (i=1) -> Green; 4-7 (i=2), 7 UP (i=3) -> Red
                     const bgColor = i < 2 ? (val > 0 ? '#1b5e20' : 'transparent') : (val > 0 ? '#b71c1c' : 'transparent');
-                    
                     html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; background: ${bgColor};">${displayVal}</td>`;
                     totals.aging[i] += val;
-                    rowAgingTotal += val;
                 });
-                // Row Total for Aging
-                html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #34495e; font-weight: bold;">${rowAgingTotal > 0 ? formatIndo(rowAgingTotal) : '-'}</td>`;
-                totals.agingTotal += rowAgingTotal;
+                
+                html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #34495e; font-weight: bold;">${store.agingTotal > 0 ? formatIndo(store.agingTotal) : '-'}</td>`;
+                totals.agingTotal += store.agingTotal;
 
                 // Unplanned Order Columns
                 store.unplannedCbm.forEach((val, i) => {
                     const displayVal = val > 0 ? formatIndo(val) : '-';
                     const color = val > 0 ? '#fff' : '#444';
-                    // 0 (i=0), 1-3 (i=1) -> Green; 4-7 (i=2), 7 UP (i=3) -> Red
                     const bgColor = i < 2 ? (val > 0 ? '#1b5e20' : 'transparent') : (val > 0 ? '#b71c1c' : 'transparent');
-
                     html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; font-weight: ${val > 0 ? 'bold' : 'normal'}; background: ${bgColor};">${displayVal}</td>`;
                     totals.unplanned[i] += val;
-                    rowUnplannedTotal += val;
                 });
-                // Row Total for Unplanned
-                html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #219150; font-weight: bold;">${rowUnplannedTotal > 0 ? formatIndo(rowUnplannedTotal) : '-'}</td>`;
-                totals.unplannedTotal += rowUnplannedTotal;
+                
+                html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #219150; font-weight: bold;">${store.unplannedTotal > 0 ? formatIndo(store.unplannedTotal) : '-'}</td>`;
+                totals.unplannedTotal += store.unplannedTotal;
 
                 html += `</tr>`;
             });
+
+            // Update Grand Total in Header
+            const grandTotalAll = totals.agingTotal + totals.unplannedTotal;
+            const grandTotalEl = document.getElementById('pivot-grand-total-display');
+            const grandTotalVal = document.getElementById('pivot-grand-total-value');
+            if (grandTotalEl && grandTotalVal) {
+                grandTotalVal.textContent = formatIndo(grandTotalAll);
+                grandTotalEl.style.display = 'block';
+            }
+
 
             // Add Grand Total Row
             html += `<tr style="background: #2c3e50; font-weight: bold; color: #ffd700;">
@@ -2094,6 +2196,29 @@
             html += `</tr>`;
 
             tbody.innerHTML = html;
+            
+            // Populate Priority Summary
+            let priorityHtml = '';
+            const priorityList = storeList.filter(s => s.unplannedCbm[2] > 0 || s.unplannedCbm[3] > 0);
+            
+            // Sort priority by total unplanned (Highest first)
+            priorityList.sort((a, b) => (b.unplannedCbm[2] + b.unplannedCbm[3]) - (a.unplannedCbm[2] + a.unplannedCbm[3]));
+
+            if (priorityList.length > 0) {
+                priorityList.forEach(s => {
+                    const totalPrio = s.unplannedCbm[2] + s.unplannedCbm[3];
+                    priorityHtml += `<tr>
+                        <td style="text-align: center; border: 1px solid #333; padding: 8px; background: #222;">${s.code}</td>
+                        <td style="padding: 8px 20px; border: 1px solid #333;">${s.name}</td>
+                        <td style="text-align: right; border: 1px solid #333; padding: 8px; background: rgba(183, 28, 28, 0.2); color: #f87171; font-weight: bold;">${s.unplannedCbm[2] > 0 ? formatIndo(s.unplannedCbm[2]) : '-'}</td>
+                        <td style="text-align: right; border: 1px solid #333; padding: 8px; background: rgba(183, 28, 28, 0.4); color: #f87171; font-weight: bold;">${s.unplannedCbm[3] > 0 ? formatIndo(s.unplannedCbm[3]) : '-'}</td>
+                        <td style="text-align: right; border: 1px solid #333; padding: 8px; background: #b71c1c; font-weight: bold;">${formatIndo(totalPrio)}</td>
+                    </tr>`;
+                });
+                priorityBody.innerHTML = priorityHtml;
+                priorityContainer.style.display = 'block';
+            }
+
             updateWhatsAppLink();
         }
 
@@ -2221,8 +2346,8 @@
             for (let i = 1; i < allRows.length; i++) {
                 const values = allRows[i];
 
-                // Check if we have at least the basic columns (up to AR which is index 43)
-                if (values.length > 43) {
+                // Check if we have enough columns for basic ID and Date
+                if (values.length > 40) {
                     const id = (values[COLUMNS.A] || '').trim();
                     const stuffingDate = (values[COLUMNS.AO] || '').trim();
                     const kota = (values[COLUMNS.AR] || '').trim();
@@ -2541,9 +2666,201 @@
                 updateMap();
                 updateCharts();
                 updateExtraSection();
+                updateCarrierAgingTable();
+                updateVendorPerformanceTable();
             } catch (error) {
                 console.error("Error updating dashboard:", error);
             }
+        }
+
+        function updateCarrierAgingTable() {
+            if (selectedCategory !== 'dc') return;
+            
+            const carrierData = {};
+            const totals = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, '5UP': 0, grand: 0 };
+            const excludedCarriers = ['1D-INTERNAL (SDA)', 'AHI', 'DUMMY-LK-EKSP', 'DUMMY'];
+
+            // We use filteredData to respect top-level filters (Date, City, etc.)
+            filteredData.forEach(row => {
+                // Filter: Only for "Terlambat" records (Column AV)
+                // Case-insensitive check and using includes to be more robust
+                const ketVendor = (row.AV || '').trim().toLowerCase();
+                if (!ketVendor.includes('terlambat')) return;
+
+                const carrier = (row.D || '').trim();
+                if (!carrier || carrier === '-' || carrier === 'CARRIER') return;
+                
+                // Exclusion Filter
+                const carrierUpper = carrier.toUpperCase();
+                if (excludedCarriers.includes(carrierUpper) || carrierUpper.includes('DUMMY')) return;
+
+                const agingLcStr = (row.AW || '').toString();
+                const agingMatch = agingLcStr.match(/(\d+)/);
+                if (!agingMatch) return;
+                
+                const days = parseInt(agingMatch[1]);
+                // If it's "Terlambat", we count it even if days is 0 (though usually it's > 0)
+                // If user wants to see it in the table, we should categorize it.
+                
+                if (!carrierData[carrier]) {
+                    carrierData[carrier] = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, '5UP': 0, total: 0 };
+                }
+
+                let bracket;
+                if (days >= 5) bracket = '5UP';
+                else if (days <= 0) bracket = 1; // Default to bracket 1 if somehow 0 or less but marked "Terlambat"
+                else bracket = days;
+
+                if (carrierData[carrier][bracket] !== undefined) {
+                    carrierData[carrier][bracket]++;
+                    carrierData[carrier].total++;
+                    totals[bracket]++;
+                    totals.grand++;
+                }
+            });
+
+            const sortedCarriers = Object.keys(carrierData).sort((a, b) => carrierData[b].total - carrierData[a].total);
+
+            let html = '';
+            sortedCarriers.forEach((carrier, idx) => {
+                const data = carrierData[carrier];
+                html += `
+                    <tr style="border-bottom: 1px solid #222;">
+                        <td style="text-align: center; color: #555; background: #151515;">${idx + 1}</td>
+                        <td style="padding: 12px 20px; font-weight: 500;">${carrier}</td>
+                        <td style="text-align: center; color: #00a8e8;">${data[1] || '-'}</td>
+                        <td style="text-align: center; color: #00a8e8;">${data[2] || '-'}</td>
+                        <td style="text-align: center; color: #00a8e8;">${data[3] || '-'}</td>
+                        <td style="text-align: center; color: #00a8e8;">${data[4] || '-'}</td>
+                        <td style="text-align: center; color: #00a8e8;">${data[5] || '-'}</td>
+                        <td style="text-align: center; color: #00a8e8; border-right: 1px solid #333;">${data['5UP'] || '-'}</td>
+                        <td style="text-align: center; padding: 8px;">
+                            <span style="background: #8b0000; color: #fff; padding: 3px 10px; border-radius: 4px; font-weight: bold; display: inline-block; min-width: 35px;">
+                                ${data.total}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const body = document.getElementById('carrier-aging-body');
+            if (body) body.innerHTML = html || '<tr><td colspan="9" style="text-align:center; padding:20px; color:#666;">Tidak ada data delay</td></tr>';
+
+            // Footer
+            let footerHtml = `
+                <tr style="background: #111; font-weight: bold; border-top: 2px solid #8b0000;">
+                    <td colspan="2" style="color: #ffd700; text-align: left; padding: 15px 20px;">TOTAL</td>
+                    <td style="text-align: center; color: #ffd700;">${totals[1] || '-'}</td>
+                    <td style="text-align: center; color: #ffd700;">${totals[2] || '-'}</td>
+                    <td style="text-align: center; color: #ffd700;">${totals[3] || '-'}</td>
+                    <td style="text-align: center; color: #ffd700;">${totals[4] || '-'}</td>
+                    <td style="text-align: center; color: #ffd700;">${totals[5] || '-'}</td>
+                    <td style="text-align: center; color: #ffd700; border-right: 1px solid #333;">${totals['5UP'] || '-'}</td>
+                    <td style="text-align: center;">
+                        <span style="background: #8b0000; color: #fff; padding: 5px 12px; border-radius: 4px; display: inline-block; min-width: 45px;">
+                            ${totals.grand}
+                        </span>
+                    </td>
+                </tr>
+            `;
+            const foot = document.getElementById('carrier-aging-foot');
+            if (foot) foot.innerHTML = footerHtml;
+        }
+
+        function sortVendorPerformance(field) {
+            if (vendorPerformanceSort.field === field) {
+                vendorPerformanceSort.direction = (vendorPerformanceSort.direction === 'asc') ? 'desc' : 'asc';
+            } else {
+                vendorPerformanceSort.field = field;
+                vendorPerformanceSort.direction = 'desc'; // Default to desc for performance metrics
+            }
+            updateVendorPerformanceTable();
+        }
+
+        function updateVendorPerformanceTable() {
+            if (selectedCategory !== 'dc') return;
+
+            const perfData = {};
+            let grandOnTime = 0;
+            let grandTerlambat = 0;
+            let grandTotal = 0;
+            const excludedCarriers = ['1D-INTERNAL (SDA)', 'AHI', 'DUMMY-LK-EKSP', 'DUMMY'];
+
+            filteredData.forEach(row => {
+                const carrier = (row.D || '').trim();
+                if (!carrier || carrier === '-' || carrier === 'CARRIER') return;
+
+                // Exclusion Filter
+                const carrierUpper = carrier.toUpperCase();
+                if (excludedCarriers.includes(carrierUpper) || carrierUpper.includes('DUMMY')) return;
+
+                if (!perfData[carrier]) {
+                    perfData[carrier] = { carrier: carrier, onTime: 0, terlambat: 0, total: 0, achievement: 0 };
+                }
+
+                const ketVendor = (row.AV || '').trim().toLowerCase();
+                const isTerlambat = ketVendor.includes('terlambat');
+
+                if (isTerlambat) {
+                    perfData[carrier].terlambat++;
+                    grandTerlambat++;
+                } else {
+                    perfData[carrier].onTime++;
+                    grandOnTime++;
+                }
+                perfData[carrier].total++;
+                grandTotal++;
+            });
+
+            // Calculate Achievement and convert back to list for sorting
+            const carrierList = Object.values(perfData);
+            carrierList.forEach(c => {
+                c.achievement = c.total > 0 ? (c.onTime / c.total * 100) : 0;
+            });
+
+            // Sorting logic
+            carrierList.sort((a, b) => {
+                const field = vendorPerformanceSort.field;
+                const dir = (vendorPerformanceSort.direction === 'asc') ? 1 : -1;
+                
+                if (field === 'carrier') {
+                    return a.carrier.localeCompare(b.carrier) * dir;
+                }
+                return (a[field] - b[field]) * dir;
+            });
+
+            let html = '';
+            carrierList.forEach((d, idx) => {
+                const achievementFormatted = d.achievement.toFixed(2) + '%';
+                
+                html += `
+                    <tr style="border-bottom: 1px solid #222;">
+                        <td style="text-align: center; color: #555; background: #151515; border: 1px solid #222;">${idx + 1}</td>
+                        <td style="padding: 10px 20px; font-weight: 500; border: 1px solid #222;">${d.carrier}</td>
+                        <td style="text-align: center; border: 1px solid #222; color: #00ff00;">${d.onTime}</td>
+                        <td style="text-align: center; border: 1px solid #222; color: #ff3e3e;">${d.terlambat}</td>
+                        <td style="text-align: center; border: 1px solid #222; font-weight: bold;">${d.total}</td>
+                        <td style="text-align: center; border: 1px solid #222; font-weight: bold; color: #ffd700;">${achievementFormatted}</td>
+                    </tr>
+                `;
+            });
+
+            const body = document.getElementById('vendor-performance-body');
+            if (body) body.innerHTML = html || '<tr><td colspan="6" style="text-align:center; padding:20px; color:#666;">Tidak ada data performa</td></tr>';
+
+            // Grand Total
+            const grandAchievement = grandTotal > 0 ? (grandOnTime / grandTotal * 100).toFixed(2) + '%' : '0.00%';
+            let footHtml = `
+                <tr style="background: #111; font-weight: bold; border-top: 2px solid #ffd700;">
+                    <td colspan="2" style="padding: 12px 20px; color: #ffd700;">GRAND TOTAL</td>
+                    <td style="text-align: center; color: #00ff00; border: 1px solid #222;">${grandOnTime}</td>
+                    <td style="text-align: center; color: #ff3e3e; border: 1px solid #222;">${grandTerlambat}</td>
+                    <td style="text-align: center; border: 1px solid #222;">${grandTotal}</td>
+                    <td style="text-align: center; color: #ffd700; border: 1px solid #222;">${grandAchievement}</td>
+                </tr>
+            `;
+            const foot = document.getElementById('vendor-performance-foot');
+            if (foot) foot.innerHTML = footHtml;
         }
 
         // Update Charts
@@ -2605,9 +2922,18 @@
                 return ratio === 0 ? null : ratio;
             });
 
+            // Default font family for all charts
+            Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+
             // SLA Chart
             const slaCtx = document.getElementById('slaChart').getContext('2d');
             if (slaChart) slaChart.destroy();
+            
+            // Create Gradients
+            const gradBlueLine = slaCtx.createLinearGradient(0, 0, 0, 400);
+            gradBlueLine.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+            gradBlueLine.addColorStop(1, 'rgba(59, 130, 246, 0)');
+
             slaChart = new Chart(slaCtx, {
                 type: 'line',
                 data: {
@@ -2618,70 +2944,119 @@
                             data: slaCustomerData,
                             borderColor: '#3b82f6',
                             backgroundColor: 'transparent',
-                            borderWidth: 3,
-                            pointRadius: 4,
-                            tension: 0.1
+                            borderWidth: 4,
+                            pointRadius: 5,
+                            pointHoverRadius: 8,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#3b82f6',
+                            pointBorderWidth: 3,
+                            tension: 0.4,
+                            borderDash: [8, 4]
                         },
                         {
                             label: 'SLA GRW (Actual)',
                             data: slaGrwData,
                             borderColor: '#2dd4bf',
                             backgroundColor: 'transparent',
-                            borderWidth: 3,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#2dd4bf',
-                            tension: 0.4
+                            borderWidth: 5,
+                            pointRadius: 7,
+                            pointHoverRadius: 10,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#2dd4bf',
+                            pointBorderWidth: 3,
+                            tension: 0.4,
+                            fill: false
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: false, // Mematikan animasi agar tidak bergerak/flicker
+                    animation: { duration: 800 },
+                    layout: {
+                        padding: {
+                            top: 15,
+                            bottom: 5,
+                            left: 10,
+                            right: 15
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
                     scales: {
                         y: {
-                            // Menyesuaikan range agar fluktuasi terlihat
+                            min: 95,
+                            max: 101,
                             ticks: {
-                                color: '#aaa',
-                                callback: value => value + '%'
+                                stepSize: 1,
+                                color: '#e5e7eb',
+                                font: { size: 13, weight: '700' },
+                                padding: 15,
+                                callback: value => value <= 100 ? value + '%' : ''
                             },
-                            grid: { color: '#333' }
+                            grid: { color: 'rgba(255, 255, 255, 0.08)', drawBorder: false }
                         },
                         x: {
-                            ticks: { color: '#aaa' },
+                            ticks: { 
+                                color: '#d1d5db',
+                                font: { size: 12, weight: '600' },
+                                maxRotation: 45,
+                                minRotation: 45,
+                                padding: 5
+                            },
                             grid: { display: false }
                         }
                     },
                     plugins: {
                         legend: {
                             position: 'top',
-                            labels: { color: '#fff', font: { weight: 'bold' } }
+                            align: 'end',
+                            labels: { 
+                                color: '#ffffff', 
+                                font: { size: 13, weight: 'bold' },
+                                usePointStyle: true,
+                                boxWidth: 10,
+                                padding: 15
+                            }
                         },
                         datalabels: {
-                            anchor: (context) => {
-                                const val = context.dataset.data[context.dataIndex];
-                                return (val !== null && val < 100) ? 'center' : 'end';
-                            },
-                            align: (context) => {
-                                const val = context.dataset.data[context.dataIndex];
-                                return (val !== null && val < 100) ? 'right' : 'top';
-                            },
-                            offset: 5,
-                            color: (context) => context.dataset.borderColor,
-                            font: { weight: 'bold', size: 10 },
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 10,
+                            color: '#ffffff',
+                            font: { weight: 'bold', size: 13 },
+                            backgroundColor: 'rgba(15, 15, 15, 0.8)',
+                            borderColor: 'rgba(255,255,255,0.2)',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            padding: 6,
                             formatter: (value) => value === null ? '' : value.toFixed(1) + '%',
                             display: (context) => {
                                 const data = context.dataset.data;
                                 const validData = data.filter(v => v !== null);
-                                if (validData.length === 0 || context.dataset.data[context.dataIndex] === null) return false;
+                                if (validData.length === 0 || data[context.dataIndex] === null) return false;
                                 
                                 const max = Math.max(...validData);
                                 const min = Math.min(...validData);
-                                const currentVal = context.dataset.data[context.dataIndex];
+                                const currentVal = data[context.dataIndex];
                                 
-                                // Tampilkan hanya jika nilai adalah Max pertama atau Min pertama di antara data valid
-                                return currentVal === max && context.dataIndex === data.indexOf(max) || 
-                                       currentVal === min && context.dataIndex === data.indexOf(min);
+                                return (currentVal === max && context.dataIndex === data.indexOf(max)) || 
+                                       (currentVal === min && context.dataIndex === data.indexOf(min)) ||
+                                       (context.dataIndex === data.length - 1); // Also show latest
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#111',
+                            titleFont: { size: 15, weight: 'bold' },
+                            bodyFont: { size: 14 },
+                            padding: 15,
+                            cornerRadius: 10,
+                            borderColor: '#333',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: (context) => ` ${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`
                             }
                         }
                     }
@@ -2691,70 +3066,97 @@
             // CBM Ratio Chart
             const cbmCtx = document.getElementById('cbmRatioChart').getContext('2d');
             if (cbmRatioChart) cbmRatioChart.destroy();
+
+            const cbmGrad = cbmCtx.createLinearGradient(0, 0, 0, 400);
+            cbmGrad.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
+            cbmGrad.addColorStop(1, 'rgba(59, 130, 246, 0)');
+
             cbmRatioChart = new Chart(cbmCtx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'CBM Plan-to-Actual Ratio (%)',
+                        label: 'CBM Ratio (%)',
                         data: cbmRatioData,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderColor: '#60a5fa',
+                        backgroundColor: cbmGrad,
                         fill: true,
-                        borderWidth: 3,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#3b82f6',
+                        borderWidth: 5,
+                        pointRadius: 7,
+                        pointHoverRadius: 11,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#60a5fa',
+                        pointBorderWidth: 4,
                         tension: 0.4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: false, // Mematikan animasi
+                    animation: { duration: 1000 },
+                    layout: {
+                        padding: {
+                            top: 15,
+                            bottom: 5,
+                            left: 10,
+                            right: 15
+                        }
+                    },
                     scales: {
                         y: {
-                            beginAtZero: true,
+                            beginAtZero: false,
+                            min: Math.min(...cbmRatioData.filter(v => v !== null)) * 0.85,
                             ticks: {
-                                color: '#aaa',
-                                callback: value => value + '%'
+                                color: '#e5e7eb',
+                                font: { size: 13, weight: '700' },
+                                padding: 15,
+                                callback: value => value.toFixed(0) + '%'
                             },
-                            grid: { color: '#333' }
+                            grid: { color: 'rgba(255, 255, 255, 0.08)', drawBorder: false }
                         },
                         x: {
-                            ticks: { color: '#aaa' },
+                            ticks: { 
+                                color: '#d1d5db',
+                                font: { size: 12, weight: '600' },
+                                maxRotation: 45,
+                                minRotation: 45,
+                                padding: 5
+                            },
                             grid: { display: false }
                         }
                     },
                     plugins: {
                         legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: context => `Ratio: ${context.parsed.y.toFixed(1)}%`
+                            display: true,
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                color: '#fff',
+                                font: { size: 13, weight: 'bold' },
+                                usePointStyle: true,
+                                boxWidth: 10,
+                                padding: 15
                             }
                         },
                         datalabels: {
-                            anchor: 'start',
-                            align: 'bottom',
-                            offset: 5,
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 12,
                             color: '#fff',
-                            font: { weight: 'bold', size: 10 },
+                            font: { weight: 'bold', size: 13 },
+                            backgroundColor: 'rgba(30, 64, 175, 0.9)',
+                            borderRadius: 6,
+                            padding: 8,
                             formatter: (value) => value === null ? '' : value.toFixed(1) + '%',
-                            backgroundColor: 'rgba(0,0,0,0.5)',
-                            borderRadius: 3,
-                            padding: 2,
                             display: (context) => {
                                 const data = context.dataset.data;
                                 const validData = data.filter(v => v !== null);
-                                if (validData.length === 0 || context.dataset.data[context.dataIndex] === null) return false;
-                                
+                                if (validData.length === 0 || data[context.dataIndex] === null) return false;
                                 const max = Math.max(...validData);
                                 const min = Math.min(...validData);
-                                const currentVal = context.dataset.data[context.dataIndex];
-                                
-                                return currentVal === max && context.dataIndex === data.indexOf(max) || 
-                                       currentVal === min && context.dataIndex === data.indexOf(min);
+                                return (data[context.dataIndex] === max && context.dataIndex === data.indexOf(max)) ||
+                                       (data[context.dataIndex] === min && context.dataIndex === data.indexOf(min)) ||
+                                       (context.dataIndex === data.length - 1);
                             }
                         }
                     }
@@ -2930,7 +3332,6 @@
             renderCitySummaryTable(cityStats);
             renderVendorUnsupportedTable(unsupportedList);
             renderVendorDelayedTable(delayedList);
-            renderAgingDelayPerCarrier(delayedList);
             renderExtraCharts(totalOnTime, totalTerlambat, totalBelumSupport, agingGroups);
             updateTopBottomCityTables();
         }
@@ -3495,9 +3896,14 @@
                 else if (jam >= 19 && jam <= 21) b4 += val;
             });
 
+            const caseIdRatio = caseIdPlan > 0 ? (caseIdShipped / caseIdPlan) * 100 : 0;
+            const cbmRatio = cbmPlan > 0 ? (cbmShipped / cbmPlan) * 100 : 0;
+
             document.getElementById('caseIdShipped').textContent = caseIdShipped.toFixed(0);
+            document.getElementById('caseIdRatioShipped').textContent = caseIdRatio.toFixed(1) + '%';
             document.getElementById('caseIdPlan').textContent = caseIdPlan.toFixed(0);
             document.getElementById('cbmPlan').textContent = cbmPlan.toFixed(2);
+            document.getElementById('cbmRatioShipped').textContent = cbmRatio.toFixed(1) + '%';
             document.getElementById('cbmShipped').textContent = cbmShipped.toFixed(2);
             document.getElementById('cbmPlanShift1').textContent = cbmShift1.toFixed(2);
             document.getElementById('cbmPlanShift2').textContent = cbmShift2.toFixed(2);
@@ -3600,51 +4006,7 @@
         }
 
         // Event Listeners (Removed old listeners, logic handled in checkboxes)
-        function renderAgingDelayPerCarrier(delayedList) {
-    const carrierMap = {};
-    delayedList.forEach(row => {
-        const carrier = (row.D || 'UNKNOWN').trim().toUpperCase();
-        const aging = parseInt(row.AW) || 0;
-        if (!carrierMap[carrier]) carrierMap[carrier] = [0,0,0,0,0,0];
-        if (aging === 1) carrierMap[carrier][0]++;
-        else if (aging === 2) carrierMap[carrier][1]++;
-        else if (aging === 3) carrierMap[carrier][2]++;
-        else if (aging === 4) carrierMap[carrier][3]++;
-        else if (aging === 5) carrierMap[carrier][4]++;
-        else if (aging > 5) carrierMap[carrier][5]++;
-    });
-
-    const sorted = Object.entries(carrierMap)
-        .map(([c, a]) => ({ carrier: c, aging: a, total: a.reduce((s,v)=>s+v,0) }))
-        .sort((a, b) => b.total - a.total);
-
-    const tbody = document.getElementById('adt-body');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-
-    const colTotals = [0,0,0,0,0,0];
-    let grandTotal = 0;
-
-    sorted.forEach((row, idx) => {
-        grandTotal += row.total;
-        row.aging.forEach((v, i) => colTotals[i] += v);
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td class="no-col">${idx + 1}</td>
-            <td class="carrier-name">${row.carrier}</td>
-            ${row.aging.map(v => `<td class="${v===0?'dash':''}">${v===0?'–':v}</td>`).join('')}
-            <td><span class="adt-badge${row.total===0?' zero':''}">${row.total}</span></td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    colTotals.forEach((v, i) => {
-        const el = document.getElementById(`adt-ft${i+1}`);
-        if (el) el.textContent = v === 0 ? '-' : v;
-    });
-    const ftTotal = document.getElementById('adt-ft-total');
-    if (ftTotal) ftTotal.textContent = grandTotal;
-}
+        
         // Auto-refresh every 30 seconds
         setInterval(fetchData, 30000);
 
