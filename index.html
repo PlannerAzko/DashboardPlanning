@@ -12,6 +12,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -1460,6 +1461,51 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Table: ALLOCATION SUMMARY -->
+            <div id="allocation-summary-container" style="margin-top: 30px; margin-bottom: 30px; border-bottom: 2px solid #333; display: none;">
+                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-tasks" style="margin-right: 10px; color: #ffd700;"></i> ALLOCATION SUMMARY (DID NOT ALLOCATE / PRE-ALLOCATED)</span>
+                    
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button onclick="downloadAllocationExcel()" style="background: #1d6f42; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; display: flex; align-items: center; gap: 6px; font-weight: bold;">
+                            <i class="fas fa-file-excel"></i> EXCEL EXPORT
+                        </button>
+                        <button id="share-mobile-btn" onclick="shareAllocationMobile()" style="display: none; background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; align-items: center; gap: 6px; font-weight: bold;">
+                            <i class="fas fa-share-nodes"></i> SHARE MOBILE
+                        </button>
+                        <a id="whatsapp-storing-btn" href="#" target="_blank" style="background: #25D366; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; display: flex; align-items: center; gap: 6px; font-weight: bold; text-decoration: none;">
+                            <i class="fab fa-whatsapp"></i> KIRIM WA STORING
+                        </a>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-left: 10px;">
+                            <label style="font-size: 0.8em; color: #ffd700; opacity: 0.8;">AREA STORING:</label>
+                            <select id="allocation-area-bb-filter" onchange="renderPivotTable()" style="background: #222; color: #ffd700; border: 1px solid #ffd700; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; outline: none;">
+                                <option value="ALL">ALL</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-content-large" style="overflow-x: auto; background: #1a1a1a; padding: 0; max-height: 400px;">
+                    <table class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em; background: #1a1a1a; color: #fff;">
+                        <thead>
+                            <tr style="background: #222;">
+                                <th style="width: 120px; text-align: center; border: 1px solid #333; padding: 10px; cursor: pointer;" onclick="sortAllocation('storeBooking')">STOREBOOKING <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th style="text-align: left; padding: 10px 20px; border: 1px solid #333; cursor: pointer;" onclick="sortAllocation('storeBookingName')">SHIP TO <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th style="width: 130px; text-align: center; border: 1px solid #333; cursor: pointer; color: #f87171;" onclick="sortAllocation('didNot')">Did Not Allocate <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th style="width: 130px; text-align: center; border: 1px solid #333; cursor: pointer; color: #34d399;" onclick="sortAllocation('preAlloc')">Pre-allocated <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th style="width: 130px; text-align: center; border: 1px solid #333; cursor: pointer; color: #fbbf24;" onclick="sortAllocation('partPre')" >Part Pre-allocated <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th style="width: 120px; text-align: center; border: 1px solid #333; color: #ffd700; cursor: pointer; background: #222;" onclick="sortAllocation('totalCbm')">CBM <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody id="allocation-summary-body">
+                            <!-- Data populated via JS -->
+                        </tbody>
+                        <tfoot id="allocation-summary-foot">
+                            <!-- Totals -->
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1651,6 +1697,7 @@
         let vendorPerformanceSort = { field: 'achievement', direction: 'desc' };
         let pivotSort = { key: 'code', dir: 'asc' }; // Options: code, name, aging0, aging1_3, aging4_7, aging7up, unplanned0...
         let prioritySort = { key: 'totalUnplanned', dir: 'desc' };
+        let allocationSort = { key: 'cbm', dir: 'desc' };
 
         function handleCategoryChoice(category) {
             selectedCategory = category;
@@ -1846,6 +1893,8 @@
         // Pivot Data Storage
         let rawPivotData = [];
         let pivotAreaOptions = new Set();
+        let pivotAreaBBOptions = new Set();
+        let pivotHeaderNames = [];
 
         async function fetchPivotData(retries = 2) {
             try {
@@ -1891,6 +1940,30 @@
             let delimiter = ',';
             if (lines[0].includes(';')) delimiter = ';';
 
+            // Extract headers for column mapping
+            const headerLine = lines[0].trim();
+            const headerValues = [];
+            let hCur = '';
+            let hInQ = false;
+            for (let j = 0; j < headerLine.length; j++) {
+                const char = headerLine[j];
+                if (char === '"') {
+                    if (hInQ && headerLine[j+1] === '"') {
+                        hCur += '"';
+                        j++;
+                    } else {
+                        hInQ = !hInQ;
+                    }
+                } else if (char === delimiter && !hInQ) {
+                    headerValues.push(hCur.trim());
+                    hCur = '';
+                } else {
+                    hCur += char;
+                }
+            }
+            headerValues.push(hCur.trim());
+            pivotHeaderNames = headerValues;
+
             // Specific column indices based on user request:
             // J=9, K=10, AI=34, BA=52, BC=54, BE=56
             const idx = {
@@ -1898,12 +1971,15 @@
                 storeBookingName: 10,
                 cbm: 34,
                 area: 52,
-                status: 54,
-                aging: 56
+                status: 54, // BC
+                aging: 56,  // BE
+                allocStatus: 6, // G
+                areaBB: 53 // BB
             };
 
             rawPivotData = [];
             pivotAreaOptions = new Set();
+            pivotAreaBBOptions = new Set();
 
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
@@ -1956,16 +2032,32 @@
                     storeBooking: storeBooking,
                     storeBookingName: storeBookingName,
                     area: values[idx.area] || '',
+                    areaBB: values[idx.areaBB] || '',
                     cbm: parseNumberWithComma(values[idx.cbm]),
                     aging: agingVal,
-                    status: (values[idx.status] || '').trim()
+                    status: (values[idx.status] || '').trim(),
+                    allocStatus: (values[idx.allocStatus] || '').trim(),
+                    rawColumns: {
+                        E: values[4] || '',
+                        F: values[5] || '',
+                        G: values[6] || '',
+                        J: values[9] || '',
+                        K: values[10] || '',
+                        Y: values[24] || '',
+                        Z: values[25] || '',
+                        AB: values[27] || '',
+                        AC: values[28] || '',
+                        AI: values[34] || ''
+                    }
                 };
 
                 if (row.area) pivotAreaOptions.add(row.area);
+                if (row.areaBB) pivotAreaBBOptions.add(row.areaBB);
                 rawPivotData.push(row);
             }
 
             populatePivotAreaFilter();
+            populateAllocationBBFilter();
             renderPivotTable();
         }
 
@@ -1987,52 +2079,209 @@
             filter.onchange = () => renderPivotTable();
         }
 
+        function populateAllocationBBFilter() {
+            const filter = document.getElementById('allocation-area-bb-filter');
+            if (!filter) return;
+
+            const currentVal = filter.value || 'ALL';
+            filter.innerHTML = '<option value="ALL">ALL</option>';
+            
+            const sortedAreas = Array.from(pivotAreaBBOptions).sort();
+            sortedAreas.forEach(area => {
+                const opt = document.createElement('option');
+                opt.value = area;
+                opt.textContent = area;
+                filter.appendChild(opt);
+            });
+            
+            if (Array.from(pivotAreaBBOptions).includes(currentVal)) {
+                filter.value = currentVal;
+            }
+        }
+
+        function downloadAllocationExcel() {
+            if (!rawPivotData || rawPivotData.length === 0) {
+                alert("Data tidak tersedia.");
+                return;
+            }
+            
+            const bbFilter = document.getElementById('allocation-area-bb-filter');
+            const selectedBB = bbFilter ? bbFilter.value : 'ALL';
+
+            const targetKeywords = ['did not allocate', 'pre-allocated', 'part pre-allocated'];
+            const filtered = rawPivotData.filter(row => {
+                const status = (row.allocStatus || '').trim().toLowerCase();
+                const matchedStatus = targetKeywords.some(kw => status === kw);
+                const matchedBB = (selectedBB === 'ALL' || row.areaBB === selectedBB);
+                return matchedStatus && matchedBB;
+            });
+
+            if (filtered.length === 0) {
+                alert("Tidak ada data dengan status alokasi yang ditemukan.");
+                return;
+            }
+
+            const exportData = filtered.map(row => {
+                const data = {};
+                const targetIndices = [4, 5, 6, 9, 10, 24, 25, 27, 28, 34]; // E,F,G,J,K,Y,Z,AB,AC,AI
+                
+                targetIndices.forEach(idx => {
+                    const headerName = pivotHeaderNames[idx] || `Kolom ${String.fromCharCode(65 + idx)}`;
+                    let val = '';
+                    if (idx === 4) val = row.rawColumns.E;
+                    else if (idx === 5) val = row.rawColumns.F;
+                    else if (idx === 6) val = row.rawColumns.G;
+                    else if (idx === 9) val = row.rawColumns.J;
+                    else if (idx === 10) val = row.rawColumns.K;
+                    else if (idx === 24) val = row.rawColumns.Y;
+                    else if (idx === 25) val = row.rawColumns.Z;
+                    else if (idx === 27) val = row.rawColumns.AB;
+                    else if (idx === 28) val = row.rawColumns.AC;
+                    else if (idx === 34) val = row.rawColumns.AI;
+                    data[headerName] = val;
+                });
+                return data;
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Allocation Data");
+            XLSX.writeFile(workbook, "Allocation_Summary_Data.xlsx");
+        }
+
+        async function shareAllocationMobile() {
+            if (!rawPivotData || rawPivotData.length === 0) return;
+
+            const bbFilter = document.getElementById('allocation-area-bb-filter');
+            const selectedBB = bbFilter ? bbFilter.value : 'ALL';
+
+            const targetKeywords = ['did not allocate', 'pre-allocated', 'part pre-allocated'];
+            const filtered = rawPivotData.filter(row => {
+                const status = (row.allocStatus || '').trim().toLowerCase();
+                const matchedStatus = targetKeywords.some(kw => status === kw);
+                const matchedBB = (selectedBB === 'ALL' || row.areaBB === selectedBB);
+                return matchedStatus && matchedBB;
+            });
+
+            const exportData = filtered.map(row => {
+                const data = {};
+                const targetIndices = [4, 5, 6, 9, 10, 24, 25, 27, 28, 34];
+                targetIndices.forEach(idx => {
+                    const headerName = pivotHeaderNames[idx] || `Kolom ${String.fromCharCode(65 + idx)}`;
+                    let val = '';
+                    if (idx === 4) val = row.rawColumns.E;
+                    else if (idx === 5) val = row.rawColumns.F;
+                    else if (idx === 6) val = row.rawColumns.G;
+                    else if (idx === 9) val = row.rawColumns.J;
+                    else if (idx === 10) val = row.rawColumns.K;
+                    else if (idx === 24) val = row.rawColumns.Y;
+                    else if (idx === 25) val = row.rawColumns.Z;
+                    else if (idx === 27) val = row.rawColumns.AB;
+                    else if (idx === 28) val = row.rawColumns.AC;
+                    else if (idx === 34) val = row.rawColumns.AI;
+                    data[headerName] = val;
+                });
+                return data;
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Allocation Data");
+            const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            
+            const file = new File([dataBlob], "Allocation_Summary_Data.xlsx", { 
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+            });
+
+            const storingText = `Dear Tim Storing,
+
+Mohon segera dilakukan pengecekan dan perbaikan lokasi pada beberapa order dengan status berikut:
+
+- Did Not Allocate
+- Pre-allocated
+- Part Pre-allocated
+
+Agar proses pengiriman dapat berjalan lancar dan tidak terjadi keterlambatan, kami harap perbaikan dapat dilakukan secepatnya.
+
+Terima kasih atas perhatian dan kerjasamanya.
+
+Regards,
+Tim Planner DC Sidoarjo`;
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Allocation Summary',
+                        text: storingText
+                    });
+                } catch (err) {
+                    if (err.name !== 'AbortError') alert("Gagal membagikan file.");
+                }
+            } else {
+                alert("Browser Anda tidak mendukung fitur berbagi file secara langsung.");
+            }
+        }
+
         function updateWhatsAppLink() {
             const btn = document.getElementById('whatsapp-btn');
-            if (!btn || !rawPivotData || rawPivotData.length === 0) return;
+            const storingBtn = document.getElementById('whatsapp-storing-btn');
+            const shareBtn = document.getElementById('share-mobile-btn');
 
-            const introMessage = "Halo Tim Inventory Planner,\n\nKami ingin menginformasikan bahwa saat ini STOREBOOKING kami mengalami kekurangan kuota. Sehubungan dengan hal tersebut, kami mohon bantuannya untuk penambahan kuota agar proses operasional dapat berjalan dengan lancar.\n\nMohon dapat ditindaklanjuti secepatnya. Terima kasih atas perhatian dan kerjasamanya.";
-            const closingMessage = "\n\nBest regards,\n[Tim Planner DC Sidoarjo]";
-            
-            // Aggregate ALL data for Maluku, Papua, Sulawesi
-            const targetAreas = ["MALUKU", "PAPUA", "SULAWESI"];
-            const stores = {};
-            
-            rawPivotData.forEach(row => {
-                const storeArea = (row.area || "").toUpperCase();
-                const isTarget = targetAreas.some(area => storeArea.includes(area));
-                
-                if (isTarget && row.status === 'Belum Plan') {
-                    const key = row.storeBooking;
-                    if (!stores[key]) {
-                        stores[key] = {
-                            code: row.storeBooking,
-                            name: row.storeBookingName,
-                            totalUnplanned: 0
-                        };
-                    }
-                    stores[key].totalUnplanned += row.cbm;
-                }
-            });
-
-            let additionalInfo = "";
-            const sortedStores = Object.values(stores).sort((a, b) => a.code.localeCompare(b.code));
-            
-            sortedStores.forEach(store => {
-                if (store.totalUnplanned < 20) {
-                    const diff = (20 - store.totalUnplanned).toFixed(2);
-                    additionalInfo += `\n${store.code} ${store.name} ${diff} CBM`;
-                }
-            });
-
-            let finalMessage = introMessage;
-            if (additionalInfo) {
-                finalMessage += "\n\nData Kekurangan Kuota Sebagai Berikut:" + additionalInfo;
+            // Show share button if supported (typically mobile)
+            if (shareBtn && navigator.canShare && navigator.canShare({ files: [new File([], "test.txt")] })) {
+                shareBtn.style.display = 'flex';
             }
-            finalMessage += closingMessage;
+            
+            // Existing WA Link Logic (Kekurangan Kuota)
+            if (btn && rawPivotData && rawPivotData.length > 0) {
+                const introMessage = "Halo Tim Inventory Planner,\n\nKami ingin menginformasikan bahwa saat ini STOREBOOKING kami mengalami kekurangan kuota. Sehubungan dengan hal tersebut, kami mohon bantuannya untuk penambahan kuota agar proses operasional dapat berjalan dengan lancar.\n\nMohon dapat ditindaklanjuti secepatnya. Terima kasih atas perhatian dan kerjasamanya.";
+                const closingMessage = "\n\nBest regards,\n[Tim Planner DC Sidoarjo]";
+                const targetAreas = ["MALUKU", "PAPUA", "SULAWESI"];
+                const stores = {};
+                rawPivotData.forEach(row => {
+                    const storeArea = (row.area || "").toUpperCase();
+                    if (targetAreas.some(area => storeArea.includes(area)) && row.status === 'Belum Plan') {
+                        const key = row.storeBooking;
+                        if (!stores[key]) {
+                            stores[key] = { code: row.storeBooking, name: row.storeBookingName, totalUnplanned: 0 };
+                        }
+                        stores[key].totalUnplanned += row.cbm;
+                    }
+                });
+                let additionalInfo = "";
+                Object.values(stores).sort((a, b) => a.code.localeCompare(b.code)).forEach(store => {
+                    if (store.totalUnplanned < 20) {
+                        additionalInfo += `\n${store.code} ${store.name} ${(20 - store.totalUnplanned).toFixed(2)} CBM`;
+                    }
+                });
+                let finalMessage = introMessage;
+                if (additionalInfo) finalMessage += "\n\nData Kekurangan Kuota Sebagai Berikut:" + additionalInfo;
+                finalMessage += closingMessage;
+                btn.href = `https://wa.me/6285973792145?text=${encodeURIComponent(finalMessage)}`;
+            }
 
-            const encodedMessage = encodeURIComponent(finalMessage);
-            btn.href = `https://wa.me/6285973792145?text=${encodedMessage}`;
+            // New WA Storing Link Logic
+            if (storingBtn) {
+                const storingNumber = "085311510931";
+                const storingText = `Dear Tim Storing,
+
+Mohon segera dilakukan pengecekan dan perbaikan lokasi pada beberapa order dengan status berikut:
+
+- Did Not Allocate
+- Pre-allocated
+- Part Pre-allocated
+
+Agar proses pengiriman dapat berjalan lancar dan tidak terjadi keterlambatan, kami harap perbaikan dapat dilakukan secepatnya.
+
+Terima kasih atas perhatian dan kerjasamanya.
+
+Regards,
+Tim Planner DC Sidoarjo`;
+                
+                storingBtn.href = `https://wa.me/62${storingNumber.substring(1)}?text=${encodeURIComponent(storingText)}`;
+            }
         }
         function sortPivot(field) {
             if (pivotSort.key === field) {
@@ -2050,6 +2299,16 @@
             } else {
                 prioritySort.key = field;
                 prioritySort.dir = 'desc';
+            }
+            renderPivotTable();
+        }
+
+        function sortAllocation(field) {
+            if (allocationSort.key === field) {
+                allocationSort.dir = allocationSort.dir === 'asc' ? 'desc' : 'asc';
+            } else {
+                allocationSort.key = field;
+                allocationSort.dir = 'desc';
             }
             renderPivotTable();
         }
@@ -2241,6 +2500,107 @@
             }
 
             updateWhatsAppLink();
+            renderAllocationSummary(filtered);
+        }
+
+        function renderAllocationSummary(data) {
+            const tbody = document.getElementById('allocation-summary-body');
+            const container = document.getElementById('allocation-summary-container');
+            const foot = document.getElementById('allocation-summary-foot');
+            const bbFilter = document.getElementById('allocation-area-bb-filter');
+            const selectedBB = bbFilter ? bbFilter.value : 'ALL';
+            
+            if (!tbody || !container) return;
+
+            // Always show container in DC mode to give feedback
+            container.style.display = selectedCategory === 'dc' ? 'block' : 'none';
+            if (selectedCategory !== 'dc') return;
+
+            // Aggregate data by StoreBooking
+            const targetKeywords = {
+                didNot: 'did not allocate',
+                preAlloc: 'pre-allocated',
+                partPre: 'part pre-allocated'
+            };
+            
+            const stores = {};
+            data.forEach(row => {
+                // Filter by Area BB
+                if (selectedBB !== 'ALL' && row.areaBB !== selectedBB) return;
+
+                const status = (row.allocStatus || '').trim().toLowerCase();
+                let type = null;
+                if (status === targetKeywords.didNot) type = 'didNot';
+                else if (status === targetKeywords.preAlloc) type = 'preAlloc';
+                else if (status === targetKeywords.partPre) type = 'partPre';
+
+                if (type) {
+                    const key = row.storeBooking;
+                    if (!stores[key]) {
+                        stores[key] = {
+                            storeBooking: row.storeBooking,
+                            storeBookingName: row.storeBookingName,
+                            didNot: 0,
+                            preAlloc: 0,
+                            partPre: 0,
+                            totalCbm: 0
+                        };
+                    }
+                    stores[key][type] += row.cbm;
+                    stores[key].totalCbm += row.cbm;
+                }
+            });
+
+            const storeList = Object.values(stores);
+
+            if (storeList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: #666;">
+                    <i class="fas fa-info-circle"></i> Tidak ada data dengan status Allocation (Did Not, Pre-allocated, Part Pre-allocated) ditemukan.
+                </td></tr>`;
+                if (foot) foot.innerHTML = '';
+                return;
+            }
+
+            // Apply sorting
+            storeList.sort((a, b) => {
+                const k = allocationSort.key;
+                const d = allocationSort.dir === 'asc' ? 1 : -1;
+                
+                if (['didNot', 'preAlloc', 'partPre', 'totalCbm'].includes(k)) {
+                    return (a[k] - b[k]) * d;
+                }
+                if (k === 'storeBooking') return (a.storeBooking || '').localeCompare(b.storeBooking || '') * d;
+                if (k === 'storeBookingName') return (a.storeBookingName || '').localeCompare(b.storeBookingName || '') * d;
+                
+                return 0;
+            });
+
+            let html = '';
+            const totals = { didNot: 0, preAlloc: 0, partPre: 0, totalCbm: 0 };
+
+            storeList.forEach((row) => {
+                html += `<tr>
+                    <td style="text-align: center; border: 1px solid #333; padding: 10px; background: #111;">${row.storeBooking}</td>
+                    <td style="border: 1px solid #333; padding: 10px 20px;">${row.storeBookingName}</td>
+                    <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #f87171; font-weight: ${row.didNot > 0 ? 'bold' : 'normal'}; background: ${row.didNot > 0 ? 'rgba(248,113,113,0.1)' : 'transparent'};">${row.didNot > 0 ? formatIndo(row.didNot) : '-'}</td>
+                    <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #34d399; font-weight: ${row.preAlloc > 0 ? 'bold' : 'normal'}; background: ${row.preAlloc > 0 ? 'rgba(52,211,153,0.1)' : 'transparent'};">${row.preAlloc > 0 ? formatIndo(row.preAlloc) : '-'}</td>
+                    <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #fbbf24; font-weight: ${row.partPre > 0 ? 'bold' : 'normal'}; background: ${row.partPre > 0 ? 'rgba(251,191,36,0.1)' : 'transparent'};">${row.partPre > 0 ? formatIndo(row.partPre) : '-'}</td>
+                    <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #ffd700; font-weight: bold; background: #111;">${formatIndo(row.totalCbm)}</td>
+                </tr>`;
+                totals.didNot += row.didNot;
+                totals.preAlloc += row.preAlloc;
+                totals.partPre += row.partPre;
+                totals.totalCbm += row.totalCbm;
+            });
+
+            tbody.innerHTML = html;
+            foot.innerHTML = `<tr style="background: #111; font-weight: bold; border-top: 2px solid #ffd700;">
+                <td colspan="2" style="text-align: right; border: 1px solid #333; padding: 15px 20px; color: #888;">GRAND TOTAL</td>
+                <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #f87171;">${formatIndo(totals.didNot)}</td>
+                <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #34d399;">${formatIndo(totals.preAlloc)}</td>
+                <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #fbbf24;">${formatIndo(totals.partPre)}</td>
+                <td style="text-align: right; border: 1px solid #333; padding: 15px 20px; color: #ffd700; font-size: 1.1em;">${formatIndo(totals.totalCbm)}</td>
+            </tr>`;
         }
 
         // Fetch Data dari Google Sheets
