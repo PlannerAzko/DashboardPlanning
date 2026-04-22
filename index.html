@@ -2260,12 +2260,26 @@ Tim Planner DC Sidoarjo`;
                 } catch (err) {
                     if (err.name !== 'AbortError') {
                         console.error("Share error:", err);
-                        // Fallback to download if sharing fails (common on some mobile browsers)
+                        
+                        // 1. Download file fallback
                         const link = document.createElement('a');
-                        link.href = URL.createObjectURL(dataBlob);
+                        const url = URL.createObjectURL(dataBlob);
+                        link.href = url;
                         link.download = "Allocation_Summary_Data.xlsx";
+                        document.body.appendChild(link);
                         link.click();
-                        alert("Gagal membagikan langsung. File dialihkan ke unduhan.");
+                        
+                        // 2. Open WhatsApp with text (using requested number: 085311510931)
+                        const waNumber = "085311510931";
+                        const waUrl = `https://wa.me/62${waNumber.substring(1)}?text=${encodeURIComponent(storingText)}`;
+                        
+                        setTimeout(() => {
+                            window.open(waUrl, '_blank');
+                            alert("Sistem berbagi file langsung tidak didukung oleh browser Anda. File telah diunduh secara otomatis. Silakan kirimkan (lampirkan) file tersebut secara manual pada nomor WhatsApp Tim Storing yang saat ini terbuka.");
+                            URL.revokeObjectURL(url);
+                        }, 800);
+                        
+                        if (document.body.contains(link)) document.body.removeChild(link);
                     }
                 }
             } else {
