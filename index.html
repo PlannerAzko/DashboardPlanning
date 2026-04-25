@@ -659,7 +659,7 @@
 
         .kpi-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
         }
 
@@ -944,7 +944,7 @@
             }
 
             .filter-section {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(4, 1fr);
             }
         }
 
@@ -1594,7 +1594,7 @@
                 </div>
 
                 <!-- Hub Summaries -->
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; background: #1a1a1a; padding: 20px; border-bottom: 1px solid #333;">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; background: #1a1a1a; padding: 20px; border-bottom: 1px solid #333;">
                     <!-- Armada Status -->
                     <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 15px;">
                         <div style="color: #ffd700; font-size: 0.8em; font-weight: bold; margin-bottom: 15px; text-transform: uppercase;">
@@ -1629,6 +1629,43 @@
                             <!-- Populated dynamically -->
                         </div>
                     </div>
+                    <!-- SLA Card -->
+<div id="hub-sla-card" style="background: #222; border: 2px solid #444; border-radius: 8px; padding: 15px;">
+    <div style="color: #ffd700; font-size: 0.8em; font-weight: bold; margin-bottom: 12px; text-transform: uppercase;">
+        <i class="fas fa-bullseye" style="margin-right: 8px;"></i> SLA Hub GRW
+    </div>
+    <div style="text-align: center; margin-bottom: 12px; background: #1a1a1a; border-radius: 8px; padding: 12px;">
+        <svg width="80" height="80" viewBox="0 0 80 80" style="display:block; margin: 0 auto 6px;">
+            <circle cx="40" cy="40" r="30" fill="none" stroke="#333" stroke-width="8"/>
+            <circle id="hub-sla-arc" cx="40" cy="40" r="30" fill="none" stroke="#ff4444" stroke-width="8"
+                stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="14.1"
+                transform="rotate(-90 40 40)"/>
+        </svg>
+        <div id="hub-sla-pct" style="font-size: 1.6em; font-weight: bold; color: #ff4444; margin-top: -8px;">0%</div>
+        <div id="hub-sla-badge" style="display: inline-block; font-size: 0.75em; font-weight: bold; padding: 3px 12px; border-radius: 999px; margin-top: 4px; background: rgba(255,68,68,0.15); color: #ff4444;">Menghitung...</div>
+        <div style="font-size: 0.7em; color: #666; margin-top: 4px;">Target: 95%</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(45,212,175,0.1); border-radius: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="width: 6px; height: 6px; border-radius: 50%; background: #2dd4bf;"></div>
+                <span style="font-size: 0.85em; color: #2dd4bf; font-weight: bold;">Hit (1-3 hari)</span>
+            </div>
+            <span id="hub-sla-hit" style="font-size: 0.9em; font-weight: bold; color: #2dd4bf;">0 store</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(255,68,68,0.1); border-radius: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <div style="width: 6px; height: 6px; border-radius: 50%; background: #ff6b6b;"></div>
+                <span style="font-size: 0.85em; color: #ff6b6b; font-weight: bold;">Miss (&gt;3 hari)</span>
+            </div>
+            <span id="hub-sla-miss" style="font-size: 0.9em; font-weight: bold; color: #ff6b6b;">0 store</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.8em; padding: 6px 10px; color: #888; border-top: 1px solid #333; margin-top: 2px;">
+            <span>Total dihitung</span>
+            <span id="hub-sla-total" style="font-weight: bold; color: #aaa;">0 store</span>
+        </div>
+    </div>
+</div>
                 </div>
 
                 <div class="table-content-large" style="overflow-x: auto; background: #1a1a1a; padding: 0; max-height: 400px;">
@@ -2525,6 +2562,103 @@
 
             if (sudahLoadingEl) sudahLoadingEl.textContent = `${formatIndo(cbmSudahLoading)} CBM`;
             if (belumLoadingEl) belumLoadingEl.textContent = `${formatIndo(cbmBelumLoading)} CBM`;
+            // ============ SLA CALCULATION ============
+let slaHit = 0;
+let slaMiss = 0;
+
+const parseTglKedatangan = (str) => {
+    if (!str) return null;
+    const monthMap = {
+        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'mei': 4, 'may': 4,
+        'jun': 5, 'jul': 6, 'agu': 7, 'aug': 7, 'sep': 8,
+        'okt': 9, 'oct': 9, 'nov': 10, 'des': 11, 'dec': 11
+    };
+    const parts = str.toLowerCase().trim().split(/\s+/);
+    if (parts.length >= 3) {
+        const day = parseInt(parts[0]);
+        const month = monthMap[parts[1].substring(0, 3)];
+        const year = parseInt(parts[2]) < 100 ? 2000 + parseInt(parts[2]) : parseInt(parts[2]);
+        if (!isNaN(day) && month !== undefined && !isNaN(year)) {
+            return new Date(year, month, day);
+        }
+    }
+    return null;
+};
+
+const parseNoLcDate = (lc) => {
+    if (!lc) return null;
+    const match = lc.match(/^(\d{2})(\d{2})(\d{2})/);
+    if (!match) return null;
+    const year = 2000 + parseInt(match[1]);
+    const month = parseInt(match[2]) - 1;
+    const day = parseInt(match[3]);
+    return new Date(year, month, day);
+};
+
+filteredHubData.forEach(row => {
+    const tglKedatangan = (row[0] || '').trim();
+    const noLc = noLcIdx !== -1 ? (row[noLcIdx] || '').trim() : '';
+
+    // Skip jika No LC kosong (belum plan)
+    if (!noLc) return;
+
+    const dateKedatangan = parseTglKedatangan(tglKedatangan);
+    const dateNoLc = parseNoLcDate(noLc);
+
+    if (!dateKedatangan || !dateNoLc) return;
+
+    const diffDays = Math.round((dateNoLc - dateKedatangan) / (1000 * 60 * 60 * 24));
+
+    if (diffDays >= 1 && diffDays <= 3) {
+        slaHit++;
+    } else if (diffDays > 3) {
+        slaMiss++;
+    }
+});
+
+const slaTotal = slaHit + slaMiss;
+const slaRate = slaTotal > 0 ? (slaHit / slaTotal * 100) : 0;
+const circumference = 2 * Math.PI * 30;
+const slaOffset = circumference - (slaRate / 100) * circumference;
+
+const slaArc = document.getElementById('hub-sla-arc');
+const slaPctEl = document.getElementById('hub-sla-pct');
+const slaBadgeEl = document.getElementById('hub-sla-badge');
+const slaHitEl = document.getElementById('hub-sla-hit');
+const slaMissEl = document.getElementById('hub-sla-miss');
+const slaTotalEl = document.getElementById('hub-sla-total');
+
+if (slaArc) {
+    slaArc.setAttribute('stroke-dasharray', circumference.toFixed(1));
+    slaArc.setAttribute('stroke-dashoffset', slaOffset.toFixed(1));
+}
+
+let slaColor, slaBg, slaText;
+if (slaRate >= 95) {
+    slaColor = '#2dd4bf';
+    slaBg = 'rgba(45,212,175,0.15)';
+    slaText = 'On target';
+} else if (slaRate >= 80) {
+    slaColor = '#ffd700';
+    slaBg = 'rgba(255,215,0,0.15)';
+    slaText = 'Near target';
+} else {
+    slaColor = '#ff6b6b';
+    slaBg = 'rgba(255,107,107,0.15)';
+    slaText = 'Below target';
+}
+
+if (slaArc) slaArc.setAttribute('stroke', slaColor);
+if (slaPctEl) { slaPctEl.textContent = slaRate.toFixed(1) + '%'; slaPctEl.style.color = slaColor; }
+if (slaBadgeEl) { slaBadgeEl.textContent = slaText; slaBadgeEl.style.color = slaColor; slaBadgeEl.style.background = slaBg; }
+if (slaHitEl) slaHitEl.textContent = slaHit + ' store';
+if (slaMissEl) slaMissEl.textContent = slaMiss + ' store';
+if (slaTotalEl) slaTotalEl.textContent = slaTotal + ' store';
+
+// Update border card sesuai status
+const slaCard = document.getElementById('hub-sla-card');
+if (slaCard) slaCard.style.borderColor = slaColor;
+// ============ END SLA ============
 
             if (agingListEl) {
                 agingListEl.innerHTML = `
