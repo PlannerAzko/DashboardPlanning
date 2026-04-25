@@ -5140,10 +5140,10 @@ Tim Planner DC Sidoarjo`;
                 document.getElementById('slaGrwKPI').textContent = '0%';
             }
 
-            document.getElementById('caseIdPlanB1').textContent = b1.toFixed(0);
-            document.getElementById('caseIdPlanB2').textContent = b2.toFixed(0);
-            document.getElementById('caseIdPlanB3').textContent = b3.toFixed(0);
-            document.getElementById('caseIdPlanB4').textContent = b4.toFixed(0);
+            document.getElementById('caseIdPlanB1').textContent = Math.round(b1).toLocaleString('id-ID');
+            document.getElementById('caseIdPlanB2').textContent = Math.round(b2).toLocaleString('id-ID');
+            document.getElementById('caseIdPlanB3').textContent = Math.round(b3).toLocaleString('id-ID');
+            document.getElementById('caseIdPlanB4').textContent = Math.round(b4).toLocaleString('id-ID');
         }
 
         // Update Map - More accurate city locations
