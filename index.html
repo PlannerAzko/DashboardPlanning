@@ -1502,6 +1502,46 @@
                 </div>
             </div>
 
+            <!-- Table: MONITORING AGING BY AREA STORING -->
+            <div id="storing-aging-container" style="margin-top: 30px; border-bottom: 2px solid #333;">
+                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span><i class="fas fa-warehouse"></i> MONITORING ORDER AGING BY AREA STORING DAN ASTOR</span>
+                    </div>
+                </div>
+                <div class="table-content-large" style="overflow-x: auto; background: #1a1a1a;">
+                    <table id="storing-aging-table" class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
+                        <thead>
+                            <tr class="nested-header">
+                                <th rowspan="2" onclick="sortStoringPivot('areaBB')" style="width: 250px; cursor: pointer;">AREA STORING DAN ASTOR <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th colspan="5" style="background: #2c3e50; color: #ecf0f1;">AGING SUDAH PLAN (CBM)</th>
+                                <th colspan="5" style="background: #27ae60; color: #fff;">AGING BELUM PLAN (CBM)</th>
+                            </tr>
+                            <tr class="sub-header">
+                                <th onclick="sortStoringPivot('aging0')" style="cursor: pointer;">0 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th onclick="sortStoringPivot('aging1_3')" style="cursor: pointer;">1-3 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th onclick="sortStoringPivot('aging4_7')" style="cursor: pointer;">4-7 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th onclick="sortStoringPivot('aging7up')" style="cursor: pointer;">7 UP <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th onclick="sortStoringPivot('agingTotal')" style="background: #34495e; cursor: pointer;">TOTAL <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th onclick="sortStoringPivot('unplanned0')" style="cursor: pointer;">0 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th onclick="sortStoringPivot('unplanned1_3')" style="cursor: pointer;">1-3 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th onclick="sortStoringPivot('unplanned4_7')" style="cursor: pointer;">4-7 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th onclick="sortStoringPivot('unplanned7up')" style="cursor: pointer;">7 UP <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th onclick="sortStoringPivot('unplannedTotal')" style="background: #219150; cursor: pointer;">TOTAL <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody id="storing-aging-body">
+                            <tr>
+                                <td colspan="11" style="text-align: center; padding: 40px; color: #666;">
+                                    <div class="loading"><div class="spinner" style="margin: 0 auto 10px;"></div>Processing Pivot Data...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot id="storing-aging-foot"></tfoot>
+                    </table>
+                </div>
+            </div>
+
             <!-- Table: ALLOCATION SUMMARY -->
             <div id="allocation-summary-container" style="margin-top: 30px; margin-bottom: 30px; border-bottom: 2px solid #333; display: none;">
                 <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
@@ -1518,6 +1558,12 @@
                             <i class="fab fa-whatsapp"></i> KIRIM WA STORING
                         </a>
                         <div style="display: flex; align-items: center; gap: 6px; margin-left: 10px;">
+                            <label style="font-size: 0.8em; color: #ffd700; opacity: 0.8;">STATUS PLAN:</label>
+                            <select id="allocation-status-filter" onchange="renderPivotTable()" style="background: #222; color: #ffd700; border: 1px solid #ffd700; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; outline: none;">
+                                <option value="ALL">ALL</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
                             <label style="font-size: 0.8em; color: #ffd700; opacity: 0.8;">AREA STORING:</label>
                             <select id="allocation-area-bb-filter" onchange="renderPivotTable()" style="background: #222; color: #ffd700; border: 1px solid #ffd700; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; outline: none;">
                                 <option value="ALL">ALL</option>
@@ -1546,6 +1592,93 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Table: MONITORING HUB GRW -->
+            <div id="hub-summary-container" style="margin-top: 30px; margin-bottom: 30px; border-bottom: 2px solid #333; display: none;">
+                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-truck-ramp-box" style="margin-right: 10px; color: #ffd700;"></i> MONITORING HUB GRW</span>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button onclick="downloadHubExcel()" style="background: #1d6f42; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; display: flex; align-items: center; gap: 6px; font-weight: bold;">
+                            <i class="fas fa-file-excel"></i> EXCEL EXPORT
+                        </button>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-left: 10px;">
+                            <label style="font-size: 0.8em; color: #ffd700; opacity: 0.8;">KETERANGAN LOADING:</label>
+                            <select id="hub-loading-filter" onchange="renderHubTable()" style="background: #222; color: #ffd700; border: 1px solid #ffd700; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; outline: none;">
+                                <option value="ALL">ALL</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size: 0.8em; color: #ffd700; opacity: 0.8;">STATUS ARMADA:</label>
+                            <select id="hub-armada-status-filter" onchange="renderHubTable()" style="background: #222; color: #ffd700; border: 1px solid #ffd700; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; outline: none;">
+                                <option value="ALL">SEMUA</option>
+                                <option value="SUDAH DATANG">SUDAH DATANG</option>
+                                <option value="BELUM DATANG">BELUM DATANG</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size: 0.8em; color: #ffd700; opacity: 0.8;">NO LC:</label>
+                            <select id="hub-nolc-filter" onchange="renderHubTable()" style="background: #222; color: #ffd700; border: 1px solid #ffd700; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; outline: none;">
+                                <option value="ALL">ALL</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hub Summaries -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; background: #1a1a1a; padding: 20px; border-bottom: 1px solid #333;">
+                    <!-- Armada Status -->
+                    <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 15px;">
+                        <div style="color: #ffd700; font-size: 0.8em; font-weight: bold; margin-bottom: 15px; text-transform: uppercase;">
+                            <i class="fas fa-truck" style="margin-right: 8px;"></i> STATUS ARMADA
+                        </div>
+                        <div id="hub-status-armada-list" style="font-size: 0.85em; color: #fff; max-height: 150px; overflow-y: auto;">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                    <!-- Loading Info -->
+                    <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 15px;">
+                        <div style="color: #ffd700; font-size: 0.8em; font-weight: bold; margin-bottom: 15px; text-transform: uppercase;">
+                            <i class="fas fa-boxes-packing" style="margin-right: 8px;"></i> KETERANGAN LOADING
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 8px;">
+                                <span style="color: #4ade80; font-size: 0.9em; font-weight: 500;">SUDAH LOADING</span>
+                                <span id="hub-sudah-loading-cbm" style="font-weight: bold; color: #ffd700;">0 CBM</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding-bottom: 4px;">
+                                <span style="color: #f87171; font-size: 0.9em; font-weight: 500;">BELUM LOADING</span>
+                                <span id="hub-belum-loading-cbm" style="font-weight: bold; color: #ffd700;">0 CBM</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Aging -->
+                    <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 15px;">
+                        <div style="color: #ffd700; font-size: 0.8em; font-weight: bold; margin-bottom: 15px; text-transform: uppercase;">
+                            <i class="fas fa-clock-rotate-left" style="margin-right: 8px;"></i> AGING (BELUM LOADING)
+                        </div>
+                        <div id="hub-aging-list" style="font-size: 0.85em; color: #fff; max-height: 150px; overflow-y: auto;">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-content-large" style="overflow-x: auto; background: #1a1a1a; padding: 0; max-height: 400px;">
+                    <table class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em; background: #1a1a1a; color: #fff;">
+                        <thead id="hub-summary-head">
+                            <tr style="background: #222;">
+                                <!-- Headers will be populated here -->
+                            </tr>
+                        </thead>
+                        <tbody id="hub-summary-body">
+                            <tr>
+                                <td colspan="20" style="text-align: center; padding: 40px; color: #666;">
+                                    <div class="loading"><div class="spinner" style="margin: 0 auto 10px;"></div>Loading Hub data...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1567,6 +1700,7 @@
         const PIVOT_SHEET_ID = '1noBpxmLuT3XQAYzO2Bdv_LrXqzDTqw1ugPN4ST_AYtg';
         const PIVOT_SHEET_GID = '1075426956';
         const PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${PIVOT_SHEET_ID}/export?format=csv&gid=${PIVOT_SHEET_GID}`;
+        const HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
 
         // Column Index Mapping (0-based)
         const COLUMNS = {
@@ -1759,6 +1893,7 @@
             // If DC is selected, fetch pivot data
             if (category === 'dc') {
                 fetchPivotData();
+                fetchHubData();
             }
         }
 
@@ -1933,8 +2068,11 @@
 
         // Pivot Data Storage
         let rawPivotData = [];
+        let rawHubData = [];
+        let hubHeaderNames = [];
         let pivotAreaOptions = new Set();
         let pivotAreaBBOptions = new Set();
+        let pivotStatusPlanOptions = new Set();
         let pivotHeaderNames = [];
 
         async function fetchPivotData(retries = 2) {
@@ -2021,6 +2159,7 @@
             rawPivotData = [];
             pivotAreaOptions = new Set();
             pivotAreaBBOptions = new Set();
+            pivotStatusPlanOptions = new Set();
 
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
@@ -2088,18 +2227,364 @@
                         Z: values[25] || '',
                         AB: values[27] || '',
                         AC: values[28] || '',
-                        AI: values[34] || ''
+                        AI: values[34] || '',
+                        AK: values[36] || ''
                     }
                 };
 
                 if (row.area) pivotAreaOptions.add(row.area);
                 if (row.areaBB) pivotAreaBBOptions.add(row.areaBB);
+                if (row.status) pivotStatusPlanOptions.add(row.status);
                 rawPivotData.push(row);
             }
 
             populatePivotAreaFilter();
             populateAllocationBBFilter();
+            populateAllocationStatusFilter();
             renderPivotTable();
+        }
+
+        async function fetchHubData(retries = 2) {
+            try {
+                const container = document.getElementById('hub-summary-container');
+                if (container) container.style.display = 'block';
+                
+                const finalUrl = `${HUB_CSV_URL}&t=${Date.now()}`;
+                const response = await fetch(finalUrl, { cache: "no-store" });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const csv = await response.text();
+                
+                if (csv.trim().startsWith('<!DOCTYPE')) {
+                    throw new Error("Diterima format HTML. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
+                }
+                
+                parseHubCSV(csv);
+            } catch (error) {
+                console.error("Error fetching hub data:", error);
+                if (retries > 0) {
+                    setTimeout(() => fetchHubData(retries - 1), 2000);
+                    return;
+                }
+                const tbody = document.getElementById('hub-summary-body');
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: #d32f2f; padding: 20px;">Gagal mengambil data Hub: ${error.message}</td></tr>`;
+                }
+            }
+        }
+
+        function parseHubCSV(csv) {
+            const lines = csv.split(/\r?\n/);
+            if (lines.length < 1) return;
+
+            let delimiter = ',';
+            if (lines[0].includes(';')) delimiter = ';';
+
+            const headerLine = lines[0].trim();
+            hubHeaderNames = [];
+            let hCur = '';
+            let hInQ = false;
+            for (let j = 0; j < headerLine.length; j++) {
+                const char = headerLine[j];
+                if (char === '"') {
+                    if (hInQ && headerLine[j+1] === '"') { hCur += '"'; j++; } else { hInQ = !hInQ; }
+                } else if (char === delimiter && !hInQ) {
+                    hubHeaderNames.push(hCur.trim()); hCur = '';
+                } else { hCur += char; }
+            }
+            hubHeaderNames.push(hCur.trim());
+
+            rawHubData = [];
+            const loadingOptions = new Set();
+            const nolcOptions = new Set();
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                const values = [];
+                let current = '';
+                let inQuotes = false;
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    if (char === '"') {
+                        if (inQuotes && line[j+1] === '"') { current += '"'; j++; } else { inQuotes = !inQuotes; }
+                    } else if (char === delimiter && !inQuotes) {
+                        values.push(current.trim()); current = '';
+                    } else { current += char; }
+                }
+                values.push(current.trim());
+                if (values.length >= hubHeaderNames.length) {
+                    rawHubData.push(values);
+                    
+                    // Column N for Keterangan Loading (Sudah/Belum Loading)
+                    const statusN = (values[13] || '').trim() || 'KOSONG';
+                    if (statusN) loadingOptions.add(statusN);
+                    
+                    // Find NO LC (usually index 2 or search it)
+                    let noLcIdx = hubHeaderNames.findIndex(h => h.toUpperCase().includes('NO LC'));
+                    if (noLcIdx !== -1) {
+                        const lcVal = (values[noLcIdx] || '').trim();
+                        nolcOptions.add(lcVal ? 'SUDAH PLAN' : 'BELUM PLAN');
+                    }
+                }
+            }
+
+            populateHubFilters(loadingOptions, nolcOptions);
+            renderHubTable();
+        }
+
+        function populateHubFilters(loadOpts, lcOpts) {
+            const loadFilter = document.getElementById('hub-loading-filter');
+            const lcFilter = document.getElementById('hub-nolc-filter');
+            if (loadFilter) {
+                const current = loadFilter.value;
+                loadFilter.innerHTML = '<option value="ALL">ALL</option>';
+                Array.from(loadOpts).sort().forEach(opt => {
+                    const o = document.createElement('option');
+                    o.value = opt;
+                    o.textContent = opt;
+                    loadFilter.appendChild(o);
+                });
+                loadFilter.value = current === '' ? 'ALL' : (Array.from(loadOpts).includes(current) ? current : 'ALL');
+            }
+            if (lcFilter) {
+                const current = lcFilter.value;
+                lcFilter.innerHTML = '<option value="ALL">ALL</option>';
+                Array.from(lcOpts).sort().forEach(opt => {
+                    const o = document.createElement('option');
+                    o.value = opt;
+                    o.textContent = opt;
+                    lcFilter.appendChild(o);
+                });
+                lcFilter.value = current === '' ? 'ALL' : (Array.from(lcOpts).includes(current) ? current : 'ALL');
+            }
+        }
+
+        function renderHubTable() {
+            const head = document.getElementById('hub-summary-head');
+            const tbody = document.getElementById('hub-summary-body');
+            const container = document.getElementById('hub-summary-container');
+            const armadaListEl = document.getElementById('hub-status-armada-list');
+            const sudahLoadingEl = document.getElementById('hub-sudah-loading-cbm');
+            const belumLoadingEl = document.getElementById('hub-belum-loading-cbm');
+            const agingListEl = document.getElementById('hub-aging-list');
+
+            const loadFilter = document.getElementById('hub-loading-filter');
+            const lcFilter = document.getElementById('hub-nolc-filter');
+            const armadaStatusFilter = document.getElementById('hub-armada-status-filter');
+            
+            const selectedLoading = loadFilter ? loadFilter.value : 'ALL';
+            const selectedLc = lcFilter ? lcFilter.value : 'ALL';
+            const selectedArmadaStatus = armadaStatusFilter ? armadaStatusFilter.value : 'ALL';
+
+            if (!head || !tbody) return;
+
+            if (container) {
+                container.style.display = selectedCategory === 'dc' ? 'block' : 'none';
+            }
+            if (selectedCategory !== 'dc') return;
+
+            if (hubHeaderNames.length === 0) return;
+
+            // Identify Columns to hide
+            const hideIndices = new Set();
+            let noLcIdx = hubHeaderNames.findIndex(h => h.toUpperCase().includes('NO LC'));
+            if (noLcIdx !== -1) {
+                hideIndices.add(noLcIdx + 1); // Delete column to the right of NO LC
+            }
+            
+            // Look for AGING or ESTIMASI PENGENDAPAN
+            let agingHariIdx = hubHeaderNames.findIndex(h => {
+                const headStr = h.toUpperCase();
+                return headStr === 'AGING' || headStr.includes('ESTIMASI PENGENDAPAN');
+            });
+            if (agingHariIdx === -1) agingHariIdx = 9; // Fallback to Column J based on user screenshot
+            if (agingHariIdx !== -1) hideIndices.add(agingHariIdx);
+
+            let statusArmadaIdx = hubHeaderNames.findIndex(h => h.toUpperCase().includes('STATUS ARMADA'));
+            if (statusArmadaIdx === -1) statusArmadaIdx = 15; // default fallback
+
+            // Render Header
+            let headHtml = '<tr style="background: #222;">';
+            hubHeaderNames.forEach((h, i) => {
+                if (i > statusArmadaIdx) return;
+                if (hideIndices.has(i)) return;
+                headHtml += `<th style="padding: 10px; border: 1px solid #333; text-align: center; color: #ffd700;">${h}</th>`;
+            });
+            headHtml += '</tr>';
+            head.innerHTML = headHtml;
+
+            // Filter Data
+            const filteredHubData = rawHubData.filter(row => {
+                const rowLoading = (row[13] || '').trim() || 'KOSONG'; // Use Column N for filter
+                const statusK = (row[10] || '').toUpperCase();
+                
+                let currentLcStatus = 'BELUM PLAN';
+                if (noLcIdx !== -1 && (row[noLcIdx] || '').trim()) {
+                    currentLcStatus = 'SUDAH PLAN';
+                }
+
+                const matchesLoading = selectedLoading === 'ALL' || rowLoading === selectedLoading;
+                const matchesLc = selectedLc === 'ALL' || currentLcStatus === selectedLc;
+                
+                const armadaValue = (row[15] || '').toUpperCase();
+                const isComing = armadaValue.includes('SUDAH DATANG') || armadaValue.includes('TERJALURKAN');
+                const isNotComing = armadaValue.includes('BELUM DATANG');
+                
+                let matchesArmadaStatus = true;
+                if (selectedArmadaStatus === 'SUDAH DATANG') matchesArmadaStatus = isComing;
+                else if (selectedArmadaStatus === 'BELUM DATANG') matchesArmadaStatus = isNotComing;
+                
+                return matchesLoading && matchesLc && matchesArmadaStatus;
+            });
+
+            if (filteredHubData.length === 0) {
+                let colCount = hubHeaderNames.filter((_, i) => i <= statusArmadaIdx && !hideIndices.has(i)).length;
+                tbody.innerHTML = `<tr><td colspan="${colCount}" style="text-align: center; padding: 20px; color: #666;">Tidak ada data Hub sesuai filter.</td></tr>`;
+            }
+
+            // Summary Calculations (always from ALL data or filtered? usually summary for filtered view)
+            let cbmSudahLoading = 0;
+            let cbmBelumLoading = 0;
+            
+            // Stats for Status Armada
+            const stats = {
+                sudahDatang: { sudahPlan: 0, belumPlan: 0 },
+                belumDatang: { sudahPlan: 0, belumPlan: 0 }
+            };
+
+            // Aging bucket stats
+            const agingBuckets = { "1-3": 0, "4-5": 0, "5 UP": 0 };
+            
+            filteredHubData.forEach(row => {
+                const cbmValue = parseNumberWithComma(row[8]); 
+                const statusK = (row[10] || '').toUpperCase(); 
+                const statusN = (row[13] || '').toUpperCase(); 
+                const actualAgingDays = agingHariIdx !== -1 ? (parseInt(row[agingHariIdx]) || 0) : 0;
+                const hasLc = noLcIdx !== -1 && (row[noLcIdx] || '').trim();
+
+                // 1. Status Armada Stats
+                const armadaValue = (row[15] || '').toUpperCase();
+                const isComing = armadaValue.includes('SUDAH DATANG') || armadaValue.includes('TERJALURKAN');
+                const isNotComing = armadaValue.includes('BELUM DATANG');
+
+                if (isComing) {
+                    if (hasLc) stats.sudahDatang.sudahPlan++;
+                    else stats.sudahDatang.belumPlan++;
+                } else if (isNotComing) {
+                    if (hasLc) stats.belumDatang.sudahPlan++;
+                    else stats.belumDatang.belumPlan++;
+                }
+
+                if (statusK.includes('SUDAH LOADING') || statusK.includes('SUDAH MUAT') || statusN.includes('SUDAH LOADING') || statusN.includes('SUDAH MUAT')) {
+                    cbmSudahLoading += cbmValue;
+                } else {
+                    // Default to Belum Loading if not Sudah Loading, as long as it's not totally empty
+                    cbmBelumLoading += cbmValue;
+                }
+
+                // 3. Aging (Belum Loading) - Grouping based on days
+                const isSudahLoading = statusK.includes('SUDAH LOADING') || statusK.includes('SUDAH MUAT') || statusN.includes('SUDAH LOADING') || statusN.includes('SUDAH MUAT');
+                if (!isSudahLoading) {
+                    if (actualAgingDays >= 1 && actualAgingDays <= 3) {
+                        agingBuckets["1-3"] += cbmValue;
+                    } else if (actualAgingDays >= 4 && actualAgingDays <= 5) {
+                        agingBuckets["4-5"] += cbmValue;
+                    } else if (actualAgingDays > 5) {
+                        agingBuckets["5 UP"] += cbmValue;
+                    } else if (actualAgingDays === 0) {
+                        // If 0 days, include in 1-3 bucket as "fresh" but only if strictly 0
+                        agingBuckets["1-3"] += cbmValue;
+                    }
+                }
+            });
+
+            // Update Summary UI
+            if (armadaListEl) {
+                armadaListEl.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <div style="color: #4ade80; font-weight: bold; margin-bottom: 5px;">SUDAH DATANG</div>
+                        <div style="padding-left: 10px;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 2px 0;">
+                                <span>SUDAH PLAN</span>
+                                <span style="color: #ffd700; font-weight: bold;">${stats.sudahDatang.sudahPlan}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 2px 0;">
+                                <span>BELUM PLAN</span>
+                                <span style="color: #ffd700; font-weight: bold;">${stats.sudahDatang.belumPlan}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="color: #f87171; font-weight: bold; margin-bottom: 5px;">BELUM DATANG</div>
+                        <div style="padding-left: 10px;">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 2px 0;">
+                                <span>SUDAH PLAN</span>
+                                <span style="color: #ffd700; font-weight: bold;">${stats.belumDatang.sudahPlan}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 2px 0;">
+                                <span>BELUM PLAN</span>
+                                <span style="color: #ffd700; font-weight: bold;">${stats.belumDatang.belumPlan}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (sudahLoadingEl) sudahLoadingEl.textContent = `${formatIndo(cbmSudahLoading)} CBM`;
+            if (belumLoadingEl) belumLoadingEl.textContent = `${formatIndo(cbmBelumLoading)} CBM`;
+
+            if (agingListEl) {
+                agingListEl.innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 4px 0;">
+                            <span>AGING 1-3 HARI</span>
+                            <span style="color: #ffd700; font-weight: bold;">${formatIndo(agingBuckets["1-3"])} CBM</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 4px 0;">
+                            <span>AGING 4-5 HARI</span>
+                            <span style="color: #ffd700; font-weight: bold;">${formatIndo(agingBuckets["4-5"])} CBM</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                            <span>AGING 5 UP HARI</span>
+                            <span style="color: #ffd700; font-weight: bold;">${formatIndo(agingBuckets["5 UP"])} CBM</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Render Table Body
+            let bodyHtml = '';
+            filteredHubData.forEach(row => {
+                bodyHtml += '<tr>';
+                row.forEach((val, i) => {
+                    if (i > statusArmadaIdx) return;
+                    if (hideIndices.has(i)) return;
+                    const isNumber = !isNaN(parseFloat(val)) && isFinite(val);
+                    const style = isNumber ? 'text-align: right;' : 'text-align: left;';
+                    bodyHtml += `<td style="border: 1px solid #333; padding: 8px; ${style}">${val}</td>`;
+                });
+                bodyHtml += '</tr>';
+            });
+            tbody.innerHTML = bodyHtml;
+        }
+
+        function downloadHubExcel() {
+            if (!rawHubData || rawHubData.length === 0) {
+                alert("Data Hub tidak tersedia.");
+                return;
+            }
+            const exportData = rawHubData.map(row => {
+                const data = {};
+                hubHeaderNames.forEach((h, i) => {
+                    data[h] = row[i];
+                });
+                return data;
+            });
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Hub Data");
+            XLSX.writeFile(workbook, "Hub_Summary_Data.xlsx");
         }
 
         function populatePivotAreaFilter() {
@@ -2127,7 +2612,7 @@
             const currentVal = filter.value || 'ALL';
             filter.innerHTML = '<option value="ALL">ALL</option>';
             
-            const sortedAreas = Array.from(pivotAreaBBOptions).sort();
+            const sortedAreas = Array.from(pivotAreaBBOptions).filter(a => a !== 'AREA ASTOR').sort();
             sortedAreas.forEach(area => {
                 const opt = document.createElement('option');
                 opt.value = area;
@@ -2135,7 +2620,27 @@
                 filter.appendChild(opt);
             });
             
-            if (Array.from(pivotAreaBBOptions).includes(currentVal)) {
+            if (sortedAreas.includes(currentVal)) {
+                filter.value = currentVal;
+            }
+        }
+
+        function populateAllocationStatusFilter() {
+            const filter = document.getElementById('allocation-status-filter');
+            if (!filter) return;
+
+            const currentVal = filter.value || 'ALL';
+            filter.innerHTML = '<option value="ALL">ALL</option>';
+            
+            const sortedStatus = Array.from(pivotStatusPlanOptions).sort();
+            sortedStatus.forEach(status => {
+                const opt = document.createElement('option');
+                opt.value = status;
+                opt.textContent = status;
+                filter.appendChild(opt);
+            });
+
+            if (sortedStatus.includes(currentVal)) {
                 filter.value = currentVal;
             }
         }
@@ -2164,7 +2669,7 @@
 
             const exportData = filtered.map(row => {
                 const data = {};
-                const targetIndices = [4, 5, 6, 9, 10, 24, 25, 27, 28, 34]; // E,F,G,J,K,Y,Z,AB,AC,AI
+                const targetIndices = [4, 5, 6, 9, 10, 24, 25, 27, 28, 34, 36]; // E,F,G,J,K,Y,Z,AB,AC,AI,AK
                 
                 targetIndices.forEach(idx => {
                     const headerName = pivotHeaderNames[idx] || `Kolom ${String.fromCharCode(65 + idx)}`;
@@ -2179,6 +2684,7 @@
                     else if (idx === 27) val = row.rawColumns.AB;
                     else if (idx === 28) val = row.rawColumns.AC;
                     else if (idx === 34) val = row.rawColumns.AI;
+                    else if (idx === 36) val = row.rawColumns.AK;
                     data[headerName] = val;
                 });
                 return data;
@@ -2206,7 +2712,7 @@
 
             const exportData = filtered.map(row => {
                 const data = {};
-                const targetIndices = [4, 5, 6, 9, 10, 24, 25, 27, 28, 34];
+                const targetIndices = [4, 5, 6, 9, 10, 24, 25, 27, 28, 34, 36];
                 targetIndices.forEach(idx => {
                     const headerName = pivotHeaderNames[idx] || `Kolom ${String.fromCharCode(65 + idx)}`;
                     let val = '';
@@ -2220,6 +2726,7 @@
                     else if (idx === 27) val = row.rawColumns.AB;
                     else if (idx === 28) val = row.rawColumns.AC;
                     else if (idx === 34) val = row.rawColumns.AI;
+                    else if (idx === 36) val = row.rawColumns.AK;
                     data[headerName] = val;
                 });
                 return data;
@@ -2698,12 +3205,145 @@ Tim Planner DC Sidoarjo`;
             if (tfoot) tfoot.innerHTML = footHtml;
         }
 
+        function sortStoringPivot(field) {
+            if (storingPivotSort.key === field) {
+                storingPivotSort.dir = storingPivotSort.dir === 'asc' ? 'desc' : 'asc';
+            } else {
+                storingPivotSort.key = field;
+                storingPivotSort.dir = 'desc';
+            }
+            renderPivotTable();
+        }
+
+        function renderStoringPivotTable(filteredData) {
+            const tbody = document.getElementById('storing-aging-body');
+            const tfoot = document.getElementById('storing-aging-foot');
+            if (!tbody) return;
+
+            // Aggregate data by Area BB
+            const areas = {};
+            filteredData.forEach(row => {
+                const key = row.areaBB || 'AREA ASTOR';
+                
+                if (!areas[key]) {
+                    areas[key] = {
+                        areaBB: key,
+                        agingCbm: Array(4).fill(0),
+                        unplannedCbm: Array(4).fill(0),
+                        agingTotal: 0,
+                        unplannedTotal: 0
+                    };
+                }
+
+                let agingIdx = 0;
+                if (row.aging === 0) agingIdx = 0;
+                else if (row.aging >= 1 && row.aging <= 3) agingIdx = 1;
+                else if (row.aging >= 4 && row.aging <= 7) agingIdx = 2;
+                else if (row.aging > 7) agingIdx = 3;
+                
+                if (row.status === 'Sudah Plan') {
+                    areas[key].agingCbm[agingIdx] += row.cbm;
+                    areas[key].agingTotal += row.cbm;
+                }
+
+                if (row.status === 'Belum Plan') {
+                    areas[key].unplannedCbm[agingIdx] += row.cbm;
+                    areas[key].unplannedTotal += row.cbm;
+                }
+            });
+
+            const areaList = Object.values(areas);
+            
+            // Sorting
+            areaList.sort((a, b) => {
+                const k = storingPivotSort.key;
+                const d = storingPivotSort.dir === 'asc' ? 1 : -1;
+                
+                if (k === 'areaBB') return a.areaBB.localeCompare(b.areaBB) * d;
+                if (k === 'aging0') return (a.agingCbm[0] - b.agingCbm[0]) * d;
+                if (k === 'aging1_3') return (a.agingCbm[1] - b.agingCbm[1]) * d;
+                if (k === 'aging4_7') return (a.agingCbm[2] - b.agingCbm[2]) * d;
+                if (k === 'aging7up') return (a.agingCbm[3] - b.agingCbm[3]) * d;
+                if (k === 'agingTotal') return (a.agingTotal - b.agingTotal) * d;
+                if (k === 'unplanned0') return (a.unplannedCbm[0] - b.unplannedCbm[0]) * d;
+                if (k === 'unplanned1_3') return (a.unplannedCbm[1] - b.unplannedCbm[1]) * d;
+                if (k === 'unplanned4_7') return (a.unplannedCbm[2] - b.unplannedCbm[2]) * d;
+                if (k === 'unplanned7up') return (a.unplannedCbm[3] - b.unplannedCbm[3]) * d;
+                if (k === 'unplannedTotal') return (a.unplannedTotal - b.unplannedTotal) * d;
+                
+                return 0;
+            });
+
+            if (areaList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 20px; color: #666;">Tidak ada data untuk area ini.</td></tr>`;
+                if (tfoot) tfoot.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            let totals = {
+                aging: Array(4).fill(0),
+                unplanned: Array(4).fill(0),
+                agingTotal: 0,
+                unplannedTotal: 0
+            };
+
+            areaList.forEach(area => {
+                html += `<tr>
+                    <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">${area.areaBB}</td>`;
+                
+                area.agingCbm.forEach((val, i) => {
+                    const displayVal = val > 0 ? formatIndo(val) : '-';
+                    const color = val > 0 ? '#fff' : '#444';
+                    const bgColor = i < 2 ? (val > 0 ? '#1b5e20' : 'transparent') : (val > 0 ? '#b71c1c' : 'transparent');
+                    html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; background: ${bgColor};">${displayVal}</td>`;
+                    totals.aging[i] += val;
+                });
+                
+                html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #34495e; font-weight: bold;">${area.agingTotal > 0 ? formatIndo(area.agingTotal) : '-'}</td>`;
+                totals.agingTotal += area.agingTotal;
+
+                area.unplannedCbm.forEach((val, i) => {
+                    const displayVal = val > 0 ? formatIndo(val) : '-';
+                    const color = val > 0 ? '#fff' : '#444';
+                    const bgColor = i < 2 ? (val > 0 ? '#1b5e20' : 'transparent') : (val > 0 ? '#b71c1c' : 'transparent');
+                    html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; font-weight: ${val > 0 ? 'bold' : 'normal'}; background: ${bgColor};">${displayVal}</td>`;
+                    totals.unplanned[i] += val;
+                });
+                
+                html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #219150; font-weight: bold;">${area.unplannedTotal > 0 ? formatIndo(area.unplannedTotal) : '-'}</td>`;
+                totals.unplannedTotal += area.unplannedTotal;
+
+                html += `</tr>`;
+            });
+
+            // Grand Total Row for Storing Table
+            let footHtml = `<tr style="background: #2c3e50; font-weight: bold; color: #ffd700;">
+                <td style="padding: 10px 20px; text-align: right; border: 1px solid #444;">GRAND TOTAL</td>`;
+            
+            totals.aging.forEach(val => {
+                footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444;">${val > 0 ? formatIndo(val) : '0'}</td>`;
+            });
+            footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444; background: #1a252f;">${totals.agingTotal > 0 ? formatIndo(totals.agingTotal) : '0'}</td>`;
+            
+            totals.unplanned.forEach(val => {
+                footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444;">${val > 0 ? formatIndo(val) : '0'}</td>`;
+            });
+            footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444; background: #166534;">${totals.unplannedTotal > 0 ? formatIndo(totals.unplannedTotal) : '0'}</td>`;
+            footHtml += `</tr>`;
+
+            tbody.innerHTML = html;
+            if (tfoot) tfoot.innerHTML = footHtml;
+        }
+
         function renderAllocationSummary(data) {
             const tbody = document.getElementById('allocation-summary-body');
             const container = document.getElementById('allocation-summary-container');
             const foot = document.getElementById('allocation-summary-foot');
             const bbFilter = document.getElementById('allocation-area-bb-filter');
+            const statusFilter = document.getElementById('allocation-status-filter');
             const selectedBB = bbFilter ? bbFilter.value : 'ALL';
+            const selectedStatus = statusFilter ? statusFilter.value : 'ALL';
             
             if (!tbody || !container) return;
 
@@ -2720,8 +3360,16 @@ Tim Planner DC Sidoarjo`;
             
             const stores = {};
             data.forEach(row => {
-                // Filter by Area BB
-                if (selectedBB !== 'ALL' && row.areaBB !== selectedBB) return;
+                // Filter by Area BB (Exclude AREA ASTOR unless specifically selected - which is impossible now as it's removed from list)
+                const isAstor = row.areaBB === 'AREA ASTOR';
+                if (selectedBB === 'ALL') {
+                    if (isAstor) return;
+                } else {
+                    if (row.areaBB !== selectedBB) return;
+                }
+
+                // Filter by Status Plan
+                if (selectedStatus !== 'ALL' && row.status !== selectedStatus) return;
 
                 const status = (row.allocStatus || '').trim().toLowerCase();
                 let type = null;
