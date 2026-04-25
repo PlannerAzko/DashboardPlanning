@@ -1602,6 +1602,15 @@
                             <i class="fas fa-file-excel"></i> EXCEL EXPORT
                         </button>
                         <div style="display: flex; align-items: center; gap: 6px; margin-left: 10px;">
+                            <label style="font-size: 0.8em; color: #ffd700; opacity: 0.8;">AGING:</label>
+                            <select id="hub-aging-filter" onchange="renderHubTable()" style="background: #222; color: #ffd700; border: 1px solid #ffd700; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; outline: none;">
+                                <option value="ALL">ALL</option>
+                                <option value="1-3">AGING 1-3 HARI</option>
+                                <option value="4-5">AGING 4-5 HARI</option>
+                                <option value="5+">AGING 5 UP HARI</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
                             <label style="font-size: 0.8em; color: #ffd700; opacity: 0.8;">KETERANGAN LOADING:</label>
                             <select id="hub-loading-filter" onchange="renderHubTable()" style="background: #222; color: #ffd700; border: 1px solid #ffd700; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; outline: none;">
                                 <option value="ALL">ALL</option>
@@ -2372,10 +2381,12 @@
             const loadFilter = document.getElementById('hub-loading-filter');
             const lcFilter = document.getElementById('hub-nolc-filter');
             const armadaStatusFilter = document.getElementById('hub-armada-status-filter');
+            const agingFilter = document.getElementById('hub-aging-filter');
             
             const selectedLoading = loadFilter ? loadFilter.value : 'ALL';
             const selectedLc = lcFilter ? lcFilter.value : 'ALL';
             const selectedArmadaStatus = armadaStatusFilter ? armadaStatusFilter.value : 'ALL';
+            const selectedAging = agingFilter ? agingFilter.value : 'ALL';
 
             if (!head || !tbody) return;
 
@@ -2393,13 +2404,20 @@
                 hideIndices.add(noLcIdx + 1); // Delete column to the right of NO LC
             }
             
-            // Look for AGING or ESTIMASI PENGENDAPAN
-            let agingHariIdx = hubHeaderNames.findIndex(h => {
-                const headStr = h.toUpperCase();
-                return headStr === 'AGING' || headStr.includes('ESTIMASI PENGENDAPAN');
+            // Specifically hide column "ESTIMASI PENGENDAPAN (HARI)"
+            hubHeaderNames.forEach((h, i) => {
+                if (h.toUpperCase().includes('ESTIMASI PENGENDAPAN')) {
+                    hideIndices.add(i);
+                }
             });
-            if (agingHariIdx === -1) agingHariIdx = 9; // Fallback to Column J based on user screenshot
-            if (agingHariIdx !== -1) hideIndices.add(agingHariIdx);
+
+            // Aging calculation index (usually index 9 / Column J)
+            let agingHariIdx = hubHeaderNames.findIndex(h => h.toUpperCase() === 'AGING');
+            if (agingHariIdx === -1) agingHariIdx = 9; // Fallback to Column J
+            
+            // Ensure AGING column (index 9) is NOT in hideIndices if it was accidentally added
+            // The user wants it visible next to TOTAL CBM (index 8)
+            hideIndices.delete(agingHariIdx);
 
             let statusArmadaIdx = hubHeaderNames.findIndex(h => h.toUpperCase().includes('STATUS ARMADA'));
             if (statusArmadaIdx === -1) statusArmadaIdx = 15; // default fallback
@@ -2434,8 +2452,21 @@
                 let matchesArmadaStatus = true;
                 if (selectedArmadaStatus === 'SUDAH DATANG') matchesArmadaStatus = isComing;
                 else if (selectedArmadaStatus === 'BELUM DATANG') matchesArmadaStatus = isNotComing;
+
+                // Aging Filter Logic
+                let matchesAging = true;
+                if (selectedAging !== 'ALL') {
+                    const agingVal = parseInt(row[agingHariIdx]) || 0;
+                    if (selectedAging === '1-3') {
+                        matchesAging = (agingVal >= 0 && agingVal <= 3);
+                    } else if (selectedAging === '4-5') {
+                        matchesAging = (agingVal >= 4 && agingVal <= 5);
+                    } else if (selectedAging === '5+') {
+                        matchesAging = (agingVal > 5);
+                    }
+                }
                 
-                return matchesLoading && matchesLc && matchesArmadaStatus;
+                return matchesLoading && matchesLc && matchesArmadaStatus && matchesAging;
             });
 
             if (filteredHubData.length === 0) {
