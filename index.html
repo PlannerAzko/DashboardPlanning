@@ -1502,46 +1502,6 @@
                 </div>
             </div>
 
-            <!-- Table: MONITORING AGING BY AREA STORING -->
-            <div id="storing-aging-container" style="margin-top: 30px; border-bottom: 2px solid #333;">
-                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <span><i class="fas fa-warehouse"></i> MONITORING ORDER AGING BY AREA STORING DAN ASTOR</span>
-                    </div>
-                </div>
-                <div class="table-content-large" style="overflow-x: auto; background: #1a1a1a;">
-                    <table id="storing-aging-table" class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
-                        <thead>
-                            <tr class="nested-header">
-                                <th rowspan="2" onclick="sortStoringPivot('areaBB')" style="width: 250px; cursor: pointer;">AREA STORING DAN ASTOR <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                                <th colspan="5" style="background: #2c3e50; color: #ecf0f1;">AGING SUDAH PLAN (CBM)</th>
-                                <th colspan="5" style="background: #27ae60; color: #fff;">AGING BELUM PLAN (CBM)</th>
-                            </tr>
-                            <tr class="sub-header">
-                                <th onclick="sortStoringPivot('aging0')" style="cursor: pointer;">0 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                                <th onclick="sortStoringPivot('aging1_3')" style="cursor: pointer;">1-3 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                                <th onclick="sortStoringPivot('aging4_7')" style="cursor: pointer;">4-7 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                                <th onclick="sortStoringPivot('aging7up')" style="cursor: pointer;">7 UP <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                                <th onclick="sortStoringPivot('agingTotal')" style="background: #34495e; cursor: pointer;">TOTAL <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                                <th onclick="sortStoringPivot('unplanned0')" style="cursor: pointer;">0 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                                <th onclick="sortStoringPivot('unplanned1_3')" style="cursor: pointer;">1-3 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                                <th onclick="sortStoringPivot('unplanned4_7')" style="cursor: pointer;">4-7 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                                <th onclick="sortStoringPivot('unplanned7up')" style="cursor: pointer;">7 UP <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                                <th onclick="sortStoringPivot('unplannedTotal')" style="background: #219150; cursor: pointer;">TOTAL <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                            </tr>
-                        </thead>
-                        <tbody id="storing-aging-body">
-                            <tr>
-                                <td colspan="11" style="text-align: center; padding: 40px; color: #666;">
-                                    <div class="loading"><div class="spinner" style="margin: 0 auto 10px;"></div>Processing Pivot Data...</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot id="storing-aging-foot"></tfoot>
-                    </table>
-                </div>
-            </div>
-
             <!-- Table: ALLOCATION SUMMARY -->
             <div id="allocation-summary-container" style="margin-top: 30px; margin-bottom: 30px; border-bottom: 2px solid #333; display: none;">
                 <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
