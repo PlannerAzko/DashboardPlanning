@@ -2567,14 +2567,15 @@ let slaHit = 0;
 let slaMiss = 0;
 
 filteredHubData.forEach(row => {
-    // Skip jika No LC kosong (belum plan)
-    const noLc = noLcIdx !== -1 ? (row[noLcIdx] || '').trim() : '';
-    if (!noLc) return;
+    // Hanya hitung yang status SUDAH LOADING (kolom N = index 13)
+    const statusLoading = (row[13] || '').toUpperCase();
+    const isSudahLoading = statusLoading.includes('SUDAH LOADING') || statusLoading.includes('SUDAH MUAT');
+    if (!isSudahLoading) return;
 
     // Ambil nilai aging langsung dari kolom aging
     const agingVal = parseInt(row[agingHariIdx]) || 0;
 
-    if (agingVal >= 1 && agingVal <= 3) {
+    if (agingVal >= 0 && agingVal <= 3) {
         slaHit++;
     } else if (agingVal > 3) {
         slaMiss++;
