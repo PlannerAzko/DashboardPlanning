@@ -2566,52 +2566,17 @@
 let slaHit = 0;
 let slaMiss = 0;
 
-const parseTglKedatangan = (str) => {
-    if (!str) return null;
-    const monthMap = {
-        'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'mei': 4, 'may': 4,
-        'jun': 5, 'jul': 6, 'agu': 7, 'aug': 7, 'sep': 8,
-        'okt': 9, 'oct': 9, 'nov': 10, 'des': 11, 'dec': 11
-    };
-    const parts = str.toLowerCase().trim().split(/\s+/);
-    if (parts.length >= 3) {
-        const day = parseInt(parts[0]);
-        const month = monthMap[parts[1].substring(0, 3)];
-        const year = parseInt(parts[2]) < 100 ? 2000 + parseInt(parts[2]) : parseInt(parts[2]);
-        if (!isNaN(day) && month !== undefined && !isNaN(year)) {
-            return new Date(year, month, day);
-        }
-    }
-    return null;
-};
-
-const parseNoLcDate = (lc) => {
-    if (!lc) return null;
-    const match = lc.match(/^(\d{2})(\d{2})(\d{2})/);
-    if (!match) return null;
-    const year = 2000 + parseInt(match[1]);
-    const month = parseInt(match[2]) - 1;
-    const day = parseInt(match[3]);
-    return new Date(year, month, day);
-};
-
 filteredHubData.forEach(row => {
-    const tglKedatangan = (row[0] || '').trim();
-    const noLc = noLcIdx !== -1 ? (row[noLcIdx] || '').trim() : '';
-
     // Skip jika No LC kosong (belum plan)
+    const noLc = noLcIdx !== -1 ? (row[noLcIdx] || '').trim() : '';
     if (!noLc) return;
 
-    const dateKedatangan = parseTglKedatangan(tglKedatangan);
-    const dateNoLc = parseNoLcDate(noLc);
+    // Ambil nilai aging langsung dari kolom aging
+    const agingVal = parseInt(row[agingHariIdx]) || 0;
 
-    if (!dateKedatangan || !dateNoLc) return;
-
-    const diffDays = Math.round((dateNoLc - dateKedatangan) / (1000 * 60 * 60 * 24));
-
-    if (diffDays >= 1 && diffDays <= 3) {
+    if (agingVal >= 1 && agingVal <= 3) {
         slaHit++;
-    } else if (diffDays > 3) {
+    } else if (agingVal > 3) {
         slaMiss++;
     }
 });
@@ -2655,7 +2620,6 @@ if (slaHitEl) slaHitEl.textContent = slaHit + ' store';
 if (slaMissEl) slaMissEl.textContent = slaMiss + ' store';
 if (slaTotalEl) slaTotalEl.textContent = slaTotal + ' store';
 
-// Update border card sesuai status
 const slaCard = document.getElementById('hub-sla-card');
 if (slaCard) slaCard.style.borderColor = slaColor;
 // ============ END SLA ============
