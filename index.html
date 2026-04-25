@@ -2422,13 +2422,22 @@
 
             // Render Header
             let headHtml = '<tr style="background: #222;">';
-            hubHeaderNames.forEach((h, i) => {
-                if (i > statusArmadaIdx) return;
-                if (hideIndices.has(i)) return;
-                headHtml += `<th style="padding: 10px; border: 1px solid #333; text-align: center; color: #ffd700;">${h}</th>`;
-            });
-            headHtml += '</tr>';
-            head.innerHTML = headHtml;
+            let hubSortKey = window.hubSortKey || -1;
+let hubSortDir = window.hubSortDir || 'asc';
+
+headHtml += `<th style="padding: 10px; border: 1px solid #333; text-align: center; color: #ffd700; width: 40px;">#</th>`;
+hubHeaderNames.forEach((h, i) => {
+    if (i > statusArmadaIdx) return;
+    if (hideIndices.has(i)) return;
+    const isActive = hubSortKey === i;
+    const icon = isActive ? (hubSortDir === 'asc' ? '▲' : '▼') : '⇅';
+    const iconColor = isActive ? '#ffd700' : '#555';
+    headHtml += `<th onclick="hubSort(${i})" style="padding: 10px; border: 1px solid #333; text-align: center; color: #ffd700; cursor: pointer; user-select: none;">
+        ${h} <span style="font-size: 0.75em; color: ${iconColor};">${icon}</span>
+    </th>`;
+});
+headHtml += '</tr>';
+head.innerHTML = headHtml;
 
             // Filter Data
             const filteredHubData = rawHubData.filter(row => {
@@ -2645,21 +2654,47 @@ if (slaCard) slaCard.style.borderColor = slaColor;
             }
 
             // Render Table Body
-            let bodyHtml = '';
-            filteredHubData.forEach(row => {
-                bodyHtml += '<tr>';
-                row.forEach((val, i) => {
-                    if (i > statusArmadaIdx) return;
-                    if (hideIndices.has(i)) return;
-                    const isNumber = !isNaN(parseFloat(val)) && isFinite(val);
-                    const style = isNumber ? 'text-align: right;' : 'text-align: left;';
-                    bodyHtml += `<td style="border: 1px solid #333; padding: 8px; ${style}">${val}</td>`;
-                });
-                bodyHtml += '</tr>';
-            });
-            tbody.innerHTML = bodyHtml;
+            // Apply sort
+let sortedHubData = [...filteredHubData];
+if (window.hubSortKey !== undefined && window.hubSortKey >= 0) {
+    sortedHubData.sort((a, b) => {
+        let valA = a[window.hubSortKey] || '';
+        let valB = b[window.hubSortKey] || '';
+        const numA = parseFloat(valA);
+        const numB = parseFloat(valB);
+        if (!isNaN(numA) && !isNaN(numB)) {
+            return window.hubSortDir === 'asc' ? numA - numB : numB - numA;
         }
+        return window.hubSortDir === 'asc'
+            ? String(valA).localeCompare(String(valB))
+            : String(valB).localeCompare(String(valA));
+    });
+}
 
+let bodyHtml = '';
+sortedHubData.forEach((row, rowIndex) => {
+    bodyHtml += '<tr>';
+    bodyHtml += `<td style="border: 1px solid #333; padding: 8px; text-align: center; color: #888; background: #151515;">${rowIndex + 1}</td>`;
+    row.forEach((val, i) => {
+        if (i > statusArmadaIdx) return;
+        if (hideIndices.has(i)) return;
+        const isNumber = !isNaN(parseFloat(val)) && isFinite(val);
+        const style = isNumber ? 'text-align: right;' : 'text-align: left;';
+        bodyHtml += `<td style="border: 1px solid #333; padding: 8px; ${style}">${val}</td>`;
+    });
+    bodyHtml += '</tr>';
+});
+tbody.innerHTML = bodyHtml;
+        }
+function hubSort(colIdx) {
+    if (window.hubSortKey === colIdx) {
+        window.hubSortDir = window.hubSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+        window.hubSortKey = colIdx;
+        window.hubSortDir = 'asc';
+    }
+    renderHubTable();
+}
         function downloadHubExcel() {
             if (!rawHubData || rawHubData.length === 0) {
                 alert("Data Hub tidak tersedia.");
