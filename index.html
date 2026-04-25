@@ -5115,14 +5115,14 @@ Tim Planner DC Sidoarjo`;
             const caseIdRatio = caseIdPlan > 0 ? (caseIdShipped / caseIdPlan) * 100 : 0;
             const cbmRatio = cbmPlan > 0 ? (cbmShipped / cbmPlan) * 100 : 0;
 
-            document.getElementById('caseIdShipped').textContent = caseIdShipped.toFixed(0);
+            document.getElementById('caseIdShipped').textContent = Math.round(caseIdShipped).toLocaleString('id-ID');
             document.getElementById('caseIdRatioShipped').textContent = caseIdRatio.toFixed(1) + '%';
-            document.getElementById('caseIdPlan').textContent = caseIdPlan.toFixed(0);
-            document.getElementById('cbmPlan').textContent = cbmPlan.toFixed(2);
+            document.getElementById('caseIdPlan').textContent = Math.round(caseIdPlan).toLocaleString('id-ID');
+            document.getElementById('cbmPlan').textContent = cbmPlan.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById('cbmRatioShipped').textContent = cbmRatio.toFixed(1) + '%';
-            document.getElementById('cbmShipped').textContent = cbmShipped.toFixed(2);
-            document.getElementById('cbmPlanShift1').textContent = cbmShift1.toFixed(2);
-            document.getElementById('cbmPlanShift2').textContent = cbmShift2.toFixed(2);
+            document.getElementById('cbmShipped').textContent = cbmShipped.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('cbmPlanShift1').textContent = cbmShift1.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('cbmPlanShift2').textContent = cbmShift2.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
             // Display SLA KPIs
             if (slaCount > 0) {
