@@ -3423,33 +3423,57 @@ let footHtml = `<tr style="background: #2c3e50; font-weight: bold; color: #ffd70
             areaList.forEach(area => {
                 const totalCbmRow = area.agingTotal + area.unplannedTotal;
 html += `<tr>
-    <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">${area.areaBB}</td>
-    <td style="border: 1px solid #333; padding: 8px; text-align: right; background: #3a2a00; color: #ffd700; font-weight: bold;">${totalCbmRow > 0 ? formatIndo(totalCbmRow) : '-'}</td>
-                
-                area.agingCbm.forEach((val, i) => {
-                    const displayVal = val > 0 ? formatIndo(val) : '-';
-                    const color = val > 0 ? '#fff' : '#444';
-                    const bgColor = i < 2 ? (val > 0 ? '#1b5e20' : 'transparent') : (val > 0 ? '#b71c1c' : 'transparent');
-                    html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; background: ${bgColor};">${displayVal}</td>`;
-                    totals.aging[i] += val;
-                });
-                
-                html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #34495e; font-weight: bold;">${area.agingTotal > 0 ? formatIndo(area.agingTotal) : '-'}</td>`;
-                totals.agingTotal += area.agingTotal;
+    <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">
+        ${area.areaBB}
+    </td>
+    <td style="border: 1px solid #333; padding: 8px; text-align: right; background: #3a2a00; color: #ffd700; font-weight: bold;">
+        ${totalCbmRow > 0 ? formatIndo(totalCbmRow) : '-'}
+    </td>`;
+    
+// ===== AGING =====
+area.agingCbm.forEach((val, i) => {
+    const displayVal = val > 0 ? formatIndo(val) : '-';
+    const color = val > 0 ? '#fff' : '#444';
+    const bgColor = i < 2 
+        ? (val > 0 ? '#1b5e20' : 'transparent') 
+        : (val > 0 ? '#b71c1c' : 'transparent');
 
-                area.unplannedCbm.forEach((val, i) => {
-                    const displayVal = val > 0 ? formatIndo(val) : '-';
-                    const color = val > 0 ? '#fff' : '#444';
-                    const bgColor = i < 2 ? (val > 0 ? '#1b5e20' : 'transparent') : (val > 0 ? '#b71c1c' : 'transparent');
-                    html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; font-weight: ${val > 0 ? 'bold' : 'normal'}; background: ${bgColor};">${displayVal}</td>`;
-                    totals.unplanned[i] += val;
-                });
-                
-                html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #219150; font-weight: bold;">${area.unplannedTotal > 0 ? formatIndo(area.unplannedTotal) : '-'}</td>`;
-                totals.unplannedTotal += area.unplannedTotal;
+    html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; background: ${bgColor};">
+        ${displayVal}
+    </td>`;
 
-                html += `</tr>`;
-            });
+    totals.aging[i] += val;
+});
+
+html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #34495e; font-weight: bold;">
+    ${area.agingTotal > 0 ? formatIndo(area.agingTotal) : '-'}
+</td>`;
+
+totals.agingTotal += area.agingTotal;
+
+// ===== UNPLANNED =====
+area.unplannedCbm.forEach((val, i) => {
+    const displayVal = val > 0 ? formatIndo(val) : '-';
+    const color = val > 0 ? '#fff' : '#444';
+    const bgColor = i < 2 
+        ? (val > 0 ? '#1b5e20' : 'transparent') 
+        : (val > 0 ? '#b71c1c' : 'transparent');
+
+    html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; font-weight: ${val > 0 ? 'bold' : 'normal'}; background: ${bgColor};">
+        ${displayVal}
+    </td>`;
+
+    totals.unplanned[i] += val;
+});
+
+html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #219150; font-weight: bold;">
+    ${area.unplannedTotal > 0 ? formatIndo(area.unplannedTotal) : '-'}
+</td>`;
+
+totals.unplannedTotal += area.unplannedTotal;
+
+// ===== CLOSE ROW =====
+html += `</tr>`;
 
             // Grand Total Row for Storing Table
             const grandTotalCbm = totals.agingTotal + totals.unplannedTotal;
