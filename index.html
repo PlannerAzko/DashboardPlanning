@@ -2483,7 +2483,10 @@ function renderHubTable() {
         </th>`;
         // Tambahkan kolom HARI tepat setelah kolom TANGGAL KEDATANGAN
         if (i === tglKedatanganIdx && !hariInserted) {
-            headHtml += `<th style="padding: 10px; border: 1px solid #333; text-align: center; color: #ffd700; background: #1a2a1a;">HARI</th>`;
+            const hariSortActive = hubSortKey === -1;
+const hariIcon = hariSortActive ? (hubSortDir === 'asc' ? '▲' : '▼') : '⇅';
+const hariIconColor = hariSortActive ? '#ffd700' : '#555';
+headHtml += `<th onclick="hubSort(-1)" style="padding: 10px; border: 1px solid #333; text-align: center; color: #ffd700; background: #1a2a1a; cursor: pointer; user-select: none;">HARI <span style="font-size: 0.75em; color: ${hariIconColor};">${hariIcon}</span></th>`;
             hariInserted = true;
         }
     });
@@ -2669,20 +2672,29 @@ function renderHubTable() {
 
     // Render Table Body dengan kolom HARI
     let sortedHubData = [...filteredHubData];
-    if (window.hubSortKey !== undefined && window.hubSortKey >= 0) {
-        sortedHubData.sort((a, b) => {
-            let valA = a[window.hubSortKey] || '';
-            let valB = b[window.hubSortKey] || '';
-            const numA = parseFloat(valA);
-            const numB = parseFloat(valB);
-            if (!isNaN(numA) && !isNaN(numB)) {
-                return window.hubSortDir === 'asc' ? numA - numB : numB - numA;
-            }
-            return window.hubSortDir === 'asc'
-                ? String(valA).localeCompare(String(valB))
-                : String(valB).localeCompare(String(valA));
-        });
-    }
+    if (window.hubSortKey !== undefined && window.hubSortKey === -1) {
+    const hariOrder = ['SENIN','SELASA','RABU','KAMIS','JUMAT','SABTU','MINGGU'];
+    sortedHubData.sort((a, b) => {
+        const tglA = (a[tglKedatanganIdx] || '');
+        const tglB = (b[tglKedatanganIdx] || '');
+        const hariA = hariOrder.indexOf(getDayName(tglA));
+        const hariB = hariOrder.indexOf(getDayName(tglB));
+        return window.hubSortDir === 'asc' ? hariA - hariB : hariB - hariA;
+    });
+} else if (window.hubSortKey !== undefined && window.hubSortKey >= 0) {
+    sortedHubData.sort((a, b) => {
+        let valA = a[window.hubSortKey] || '';
+        let valB = b[window.hubSortKey] || '';
+        const numA = parseFloat(valA);
+        const numB = parseFloat(valB);
+        if (!isNaN(numA) && !isNaN(numB)) {
+            return window.hubSortDir === 'asc' ? numA - numB : numB - numA;
+        }
+        return window.hubSortDir === 'asc'
+            ? String(valA).localeCompare(String(valB))
+            : String(valB).localeCompare(String(valA));
+    });
+}
 
     let bodyHtml = '';
     sortedHubData.forEach((row, rowIndex) => {
@@ -2709,11 +2721,22 @@ function renderHubTable() {
 }
         
 function hubSort(colIdx) {
-    if (window.hubSortKey === colIdx) {
-        window.hubSortDir = window.hubSortDir === 'asc' ? 'desc' : 'asc';
+    // -1 = sort by HARI
+    if (colIdx === -1) {
+        const hariOrder = ['SENIN','SELASA','RABU','KAMIS','JUMAT','SABTU','MINGGU'];
+        if (window.hubSortKey === -1) {
+            window.hubSortDir = window.hubSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            window.hubSortKey = -1;
+            window.hubSortDir = 'asc';
+        }
     } else {
-        window.hubSortKey = colIdx;
-        window.hubSortDir = 'asc';
+        if (window.hubSortKey === colIdx) {
+            window.hubSortDir = window.hubSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            window.hubSortKey = colIdx;
+            window.hubSortDir = 'asc';
+        }
     }
     renderHubTable();
 }
