@@ -3285,7 +3285,7 @@ Tim Planner DC Sidoarjo`;
             };
 
             areaList.forEach(area => {
-                const totalCbmRow = area.agingTotal + area.unplannedTotal;
+                let totalCbmRow = area.agingTotal + area.unplannedTotal;
 const totalCbmRow = area.agingTotal + area.unplannedTotal;
 html += `<tr>
     <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">${area.areaBB}</td>
@@ -3318,7 +3318,7 @@ html += `<tr>
             });
 
             // Grand Total Row for Storing Table
-            const grandTotalCbm = totals.agingTotal + totals.unplannedTotal;
+            let grandTotalCbm = totals.agingTotal + totals.unplannedTotal;
 let footHtml = `<tr style="background: #2c3e50; font-weight: bold; color: #ffd700;">
     <td style="padding: 10px 20px; text-align: right; border: 1px solid #444;">GRAND TOTAL</td>
     <td style="padding: 10px; text-align: right; border: 1px solid #444; background: #3a2a00; color: #ffd700;">${formatIndo(grandTotalCbm)}</td>`;
