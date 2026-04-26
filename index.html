@@ -3286,7 +3286,6 @@ Tim Planner DC Sidoarjo`;
 
             areaList.forEach(area => {
                 let totalCbmRow = area.agingTotal + area.unplannedTotal;
-let totalCbmRow = area.agingTotal + area.unplannedTotal;
 html += `<tr>
     <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">${area.areaBB}</td>
     <td style="border: 1px solid #333; padding: 8px; text-align: right; background: #3a2a00; color: #ffd700; font-weight: bold;">${totalCbmRow > 0 ? formatIndo(totalCbmRow) : '-'}</td>`;
