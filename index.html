@@ -3210,292 +3210,125 @@ Tim Planner DC Sidoarjo`;
             }
             renderPivotTable();
         }
+function renderStoringPivotTable(filteredData) {
+    const tbody = document.getElementById('storing-aging-body');
+    const tfoot = document.getElementById('storing-aging-foot');
+    if (!tbody) return;
 
-        function renderStoringPivotTable(filteredData) {
-            const tbody = document.getElementById('storing-aging-body');
-            const tfoot = document.getElementById('storing-aging-foot');
-            if (!tbody) return;
-
-            // Aggregate data by Area BB
-            const areas = {};
-            filteredData.forEach(row => {
-                const key = row.areaBB || 'AREA ASTOR';
-                
-                if (!areas[key]) {
-                    areas[key] = {
-                        areaBB: key,
-                        agingCbm: Array(4).fill(0),
-                        unplannedCbm: Array(4).fill(0),
-                        agingTotal: 0,
-                        unplannedTotal: 0
-                    };
-                }
-
-                let agingIdx = 0;
-                if (row.aging === 0) agingIdx = 0;
-                else if (row.aging >= 1 && row.aging <= 3) agingIdx = 1;
-                else if (row.aging >= 4 && row.aging <= 7) agingIdx = 2;
-                else if (row.aging > 7) agingIdx = 3;
-                
-                if (row.status === 'Sudah Plan') {
-                    areas[key].agingCbm[agingIdx] += row.cbm;
-                    areas[key].agingTotal += row.cbm;
-                }
-
-                if (row.status === 'Belum Plan') {
-                    areas[key].unplannedCbm[agingIdx] += row.cbm;
-                    areas[key].unplannedTotal += row.cbm;
-                }
-            });
-
-            const areaList = Object.values(areas);
-            
-            // Sorting
-            areaList.sort((a, b) => {
-                const k = storingPivotSort.key;
-                const d = storingPivotSort.dir === 'asc' ? 1 : -1;
-                
-                if (k === 'areaBB') return a.areaBB.localeCompare(b.areaBB) * d;
-                if (k === 'aging0') return (a.agingCbm[0] - b.agingCbm[0]) * d;
-                if (k === 'aging1_3') return (a.agingCbm[1] - b.agingCbm[1]) * d;
-                if (k === 'aging4_7') return (a.agingCbm[2] - b.agingCbm[2]) * d;
-                if (k === 'aging7up') return (a.agingCbm[3] - b.agingCbm[3]) * d;
-                if (k === 'agingTotal') return (a.agingTotal - b.agingTotal) * d;
-                if (k === 'unplanned0') return (a.unplannedCbm[0] - b.unplannedCbm[0]) * d;
-                if (k === 'unplanned1_3') return (a.unplannedCbm[1] - b.unplannedCbm[1]) * d;
-                if (k === 'unplanned4_7') return (a.unplannedCbm[2] - b.unplannedCbm[2]) * d;
-                if (k === 'unplanned7up') return (a.unplannedCbm[3] - b.unplannedCbm[3]) * d;
-                if (k === 'unplannedTotal') return (a.unplannedTotal - b.unplannedTotal) * d;
-                
-                return 0;
-            });
-
-            if (areaList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 20px; color: #666;">Tidak ada data untuk area ini.</td></tr>`;
-                if (tfoot) tfoot.innerHTML = '';
-                return;
-            }
-
-            let html = '';
-            let totals = {
-                aging: Array(4).fill(0),
-                unplanned: Array(4).fill(0),
+    const areas = {};
+    filteredData.forEach(row => {
+        const key = row.areaBB || 'AREA ASTOR';
+        if (!areas[key]) {
+            areas[key] = {
+                areaBB: key,
+                agingCbm: Array(4).fill(0),
+                unplannedCbm: Array(4).fill(0),
                 agingTotal: 0,
                 unplannedTotal: 0
             };
-
-            areaList.forEach(area => {
-                const totalCbmRow = area.agingTotal + area.unplannedTotal;
-html += `<tr>
-    <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">${area.areaBB}</td>
-    <td style="border: 1px solid #333; padding: 8px; text-align: right; background: #3a2a00; color: #ffd700; font-weight: bold;">${totalCbmRow > 0 ? formatIndo(totalCbmRow) : '-'}</td>`;
-
-                area.agingCbm.forEach                
-                area.agingCbm.forEach((val, i) => {
-                    const displayVal = val > 0 ? formatIndo(val) : '-';
-                    const color = val > 0 ? '#fff' : '#444';
-                    const bgColor = i < 2 ? (val > 0 ? '#1b5e20' : 'transparent') : (val > 0 ? '#b71c1c' : 'transparent');
-                    html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; background: ${bgColor};">${displayVal}</td>`;
-                    totals.aging[i] += val;
-                });
-                
-                html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #34495e; font-weight: bold;">${area.agingTotal > 0 ? formatIndo(area.agingTotal) : '-'}</td>`;
-                totals.agingTotal += area.agingTotal;
-
-                area.unplannedCbm.forEach((val, i) => {
-                    const displayVal = val > 0 ? formatIndo(val) : '-';
-                    const color = val > 0 ? '#fff' : '#444';
-                    const bgColor = i < 2 ? (val > 0 ? '#1b5e20' : 'transparent') : (val > 0 ? '#b71c1c' : 'transparent');
-                    html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; font-weight: ${val > 0 ? 'bold' : 'normal'}; background: ${bgColor};">${displayVal}</td>`;
-                    totals.unplanned[i] += val;
-                });
-                
-                html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #219150; font-weight: bold;">${area.unplannedTotal > 0 ? formatIndo(area.unplannedTotal) : '-'}</td>`;
-                totals.unplannedTotal += area.unplannedTotal;
-
-                html += `</tr>`;
-            });
-
-            // Grand Total Row for Storing Table
-            let grandTotalCbm = totals.agingTotal + totals.unplannedTotal;
-let footHtml = `<tr style="background: #2c3e50; font-weight: bold; color: #ffd700;">
-    <td style="padding: 10px 20px; text-align: right; border: 1px solid #444;">GRAND TOTAL</td>
-    <td style="padding: 10px; text-align: right; border: 1px solid #444; background: #3a2a00; color: #ffd700;">${formatIndo(grandTotalCbm)}</td>`;
-            
-            totals.aging.forEach(val => {
-                footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444;">${val > 0 ? formatIndo(val) : '0'}</td>`;
-            });
-            footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444; background: #1a252f;">${totals.agingTotal > 0 ? formatIndo(totals.agingTotal) : '0'}</td>`;
-            
-            totals.unplanned.forEach(val => {
-                footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444;">${val > 0 ? formatIndo(val) : '0'}</td>`;
-            });
-            footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444; background: #166534;">${totals.unplannedTotal > 0 ? formatIndo(totals.unplannedTotal) : '0'}</td>`;
-            footHtml += `</tr>`;
-
-            tbody.innerHTML = html;
-            if (tfoot) tfoot.innerHTML = footHtml;
         }
 
-        function sortStoringPivot(field) {
-            if (storingPivotSort.key === field) {
-                storingPivotSort.dir = storingPivotSort.dir === 'asc' ? 'desc' : 'asc';
-            } else {
-                storingPivotSort.key = field;
-                storingPivotSort.dir = 'desc';
-            }
-            renderPivotTable();
+        let agingIdx = 0;
+        if (row.aging === 0) agingIdx = 0;
+        else if (row.aging >= 1 && row.aging <= 3) agingIdx = 1;
+        else if (row.aging >= 4 && row.aging <= 7) agingIdx = 2;
+        else if (row.aging > 7) agingIdx = 3;
+
+        if (row.status === 'Sudah Plan') {
+            areas[key].agingCbm[agingIdx] += row.cbm;
+            areas[key].agingTotal += row.cbm;
         }
-
-        function renderStoringPivotTable(filteredData) {
-            const tbody = document.getElementById('storing-aging-body');
-            const tfoot = document.getElementById('storing-aging-foot');
-            if (!tbody) return;
-
-            // Aggregate data by Area BB
-            const areas = {};
-            filteredData.forEach(row => {
-                const key = row.areaBB || 'AREA ASTOR';
-                
-                if (!areas[key]) {
-                    areas[key] = {
-                        areaBB: key,
-                        agingCbm: Array(4).fill(0),
-                        unplannedCbm: Array(4).fill(0),
-                        agingTotal: 0,
-                        unplannedTotal: 0
-                    };
-                }
-
-                let agingIdx = 0;
-                if (row.aging === 0) agingIdx = 0;
-                else if (row.aging >= 1 && row.aging <= 3) agingIdx = 1;
-                else if (row.aging >= 4 && row.aging <= 7) agingIdx = 2;
-                else if (row.aging > 7) agingIdx = 3;
-                
-                if (row.status === 'Sudah Plan') {
-                    areas[key].agingCbm[agingIdx] += row.cbm;
-                    areas[key].agingTotal += row.cbm;
-                }
-
-                if (row.status === 'Belum Plan') {
-                    areas[key].unplannedCbm[agingIdx] += row.cbm;
-                    areas[key].unplannedTotal += row.cbm;
-                }
-            });
-
-            const areaList = Object.values(areas);
-            
-            // Sorting
-            areaList.sort((a, b) => {
-                const k = storingPivotSort.key;
-                const d = storingPivotSort.dir === 'asc' ? 1 : -1;
-                
-                if (k === 'areaBB') return a.areaBB.localeCompare(b.areaBB) * d;
-                if (k === 'aging0') return (a.agingCbm[0] - b.agingCbm[0]) * d;
-                if (k === 'aging1_3') return (a.agingCbm[1] - b.agingCbm[1]) * d;
-                if (k === 'aging4_7') return (a.agingCbm[2] - b.agingCbm[2]) * d;
-                if (k === 'aging7up') return (a.agingCbm[3] - b.agingCbm[3]) * d;
-                if (k === 'agingTotal') return (a.agingTotal - b.agingTotal) * d;
-                if (k === 'unplanned0') return (a.unplannedCbm[0] - b.unplannedCbm[0]) * d;
-                if (k === 'unplanned1_3') return (a.unplannedCbm[1] - b.unplannedCbm[1]) * d;
-                if (k === 'unplanned4_7') return (a.unplannedCbm[2] - b.unplannedCbm[2]) * d;
-                if (k === 'unplanned7up') return (a.unplannedCbm[3] - b.unplannedCbm[3]) * d;
-                if (k === 'unplannedTotal') return (a.unplannedTotal - b.unplannedTotal) * d;
-                
-                return 0;
-            });
-
-            if (areaList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 20px; color: #666;">Tidak ada data untuk area ini.</td></tr>`;
-                if (tfoot) tfoot.innerHTML = '';
-                return;
-            }
-
-            let html = '';
-            let totals = {
-                aging: Array(4).fill(0),
-                unplanned: Array(4).fill(0),
-                agingTotal: 0,
-                unplannedTotal: 0
-            };
-
-            areaList.forEach(area => {
-                const totalCbmRow = area.agingTotal + area.unplannedTotal;
-html += `<tr>
-    <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">
-        ${area.areaBB}
-    </td>
-    <td style="border: 1px solid #333; padding: 8px; text-align: right; background: #3a2a00; color: #ffd700; font-weight: bold;">
-        ${totalCbmRow > 0 ? formatIndo(totalCbmRow) : '-'}
-    </td>`;
-    
-// ===== AGING =====
-area.agingCbm.forEach((val, i) => {
-    const displayVal = val > 0 ? formatIndo(val) : '-';
-    const color = val > 0 ? '#fff' : '#444';
-    const bgColor = i < 2 
-        ? (val > 0 ? '#1b5e20' : 'transparent') 
-        : (val > 0 ? '#b71c1c' : 'transparent');
-
-    html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; background: ${bgColor};">
-        ${displayVal}
-    </td>`;
-
-    totals.aging[i] += val;
-});
-
-html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #34495e; font-weight: bold;">
-    ${area.agingTotal > 0 ? formatIndo(area.agingTotal) : '-'}
-</td>`;
-
-totals.agingTotal += area.agingTotal;
-
-// ===== UNPLANNED =====
-area.unplannedCbm.forEach((val, i) => {
-    const displayVal = val > 0 ? formatIndo(val) : '-';
-    const color = val > 0 ? '#fff' : '#444';
-    const bgColor = i < 2 
-        ? (val > 0 ? '#1b5e20' : 'transparent') 
-        : (val > 0 ? '#b71c1c' : 'transparent');
-
-    html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; font-weight: ${val > 0 ? 'bold' : 'normal'}; background: ${bgColor};">
-        ${displayVal}
-    </td>`;
-
-    totals.unplanned[i] += val;
-});
-
-html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #219150; font-weight: bold;">
-    ${area.unplannedTotal > 0 ? formatIndo(area.unplannedTotal) : '-'}
-</td>`;
-
-totals.unplannedTotal += area.unplannedTotal;
-
-// ===== CLOSE ROW =====
-html += `</tr>`;
-
-            // Grand Total Row for Storing Table
-            const grandTotalCbm = totals.agingTotal + totals.unplannedTotal;
-let footHtml = `<tr style="background: #2c3e50; font-weight: bold; color: #ffd700;">
-    <td style="padding: 10px 20px; text-align: right; border: 1px solid #444;">GRAND TOTAL</td>
-    <td style="padding: 10px; text-align: right; border: 1px solid #444; background: #3a2a00; color: #ffd700;">${formatIndo(grandTotalCbm)}</td>`;
-            
-            totals.aging.forEach(val => {
-                footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444;">${val > 0 ? formatIndo(val) : '0'}</td>`;
-            });
-            footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444; background: #1a252f;">${totals.agingTotal > 0 ? formatIndo(totals.agingTotal) : '0'}</td>`;
-            
-            totals.unplanned.forEach(val => {
-                footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444;">${val > 0 ? formatIndo(val) : '0'}</td>`;
-            });
-            footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444; background: #166534;">${totals.unplannedTotal > 0 ? formatIndo(totals.unplannedTotal) : '0'}</td>`;
-            footHtml += `</tr>`;
-
-            tbody.innerHTML = html;
-            if (tfoot) tfoot.innerHTML = footHtml;
+        if (row.status === 'Belum Plan') {
+            areas[key].unplannedCbm[agingIdx] += row.cbm;
+            areas[key].unplannedTotal += row.cbm;
         }
+    });
 
+    const areaList = Object.values(areas);
+
+    areaList.sort((a, b) => {
+        const k = storingPivotSort.key;
+        const d = storingPivotSort.dir === 'asc' ? 1 : -1;
+        if (k === 'areaBB') return a.areaBB.localeCompare(b.areaBB) * d;
+        if (k === 'aging0') return (a.agingCbm[0] - b.agingCbm[0]) * d;
+        if (k === 'aging1_3') return (a.agingCbm[1] - b.agingCbm[1]) * d;
+        if (k === 'aging4_7') return (a.agingCbm[2] - b.agingCbm[2]) * d;
+        if (k === 'aging7up') return (a.agingCbm[3] - b.agingCbm[3]) * d;
+        if (k === 'agingTotal') return (a.agingTotal - b.agingTotal) * d;
+        if (k === 'unplanned0') return (a.unplannedCbm[0] - b.unplannedCbm[0]) * d;
+        if (k === 'unplanned1_3') return (a.unplannedCbm[1] - b.unplannedCbm[1]) * d;
+        if (k === 'unplanned4_7') return (a.unplannedCbm[2] - b.unplannedCbm[2]) * d;
+        if (k === 'unplanned7up') return (a.unplannedCbm[3] - b.unplannedCbm[3]) * d;
+        if (k === 'unplannedTotal') return (a.unplannedTotal - b.unplannedTotal) * d;
+        return 0;
+    });
+
+    if (areaList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 20px; color: #666;">Tidak ada data untuk area ini.</td></tr>`;
+        if (tfoot) tfoot.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+    let totals = {
+        aging: Array(4).fill(0),
+        unplanned: Array(4).fill(0),
+        agingTotal: 0,
+        unplannedTotal: 0
+    };
+
+    areaList.forEach(area => {
+        const totalCbmRow = area.agingTotal + area.unplannedTotal;
+
+        html += `<tr>
+            <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">${area.areaBB}</td>
+            <td style="border: 1px solid #333; padding: 8px; text-align: right; background: #3a2a00; color: #ffd700; font-weight: bold;">${totalCbmRow > 0 ? formatIndo(totalCbmRow) : '-'}</td>`;
+
+        area.agingCbm.forEach((val, i) => {
+            const displayVal = val > 0 ? formatIndo(val) : '-';
+            const color = val > 0 ? '#fff' : '#444';
+            const bgColor = i < 2 ? (val > 0 ? '#1b5e20' : 'transparent') : (val > 0 ? '#b71c1c' : 'transparent');
+            html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; background: ${bgColor};">${displayVal}</td>`;
+            totals.aging[i] += val;
+        });
+
+        html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #34495e; font-weight: bold;">${area.agingTotal > 0 ? formatIndo(area.agingTotal) : '-'}</td>`;
+        totals.agingTotal += area.agingTotal;
+
+        area.unplannedCbm.forEach((val, i) => {
+            const displayVal = val > 0 ? formatIndo(val) : '-';
+            const color = val > 0 ? '#fff' : '#444';
+            const bgColor = i < 2 ? (val > 0 ? '#1b5e20' : 'transparent') : (val > 0 ? '#b71c1c' : 'transparent');
+            html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; color: ${color}; font-weight: ${val > 0 ? 'bold' : 'normal'}; background: ${bgColor};">${displayVal}</td>`;
+            totals.unplanned[i] += val;
+        });
+
+        html += `<td style="border: 1px solid #333; padding: 8px; text-align: right; background: #219150; font-weight: bold;">${area.unplannedTotal > 0 ? formatIndo(area.unplannedTotal) : '-'}</td>`;
+        totals.unplannedTotal += area.unplannedTotal;
+
+        html += `</tr>`;
+    });
+
+    const grandTotalCbm = totals.agingTotal + totals.unplannedTotal;
+    let footHtml = `<tr style="background: #2c3e50; font-weight: bold; color: #ffd700;">
+        <td style="padding: 10px 20px; text-align: right; border: 1px solid #444;">GRAND TOTAL</td>
+        <td style="padding: 10px; text-align: right; border: 1px solid #444; background: #3a2a00; color: #ffd700;">${formatIndo(grandTotalCbm)}</td>`;
+
+    totals.aging.forEach(val => {
+        footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444;">${val > 0 ? formatIndo(val) : '0'}</td>`;
+    });
+    footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444; background: #1a252f;">${totals.agingTotal > 0 ? formatIndo(totals.agingTotal) : '0'}</td>`;
+
+    totals.unplanned.forEach(val => {
+        footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444;">${val > 0 ? formatIndo(val) : '0'}</td>`;
+    });
+    footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444; background: #166534;">${totals.unplannedTotal > 0 ? formatIndo(totals.unplannedTotal) : '0'}</td>`;
+    footHtml += `</tr>`;
+
+    tbody.innerHTML = html;
+    if (tfoot) tfoot.innerHTML = footHtml;
+}
+        
         function renderAllocationSummary(data) {
             const tbody = document.getElementById('allocation-summary-body');
             const container = document.getElementById('allocation-summary-container');
