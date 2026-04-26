@@ -1474,8 +1474,9 @@
                         <thead>
                             <tr class="nested-header">
                                 <th rowspan="2" onclick="sortStoringPivot('areaBB')" style="width: 250px; cursor: pointer;">AREA STORING <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                                <th colspan="5" style="background: #2c3e50; color: #ecf0f1;">AGING SUDAH PLAN (CBM)</th>
-                                <th colspan="5" style="background: #27ae60; color: #fff;">AGING BELUM PLAN (CBM)</th>
+                                <th rowspan="2" style="background: #b8860b; color: #ffd700; width: 100px; vertical-align: middle; text-align: center;">TOTAL CBM</th>
+<th colspan="5" style="background: #2c3e50; color: #ecf0f1;">AGING SUDAH PLAN (CBM)</th>
+<th colspan="5" style="background: #27ae60; color: #fff;">AGING BELUM PLAN (CBM)</th>
                             </tr>
                             <tr class="sub-header">
                                 <th onclick="sortStoringPivot('aging0')" style="cursor: pointer;">0 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
@@ -3284,8 +3285,10 @@ Tim Planner DC Sidoarjo`;
             };
 
             areaList.forEach(area => {
-                html += `<tr>
-                    <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">${area.areaBB}</td>`;
+                const totalCbmRow = area.agingTotal + area.unplannedTotal;
+html += `<tr>
+    <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">${area.areaBB}</td>
+    <td style="border: 1px solid #333; padding: 8px; text-align: right; background: #3a2a00; color: #ffd700; font-weight: bold;">${totalCbmRow > 0 ? formatIndo(totalCbmRow) : '-'}</td>
                 
                 area.agingCbm.forEach((val, i) => {
                     const displayVal = val > 0 ? formatIndo(val) : '-';
@@ -3313,8 +3316,10 @@ Tim Planner DC Sidoarjo`;
             });
 
             // Grand Total Row for Storing Table
-            let footHtml = `<tr style="background: #2c3e50; font-weight: bold; color: #ffd700;">
-                <td style="padding: 10px 20px; text-align: right; border: 1px solid #444;">GRAND TOTAL</td>`;
+            const grandTotalCbm = totals.agingTotal + totals.unplannedTotal;
+let footHtml = `<tr style="background: #2c3e50; font-weight: bold; color: #ffd700;">
+    <td style="padding: 10px 20px; text-align: right; border: 1px solid #444;">GRAND TOTAL</td>
+    <td style="padding: 10px; text-align: right; border: 1px solid #444; background: #3a2a00; color: #ffd700;">${formatIndo(grandTotalCbm)}</td>`;
             
             totals.aging.forEach(val => {
                 footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444;">${val > 0 ? formatIndo(val) : '0'}</td>`;
@@ -3415,8 +3420,10 @@ Tim Planner DC Sidoarjo`;
             };
 
             areaList.forEach(area => {
-                html += `<tr>
-                    <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">${area.areaBB}</td>`;
+                const totalCbmRow = area.agingTotal + area.unplannedTotal;
+html += `<tr>
+    <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">${area.areaBB}</td>
+    <td style="border: 1px solid #333; padding: 8px; text-align: right; background: #3a2a00; color: #ffd700; font-weight: bold;">${totalCbmRow > 0 ? formatIndo(totalCbmRow) : '-'}</td>
                 
                 area.agingCbm.forEach((val, i) => {
                     const displayVal = val > 0 ? formatIndo(val) : '-';
@@ -3444,8 +3451,10 @@ Tim Planner DC Sidoarjo`;
             });
 
             // Grand Total Row for Storing Table
-            let footHtml = `<tr style="background: #2c3e50; font-weight: bold; color: #ffd700;">
-                <td style="padding: 10px 20px; text-align: right; border: 1px solid #444;">GRAND TOTAL</td>`;
+            const grandTotalCbm = totals.agingTotal + totals.unplannedTotal;
+let footHtml = `<tr style="background: #2c3e50; font-weight: bold; color: #ffd700;">
+    <td style="padding: 10px 20px; text-align: right; border: 1px solid #444;">GRAND TOTAL</td>
+    <td style="padding: 10px; text-align: right; border: 1px solid #444; background: #3a2a00; color: #ffd700;">${formatIndo(grandTotalCbm)}</td>`;
             
             totals.aging.forEach(val => {
                 footHtml += `<td style="padding: 10px; text-align: right; border: 1px solid #444;">${val > 0 ? formatIndo(val) : '0'}</td>`;
