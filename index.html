@@ -1597,6 +1597,16 @@
         <option value="ALL">ALL</option>
     </select>
 </div>
+<div style="display: flex; align-items: center; gap: 6px;">
+    <label style="font-size: 0.8em; color: #ffd700; opacity: 0.8;">AREA:</label>
+    <select id="hub-area-filter" onchange="renderHubTable()"
+            style="background: #222; color: #ffd700; border: 1px solid #ffd700;
+                   padding: 3px 8px; border-radius: 4px; font-size: 0.85em; outline: none;">
+        <option value="ALL">ALL</option>
+        <option value="DK">DK</option>
+        <option value="LK">LK</option>
+    </select>
+</div>                        
                     </div>
                 </div>
 
@@ -2393,6 +2403,8 @@ function renderHubTable() {
     const selectedArmadaStatus = armadaStatusFilter ? armadaStatusFilter.value : 'ALL';
     const selectedAging = agingFilter ? agingFilter.value : 'ALL';
     const selectedRegion = regionFilter ? regionFilter.value : 'ALL';
+    const areaFilter2 = document.getElementById('hub-area-filter');
+    const selectedArea2 = areaFilter2 ? areaFilter2.value : 'ALL';
 
     if (!head || !tbody) return;
 
@@ -2523,7 +2535,14 @@ headHtml += `<th onclick="hubSort(-1)" style="padding: 10px; border: 1px solid #
         const rowRegion = (row[regionIdx] || '').trim();
         const matchesRegion = selectedRegion === 'ALL' || rowRegion === selectedRegion;
 
-        return matchesLoading && matchesLc && matchesArmadaStatus && matchesAging && matchesRegion;
+        let matchesArea2 = true;
+if (selectedArea2 === 'DK') {
+    matchesArea2 = rowRegion === 'JATIM DK';
+} else if (selectedArea2 === 'LK') {
+    matchesArea2 = rowRegion !== 'JATIM DK';
+}
+
+return matchesLoading && matchesLc && matchesArmadaStatus && matchesAging && matchesRegion && matchesArea2;
     });
 
     if (filteredHubData.length === 0) {
