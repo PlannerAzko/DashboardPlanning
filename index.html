@@ -1866,7 +1866,6 @@
                         <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;width:40px;">#</th>
                         <th style="padding:10px;border:1px solid #333;color:#ffd700;">TGL INPUT</th>
                         <th style="padding:10px;border:1px solid #333;color:#ffd700;">RT/OD</th>
-                        <th style="padding:10px;border:1px solid #333;color:#ffd700;">NO LC</th>
                         <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;">BU</th>
                         <th style="padding:10px;border:1px solid #333;color:#ffd700;">KOTA</th>
                         <th style="padding:10px;border:1px solid #333;color:#ffd700;">REGION</th>
@@ -5477,7 +5476,7 @@ const ASTOR_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export
 let rawAstorData = [];
 let astorChartBu = null, astorChartArea = null, astorChartAging = null;
 
-const ACOL = { TGL:0, RTOD:1, CBM:3, NOLC:4, BU:7, KOTA:8, REGION:9, AREA:10, STUFFING:11, AGING:12 };
+const ACOL = { TGL:0, RTOD:1, CBM:3, BU:7, KOTA:8, REGION:9, AREA:10, STUFFING:11, AGING:12 };
 
 async function fetchAstorData() {
     try {
@@ -5511,30 +5510,14 @@ function parseAstorCSV(csv) {
         const stuffing = (row[ACOL.STUFFING]||'').trim();
         const aging    = parseInt(row[ACOL.AGING]) || 0;
         const cbm      = parseNumberWithComma(row[ACOL.CBM] || '0');
-        const nolc     = (row[ACOL.NOLC]||'').trim();
-
-        const today = new Date();
-        today.setHours(0,0,0,0);
-        let stuffingDate = null;
-        if (stuffing !== '') {
-            if (stuffing.includes('/')) {
-                const p = stuffing.split('/');
-                stuffingDate = p.length === 3 ? new Date(p[2], p[1]-1, p[0]) : new Date(stuffing);
-            } else {
-                stuffingDate = new Date(stuffing);
-            }
-            if (isNaN((stuffingDate||{}).getTime?.())) stuffingDate = null;
-        }
-        const isFutureOrToday = stuffingDate && stuffingDate >= today;
-        const isEmpty = stuffing === '';
 
         let sla = '';
-        if (!isEmpty && !isFutureOrToday) {
+        if (stuffing !== '') {
             sla = area === 'DK' ? (aging <= 3 ? 'HIT' : 'MISS') : (aging <= 7 ? 'HIT' : 'MISS');
         }
 
         rawAstorData.push({
-            tgl: row[ACOL.TGL]||'', rtod: row[ACOL.RTOD]||'', nolc,
+            tgl: row[ACOL.TGL]||'', rtod: row[ACOL.RTOD]||'',
             bu, kota: row[ACOL.KOTA]||'', region: row[ACOL.REGION]||'',
             area, stuffing, aging, cbm, sla
         });
@@ -5632,7 +5615,6 @@ function renderAstorSLA() {
     if(astorChartAging) astorChartAging.destroy();
     const bVals = Object.values(bucket);
     const bTot  = bVals.reduce((a,b)=>a+b,0);
-    const maxBval = Math.max(...bVals, 1);
     astorChartAging = new Chart(ctx3, {
         type:'bar',
         data:{ labels:Object.keys(bucket).map(l=>l+' hari'),
@@ -5640,16 +5622,12 @@ function renderAstorSLA() {
                 backgroundColor:['#2dd4bf','#fbbf24','#f87171','#b91c1c'], borderRadius:6 }]
         },
         options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
-            layout:{ padding:{ right: 90 } },
             plugins:{ legend:{display:false},
                 datalabels:{ anchor:'end', align:'right', color:'#fff', font:{weight:'bold',size:12},
-                    formatter:v=>v>0?`${v} (${bTot>0?(v/bTot*100).toFixed(0):0}%)`:'',
-                    padding:{left:6} }
+                    formatter:v=>v>0?`${v} (${bTot>0?(v/bTot*100).toFixed(0):0}%)`:'', padding:{right:8} }
             },
-            scales:{ 
-                x:{ticks:{color:'#ccc'},grid:{color:'#2a2a2a'},beginAtZero:true, max: maxBval * 1.6},
-                y:{ticks:{color:'#ffd700',font:{weight:'bold'}},grid:{display:false}} 
-            }
+            scales:{ x:{ticks:{color:'#ccc'},grid:{color:'#2a2a2a'},beginAtZero:true},
+                     y:{ticks:{color:'#ffd700',font:{weight:'bold'}},grid:{display:false}} }
         }
     });
 
@@ -5671,7 +5649,6 @@ function renderAstorSLA() {
             <td style="padding:8px;border:1px solid #222;text-align:center;color:#555;">${i+1}</td>
             <td style="padding:8px;border:1px solid #222;color:#ccc;">${r.tgl}</td>
             <td style="padding:8px;border:1px solid #222;font-weight:bold;">${r.rtod}</td>
-            <td style="padding:8px;border:1px solid #222;color:#60a5fa;font-family:monospace;">${r.nolc||'-'}</td>
             <td style="padding:8px;border:1px solid #222;text-align:center;">
                 <span style="background:${buBg};color:${buColor};padding:2px 10px;border-radius:4px;font-weight:bold;font-size:0.85em;">${r.bu}</span>
             </td>
