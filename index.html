@@ -5615,6 +5615,7 @@ function renderAstorSLA() {
     if(astorChartAging) astorChartAging.destroy();
     const bVals = Object.values(bucket);
     const bTot  = bVals.reduce((a,b)=>a+b,0);
+    const maxBval = Math.max(...bVals, 1);
     astorChartAging = new Chart(ctx3, {
         type:'bar',
         data:{ labels:Object.keys(bucket).map(l=>l+' hari'),
@@ -5622,12 +5623,16 @@ function renderAstorSLA() {
                 backgroundColor:['#2dd4bf','#fbbf24','#f87171','#b91c1c'], borderRadius:6 }]
         },
         options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+            layout:{ padding:{ right: 90 } },
             plugins:{ legend:{display:false},
                 datalabels:{ anchor:'end', align:'right', color:'#fff', font:{weight:'bold',size:12},
-                    formatter:v=>v>0?`${v} (${bTot>0?(v/bTot*100).toFixed(0):0}%)`:'', padding:{right:8} }
+                    formatter:v=>v>0?`${v} (${bTot>0?(v/bTot*100).toFixed(0):0}%)`:'',
+                    padding:{left:6} }
             },
-            scales:{ x:{ticks:{color:'#ccc'},grid:{color:'#2a2a2a'},beginAtZero:true},
-                     y:{ticks:{color:'#ffd700',font:{weight:'bold'}},grid:{display:false}} }
+            scales:{ 
+                x:{ticks:{color:'#ccc'},grid:{color:'#2a2a2a'},beginAtZero:true, max: maxBval * 1.6},
+                y:{ticks:{color:'#ffd700',font:{weight:'bold'}},grid:{display:false}} 
+            }
         }
     });
 
