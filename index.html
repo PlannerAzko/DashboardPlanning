@@ -1078,6 +1078,137 @@
     outline: none;
     cursor: pointer;
 }
+
+/* Circular Neon Menu */
+.circular-menu {
+    position: fixed;
+    left: 25px;
+    bottom: 60px; /* Adjusted to be above the marquee */
+    z-index: 10000;
+    display: none;
+}
+
+.circular-menu.active .floating-btn {
+    box-shadow: 0 0 25px #ff0000, 0 0 45px #ff0000, inset 0 0 20px #ff0000;
+    transform: scale(1.05);
+}
+
+.circular-menu .floating-btn {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: #111;
+    border: 3px solid #ff0000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 12px #ff0000, inset 0 0 12px #ff0000;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 101;
+}
+
+.circular-menu .floating-btn i {
+    display: none;
+}
+
+.circular-menu .menu-items {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.circular-menu.active .menu-items {
+    pointer-events: auto;
+}
+
+.circular-menu .menu-item {
+    position: absolute;
+    left: 5px;
+    bottom: 5px;
+    width: 50px;
+    height: 50px;
+    background: #111;
+    border: 2px solid #ff0000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+    transform: scale(0);
+}
+
+.circular-menu.active .menu-item {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.circular-menu .menu-item:nth-child(1) { transition-delay: 0.05s; }
+.circular-menu .menu-item:nth-child(2) { transition-delay: 0.1s; }
+.circular-menu .menu-item:nth-child(3) { transition-delay: 0.15s; }
+.circular-menu .menu-item:nth-child(4) { transition-delay: 0.2s; }
+.circular-menu .menu-item:nth-child(5) { transition-delay: 0.25s; }
+
+.circular-menu.active .menu-item:nth-child(1) { transform: translate(10px, -280px) scale(1); }
+.circular-menu.active .menu-item:nth-child(2) { transform: translate(75px, -220px) scale(1); }
+.circular-menu.active .menu-item:nth-child(3) { transform: translate(110px, -140px) scale(1); }
+.circular-menu.active .menu-item:nth-child(4) { transform: translate(120px, -50px) scale(1); }
+.circular-menu.active .menu-item:nth-child(5) { transform: translate(100px, 40px) scale(1); }
+
+.circular-menu .menu-item .menu-label {
+    position: absolute;
+    left: 75px;
+    background: rgba(183, 28, 28, 0.98);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 800;
+    white-space: nowrap;
+    opacity: 0;
+    transition: 0.3s;
+    pointer-events: none;
+    border-left: 5px solid #ffd700;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.7);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.circular-menu.active .menu-item:hover .menu-label {
+    opacity: 1;
+    transform: translateX(5px);
+}
+
+.circular-menu .menu-item:hover {
+    background: #ff0000;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+}
+
+.section-title-banner {
+    background: linear-gradient(90deg, #b71c1c 0%, #1a1a1a 100%);
+    padding: 18px 30px;
+    margin-bottom: 30px;
+    border-left: 8px solid #ffd700;
+    color: #fff;
+    font-size: 1.6em;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 5px 5px 20px rgba(0,0,0,0.4);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
     </style>
 </head>
 <body>
@@ -1128,7 +1259,11 @@
     </div>
 
     <div class="container">
-        <div class="filter-section">
+        <div id="main-dashboard-section" class="dash-section">
+            <div class="section-title-banner">
+                <i class="fas fa-desktop"></i> MAIN DASHBOARD
+            </div>
+            <div class="filter-section">
             <div class="filter-group">
                 <label>BULAN</label>
                 <div class="multi-select-container" id="bulan-container">
@@ -1263,7 +1398,12 @@
             </div>
             <div class="pagination" id="pagination"></div>
         </div>
+        </div> <!-- End main-dashboard-section -->
 
+        <div id="summary-report-section" class="dash-section" style="display: none;">
+            <div class="section-title-banner">
+                <i class="fas fa-chart-line"></i> SUMMARY REPORT SLA & CBM SHIPPED
+            </div>
         <div class="chart-section">
             <div class="chart-container">
                 <div class="table-header">
@@ -1294,7 +1434,12 @@
                 </div>
             </div>
         </div>
+        </div> <!-- End summary-report-section -->
 
+        <div id="supply-partner-section" class="dash-section" style="display: none;">
+            <div class="section-title-banner">
+                <i class="fas fa-handshake"></i> SUPPLY PARTNER EVALUATION
+            </div>
         <!-- Filter Section for Extra Tables -->
         <div class="filter-section" style="margin-top: 40px; border-top: 1px solid #444; padding-top: 25px;">
             <div class="filter-group">
@@ -1399,7 +1544,7 @@
         </div>
 
         <!-- Pivot Table Section (Unit Distribution Center Only) -->
-        <div id="pivot-section" class="pivot-section" style="margin-top: 40px; display: none;">
+        <!-- Pivot Table Section Removed in favor of Dashboard Sections -->
             
             <!-- Table: DELIVERY DELAY AGING PER CARRIER -->
             <div id="carrier-aging-container" style="margin-bottom: 30px; border-bottom: 2px solid #333;">
@@ -1470,7 +1615,12 @@
                     </table>
                 </div>
             </div>
+        </div> <!-- End supply-partner-section -->
 
+        <div id="outstanding-section" class="dash-section" style="display: none;">
+            <div class="section-title-banner">
+                <i class="fas fa-hourglass-half"></i> MONITORING OUTSTANDING
+            </div>
             <!-- Table: Planning Priority Summary -->
             <div id="planning-priority-container" style="margin-bottom: 30px; border-bottom: 2px solid #333; display: none;">
                 <div class="table-header" style="background: linear-gradient(90deg, #d32f2f 0%, #333 100%); border-left: 4px solid #ffd700; color: #fff; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
@@ -1643,7 +1793,12 @@
                     </table>
                 </div>
             </div>
+        </div> <!-- End outstanding-section -->
 
+        <div id="hub-astor-section" class="dash-section" style="display: none;">
+            <div class="section-title-banner">
+                <i class="fas fa-warehouse"></i> MONITORING HUB GRW & ASTOR
+            </div>
             <!-- Table: MONITORING HUB GRW -->
             <div id="hub-summary-container" style="margin-top: 30px; margin-bottom: 30px; border-bottom: 2px solid #333; display: none;">
                 <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
@@ -1792,96 +1947,124 @@
                     </table>
                 </div>
             </div>
+
+            <!-- ===== ASTOR SLA & OUTSTANDING SECTION ===== -->
+            <div class="astor-sla-section" id="astor-sla-section">
+                <div class="astor-sla-header">
+                    <span><i class="fas fa-chart-pie" style="margin-right:10px;"></i> SLA & OUTSTANDING ASTOR — AZKO & KWI</span>
+                    <div class="astor-filter-row">
+                        <label style="font-size:0.8em;color:#ccc;">BU:</label>
+                        <select id="astor-bu-filter" onchange="renderAstorSLA()">
+                            <option value="ALL">SEMUA (AZKO + KWI)</option>
+                            <option value="AZKO">AZKO</option>
+                            <option value="KWI">KWI</option>
+                        </select>
+                        <label style="font-size:0.8em;color:#ccc;">AREA:</label>
+                        <select id="astor-area-filter" onchange="renderAstorSLA()">
+                            <option value="ALL">SEMUA</option>
+                            <option value="DK">DK</option>
+                            <option value="LK">LK</option>
+                            <option value="LP">LP</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="astor-kpi-row">
+                    <div class="astor-kpi-card total">
+                        <div class="astor-kpi-label">Total Order</div>
+                        <div class="astor-kpi-value" id="astor-total">—</div>
+                    </div>
+                    <div class="astor-kpi-card hit">
+                        <div class="astor-kpi-label">SLA HIT</div>
+                        <div class="astor-kpi-value" id="astor-hit">—</div>
+                    </div>
+                    <div class="astor-kpi-card miss">
+                        <div class="astor-kpi-label">SLA MISS</div>
+                        <div class="astor-kpi-value" id="astor-miss">—</div>
+                    </div>
+                    <div class="astor-kpi-card hit">
+                        <div class="astor-kpi-label">SLA Achievement</div>
+                        <div class="astor-kpi-value" id="astor-pct">—</div>
+                    </div>
+                    <div class="astor-kpi-card outstanding">
+                        <div class="astor-kpi-label">Outstanding</div>
+                        <div class="astor-kpi-value" id="astor-outstanding">—</div>
+                    </div>
+                    <div class="astor-kpi-card miss">
+                        <div class="astor-kpi-label">Outstanding CBM</div>
+                        <div class="astor-kpi-value" id="astor-outstanding-cbm">—</div>
+                    </div>
+                </div>
+                <div class="astor-chart-grid">
+                    <div class="astor-chart-box">
+                        <div class="astor-chart-title"><i class="fas fa-chart-bar" style="margin-right:6px;"></i> SLA HIT vs MISS per BU</div>
+                        <div class="astor-chart-body"><canvas id="astorSlaByBuChart"></canvas></div>
+                    </div>
+                    <div class="astor-chart-box">
+                        <div class="astor-chart-title"><i class="fas fa-chart-pie" style="margin-right:6px;"></i> SLA ACHIEVEMENT per AREA</div>
+                        <div class="astor-chart-body"><canvas id="astorSlaByAreaChart"></canvas></div>
+                    </div>
+                    <div class="astor-chart-box">
+                        <div class="astor-chart-title"><i class="fas fa-hourglass-half" style="margin-right:6px;"></i> OUTSTANDING per AGING BUCKET</div>
+                        <div class="astor-chart-body"><canvas id="astorOutstandingAgingChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="astor-outstanding-box">
+                    <div class="astor-chart-title" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;">
+                        <span><i class="fas fa-exclamation-triangle" style="margin-right:6px;color:#ffd700;"></i> DETAIL OUTSTANDING ORDER (STUFFING BELUM TERISI)</span>
+                        <span id="astor-outstanding-count" style="background:#b71c1c;padding:3px 12px;border-radius:4px;font-size:0.85em;">0 Order</span>
+                    </div>
+                    <div class="astor-outstanding-table-wrap">
+                        <table style="width:100%;border-collapse:collapse;font-size:0.85em;">
+                            <thead style="background:#111;position:sticky;top:0;z-index:5;">
+                                <tr>
+                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;width:40px;">#</th>
+                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">TGL INPUT</th>
+                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">RT/OD</th>
+                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">NO LC</th>
+                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;">BU</th>
+                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">KOTA</th>
+                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">REGION</th>
+                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;">AREA</th>
+                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:right;">AGING (HARI)</th>
+                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="astor-outstanding-tbody">
+                                <tr><td colspan="9" style="text-align:center;padding:30px;color:#666;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- End container -->
+
+    <!-- Circular Navigation Menu -->
+    <div class="circular-menu" id="circularMenu">
+        <div class="floating-btn" onclick="toggleCircularMenu()"></div>
+        <div class="menu-items">
+            <div class="menu-item" onclick="showDashboardSection('main-dashboard-section')">
+                <i class="fas fa-desktop"></i>
+                <div class="menu-label">MAIN DASHBOARD</div>
+            </div>
+            <div class="menu-item" onclick="showDashboardSection('summary-report-section')">
+                <i class="fas fa-chart-line"></i>
+                <div class="menu-label">SUMMARY REPORT SLA & CBM SHIPPED</div>
+            </div>
+            <div class="menu-item" onclick="showDashboardSection('supply-partner-section')">
+                <i class="fas fa-handshake"></i>
+                <div class="menu-label">SUPPLY PARTNER EVALUATION</div>
+                </div>
+            <div class="menu-item" onclick="showDashboardSection('outstanding-section')">
+                <i class="fas fa-hourglass-half"></i>
+                <div class="menu-label">MONITORING OUTSTANDING</div>
+            </div>
+            <div class="menu-item" onclick="showDashboardSection('hub-astor-section')">
+                <i class="fas fa-warehouse"></i>
+                <div class="menu-label">MONITORING HUB GRW & ASTOR</div>
+            </div>
         </div>
     </div>
-<!-- ===== ASTOR SLA & OUTSTANDING SECTION ===== -->
-<div class="astor-sla-section" id="astor-sla-section">
-    <div class="astor-sla-header">
-        <span><i class="fas fa-chart-pie" style="margin-right:10px;"></i> SLA & OUTSTANDING ASTOR — AZKO & KWI</span>
-        <div class="astor-filter-row">
-            <label style="font-size:0.8em;color:#ccc;">BU:</label>
-            <select id="astor-bu-filter" onchange="renderAstorSLA()">
-                <option value="ALL">SEMUA (AZKO + KWI)</option>
-                <option value="AZKO">AZKO</option>
-                <option value="KWI">KWI</option>
-            </select>
-            <label style="font-size:0.8em;color:#ccc;">AREA:</label>
-            <select id="astor-area-filter" onchange="renderAstorSLA()">
-                <option value="ALL">SEMUA</option>
-                <option value="DK">DK</option>
-                <option value="LK">LK</option>
-                <option value="LP">LP</option>
-            </select>
-        </div>
-    </div>
-    <div class="astor-kpi-row">
-        <div class="astor-kpi-card total">
-            <div class="astor-kpi-label">Total Order</div>
-            <div class="astor-kpi-value" id="astor-total">—</div>
-        </div>
-        <div class="astor-kpi-card hit">
-            <div class="astor-kpi-label">SLA HIT</div>
-            <div class="astor-kpi-value" id="astor-hit">—</div>
-        </div>
-        <div class="astor-kpi-card miss">
-            <div class="astor-kpi-label">SLA MISS</div>
-            <div class="astor-kpi-value" id="astor-miss">—</div>
-        </div>
-        <div class="astor-kpi-card hit">
-            <div class="astor-kpi-label">SLA Achievement</div>
-            <div class="astor-kpi-value" id="astor-pct">—</div>
-        </div>
-        <div class="astor-kpi-card outstanding">
-            <div class="astor-kpi-label">Outstanding</div>
-            <div class="astor-kpi-value" id="astor-outstanding">—</div>
-        </div>
-        <div class="astor-kpi-card miss">
-            <div class="astor-kpi-label">Outstanding CBM</div>
-            <div class="astor-kpi-value" id="astor-outstanding-cbm">—</div>
-        </div>
-    </div>
-    <div class="astor-chart-grid">
-        <div class="astor-chart-box">
-            <div class="astor-chart-title"><i class="fas fa-chart-bar" style="margin-right:6px;"></i> SLA HIT vs MISS per BU</div>
-            <div class="astor-chart-body"><canvas id="astorSlaByBuChart"></canvas></div>
-        </div>
-        <div class="astor-chart-box">
-            <div class="astor-chart-title"><i class="fas fa-chart-pie" style="margin-right:6px;"></i> SLA ACHIEVEMENT per AREA</div>
-            <div class="astor-chart-body"><canvas id="astorSlaByAreaChart"></canvas></div>
-        </div>
-        <div class="astor-chart-box">
-            <div class="astor-chart-title"><i class="fas fa-hourglass-half" style="margin-right:6px;"></i> OUTSTANDING per AGING BUCKET</div>
-            <div class="astor-chart-body"><canvas id="astorOutstandingAgingChart"></canvas></div>
-        </div>
-    </div>
-    <div class="astor-outstanding-box">
-        <div class="astor-chart-title" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;">
-            <span><i class="fas fa-exclamation-triangle" style="margin-right:6px;color:#ffd700;"></i> DETAIL OUTSTANDING ORDER ASTOR (AZKO & KWI)</span>
-            <span id="astor-outstanding-count" style="background:#b71c1c;padding:3px 12px;border-radius:4px;font-size:0.85em;">0 Order</span>
-        </div>
-        <div class="astor-outstanding-table-wrap">
-            <table style="width:100%;border-collapse:collapse;font-size:0.85em;">
-                <thead style="background:#111;position:sticky;top:0;z-index:5;">
-                    <tr>
-                        <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;width:40px;">#</th>
-                        <th style="padding:10px;border:1px solid #333;color:#ffd700;">TGL INPUT</th>
-                        <th style="padding:10px;border:1px solid #333;color:#ffd700;">RT/OD</th>
-                        <th style="padding:10px;border:1px solid #333;color:#ffd700;">NO LC</th>
-                        <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;">BU</th>
-                        <th style="padding:10px;border:1px solid #333;color:#ffd700;">STORE TUJUAN</th>
-                        <th style="padding:10px;border:1px solid #333;color:#ffd700;">REGION</th>
-                        <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;">AREA</th>
-                        <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:right;">AGING (HARI)</th>
-                        <th style="padding:10px;border:1px solid #333;color:#ffd700;">STATUS</th>
-                    </tr>
-                </thead>
-                <tbody id="astor-outstanding-tbody">
-                    <tr><td colspan="9" style="text-align:center;padding:30px;color:#666;">Loading...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
     <!-- Scrolling Marquee Footer -->
     <div class="footer-marquee">
         <div class="marquee-content" id="last-update-text">
@@ -2079,10 +2262,18 @@
             selectedCategory = category;
             document.body.className = category === 'store' ? 'view-store' : 'view-dc';
             
-            // Toggle Pivot Section
-            const pivotSection = document.getElementById('pivot-section');
-            if (pivotSection) {
-                pivotSection.style.display = category === 'dc' ? 'block' : 'none';
+            // Show/Hide Circular Menu and Default Section for DC
+            const circMenu = document.getElementById('circularMenu');
+            if (circMenu) {
+                circMenu.style.display = category === 'dc' ? 'block' : 'none';
+            }
+
+            if (category === 'dc') {
+                showDashboardSection('main-dashboard-section');
+            } else if (category === 'store') {
+                // For store view, show all sections or handled differently
+                const sections = document.querySelectorAll('.dash-section');
+                sections.forEach(s => s.style.display = 'block');
             }
 
             document.getElementById('welcome-step-1').classList.add('hidden');
@@ -2275,6 +2466,29 @@
         let pivotAreaBBOptions = new Set();
         let pivotStatusPlanOptions = new Set();
         let pivotHeaderNames = [];
+
+        function toggleCircularMenu() {
+            const menu = document.getElementById('circularMenu');
+            if (menu) menu.classList.toggle('active');
+        }
+
+        function showDashboardSection(sectionId) {
+            const sections = document.querySelectorAll('.dash-section');
+            sections.forEach(s => s.style.display = 'none');
+            
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.style.display = 'block';
+                // Trigger chart resize if visible
+                window.dispatchEvent(new Event('resize'));
+            }
+            
+            const menu = document.getElementById('circularMenu');
+            if (menu) menu.classList.remove('active');
+            
+            // Scroll to top of dashboard
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         async function fetchPivotData(retries = 2) {
             try {
@@ -5477,7 +5691,7 @@ const ASTOR_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export
 let rawAstorData = [];
 let astorChartBu = null, astorChartArea = null, astorChartAging = null;
 
-const ACOL = { TGL:0, RTOD:1, STORE:2, CBM:3, NOLC:4, BU:7, KOTA:8, REGION:9, AREA:10, STUFFING:11, AGING:12 };
+const ACOL = { TGL:0, RTOD:1, CBM:3, BU:7, KOTA:8, REGION:9, AREA:10, STUFFING:11, AGING:12 };
 
 async function fetchAstorData() {
     try {
@@ -5516,11 +5730,9 @@ function parseAstorCSV(csv) {
         if (stuffing !== '') {
             sla = area === 'DK' ? (aging <= 3 ? 'HIT' : 'MISS') : (aging <= 7 ? 'HIT' : 'MISS');
         }
-        const nolc  = (row[ACOL.NOLC]||'').trim();
-        const store = (row[ACOL.STORE]||'').trim();
+
         rawAstorData.push({
-            tgl: row[ACOL.TGL]||'', rtod: row[ACOL.RTOD]||'', nolc,
-            store,   
+            tgl: row[ACOL.TGL]||'', rtod: row[ACOL.RTOD]||'',
             bu, kota: row[ACOL.KOTA]||'', region: row[ACOL.REGION]||'',
             area, stuffing, aging, cbm, sla
         });
@@ -5661,7 +5873,7 @@ function renderAstorSLA() {
             <td style="padding:8px;border:1px solid #222;text-align:center;">
                 <span style="background:${buBg};color:${buColor};padding:2px 10px;border-radius:4px;font-weight:bold;font-size:0.85em;">${r.bu}</span>
             </td>
-            <td style="padding:8px;border:1px solid #222;">${r.store||r.kota}</td>
+            <td style="padding:8px;border:1px solid #222;">${r.kota}</td>
             <td style="padding:8px;border:1px solid #222;">${r.region}</td>
             <td style="padding:8px;border:1px solid #222;text-align:center;">
                 <span style="background:rgba(255,255,255,0.07);padding:2px 8px;border-radius:4px;font-size:0.8em;">${r.area}</span>
