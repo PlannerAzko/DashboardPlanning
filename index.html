@@ -2096,6 +2096,7 @@
                                     <th onclick="sortAstorOS('kota')" style="padding:10px;border:1px solid #333;color:#ffd700;cursor:pointer;">STORE TUJUAN <i class="fas fa-sort" style="font-size:0.8em;opacity:0.5;"></i></th>
                                     <th onclick="sortAstorOS('region')" style="padding:10px;border:1px solid #333;color:#ffd700;cursor:pointer;">REGION <i class="fas fa-sort" style="font-size:0.8em;opacity:0.5;"></i></th>
                                     <th onclick="sortAstorOS('area')" style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;cursor:pointer;">AREA <i class="fas fa-sort" style="font-size:0.8em;opacity:0.5;"></i></th>
+                                    <th onclick="sortAstorOS('cbm')" style="padding:10px;border:1px solid #333;color:#ffd700;text-align:right;cursor:pointer;">CBM <i class="fas fa-sort" style="font-size:0.8em;opacity:0.5;"></i></th>
                                     <th onclick="sortAstorOS('aging')" style="padding:10px;border:1px solid #333;color:#ffd700;text-align:right;cursor:pointer;background:#450a0a;">AGING (HARI) <i class="fas fa-sort" style="font-size:0.8em;opacity:0.8;"></i></th>
                                     <th style="padding:10px;border:1px solid #333;color:#ffd700;">STATUS</th>
                                 </tr>
@@ -5845,7 +5846,7 @@ async function fetchAstorData() {
     } catch(e) {
         console.error('Astor fetch error:', e);
         document.getElementById('astor-outstanding-tbody').innerHTML =
-            `<tr><td colspan="9" style="text-align:center;padding:20px;color:#f87171;">
+            `<tr><td colspan="10" style="text-align:center;padding:20px;color:#f87171;">
                 Gagal: ${e.message}
                 <button onclick="fetchAstorData()" style="margin-left:10px;padding:5px 12px;background:#d32f2f;color:#fff;border:none;border-radius:4px;cursor:pointer;">Coba Lagi</button>
             </td></tr>`;
@@ -6063,6 +6064,7 @@ function renderAstorSLA() {
             <td style="padding:8px;border:1px solid #222;text-align:center;">
                 <span style="background:rgba(255,255,255,0.07);padding:2px 8px;border-radius:4px;font-size:0.8em;">${r.area}</span>
             </td>
+            <td style="padding:8px;border:1px solid #222;text-align:right;font-weight:bold;color:#ffd700;">${r.cbm > 0 ? r.cbm.toFixed(2) : '-'}</td>
             <td style="padding:8px;border:1px solid #222;text-align:right;font-weight:bold;color:${ac};font-size:1.05em;">${r.aging}</td>
             <td style="padding:8px;border:1px solid #222;">
                 <span style="background:rgba(255,215,0,0.12);color:#ffd700;padding:2px 10px;border-radius:4px;font-size:0.78em;font-weight:bold;">⏳ OUTSTANDING</span>
