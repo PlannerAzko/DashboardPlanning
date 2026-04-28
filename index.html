@@ -1259,11 +1259,8 @@
     </div>
 
     <div class="container">
-        <div id="main-dashboard-section" class="dash-section">
-            <div class="section-title-banner">
-                <i class="fas fa-desktop"></i> MAIN DASHBOARD
-            </div>
-            <div class="filter-section">
+        <!-- Filter Utama (Global untuk Main, Summary, Supply) -->
+        <div id="global-filter-section" class="filter-section" style="display: grid;">
             <div class="filter-group">
                 <label>BULAN</label>
                 <div class="multi-select-container" id="bulan-container">
@@ -1300,6 +1297,11 @@
                 </div>
             </div>
         </div>
+
+        <div id="main-dashboard-section" class="dash-section">
+            <div class="section-title-banner">
+                <i class="fas fa-desktop"></i> MAIN DASHBOARD
+            </div>
 
         <div class="main-content">
             <div class="left-panel">
@@ -2022,7 +2024,7 @@
                                     <th style="padding:10px;border:1px solid #333;color:#ffd700;">RT/OD</th>
                                     <th style="padding:10px;border:1px solid #333;color:#ffd700;">NO LC</th>
                                     <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;">BU</th>
-                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">KOTA</th>
+                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">STORE TUJUAN</th>
                                     <th style="padding:10px;border:1px solid #333;color:#ffd700;">REGION</th>
                                     <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;">AREA</th>
                                     <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:right;">AGING (HARI)</th>
@@ -2274,6 +2276,8 @@
                 // For store view, show all sections or handled differently
                 const sections = document.querySelectorAll('.dash-section');
                 sections.forEach(s => s.style.display = 'block');
+                const globalFilter = document.getElementById('global-filter-section');
+                if (globalFilter) globalFilter.style.display = 'grid';
             }
 
             document.getElementById('welcome-step-1').classList.add('hidden');
@@ -2476,6 +2480,12 @@
             const sections = document.querySelectorAll('.dash-section');
             sections.forEach(s => s.style.display = 'none');
             
+            const globalFilter = document.getElementById('global-filter-section');
+            const showFilterFor = ['main-dashboard-section', 'summary-report-section', 'supply-partner-section'];
+            if (globalFilter) {
+                globalFilter.style.display = showFilterFor.includes(sectionId) ? 'grid' : 'none';
+            }
+
             const target = document.getElementById(sectionId);
             if (target) {
                 target.style.display = 'block';
@@ -5795,8 +5805,23 @@ function renderAstorSLA() {
             ]
         },
         options:{ responsive:true, maintainAspectRatio:false,
+            layout: { padding: { top: 30 } },
             plugins:{ legend:{labels:{color:'#fff'}},
-                datalabels:{color:'#fff',font:{weight:'bold',size:13},formatter:v=>v>0?v:''} },
+                datalabels:{
+                    anchor:'end', 
+                    align:'top', 
+                    offset: 5,
+                    color:'#fff',
+                    font:{weight:'bold',size:13},
+                    formatter: (value, context) => {
+                        if (!value || value === 0) return '';
+                        const bu = context.chart.data.labels[context.dataIndex];
+                        const total = byBu[bu].hit + byBu[bu].miss;
+                        const pct = total > 0 ? (value / total * 100).toFixed(0) : 0;
+                        return `${value} (${pct}%)`;
+                    }
+                } 
+            },
             scales:{ x:{ticks:{color:'#ccc'},grid:{display:false}},
                      y:{ticks:{color:'#ccc'},grid:{color:'#2a2a2a'},beginAtZero:true} }
         }
