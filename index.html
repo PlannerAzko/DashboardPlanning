@@ -1868,7 +1868,7 @@
                         <th style="padding:10px;border:1px solid #333;color:#ffd700;">RT/OD</th>
                         <th style="padding:10px;border:1px solid #333;color:#ffd700;">NO LC</th>
                         <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;">BU</th>
-                        <th style="padding:10px;border:1px solid #333;color:#ffd700;">KOTA</th>
+                        <th style="padding:10px;border:1px solid #333;color:#ffd700;">STORE TUJUAN</th>
                         <th style="padding:10px;border:1px solid #333;color:#ffd700;">REGION</th>
                         <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;">AREA</th>
                         <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:right;">AGING (HARI)</th>
@@ -5477,7 +5477,7 @@ const ASTOR_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export
 let rawAstorData = [];
 let astorChartBu = null, astorChartArea = null, astorChartAging = null;
 
-const ACOL = { TGL:0, RTOD:1, CBM:3, BU:7, KOTA:8, REGION:9, AREA:10, STUFFING:11, AGING:12 };
+const ACOL = { TGL:0, RTOD:1, STORE:2, CBM:3, NOLC:4, BU:7, KOTA:8, REGION:9, AREA:10, STUFFING:11, AGING:12 };
 
 async function fetchAstorData() {
     try {
@@ -5517,8 +5517,9 @@ function parseAstorCSV(csv) {
             sla = area === 'DK' ? (aging <= 3 ? 'HIT' : 'MISS') : (aging <= 7 ? 'HIT' : 'MISS');
         }
 
-        rawAstorData.push({
-            tgl: row[ACOL.TGL]||'', rtod: row[ACOL.RTOD]||'',
+       rawAstorData.push({
+            tgl: row[ACOL.TGL]||'', rtod: row[ACOL.RTOD]||'', nolc,
+            store: (row[ACOL.STORE]||'').trim(),
             bu, kota: row[ACOL.KOTA]||'', region: row[ACOL.REGION]||'',
             area, stuffing, aging, cbm, sla
         });
@@ -5659,7 +5660,7 @@ function renderAstorSLA() {
             <td style="padding:8px;border:1px solid #222;text-align:center;">
                 <span style="background:${buBg};color:${buColor};padding:2px 10px;border-radius:4px;font-weight:bold;font-size:0.85em;">${r.bu}</span>
             </td>
-            <td style="padding:8px;border:1px solid #222;">${r.kota}</td>
+            <td style="padding:8px;border:1px solid #222;">${r.store||r.kota}</td>
             <td style="padding:8px;border:1px solid #222;">${r.region}</td>
             <td style="padding:8px;border:1px solid #222;text-align:center;">
                 <span style="background:rgba(255,255,255,0.07);padding:2px 8px;border-radius:4px;font-size:0.8em;">${r.area}</span>
