@@ -1290,6 +1290,20 @@
                 </div>
             </div>
 
+            <!-- Step Login: Authentication for DC -->
+            <div id="welcome-step-login" class="welcome-step hidden">
+                <p class="welcome-question">Silahkan Login untuk Mengakses DC Dashboard:</p>
+                <div style="display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: 0 auto 25px;">
+                    <input type="text" id="login-nik" placeholder="MASUKKAN NIK" style="padding: 12px; border-radius: 8px; border: 1px solid #444; background: #222; color: #fff; text-align: center; font-weight: bold; letter-spacing: 2px;">
+                    <input type="password" id="login-pass" placeholder="PASSWORD" style="padding: 12px; border-radius: 8px; border: 1px solid #444; background: #222; color: #fff; text-align: center; font-weight: bold; letter-spacing: 2px;">
+                </div>
+                <div class="welcome-buttons">
+                    <button class="welcome-btn btn-iya" onclick="handleLogin()">LOGIN</button>
+                    <button class="welcome-btn btn-tidak" onclick="document.getElementById('welcome-step-login').classList.add('hidden'); document.getElementById('welcome-step-1').classList.remove('hidden');">KEMBALI</button>
+                </div>
+                <div id="login-error" style="color: #ff4444; font-size: 0.85em; margin-top: 15px; display: none;">NIK atau Password salah!</div>
+            </div>
+
             <!-- Step 2: Plan Update Selection -->
             <div id="welcome-step-2" class="welcome-step hidden">
                 <p class="welcome-question">Apakah anda ingin melihat Plan Update terbaru?</p>
@@ -2141,6 +2155,7 @@
         const PIVOT_SHEET_GID = '1075426956';
         const PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${PIVOT_SHEET_ID}/export?format=csv&gid=${PIVOT_SHEET_GID}`;
         const HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
+        const USER_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1368870427`;
 
         // Column Index Mapping (0-based)
         const COLUMNS = {
@@ -2317,34 +2332,86 @@
 
         function handleCategoryChoice(category) {
             selectedCategory = category;
-            document.body.className = category === 'store' ? 'view-store' : 'view-dc';
             
-            // Show/Hide Circular Menu and Default Section for DC
-            const circMenu = document.getElementById('circularMenu');
-            if (circMenu) {
-                circMenu.style.display = category === 'dc' ? 'block' : 'none';
+            if (category === 'dc') {
+                // Tampilkan form login jika pilih DC
+                document.getElementById('welcome-step-1').classList.add('hidden');
+                document.getElementById('welcome-step-login').classList.remove('hidden');
+            } else {
+                // Langsung ke step 2 jika pilih Store
+                document.body.className = 'view-store';
+                document.getElementById('welcome-step-1').classList.add('hidden');
+                document.getElementById('welcome-step-2').classList.remove('hidden');
+                
+                const circMenu = document.getElementById('circularMenu');
+                if (circMenu) circMenu.style.display = 'none';
+            }
+        }
+
+        async function handleLogin() {
+            const nikInput = document.getElementById('login-nik').value.trim();
+            const passInput = document.getElementById('login-pass').value.trim();
+            const errorMsg = document.getElementById('login-error');
+            const loginBtn = document.querySelector('#welcome-step-login .btn-iya');
+
+            if (nikInput === '' || passInput === '') {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = "Silahkan isi NIK dan Password!";
+                return;
             }
 
-            if (category === 'dc') {
-                showDashboardSection('main-dashboard-section');
-            } else if (category === 'store') {
-                // For store view, show all sections or handled differently
-                const sections = document.querySelectorAll('.dash-section');
-                sections.forEach(s => s.style.display = 'block');
-                const globalFilter = document.getElementById('global-filter-section');
-                if (globalFilter) globalFilter.style.display = 'grid';
-            }
+            try {
+                loginBtn.disabled = true;
+                loginBtn.textContent = "VERIFYING...";
+                
+                // Fetch user data from spreadsheet
+                const response = await fetch(`${USER_CSV_URL}&t=${Date.now()}`);
+                const csv = await response.text();
+                const lines = csv.split(/\r?\n/);
+                
+                let isValid = false;
+                // Loop through lines, skip header (i=0)
+                // Assume Column A (0) is NIK, Column B (1) is Password
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i]) continue;
+                    const cols = lines[i].split(',');
+                    if (cols.length >= 2) {
+                        const nik = cols[0].replace(/"/g, '').trim();
+                        const pass = cols[1].replace(/"/g, '').trim();
+                        
+                        if (nik === nikInput && pass === passInput) {
+                            isValid = true;
+                            break;
+                        }
+                    }
+                }
 
-            document.getElementById('welcome-step-1').classList.add('hidden');
-            document.getElementById('welcome-step-2').classList.remove('hidden');
-            
-            // Request full screen on first interaction
-            toggleFullScreen();
-
-            // If DC is selected, fetch pivot data
-            if (category === 'dc') {
-                fetchPivotData();
-                fetchHubData();
+                if (isValid) {
+                    errorMsg.style.display = 'none';
+                    // Apply DC view settings
+                    document.body.className = 'view-dc';
+                    const circMenu = document.getElementById('circularMenu');
+                    if (circMenu) circMenu.style.display = 'block';
+                    showDashboardSection('main-dashboard-section');
+                    
+                    document.getElementById('welcome-step-login').classList.add('hidden');
+                    document.getElementById('welcome-step-2').classList.remove('hidden');
+                    
+                    fetchPivotData();
+                    fetchHubData();
+                    toggleFullScreen();
+                } else {
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = "NIK atau Password salah!";
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = "LOGIN";
+                }
+            } catch (e) {
+                console.error("Login Error:", e);
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = "Gagal memproses login (Koneksi Database).";
+                loginBtn.disabled = false;
+                loginBtn.textContent = "LOGIN";
             }
         }
 
