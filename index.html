@@ -2370,17 +2370,20 @@
                 const lines = csv.split(/\r?\n/);
                 
                 let isValid = false;
+                let userName = '';
                 // Loop through lines, skip header (i=0)
-                // Assume Column A (0) is NIK, Column B (1) is Password
+                // Assume Column A (0) is NIK, Column B (1) is Password, Column C (2) is Name
                 for (let i = 1; i < lines.length; i++) {
                     if (!lines[i]) continue;
                     const cols = lines[i].split(',');
                     if (cols.length >= 2) {
                         const nik = cols[0].replace(/"/g, '').trim();
                         const pass = cols[1].replace(/"/g, '').trim();
+                        const name = cols[2] ? cols[2].replace(/"/g, '').trim() : 'User';
                         
                         if (nik === nikInput && pass === passInput) {
                             isValid = true;
+                            userName = name;
                             break;
                         }
                     }
@@ -2394,6 +2397,12 @@
                     if (circMenu) circMenu.style.display = 'block';
                     showDashboardSection('main-dashboard-section');
                     
+                    // Update welcome message in step 2
+                    const step2Question = document.querySelector('#welcome-step-2 .welcome-question');
+                    if (step2Question) {
+                        step2Question.innerHTML = `Selamat datang, <strong>${userName}</strong>. Anda berhasil login ke sistem. Silakan gunakan dashboard untuk memantau dan mengelola aktivitas Anda.<br><br>Apakah anda ingin melihat Plan Update terbaru?`;
+                    }
+
                     document.getElementById('welcome-step-login').classList.add('hidden');
                     document.getElementById('welcome-step-2').classList.remove('hidden');
                     
