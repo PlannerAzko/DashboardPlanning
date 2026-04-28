@@ -1957,11 +1957,19 @@
                     <div class="astor-filter-row">
                         <label style="font-size:0.8em;color:#ccc;">BU:</label>
                         <select id="astor-bu-filter" onchange="renderAstorSLA()">
-                            <option value="ALL">SEMUA (AZKO + KWI)</option>
+                            <option value="ALL">SEMUA</option>
                             <option value="AZKO">AZKO</option>
                             <option value="KWI">KWI</option>
                         </select>
-                        <label style="font-size:0.8em;color:#ccc;">AREA:</label>
+                        <label style="font-size:0.8em;color:#ccc;margin-left:10px;">AGING:</label>
+                        <select id="astor-aging-filter" onchange="renderAstorSLA()">
+                            <option value="ALL">SEMUA</option>
+                            <option value="0-3">0-3</option>
+                            <option value="3-5">3-5</option>
+                            <option value="5-7">5-7</option>
+                            <option value="7 UP">7 UP</option>
+                        </select>
+                        <label style="font-size:0.8em;color:#ccc;margin-left:10px;">AREA:</label>
                         <select id="astor-area-filter" onchange="renderAstorSLA()">
                             <option value="ALL">SEMUA</option>
                             <option value="DK">DK</option>
@@ -2020,14 +2028,14 @@
                             <thead style="background:#111;position:sticky;top:0;z-index:5;">
                                 <tr>
                                     <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;width:40px;">#</th>
-                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">TGL INPUT</th>
-                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">RT/OD</th>
-                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">NO LC</th>
-                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;">BU</th>
-                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">STORE TUJUAN</th>
-                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;">REGION</th>
-                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;">AREA</th>
-                                    <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:right;">AGING (HARI)</th>
+                                    <th onclick="sortAstorOS('tgl')" style="padding:10px;border:1px solid #333;color:#ffd700;cursor:pointer;">TGL INPUT <i class="fas fa-sort" style="font-size:0.8em;opacity:0.5;"></i></th>
+                                    <th onclick="sortAstorOS('rtod')" style="padding:10px;border:1px solid #333;color:#ffd700;cursor:pointer;">RT/OD <i class="fas fa-sort" style="font-size:0.8em;opacity:0.5;"></i></th>
+                                    <th onclick="sortAstorOS('lc')" style="padding:10px;border:1px solid #333;color:#ffd700;cursor:pointer;">NO LC <i class="fas fa-sort" style="font-size:0.8em;opacity:0.5;"></i></th>
+                                    <th onclick="sortAstorOS('bu')" style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;cursor:pointer;">BU <i class="fas fa-sort" style="font-size:0.8em;opacity:0.5;"></i></th>
+                                    <th onclick="sortAstorOS('kota')" style="padding:10px;border:1px solid #333;color:#ffd700;cursor:pointer;">STORE TUJUAN <i class="fas fa-sort" style="font-size:0.8em;opacity:0.5;"></i></th>
+                                    <th onclick="sortAstorOS('region')" style="padding:10px;border:1px solid #333;color:#ffd700;cursor:pointer;">REGION <i class="fas fa-sort" style="font-size:0.8em;opacity:0.5;"></i></th>
+                                    <th onclick="sortAstorOS('area')" style="padding:10px;border:1px solid #333;color:#ffd700;text-align:center;cursor:pointer;">AREA <i class="fas fa-sort" style="font-size:0.8em;opacity:0.5;"></i></th>
+                                    <th onclick="sortAstorOS('aging')" style="padding:10px;border:1px solid #333;color:#ffd700;text-align:right;cursor:pointer;background:#450a0a;">AGING (HARI) <i class="fas fa-sort" style="font-size:0.8em;opacity:0.8;"></i></th>
                                     <th style="padding:10px;border:1px solid #333;color:#ffd700;">STATUS</th>
                                 </tr>
                             </thead>
@@ -5700,8 +5708,9 @@ const ASTOR_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export
 
 let rawAstorData = [];
 let astorChartBu = null, astorChartArea = null, astorChartAging = null;
+let astorSort = { key: 'aging', dir: 'desc' };
 
-const ACOL = { TGL:0, RTOD:1, CBM:3, BU:7, KOTA:8, REGION:9, AREA:10, STUFFING:11, AGING:12 };
+const ACOL = { TGL:0, RTOD:1, LC:4, CBM:3, BU:7, KOTA:8, REGION:9, AREA:10, STUFFING:11, AGING:12, SLA:13 };
 
 async function fetchAstorData() {
     try {
@@ -5737,12 +5746,15 @@ function parseAstorCSV(csv) {
         const cbm      = parseNumberWithComma(row[ACOL.CBM] || '0');
 
         let sla = '';
-        if (stuffing !== '') {
-            sla = area === 'DK' ? (aging <= 3 ? 'HIT' : 'MISS') : (aging <= 7 ? 'HIT' : 'MISS');
+        const slaRaw = (row[ACOL.SLA] || '').trim().toUpperCase();
+        if (slaRaw.includes('HIT')) {
+            sla = 'HIT';
+        } else if (slaRaw.includes('MISS')) {
+            sla = 'MISS';
         }
 
         rawAstorData.push({
-            tgl: row[ACOL.TGL]||'', rtod: row[ACOL.RTOD]||'',
+            tgl: row[ACOL.TGL]||'', rtod: row[ACOL.RTOD]||'', lc: row[ACOL.LC]||'',
             bu, kota: row[ACOL.KOTA]||'', region: row[ACOL.REGION]||'',
             area, stuffing, aging, cbm, sla
         });
@@ -5753,6 +5765,7 @@ function parseAstorCSV(csv) {
 function renderAstorSLA() {
     const buF   = (document.getElementById('astor-bu-filter')||{}).value   || 'ALL';
     const areaF = (document.getElementById('astor-area-filter')||{}).value || 'ALL';
+    const agingF = (document.getElementById('astor-aging-filter')||{}).value || 'ALL';
 
     const data = rawAstorData.filter(r =>
         (buF==='ALL'||r.bu===buF) && (areaF==='ALL'||r.area===areaF)
@@ -5762,7 +5775,7 @@ function renderAstorSLA() {
     const byBu   = { AZKO:{hit:0,miss:0}, KWI:{hit:0,miss:0} };
     const byArea = { DK:{hit:0,miss:0,tot:0}, LK:{hit:0,miss:0,tot:0}, LP:{hit:0,miss:0,tot:0} };
     const bucket = { '0-3':0, '4-7':0, '8-14':0, '15+':0 };
-    const osList = [];
+    let osList = [];
 
     data.forEach(r => {
         if (r.sla==='HIT') {
@@ -5774,11 +5787,22 @@ function renderAstorSLA() {
             if(byBu[r.bu])   byBu[r.bu].miss++;
             if(byArea[r.area]){byArea[r.area].miss++;byArea[r.area].tot++;}
         } else {
-            os++; osCbm+=r.cbm; osList.push(r);
-            if(r.aging<=3)       bucket['0-3']++;
-            else if(r.aging<=7)  bucket['4-7']++;
-            else if(r.aging<=14) bucket['8-14']++;
-            else                 bucket['15+']++;
+            // Apply aging filter to OS list
+            let matchAging = true;
+            if (agingF !== 'ALL') {
+                if (agingF === '0-3') matchAging = r.aging <= 3;
+                else if (agingF === '3-5') matchAging = r.aging > 3 && r.aging <= 5;
+                else if (agingF === '5-7') matchAging = r.aging > 5 && r.aging <= 7;
+                else if (agingF === '7 UP') matchAging = r.aging > 7;
+            }
+
+            if (matchAging) {
+                os++; osCbm+=r.cbm; osList.push(r);
+                if(r.aging<=3)       bucket['0-3']++;
+                else if(r.aging<=7)  bucket['4-7']++;
+                else if(r.aging<=14) bucket['8-14']++;
+                else                 bucket['15+']++;
+            }
         }
     });
 
@@ -5879,12 +5903,25 @@ function renderAstorSLA() {
     // Tabel Outstanding
     const tbody = document.getElementById('astor-outstanding-tbody');
     if(osList.length===0){
-        tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;padding:30px;color:#2dd4bf;">
+        tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:30px;color:#2dd4bf;">
             <i class="fas fa-check-circle" style="font-size:1.5em;display:block;margin-bottom:8px;"></i>
             Tidak ada outstanding — semua sudah terstuffing!</td></tr>`;
         return;
     }
-    const sorted=[...osList].sort((a,b)=>b.aging-a.aging);
+
+    // Sort OS List
+    const sorted = [...osList].sort((a, b) => {
+        let valA = a[astorSort.key];
+        let valB = b[astorSort.key];
+        
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+        
+        if (valA < valB) return astorSort.dir === 'asc' ? -1 : 1;
+        if (valA > valB) return astorSort.dir === 'asc' ? 1 : -1;
+        return 0;
+    });
+
     tbody.innerHTML=sorted.map((r,i)=>{
         const ac=r.aging>14?'#b91c1c':r.aging>7?'#f87171':r.aging>3?'#fbbf24':'#2dd4bf';
         const bg=i%2===0?'#1a1a1a':'#111';
@@ -5894,7 +5931,7 @@ function renderAstorSLA() {
             <td style="padding:8px;border:1px solid #222;text-align:center;color:#555;">${i+1}</td>
             <td style="padding:8px;border:1px solid #222;color:#ccc;">${r.tgl}</td>
             <td style="padding:8px;border:1px solid #222;font-weight:bold;">${r.rtod}</td>
-            <td style="padding:8px;border:1px solid #222;color:#60a5fa;font-family:monospace;">${r.nolc||'-'}</td>
+            <td style="padding:8px;border:1px solid #222;color:${buColor};font-weight:bold;font-size:0.85em;">${r.lc||'-'}</td>
             <td style="padding:8px;border:1px solid #222;text-align:center;">
                 <span style="background:${buBg};color:${buColor};padding:2px 10px;border-radius:4px;font-weight:bold;font-size:0.85em;">${r.bu}</span>
             </td>
@@ -5909,6 +5946,16 @@ function renderAstorSLA() {
             </td>
         </tr>`;
     }).join('');
+}
+
+function sortAstorOS(key) {
+    if (astorSort.key === key) {
+        astorSort.dir = astorSort.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+        astorSort.key = key;
+        astorSort.dir = 'desc';
+    }
+    renderAstorSLA();
 }
 
 // Fetch & auto-refresh
