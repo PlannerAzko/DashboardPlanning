@@ -1082,35 +1082,72 @@
 /* Circular Neon Menu */
 .circular-menu {
     position: fixed;
-    left: 25px;
-    bottom: 60px; /* Adjusted to be above the marquee */
+    left: 40px;
+    bottom: 80px;
     z-index: 10000;
     display: none;
 }
 
 .circular-menu.active .floating-btn {
-    box-shadow: 0 0 25px #ff0000, 0 0 45px #ff0000, inset 0 0 20px #ff0000;
+    border-color: #ffd700;
+    box-shadow: 0 0 20px #ffd700, 0 0 40px #ffd700, inset 0 0 15px #ffd700;
     transform: scale(1.05);
 }
 
+.circular-menu.active .floating-btn::before,
+.circular-menu.active .floating-btn::after {
+    background: #ffd700;
+}
+
+.circular-menu.active .menu-item {
+    border-color: #ffd700;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+.circular-menu.active .menu-item:hover {
+    background: #ffd700;
+    color: #000;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), 0 0 10px #ffd700;
+}
+
 .circular-menu .floating-btn {
-    width: 65px;
-    height: 65px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
-    background: #111;
+    background: #0a0a0a;
     border: 3px solid #ff0000;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 0 12px #ff0000, inset 0 0 12px #ff0000;
-    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.6), inset 0 0 10px rgba(255, 0, 0, 0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     z-index: 101;
 }
 
-.circular-menu .floating-btn i {
-    display: none;
+/* Interactive Icon + to X */
+.circular-menu .floating-btn::before,
+.circular-menu .floating-btn::after {
+    content: "";
+    position: absolute;
+    width: 25px;
+    height: 3px;
+    background: #fff;
+    transition: all 0.4s ease;
+    border-radius: 2px;
+}
+
+.circular-menu .floating-btn::after {
+    transform: rotate(90deg);
+}
+
+.circular-menu.active .floating-btn::before {
+    transform: rotate(45deg);
+}
+
+.circular-menu.active .floating-btn::after {
+    transform: rotate(-45deg);
 }
 
 .circular-menu .menu-items {
@@ -1128,8 +1165,8 @@
 
 .circular-menu .menu-item {
     position: absolute;
-    left: 5px;
-    bottom: 5px;
+    left: 10px;
+    bottom: 10px;
     width: 50px;
     height: 50px;
     background: #111;
@@ -1141,9 +1178,10 @@
     color: #fff;
     font-size: 18px;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     opacity: 0;
     transform: scale(0);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.4);
 }
 
 .circular-menu.active .menu-item {
@@ -1151,35 +1189,37 @@
     transform: scale(1);
 }
 
-.circular-menu .menu-item:nth-child(1) { transition-delay: 0.05s; }
-.circular-menu .menu-item:nth-child(2) { transition-delay: 0.1s; }
-.circular-menu .menu-item:nth-child(3) { transition-delay: 0.15s; }
-.circular-menu .menu-item:nth-child(4) { transition-delay: 0.2s; }
-.circular-menu .menu-item:nth-child(5) { transition-delay: 0.25s; }
+/* Staggered Entrance Animation */
+.circular-menu .menu-item:nth-child(1) { transition-delay: 0.1s; }
+.circular-menu .menu-item:nth-child(2) { transition-delay: 0.15s; }
+.circular-menu .menu-item:nth-child(3) { transition-delay: 0.2s; }
+.circular-menu .menu-item:nth-child(4) { transition-delay: 0.25s; }
+.circular-menu .menu-item:nth-child(5) { transition-delay: 0.3s; }
 
-.circular-menu.active .menu-item:nth-child(1) { transform: translate(10px, -280px) scale(1); }
-.circular-menu.active .menu-item:nth-child(2) { transform: translate(75px, -220px) scale(1); }
-.circular-menu.active .menu-item:nth-child(3) { transform: translate(110px, -140px) scale(1); }
-.circular-menu.active .menu-item:nth-child(4) { transform: translate(120px, -50px) scale(1); }
-.circular-menu.active .menu-item:nth-child(5) { transform: translate(100px, 40px) scale(1); }
+.circular-menu.active .menu-item:nth-child(1) { transform: translate(0px, -290px) scale(1); }
+.circular-menu.active .menu-item:nth-child(2) { transform: translate(75px, -230px) scale(1); }
+.circular-menu.active .menu-item:nth-child(3) { transform: translate(120px, -150px) scale(1); }
+.circular-menu.active .menu-item:nth-child(4) { transform: translate(140px, -55px) scale(1); }
+.circular-menu.active .menu-item:nth-child(5) { transform: translate(120px, 40px) scale(1); }
 
 .circular-menu .menu-item .menu-label {
     position: absolute;
-    left: 75px;
-    background: rgba(183, 28, 28, 0.98);
+    left: 65px;
+    background: linear-gradient(135deg, rgba(183, 28, 28, 0.95) 0%, rgba(139, 0, 0, 0.95) 100%);
     color: #fff;
-    padding: 10px 22px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 800;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
     white-space: nowrap;
     opacity: 0;
-    transition: 0.3s;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
     pointer-events: none;
-    border-left: 5px solid #ffd700;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.7);
+    border-left: 4px solid #ffd700;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
 }
 
 .circular-menu.active .menu-item:hover .menu-label {
@@ -1189,8 +1229,15 @@
 
 .circular-menu .menu-item:hover {
     background: #ff0000;
-    box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 10px #ff0000;
+    transform: scale(1.1) !important;
 }
+
+.circular-menu.active .menu-item:nth-child(1):hover { transform: translate(0px, -290px) scale(1.1) !important; }
+.circular-menu.active .menu-item:nth-child(2):hover { transform: translate(75px, -230px) scale(1.1) !important; }
+.circular-menu.active .menu-item:nth-child(3):hover { transform: translate(120px, -150px) scale(1.1) !important; }
+.circular-menu.active .menu-item:nth-child(4):hover { transform: translate(140px, -55px) scale(1.1) !important; }
+.circular-menu.active .menu-item:nth-child(5):hover { transform: translate(120px, 40px) scale(1.1) !important; }
 
 .section-title-banner {
     background: linear-gradient(90deg, #b71c1c 0%, #1a1a1a 100%);
@@ -2020,7 +2067,7 @@
                 </div>
                 <div class="astor-outstanding-box">
                     <div class="astor-chart-title" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;">
-                        <span><i class="fas fa-exclamation-triangle" style="margin-right:6px;color:#ffd700;"></i> DETAIL OUTSTANDING ORDER ASTOR (AZKO & KWI)</span>
+                        <span><i class="fas fa-exclamation-triangle" style="margin-right:6px;color:#ffd700;"></i> DETAIL OUTSTANDING ORDER (STUFFING BELUM TERISI)</span>
                         <span id="astor-outstanding-count" style="background:#b71c1c;padding:3px 12px;border-radius:4px;font-size:0.85em;">0 Order</span>
                     </div>
                     <div class="astor-outstanding-table-wrap">
