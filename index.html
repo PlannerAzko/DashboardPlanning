@@ -2078,48 +2078,6 @@
                         <div class="astor-chart-title"><i class="fas fa-hourglass-half" style="margin-right:6px;"></i> OUTSTANDING per AGING BUCKET</div>
                         <div class="astor-chart-body"><canvas id="astorOutstandingAgingChart"></canvas></div>
                     </div>
-                    <div class="astor-chart-box">
-    <div class="astor-chart-title"><i class="fas fa-medal" style="margin-right:6px;"></i> DETAIL SLA PER KATEGORI</div>
-    <div style="padding:15px;overflow-y:auto;height:280px;">
-
-        <!-- DK -->
-        <div style="margin-bottom:14px;">
-            <div style="color:#60a5fa;font-weight:bold;font-size:0.8em;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;border-bottom:1px solid #333;padding-bottom:5px;">
-                <i class="fas fa-city" style="margin-right:6px;"></i> SLA DALAM KOTA (DK)
-            </div>
-            <div id="astor-sla-dk" style="display:flex;flex-direction:column;gap:5px;font-size:0.82em;">
-                <div style="display:flex;justify-content:space-between;"><span style="color:#aaa;">0-3 Hari</span><span id="astor-dk-03" style="color:#fff;font-weight:bold;">- ORDER (-%)</span></div>
-                <div style="display:flex;justify-content:space-between;"><span style="color:#aaa;">4-7 Hari</span><span id="astor-dk-47" style="color:#fff;font-weight:bold;">- ORDER (-%)</span></div>
-                <div style="display:flex;justify-content:space-between;"><span style="color:#aaa;">7 Hari UP</span><span id="astor-dk-7up" style="color:#fff;font-weight:bold;">- ORDER (-%)</span></div>
-            </div>
-        </div>
-
-        <!-- LK -->
-        <div style="margin-bottom:14px;">
-            <div style="color:#2dd4bf;font-weight:bold;font-size:0.8em;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;border-bottom:1px solid #333;padding-bottom:5px;">
-                <i class="fas fa-road" style="margin-right:6px;"></i> SLA LUAR KOTA (LK)
-            </div>
-            <div style="display:flex;flex-direction:column;gap:5px;font-size:0.82em;">
-                <div style="display:flex;justify-content:space-between;"><span style="color:#aaa;">0-5 Hari</span><span id="astor-lk-05" style="color:#fff;font-weight:bold;">- ORDER (-%)</span></div>
-                <div style="display:flex;justify-content:space-between;"><span style="color:#aaa;">6-7 Hari</span><span id="astor-lk-67" style="color:#fff;font-weight:bold;">- ORDER (-%)</span></div>
-                <div style="display:flex;justify-content:space-between;"><span style="color:#aaa;">7 Hari UP</span><span id="astor-lk-7up" style="color:#fff;font-weight:bold;">- ORDER (-%)</span></div>
-            </div>
-        </div>
-
-        <!-- LP -->
-        <div>
-            <div style="color:#fbbf24;font-weight:bold;font-size:0.8em;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;border-bottom:1px solid #333;padding-bottom:5px;">
-                <i class="fas fa-plane" style="margin-right:6px;"></i> SLA LUAR PULAU (LP)
-            </div>
-            <div style="display:flex;flex-direction:column;gap:5px;font-size:0.82em;">
-                <div style="display:flex;justify-content:space-between;"><span style="color:#aaa;">0-5 Hari</span><span id="astor-lp-05" style="color:#fff;font-weight:bold;">- ORDER (-%)</span></div>
-                <div style="display:flex;justify-content:space-between;"><span style="color:#aaa;">6-7 Hari</span><span id="astor-lp-67" style="color:#fff;font-weight:bold;">- ORDER (-%)</span></div>
-                <div style="display:flex;justify-content:space-between;"><span style="color:#aaa;">7 Hari UP</span><span id="astor-lp-7up" style="color:#fff;font-weight:bold;">- ORDER (-%)</span></div>
-            </div>
-        </div>
-
-    </div>
-</div>
                 </div>
                 <div class="astor-outstanding-box">
                     <div class="astor-chart-title" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;">
@@ -5938,11 +5896,6 @@ function renderAstorSLA() {
     );
 
     let hit=0, miss=0, os=0, osCbm=0;
-    const slaDetail = {
-    DK:  { '0-3':0, '4-7':0, '7up':0, total:0 },
-    LK:  { '0-5':0, '6-7':0, '7up':0, total:0 },
-    LP:  { '0-5':0, '6-7':0, '7up':0, total:0 }
-};
     const byBu   = { AZKO:{hit:0,miss:0}, KWI:{hit:0,miss:0} };
     const byArea = { DK:{hit:0,miss:0,tot:0}, LK:{hit:0,miss:0,tot:0}, LP:{hit:0,miss:0,tot:0} };
     const bucket = { '0-3':0, '4-7':0, '8-14':0, '15+':0 };
@@ -5951,23 +5904,6 @@ function renderAstorSLA() {
     data.forEach(r => {
         if (r.sla==='HIT') {
             hit++;
-            if (slaDetail[r.area]) {
-    slaDetail[r.area].total++;
-    const a = r.aging;
-    if (r.area === 'DK') {
-        if (a <= 3)      slaDetail.DK['0-3']++;
-        else if (a <= 7) slaDetail.DK['4-7']++;
-        else             slaDetail.DK['7up']++;
-    } else if (r.area === 'LK') {
-        if (a <= 5)      slaDetail.LK['0-5']++;
-        else if (a <= 7) slaDetail.LK['6-7']++;
-        else             slaDetail.LK['7up']++;
-    } else if (r.area === 'LP') {
-        if (a <= 5)      slaDetail.LP['0-5']++;
-        else if (a <= 7) slaDetail.LP['6-7']++;
-        else             slaDetail.LP['7up']++;
-    }
-}
             if(byBu[r.bu])   byBu[r.bu].hit++;
             if(byArea[r.area]){byArea[r.area].hit++;byArea[r.area].tot++;}
         } else if (r.sla==='MISS') {
@@ -6088,39 +6024,6 @@ function renderAstorSLA() {
         }
     });
 
-    // Update Detail SLA Cards
-const fmt = (n, tot) => `${n} ORDER (${tot > 0 ? (n/tot*100).toFixed(0) : 0}%)`;
-const col = (n, tot) => {
-    const pct = tot > 0 ? n/tot*100 : 0;
-    return pct >= 80 ? '#2dd4bf' : pct >= 50 ? '#fbbf24' : '#f87171';
-};
-
-// DK
-const dkT = slaDetail.DK.total;
-document.getElementById('astor-dk-03').textContent  = fmt(slaDetail.DK['0-3'], dkT);
-document.getElementById('astor-dk-03').style.color  = col(slaDetail.DK['0-3'], dkT);
-document.getElementById('astor-dk-47').textContent  = fmt(slaDetail.DK['4-7'], dkT);
-document.getElementById('astor-dk-47').style.color  = col(slaDetail.DK['4-7'], dkT);
-document.getElementById('astor-dk-7up').textContent = fmt(slaDetail.DK['7up'], dkT);
-document.getElementById('astor-dk-7up').style.color = slaDetail.DK['7up'] > 0 ? '#f87171' : '#2dd4bf';
-
-// LK
-const lkT = slaDetail.LK.total;
-document.getElementById('astor-lk-05').textContent  = fmt(slaDetail.LK['0-5'], lkT);
-document.getElementById('astor-lk-05').style.color  = col(slaDetail.LK['0-5'], lkT);
-document.getElementById('astor-lk-67').textContent  = fmt(slaDetail.LK['6-7'], lkT);
-document.getElementById('astor-lk-67').style.color  = col(slaDetail.LK['6-7'], lkT);
-document.getElementById('astor-lk-7up').textContent = fmt(slaDetail.LK['7up'], lkT);
-document.getElementById('astor-lk-7up').style.color = slaDetail.LK['7up'] > 0 ? '#f87171' : '#2dd4bf';
-
-// LP
-const lpT = slaDetail.LP.total;
-document.getElementById('astor-lp-05').textContent  = fmt(slaDetail.LP['0-5'], lpT);
-document.getElementById('astor-lp-05').style.color  = col(slaDetail.LP['0-5'], lpT);
-document.getElementById('astor-lp-67').textContent  = fmt(slaDetail.LP['6-7'], lpT);
-document.getElementById('astor-lp-67').style.color  = col(slaDetail.LP['6-7'], lpT);
-document.getElementById('astor-lp-7up').textContent = fmt(slaDetail.LP['7up'], lpT);
-document.getElementById('astor-lp-7up').style.color = slaDetail.LP['7up'] > 0 ? '#f87171' : '#2dd4bf';
     // Tabel Outstanding
     const tbody = document.getElementById('astor-outstanding-tbody');
     if(osList.length===0){
