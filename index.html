@@ -877,7 +877,7 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 25px; /* Consistent gap */
             margin-top: 25px;
-            margin-bottom: 50px; /* Space between this section and the next */
+            margin-bottom: 80px; /* Space between this section and the next expanded to prevent touching */
             align-items: start;
         }
 
@@ -899,10 +899,13 @@
 
         /* Fix height of second items to align their bottoms */
         .extra-section > div > *:last-child {
-            height: 650px !important; /* Force identical height for bottom row */
+            height: 680px !important; /* Slightly increased to ensure charts fit nicely */
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); /* Added depth */
+            border: 1px solid #333;
+            border-radius: 8px;
         }
 
         .table-content-extra {
@@ -1623,18 +1626,18 @@
                     <table class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em; background: #1a1a1a; color: #fff;">
                         <thead>
                             <tr class="nested-header">
-                                <th rowspan="2" style="width: 50px; background: #1a1a1a; border-right: 1px solid #333;">NO</th>
+                                <th rowspan="2" style="width: 50px; background: #1a1a1a; border-right: 1px solid #333; text-align: center;">NO</th>
                                 <th rowspan="2" style="width: 250px; background: #1a1a1a; text-align: left; padding-left: 20px; border-right: 1px solid #333;">CARRIER</th>
-                                <th colspan="6" style="background: #006994; color: #fff; font-weight: bold; border-right: 1px solid #333;">AGING DELAY</th>
-                                <th rowspan="2" style="width: 120px; background: #8b0000; color: #fff; font-weight: bold;">TOTAL DELAY <i class="fas fa-sort-down"></i></th>
+                                <th colspan="6" style="background: #006994; color: #fff; font-weight: bold; border-right: 1px solid #333; text-align: center;">AGING DELAY</th>
+                                <th rowspan="2" style="width: 120px; background: #8b0000; color: #fff; font-weight: bold; text-align: center;">TOTAL DELAY <i class="fas fa-sort-down"></i></th>
                             </tr>
                             <tr class="sub-header">
-                                <th style="background: #111; color: #00a8e8; width: 60px;">1</th>
-                                <th style="background: #111; color: #00a8e8; width: 60px;">2</th>
-                                <th style="background: #111; color: #00a8e8; width: 60px;">3</th>
-                                <th style="background: #111; color: #00a8e8; width: 60px;">4</th>
-                                <th style="background: #111; color: #00a8e8; width: 60px;">5</th>
-                                <th style="background: #111; color: #00a8e8; width: 80px; border-right: 1px solid #333;">5 UP</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center;">1</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center;">2</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center;">3</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center;">4</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center;">5</th>
+                                <th style="background: #111; color: #00a8e8; width: 80px; border-right: 1px solid #333; text-align: center;">5 UP</th>
                             </tr>
                         </thead>
                         <tbody id="carrier-aging-body">
@@ -5441,7 +5444,7 @@ function renderStoringPivotTable(filteredData) {
                     datasets: [{
                         label: 'TERLAMBAT',
                         data: agingData.map(v => totalAging ? (v / totalAging * 100).toFixed(0) : 0),
-                        backgroundColor: '#3b82f6',
+                        backgroundColor: '#d32f2f',
                         borderRadius: 5
                     }]
                 },
