@@ -877,6 +877,7 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 25px; /* Consistent gap */
             margin-top: 25px;
+            margin-bottom: 50px; /* Space between this section and the next */
             align-items: start;
         }
 
@@ -896,15 +897,19 @@
             margin-bottom: 0 !important;
         }
 
-        .table-content-extra {
-            flex-grow: 1;
-            height: 400px;
-            overflow-y: auto;
-            background-color: #1a1a1a;
+        /* Fix height of second items to align their bottoms */
+        .extra-section > div > *:last-child {
+            height: 650px !important; /* Force identical height for bottom row */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .extra-section .chart-container {
-            height: auto;
+        .table-content-extra {
+            flex-grow: 1;
+            /* Height will be determined by flex-grow due to parent fixed height */
+            overflow-y: auto;
+            background-color: #1a1a1a;
         }
 
         .extra-section .chart-body {
@@ -1610,7 +1615,7 @@
         <!-- Pivot Table Section Removed in favor of Dashboard Sections -->
             
             <!-- Table: DELIVERY DELAY AGING PER CARRIER -->
-            <div id="carrier-aging-container" style="margin-bottom: 30px; border-bottom: 2px solid #333;">
+            <div id="carrier-aging-container" style="margin-top: 40px; margin-bottom: 30px; border-bottom: 2px solid #333;">
                 <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em;">
                     <i class="fas fa-history" style="margin-right: 10px; color: #ffd700;"></i> DELIVERY DELAY AGING PER CARRIER
                 </div>
