@@ -6133,8 +6133,11 @@ function parseAstorCSV(csv) {
     });
     // Populate TGL filter multi-select
 const tglSet = new Set(rawAstorData.map(r => r.tgl).filter(t => t));
-const tglOptions = Array.from(tglSet).sort().reverse();
-populateMultiSelectAstor('astorTgl', tglOptions, 'Tanggal');
+    const tglOptions = Array.from(tglSet).sort().reverse();
+    populateMultiSelectAstor('astorTgl', tglOptions, 'Tanggal');
+    renderAstorSLA();
+}
+    
     let selectedAstorTgl = [];
 
 function populateMultiSelectAstor(filterId, options, label) {
