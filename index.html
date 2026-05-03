@@ -1949,7 +1949,7 @@
                             <label style="font-size: 0.8em; color: #ffd700; opacity: 0.8;">AGING:</label>
                             <select id="hub-aging-filter" onchange="renderHubTable()" style="background: #222; color: #ffd700; border: 1px solid #ffd700; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; outline: none;">
                                 <option value="ALL">ALL</option>
-                                <option value="1-3">AGING 1-3 HARI</option>
+                                <option value="1-3">AGING 0-3 HARI</option>
                                 <option value="4-5">AGING 4-5 HARI</option>
                                 <option value="5+">AGING 5 UP HARI</option>
                             </select>
@@ -3310,7 +3310,7 @@ filteredHubData.forEach(row => {
         agingListEl.innerHTML = `
             <div style="display: flex; flex-direction: column; gap: 8px;">
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 4px 0;">
-                    <span>AGING 1-3 HARI</span>
+                    <span>AGING 0-3 HARI</span>
                     <span style="color: #ffd700; font-weight: bold;">${formatIndo(agingBuckets["1-3"])} CBM</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 4px 0;">
