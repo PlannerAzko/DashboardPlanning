@@ -2091,12 +2091,15 @@
                 <div class="astor-sla-header">
                     <span><i class="fas fa-chart-pie" style="margin-right:10px;"></i> SLA & OUTSTANDING ASTOR — AZKO & KWI</span>
                     <div class="astor-filter-row">
-                        <label style="font-size:0.8em;color:#ccc;">TGL INPUT:</label>
-                        <div class="multi-select-container" id="astorTgl-container" style="min-width:160px;">
-                        <div class="multi-select-display" id="astorTgl-display">-- Semua Tanggal --</div>
-                        <div class="multi-select-options" id="astorTgl-options"></div>
-                        </div>
-                        <label style="font-size:0.8em;color:#ccc;margin-left:10px;">BU:</label>
+    <label style="font-size:0.8em;color:#ccc;">BULAN:</label>
+    <select id="astor-bulan-filter" onchange="renderAstorSLA()">
+        <option value="ALL">SEMUA</option>
+    </select>
+    <label style="font-size:0.8em;color:#ccc;margin-left:6px;">TGL INPUT:</label>
+    <select id="astor-tgl-filter" onchange="renderAstorSLA()">
+        <option value="ALL">SEMUA</option>
+    </select>
+    <label style="font-size:0.8em;color:#ccc;margin-left:6px;">BU:</label>
                         <select id="astor-bu-filter" onchange="renderAstorSLA()">
                             <option value="ALL">SEMUA</option>
                             <option value="AZKO">AZKO</option>
@@ -6131,10 +6134,37 @@ function parseAstorCSV(csv) {
             area, stuffing, aging, cbm, sla
         });
     });
-    // Populate TGL filter multi-select
-const tglSet = new Set(rawAstorData.map(r => r.tgl).filter(t => t));
-    const tglOptions = Array.from(tglSet).sort().reverse();
-    populateMultiSelectAstor('astorTgl', tglOptions, 'Tanggal');
+    // Populate BULAN filter
+    const bulanSet = new Set(rawAstorData.map(r => {
+        if (!r.tgl) return null;
+        const parts = r.tgl.split('/');
+        if (parts.length === 3) {
+            const d = new Date(parts[2], parts[1]-1, parts[0]);
+            return d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+        }
+        return null;
+    }).filter(t => t));
+    
+    const bulanFilter = document.getElementById('astor-bulan-filter');
+    if (bulanFilter) {
+        bulanFilter.innerHTML = '<option value="ALL">SEMUA</option>';
+        Array.from(bulanSet).sort().forEach(b => {
+            const o = document.createElement('option');
+            o.value = b; o.textContent = b;
+            bulanFilter.appendChild(o);
+        });
+    }
+
+    const tglSet = new Set(rawAstorData.map(r => r.tgl).filter(t => t));
+    const tglFilter = document.getElementById('astor-tgl-filter');
+    if (tglFilter) {
+        tglFilter.innerHTML = '<option value="ALL">SEMUA</option>';
+        Array.from(tglSet).sort().reverse().forEach(t => {
+            const o = document.createElement('option');
+            o.value = t; o.textContent = t;
+            tglFilter.appendChild(o);
+        });
+    }
     renderAstorSLA();
 }
     
@@ -6212,11 +6242,26 @@ function renderAstorSLA() {
     const areaF = (document.getElementById('astor-area-filter')||{}).value || 'ALL';
     const agingF = (document.getElementById('astor-aging-filter')||{}).value || 'ALL';
 
-    const data = rawAstorData.filter(r =>
-    (buF==='ALL'||r.bu===buF) && 
-    (areaF==='ALL'||r.area===areaF) &&
-    (selectedAstorTgl.length===0 || selectedAstorTgl.includes(r.tgl))
-);
+    const bulanF = (document.getElementById('astor-bulan-filter')||{}).value || 'ALL';
+const tglF   = (document.getElementById('astor-tgl-filter')||{}).value   || 'ALL';
+
+const data = rawAstorData.filter(r => {
+    const matchBu   = buF==='ALL'   || r.bu===buF;
+    const matchArea = areaF==='ALL' || r.area===areaF;
+    
+    let matchBulan = true;
+    if (bulanF !== 'ALL' && r.tgl) {
+        const parts = r.tgl.split('/');
+        if (parts.length === 3) {
+            const d = new Date(parts[2], parts[1]-1, parts[0]);
+            const label = d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+            matchBulan = label === bulanF;
+        }
+    }
+    
+    const matchTgl = tglF==='ALL' || r.tgl===tglF;
+    return matchBu && matchArea && matchBulan && matchTgl;
+});
 
     let hit=0, miss=0, os=0, osCbm=0;
     const byBu   = { AZKO:{hit:0,miss:0}, KWI:{hit:0,miss:0} };
