@@ -6129,41 +6129,73 @@ function parseAstorCSV(csv) {
         }
 
         rawAstorData.push({
-            tgl: row[ACOL.TGL]||'', rtod: row[ACOL.RTOD]||'', lc: row[ACOL.LC]||'',
-            bu, kota: row[ACOL.KOTA]||'', region: row[ACOL.REGION]||'',
-            area, stuffing, aging, cbm, sla
-        });
+        tgl: row[ACOL.TGL]||'', rtod: row[ACOL.RTOD]||'', lc: row[ACOL.LC]||'',
+        bu, kota: row[ACOL.KOTA]||'', region: row[ACOL.REGION]||'',
+        area, stuffing, aging, cbm, sla
     });
-    // Populate BULAN filter
-    const bulanSet = new Set(rawAstorData.map(r => {
-        if (!r.tgl) return null;
-        const parts = r.tgl.split('/');
+    });
+
+    function parseTgl(tglStr) {
+        if (!tglStr) return null;
+        const months = {
+            'jan':0,'feb':1,'mar':2,'apr':3,'mei':4,'may':4,
+            'jun':5,'jul':6,'agu':7,'aug':7,'sep':8,'okt':9,'oct':9,'nov':10,'des':11,'dec':11
+        };
+        const parts = tglStr.trim().split(/\s+/);
         if (parts.length === 3) {
-            const d = new Date(parts[2], parts[1]-1, parts[0]);
-            return d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+            const day = parseInt(parts[0]);
+            const monthKey = parts[1].toLowerCase().substring(0,3);
+            const year = parseInt(parts[2]) + (parseInt(parts[2]) < 100 ? 2000 : 0);
+            const month = months[monthKey];
+            if (!isNaN(day) && month !== undefined && !isNaN(year)) {
+                return new Date(year, month, day);
+            }
+        }
+        if (tglStr.includes('/')) {
+            const p = tglStr.split('/');
+            if (p.length === 3) return new Date(p[2], p[1]-1, p[0]);
         }
         return null;
-    }).filter(t => t));
-    
+    }
+
+    const bulanMap = {};
+    rawAstorData.forEach(r => {
+        const d = parseTgl(r.tgl);
+        if (!d) return;
+        const key = d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+        const sortKey = d.getFullYear() * 100 + d.getMonth();
+        bulanMap[key] = sortKey;
+    });
+
     const bulanFilter = document.getElementById('astor-bulan-filter');
     if (bulanFilter) {
         bulanFilter.innerHTML = '<option value="ALL">SEMUA</option>';
-        Array.from(bulanSet).sort().forEach(b => {
-            const o = document.createElement('option');
-            o.value = b; o.textContent = b;
-            bulanFilter.appendChild(o);
-        });
+        Object.keys(bulanMap)
+            .sort((a, b) => bulanMap[b] - bulanMap[a])
+            .forEach(b => {
+                const o = document.createElement('option');
+                o.value = b; o.textContent = b;
+                bulanFilter.appendChild(o);
+            });
     }
 
-    const tglSet = new Set(rawAstorData.map(r => r.tgl).filter(t => t));
+    const tglDateMap = {};
+    rawAstorData.forEach(r => {
+        if (!r.tgl) return;
+        const d = parseTgl(r.tgl);
+        tglDateMap[r.tgl] = d ? d.getTime() : 0;
+    });
+
     const tglFilter = document.getElementById('astor-tgl-filter');
     if (tglFilter) {
         tglFilter.innerHTML = '<option value="ALL">SEMUA</option>';
-        Array.from(tglSet).sort().reverse().forEach(t => {
-            const o = document.createElement('option');
-            o.value = t; o.textContent = t;
-            tglFilter.appendChild(o);
-        });
+        Object.keys(tglDateMap)
+            .sort((a, b) => tglDateMap[b] - tglDateMap[a])
+            .forEach(t => {
+                const o = document.createElement('option');
+                o.value = t; o.textContent = t;
+                tglFilter.appendChild(o);
+            });
     }
     renderAstorSLA();
 }
@@ -6249,13 +6281,23 @@ const data = rawAstorData.filter(r => {
     const matchBu   = buF==='ALL'   || r.bu===buF;
     const matchArea = areaF==='ALL' || r.area===areaF;
     
-    let matchBulan = true;
+   let matchBulan = true;
     if (bulanF !== 'ALL' && r.tgl) {
-        const parts = r.tgl.split('/');
+        const months = {
+            'jan':0,'feb':1,'mar':2,'apr':3,'mei':4,'may':4,
+            'jun':5,'jul':6,'agu':7,'aug':7,'sep':8,'okt':9,'oct':9,'nov':10,'des':11,'dec':11
+        };
+        const parts = r.tgl.trim().split(/\s+/);
         if (parts.length === 3) {
-            const d = new Date(parts[2], parts[1]-1, parts[0]);
-            const label = d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
-            matchBulan = label === bulanF;
+            const day = parseInt(parts[0]);
+            const monthKey = parts[1].toLowerCase().substring(0,3);
+            const year = parseInt(parts[2]) + (parseInt(parts[2]) < 100 ? 2000 : 0);
+            const month = months[monthKey];
+            if (!isNaN(day) && month !== undefined && !isNaN(year)) {
+                const d = new Date(year, month, day);
+                const label = d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+                matchBulan = label === bulanF;
+            }
         }
     }
     
