@@ -1939,27 +1939,9 @@
             </div>
             <!-- Table: MONITORING HUB GRW -->
             <div id="hub-summary-container" style="margin-top: 30px; margin-bottom: 30px; border-bottom: 2px solid #333; display: none;">
-               <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; flex-direction: column; gap: 10px;">
-
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <i class="fas fa-truck-ramp-box" style="color: #ffd700;"></i>
-        <span>MONITORING HUB GRW</span>
-    </div>
-
-    <div style="display: flex; gap: 10px; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #444;">
-        <label style="font-size:0.8em; color:#ffd700; opacity:0.8;">BULAN:</label>
-        <select id="hub-bulan-filter" onchange="onHubBulanChange()"
-            style="background:#222; color:#ffd700; border:1px solid #ffd700; padding:3px 8px; border-radius:4px; font-size:0.85em; outline:none;">
-            <option value="ALL">-- Semua Bulan --</option>
-        </select>
-        <label style="font-size:0.8em; color:#ffd700; opacity:0.8; margin-left:10px;">TANGGAL KEDATANGAN:</label>
-        <select id="hub-tgl-filter" onchange="renderHubTable()"
-            style="background:#222; color:#ffd700; border:1px solid #ffd700; padding:3px 8px; border-radius:4px; font-size:0.85em; outline:none;">
-            <option value="ALL">-- Semua Tanggal --</option>
-        </select>
-    </div>
-
-    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-truck-ramp-box" style="margin-right: 10px; color: #ffd700;"></i> MONITORING HUB GRW</span>
+                    <div style="display: flex; gap: 10px; align-items: center;">
                         <button onclick="downloadHubExcel()" style="background: #1d6f42; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; display: flex; align-items: center; gap: 6px; font-weight: bold;">
                             <i class="fas fa-file-excel"></i> EXCEL EXPORT
                         </button>
@@ -2999,60 +2981,6 @@
                 values.push(current.trim());
                 if (values.length >= hubHeaderNames.length) {
                     rawHubData.push(values);
-                    // Kumpulkan semua nilai unik Tanggal Kedatangan
-const tglSet = new Set();
-rawHubData.forEach(row => {
-    const tgl = (row[tglKedatanganIdx] || '').trim();
-    if (tgl) tglSet.add(tgl);
-});
-
-// Fungsi helper parse tanggal format "1 Apr 26" atau "DD/MM/YYYY"
-function parseTglHub(s) {
-    if (!s) return new Date(0);
-    const mo = {jan:0,feb:1,mar:2,apr:3,mei:4,may:4,jun:5,jul:6,
-                agu:7,aug:7,sep:8,okt:9,oct:9,nov:10,des:11,dec:11};
-    const p = s.trim().split(/[\s\/]+/);
-    if (p.length >= 3) {
-        const d = parseInt(p[0]);
-        const m = mo[p[1].toLowerCase().substring(0,3)];
-        const y = parseInt(p[2]) + (parseInt(p[2]) < 100 ? 2000 : 0);
-        if (!isNaN(d) && m !== undefined && !isNaN(y)) return new Date(y, m, d);
-    }
-    return new Date(s) || new Date(0);
-}
-
-// Urutkan dari terbaru ke terlama
-const sortedTgl = Array.from(tglSet).sort((a,b) => parseTglHub(b) - parseTglHub(a));
-
-// Buat daftar Bulan unik dari tanggal-tanggal tersebut
-const bulanMap = {};
-sortedTgl.forEach(tgl => {
-    const d = parseTglHub(tgl);
-    const key = d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
-    const sortKey = d.getFullYear() * 100 + d.getMonth();
-    if (!bulanMap[key]) bulanMap[key] = { sortKey, dates: [] };
-    bulanMap[key].dates.push(tgl);
-});
-
-// Populate select Bulan
-const bulanEl = document.getElementById('hub-bulan-filter');
-if (bulanEl) {
-    bulanEl.innerHTML = '<option value="ALL">-- Semua Bulan --</option>';
-    Object.keys(bulanMap)
-        .sort((a,b) => bulanMap[b].sortKey - bulanMap[a].sortKey)
-        .forEach(b => {
-            const o = document.createElement('option');
-            o.value = b; o.textContent = b;
-            bulanEl.appendChild(o);
-        });
-}
-
-// Simpan mapping global agar bisa dipakai saat filter bulan berubah
-window.hubBulanMap = bulanMap;
-window.hubSortedTgl = sortedTgl;
-
-// Populate select Tanggal (semua, karena bulan belum dipilih)
-populateHubTglFilter('ALL');
                     
                     // Column N for Keterangan Loading (Sudah/Belum Loading)
                     const statusN = (values[13] || '').trim() || 'KOSONG';
@@ -3085,32 +3013,6 @@ populateHubTglFilter('ALL');
                 });
                 loadFilter.value = current === '' ? 'ALL' : (Array.from(loadOpts).includes(current) ? current : 'ALL');
             }
-            function populateHubTglFilter(selectedBulan) {
-    const tglEl = document.getElementById('hub-tgl-filter');
-    if (!tglEl) return;
-    const prev = tglEl.value;
-    tglEl.innerHTML = '<option value="ALL">-- Semua Tanggal --</option>';
-
-    let dates = window.hubSortedTgl || [];
-    if (selectedBulan !== 'ALL' && window.hubBulanMap && window.hubBulanMap[selectedBulan]) {
-        dates = window.hubBulanMap[selectedBulan].dates;
-    }
-
-    dates.forEach(tgl => {
-        const o = document.createElement('option');
-        o.value = tgl; o.textContent = tgl;
-        tglEl.appendChild(o);
-    });
-
-    // Pertahankan pilihan sebelumnya jika masih ada
-    tglEl.value = dates.includes(prev) ? prev : 'ALL';
-}
-
-function onHubBulanChange() {
-    const bulan = document.getElementById('hub-bulan-filter').value;
-    populateHubTglFilter(bulan);
-    renderHubTable();
-}
             if (lcFilter) {
                 const current = lcFilter.value;
                 lcFilter.innerHTML = '<option value="ALL">ALL</option>';
@@ -3145,22 +3047,6 @@ function renderHubTable() {
     const selectedRegion = regionFilter ? regionFilter.value : 'ALL';
     const areaFilter2 = document.getElementById('hub-area-filter');
     const selectedArea2 = areaFilter2 ? areaFilter2.value : 'ALL';
-    const selectedBulan2 = (document.getElementById('hub-bulan-filter')||{}).value || 'ALL';
-const selectedTgl2   = (document.getElementById('hub-tgl-filter')||{}).value   || 'ALL';
-
-function parseTglHub(s) {
-    if (!s) return new Date(0);
-    const mo = {jan:0,feb:1,mar:2,apr:3,mei:4,may:4,jun:5,jul:6,
-                agu:7,aug:7,sep:8,okt:9,oct:9,nov:10,des:11,dec:11};
-    const p = s.trim().split(/[\s\/]+/);
-    if (p.length >= 3) {
-        const d = parseInt(p[0]);
-        const m = mo[p[1].toLowerCase().substring(0,3)];
-        const y = parseInt(p[2]) + (parseInt(p[2]) < 100 ? 2000 : 0);
-        if (!isNaN(d) && m !== undefined && !isNaN(y)) return new Date(y, m, d);
-    }
-    return new Date(0);
-}
 
     if (!head || !tbody) return;
 
@@ -3298,21 +3184,7 @@ if (selectedArea2 === 'DK') {
     matchesArea2 = rowRegion !== 'JATIM DK';
 }
 
-// ⬇️ Tambah logika bulan & tanggal
-const tglVal = (row[tglKedatanganIdx] || '').trim();
-
-let matchBulan2 = true;
-if (selectedBulan2 !== 'ALL') {
-    const d = parseTglHub(tglVal);
-    const label = d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
-    matchBulan2 = label === selectedBulan2;
-}
-
-const matchTgl2 = selectedTgl2 === 'ALL' || tglVal === selectedTgl2;
-
-return matchesLoading && matchesLc && matchesArmadaStatus 
-    && matchesAging && matchesRegion && matchesArea2
-    && matchBulan2 && matchTgl2;  // <-- tambahan baru
+return matchesLoading && matchesLc && matchesArmadaStatus && matchesAging && matchesRegion && matchesArea2;
     });
 
     if (filteredHubData.length === 0) {
