@@ -1884,7 +1884,7 @@
             <!-- Table: ALLOCATION SUMMARY -->
             <div id="allocation-summary-container" style="margin-top: 30px; margin-bottom: 30px; border-bottom: 2px solid #333; display: none;">
                 <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
-                    <span><i class="fas fa-tasks" style="margin-right: 10px; color: #ffd700;"></i> ALLOCATION SUMMARY (DID NOT ALLOCATE / PRE-ALLOCATED)</span>
+                    <span><i class="fas fa-tasks" style="margin-right: 10px; color: #ffd700;"></i> ALLOCATION SUMMARY (DID NOT ALLOCATE / PRE-ALLOCATED / NOT STARTED)</span>
                     
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <button onclick="downloadAllocationExcel()" style="background: #1d6f42; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; display: flex; align-items: center; gap: 6px; font-weight: bold;">
@@ -1919,6 +1919,7 @@
                                 <th style="width: 130px; text-align: center; border: 1px solid #333; cursor: pointer; color: #f87171;" onclick="sortAllocation('didNot')">Did Not Allocate <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
                                 <th style="width: 130px; text-align: center; border: 1px solid #333; cursor: pointer; color: #34d399;" onclick="sortAllocation('preAlloc')">Pre-allocated <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
                                 <th style="width: 130px; text-align: center; border: 1px solid #333; cursor: pointer; color: #fbbf24;" onclick="sortAllocation('partPre')" >Part Pre-allocated <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                                <th style="width: 130px; text-align: center; border: 1px solid #333; cursor: pointer; color: #60a5fa;" onclick="sortAllocation('notStarted')" >Not Started <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
                                 <th style="width: 120px; text-align: center; border: 1px solid #333; color: #ffd700; cursor: pointer; background: #222;" onclick="sortAllocation('totalCbm')">CBM <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
                             </tr>
                         </thead>
@@ -3575,7 +3576,7 @@ function hubSort(colIdx) {
             const bbFilter = document.getElementById('allocation-area-bb-filter');
             const selectedBB = bbFilter ? bbFilter.value : 'ALL';
 
-            const targetKeywords = ['did not allocate', 'pre-allocated', 'part pre-allocated'];
+            const targetKeywords = ['did not allocate', 'pre-allocated', 'part pre-allocated', 'not started'];
             const filtered = rawPivotData.filter(row => {
                 const status = (row.allocStatus || '').trim().toLowerCase();
                 const matchedStatus = targetKeywords.some(kw => status === kw);
@@ -3584,7 +3585,7 @@ function hubSort(colIdx) {
             });
 
             if (filtered.length === 0) {
-                alert("Tidak ada data dengan status alokasi yang ditemukan.");
+                alert("Tidak ada data dengan status alokasi (Did Not, Pre-allocated, Part Pre-allocated, Not Started) yang ditemukan.");
                 return;
             }
 
@@ -3761,7 +3762,7 @@ function hubSort(colIdx) {
             const bbFilter = document.getElementById('allocation-area-bb-filter');
             const selectedBB = bbFilter ? bbFilter.value : 'ALL';
 
-            const targetKeywords = ['did not allocate', 'pre-allocated', 'part pre-allocated'];
+            const targetKeywords = ['did not allocate', 'pre-allocated', 'part pre-allocated', 'not started'];
             const filtered = rawPivotData.filter(row => {
                 const status = (row.allocStatus || '').trim().toLowerCase();
                 const matchedStatus = targetKeywords.some(kw => status === kw);
@@ -4280,7 +4281,8 @@ function renderStoringPivotTable(filteredData) {
             const targetKeywords = {
                 didNot: 'did not allocate',
                 preAlloc: 'pre-allocated',
-                partPre: 'part pre-allocated'
+                partPre: 'part pre-allocated',
+                notStarted: 'not started'
             };
             
             const stores = {};
@@ -4301,6 +4303,7 @@ function renderStoringPivotTable(filteredData) {
                 if (status === targetKeywords.didNot) type = 'didNot';
                 else if (status === targetKeywords.preAlloc) type = 'preAlloc';
                 else if (status === targetKeywords.partPre) type = 'partPre';
+                else if (status === targetKeywords.notStarted) type = 'notStarted';
 
                 if (type) {
                     const key = row.storeBooking;
@@ -4311,6 +4314,7 @@ function renderStoringPivotTable(filteredData) {
                             didNot: 0,
                             preAlloc: 0,
                             partPre: 0,
+                            notStarted: 0,
                             totalCbm: 0
                         };
                     }
@@ -4322,8 +4326,8 @@ function renderStoringPivotTable(filteredData) {
             const storeList = Object.values(stores);
 
             if (storeList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: #666;">
-                    <i class="fas fa-info-circle"></i> Tidak ada data dengan status Allocation (Did Not, Pre-allocated, Part Pre-allocated) ditemukan.
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #666;">
+                    <i class="fas fa-info-circle"></i> Tidak ada data dengan status Allocation (Did Not, Pre-allocated, Part Pre-allocated, Not Started) ditemukan.
                 </td></tr>`;
                 if (foot) foot.innerHTML = '';
                 return;
@@ -4334,7 +4338,7 @@ function renderStoringPivotTable(filteredData) {
                 const k = allocationSort.key;
                 const d = allocationSort.dir === 'asc' ? 1 : -1;
                 
-                if (['didNot', 'preAlloc', 'partPre', 'totalCbm'].includes(k)) {
+                if (['didNot', 'preAlloc', 'partPre', 'notStarted', 'totalCbm'].includes(k)) {
                     return (a[k] - b[k]) * d;
                 }
                 if (k === 'storeBooking') return (a.storeBooking || '').localeCompare(b.storeBooking || '') * d;
@@ -4344,7 +4348,7 @@ function renderStoringPivotTable(filteredData) {
             });
 
             let html = '';
-            const totals = { didNot: 0, preAlloc: 0, partPre: 0, totalCbm: 0 };
+            const totals = { didNot: 0, preAlloc: 0, partPre: 0, notStarted: 0, totalCbm: 0 };
 
             storeList.forEach((row) => {
                 html += `<tr>
@@ -4353,11 +4357,13 @@ function renderStoringPivotTable(filteredData) {
                     <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #f87171; font-weight: ${row.didNot > 0 ? 'bold' : 'normal'}; background: ${row.didNot > 0 ? 'rgba(248,113,113,0.1)' : 'transparent'};">${row.didNot > 0 ? formatIndo(row.didNot) : '-'}</td>
                     <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #34d399; font-weight: ${row.preAlloc > 0 ? 'bold' : 'normal'}; background: ${row.preAlloc > 0 ? 'rgba(52,211,153,0.1)' : 'transparent'};">${row.preAlloc > 0 ? formatIndo(row.preAlloc) : '-'}</td>
                     <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #fbbf24; font-weight: ${row.partPre > 0 ? 'bold' : 'normal'}; background: ${row.partPre > 0 ? 'rgba(251,191,36,0.1)' : 'transparent'};">${row.partPre > 0 ? formatIndo(row.partPre) : '-'}</td>
+                    <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #60a5fa; font-weight: ${row.notStarted > 0 ? 'bold' : 'normal'}; background: ${row.notStarted > 0 ? 'rgba(96,165,250,0.1)' : 'transparent'};">${row.notStarted > 0 ? formatIndo(row.notStarted) : '-'}</td>
                     <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #ffd700; font-weight: bold; background: #111;">${formatIndo(row.totalCbm)}</td>
                 </tr>`;
                 totals.didNot += row.didNot;
                 totals.preAlloc += row.preAlloc;
                 totals.partPre += row.partPre;
+                totals.notStarted += row.notStarted;
                 totals.totalCbm += row.totalCbm;
             });
 
@@ -4367,6 +4373,7 @@ function renderStoringPivotTable(filteredData) {
                 <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #f87171;">${formatIndo(totals.didNot)}</td>
                 <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #34d399;">${formatIndo(totals.preAlloc)}</td>
                 <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #fbbf24;">${formatIndo(totals.partPre)}</td>
+                <td style="text-align: right; border: 1px solid #333; padding: 10px 20px; color: #60a5fa;">${formatIndo(totals.notStarted)}</td>
                 <td style="text-align: right; border: 1px solid #333; padding: 15px 20px; color: #ffd700; font-size: 1.1em;">${formatIndo(totals.totalCbm)}</td>
             </tr>`;
         }
