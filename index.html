@@ -1016,7 +1016,7 @@
 }
 .astor-kpi-row {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 15px;
     margin: 20px 0;
 }
@@ -2098,7 +2098,14 @@
                 <div class="astor-sla-header">
                     <span><i class="fas fa-chart-pie" style="margin-right:10px;"></i> SLA & OUTSTANDING ASTOR — AZKO & KWI</span>
                     <div class="astor-filter-row">
-    <label style="font-size:0.8em;color:#ccc;">BULAN:</label>
+                        <div id="astor-free-line-box" style="background:#0f172a; border:1px solid #ffd700; border-radius:6px; padding:6px 15px; margin-right:20px; display:inline-flex; align-items:center; gap:12px; box-shadow:0 0 15px rgba(255,215,0,0.1);">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-check-circle" style="color: #ffd700; font-size: 0.9em;"></i>
+                                <span style="font-size:0.75em; color:#94a3b8; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;">Free Line:</span>
+                            </div>
+                            <span id="astor-free-line-val" style="font-size:1.25em; color:#ffd700; font-weight:900; text-shadow: 0 0 10px rgba(255,215,0,0.3);">—</span>
+                        </div>
+                        <label style="font-size:0.8em;color:#ccc;">BULAN:</label>
     <select id="astor-bulan-filter" onchange="renderAstorSLA()">
         <option value="ALL">SEMUA</option>
     </select>
@@ -2138,19 +2145,19 @@
                             <span>DK: <b>-</b></span><span>LK: <b>-</b></span><span>LP: <b>-</b></span>
                         </div>
                     </div>
-                        <div class="astor-kpi-card hit">
-                            <div class="astor-kpi-label">SLA HIT</div>
-                            <div class="astor-kpi-value" id="astor-hit">—</div>
-                            <div style="font-size:0.7em;color:#2dd4bf;opacity:0.8;margin-bottom:6px;font-style:italic;">(DK ≤3 / LK ≤5 hari)</div>
+                    <div class="astor-kpi-card hit">
+                        <div class="astor-kpi-label">SLA HIT</div>
+                        <div class="astor-kpi-value" id="astor-hit">—</div>
+                        <div style="font-size:0.7em;color:#2dd4bf;opacity:0.8;margin-bottom:6px;font-style:italic;">(DK ≤3 / LK ≤5 hari)</div>
                         <div class="astor-kpi-breakdown" id="astor-hit-breakdown">
                             <div class="brk-title">Breakdown Area</div>
                             <span>DK: <b>-</b></span><span>LK: <b>-</b></span><span>LP: <b>-</b></span>
                         </div>
                     </div>
-                       <div class="astor-kpi-card miss">
-                            <div class="astor-kpi-label">SLA MISS</div>
-                            <div class="astor-kpi-value" id="astor-miss">—</div>
-                            <div style="font-size:0.7em;color:#f87171;opacity:0.8;margin-bottom:6px;font-style:italic;">(DK &gt;3 / LK &gt;5 hari)</div>
+                    <div class="astor-kpi-card miss">
+                        <div class="astor-kpi-label">SLA MISS</div>
+                        <div class="astor-kpi-value" id="astor-miss">—</div>
+                        <div style="font-size:0.7em;color:#f87171;opacity:0.8;margin-bottom:6px;font-style:italic;">(DK >3 / LK >5 hari)</div>
                         <div class="astor-kpi-breakdown" id="astor-miss-breakdown">
                             <div class="brk-title">Breakdown Area</div>
                             <span>DK: <b>-</b></span><span>LK: <b>-</b></span><span>LP: <b>-</b></span>
@@ -2165,7 +2172,7 @@
                         </div>
                     </div>
                     <div class="astor-kpi-card outstanding">
-                        <div class="astor-kpi-label">Outstanding</div>
+                        <div class="astor-kpi-label">Outstanding Order</div>
                         <div class="astor-kpi-value" id="astor-outstanding">—</div>
                         <div class="astor-kpi-breakdown" id="astor-os-breakdown">
                             <div class="brk-title">Breakdown Area</div>
@@ -2177,6 +2184,52 @@
                         <div class="astor-kpi-value" id="astor-outstanding-cbm">—</div>
                         <div class="astor-kpi-breakdown" id="astor-os-cbm-breakdown">
                             <div class="brk-title">CBM Breakdown</div>
+                            <span>DK: <b>-</b></span><span>LK: <b>-</b></span><span>LP: <b>-</b></span>
+                        </div>
+                    </div>
+                    <div class="astor-kpi-card outstanding">
+                        <div class="astor-kpi-label">Outstanding Line Astor</div>
+                        <div class="astor-kpi-value" id="astor-line-os">—</div>
+                        <div id="astor-line-os-info" style="font-size: 0.75em; color: #fff; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 10px; margin-top: 6px; display: inline-block;">0 CBM</div>
+                        <div style="width: 100%; height: 6px; background: #333; border-radius: 3px; margin-top: 12px; overflow: hidden; border: 1px solid #444;">
+                            <div id="astor-occupancy-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #ffd700, #ff8c00); transition: width 0.5s;"></div>
+                        </div>
+                        <div style="font-size:0.7em; color:#aaa; margin-top:6px; display:flex; justify-content:space-between; font-weight: 500;">
+                            <span>Occupancy: <b id="astor-occupancy-pct" style="color: #ffd700;">0%</b></span>
+                            <span>Cap: 7 Lines</span>
+                        </div>
+                        <div class="astor-kpi-breakdown" id="astor-line-os-breakdown">
+                            <div class="brk-title">Line Breakdown (OS)</div>
+                            <span>DK: <b>-</b></span><span>LK: <b>-</b></span><span>LP: <b>-</b></span>
+                        </div>
+                    </div>
+                    <div class="astor-kpi-card total">
+                        <div class="astor-kpi-label">Total Line Astor (Sudah Plan)</div>
+                        <div class="astor-kpi-value" id="astor-line-sudah" style="color: #60a5fa;">—</div>
+                        <div id="astor-line-sudah-info" style="font-size: 0.75em; color: #60a5fa; background: rgba(96,165,250,0.1); padding: 2px 8px; border-radius: 10px; margin-top: 6px; display: inline-block;">0 CBM</div>
+                        
+                        <div id="astor-line-sudah-bu" style="margin-top: 12px; border-top: 1px solid #333; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; align-items: center; font-size: 0.75em; color: #fff;">
+                            <div id="astor-line-sudah-azko">AZKO: <b>-</b> Line | <b>-</b> CBM</div>
+                            <div id="astor-line-sudah-kwi">KWI: <b>-</b> Line | <b>-</b> CBM</div>
+                        </div>
+
+                        <div class="astor-kpi-breakdown" id="astor-line-sudah-breakdown">
+                            <div class="brk-title">Line Breakdown (Sudah Plan)</div>
+                            <span>DK: <b>-</b></span><span>LK: <b>-</b></span><span>LP: <b>-</b></span>
+                        </div>
+                    </div>
+                    <div class="astor-kpi-card miss">
+                        <div class="astor-kpi-label">Total Line Astor (Belum Plan)</div>
+                        <div class="astor-kpi-value" id="astor-line-belum" style="color: #f87171;">—</div>
+                        <div id="astor-line-belum-info" style="font-size: 0.75em; color: #f87171; background: rgba(248,113,113,0.1); padding: 2px 8px; border-radius: 10px; margin-top: 6px; display: inline-block;">0 CBM</div>
+
+                        <div id="astor-line-belum-bu" style="margin-top: 12px; border-top: 1px solid #333; padding-top: 10px; display: flex; flex-direction: column; gap: 4px; align-items: center; font-size: 0.75em; color: #fff;">
+                            <div id="astor-line-belum-azko">AZKO: <b>-</b> Line | <b>-</b> CBM</div>
+                            <div id="astor-line-belum-kwi">KWI: <b>-</b> Line | <b>-</b> CBM</div>
+                        </div>
+
+                        <div class="astor-kpi-breakdown" id="astor-line-belum-breakdown">
+                            <div class="brk-title">Line Breakdown (Belum Plan)</div>
                             <span>DK: <b>-</b></span><span>LK: <b>-</b></span><span>LP: <b>-</b></span>
                         </div>
                     </div>
@@ -6374,7 +6427,7 @@ const data = rawAstorData.filter(r => {
     return matchBu && matchArea && matchBulan && matchTgl;
 });
 
-    let hit=0, miss=0, os=0, osCbm=0;
+    let hit=0, miss=0, os=0, osCbm=0, lineOsCbmFiltered=0;
     const byBu   = { AZKO:{hit:0,miss:0}, KWI:{hit:0,miss:0} };
     const byArea = { DK:{hit:0,miss:0,tot:0}, LK:{hit:0,miss:0,tot:0}, LP:{hit:0,miss:0,tot:0} };
     const bucket = { '0-3':0, '4-7':0, '8-14':0, '15+':0 };
@@ -6385,13 +6438,23 @@ const data = rawAstorData.filter(r => {
         hit:   { DK: 0, LK: 0, LP: 0 },
         miss:  { DK: 0, LK: 0, LP: 0 },
         os:    { DK: 0, LK: 0, LP: 0 },
-        osCbm: { DK: 0, LK: 0, LP: 0 }
+        osCbm: { DK: 0, LK: 0, LP: 0 },
+        lineSudahPlanCbm: { DK: 0, LK: 0, LP: 0 },
+        lineBelumPlanCbm: { DK: 0, LK: 0, LP: 0 }
     };
+    const buLineSudah = { AZKO: 0, KWI: 0 };
+    const buLineBelum = { AZKO: 0, KWI: 0 };
+    const LINE_FACTOR = 10.5; // (7 pallets midpoint) * 1.5 cbm
+    const MAX_LINES = 7;
 
     let osList = [];
 
     data.forEach(r => {
         const a = r.area; // DK, LK, LP
+        const lcVal = (r.lc || '').toString().trim();
+        const hasLc = lcVal !== '' && lcVal !== '-';
+        const isKeluarDc = (r.stuffing || '').toUpperCase().includes('KELUAR DC');
+        
         if (brk.total[a] !== undefined) brk.total[a]++;
 
         if (r.sla==='HIT') {
@@ -6405,7 +6468,7 @@ const data = rawAstorData.filter(r => {
             if(byArea[r.area]){byArea[r.area].miss++;byArea[r.area].tot++;}
             if(brk.miss[a] !== undefined) brk.miss[a]++;
         } else {
-            // Apply aging filter to OS list
+            // OS logic
             let matchAging = true;
             if (agingF !== 'ALL') {
                 if (agingF === '0-3') matchAging = r.aging <= 3;
@@ -6413,7 +6476,6 @@ const data = rawAstorData.filter(r => {
                 else if (agingF === '5-7') matchAging = r.aging > 5 && r.aging <= 7;
                 else if (agingF === '7 UP') matchAging = r.aging > 7;
             }
-
             if (matchAging) {
                 os++; osCbm+=r.cbm; osList.push(r);
                 if(r.aging<=3)       bucket['0-3']++;
@@ -6423,12 +6485,32 @@ const data = rawAstorData.filter(r => {
 
                 if(brk.os[a] !== undefined) brk.os[a]++;
                 if(brk.osCbm[a] !== undefined) brk.osCbm[a] += r.cbm;
+
+                // Line metrics for Outstanding data ONLY, excluding KELUAR DC
+                if (!isKeluarDc) {
+                    lineOsCbmFiltered += r.cbm;
+                    if (hasLc) {
+                        if (brk.lineSudahPlanCbm[a] !== undefined) brk.lineSudahPlanCbm[a] += r.cbm;
+                        if (buLineSudah[r.bu] !== undefined) buLineSudah[r.bu] += r.cbm;
+                    } else {
+                        if (brk.lineBelumPlanCbm[a] !== undefined) brk.lineBelumPlanCbm[a] += r.cbm;
+                        if (buLineBelum[r.bu] !== undefined) buLineBelum[r.bu] += r.cbm;
+                    }
+                }
             }
         }
     });
 
     const total = hit + miss;
     const pct   = total > 0 ? (hit/total*100) : 0;
+
+    const sudahCbmTot = Object.values(brk.lineSudahPlanCbm).reduce((a,b)=>a+b,0);
+    const belumCbmTot = Object.values(brk.lineBelumPlanCbm).reduce((a,b)=>a+b,0);
+    const lineSudahTot = sudahCbmTot / LINE_FACTOR;
+    const lineBelumTot = belumCbmTot / LINE_FACTOR;
+    const lineOsTot = lineOsCbmFiltered / LINE_FACTOR;
+    const occupancyPct = Math.min((lineOsTot / MAX_LINES) * 100, 100);
+    const freeLines = Math.max(MAX_LINES - lineOsTot, 0);
 
     document.getElementById('astor-total').textContent           = total + os;
     document.getElementById('astor-hit').textContent             = hit;
@@ -6438,8 +6520,34 @@ const data = rawAstorData.filter(r => {
     document.getElementById('astor-outstanding-cbm').textContent = osCbm.toFixed(2);
     document.getElementById('astor-outstanding-count').textContent = os + ' Order';
 
+    // Update new KPI card values
+    document.getElementById('astor-line-os').textContent = lineOsTot.toFixed(1);
+    document.getElementById('astor-line-sudah').textContent = lineSudahTot.toFixed(1);
+    document.getElementById('astor-line-belum').textContent = lineBelumTot.toFixed(1);
+    
+    // Update Sub-info (CBM)
+    if(document.getElementById('astor-line-os-info')) document.getElementById('astor-line-os-info').textContent = lineOsCbmFiltered.toFixed(1) + ' CBM';
+    if(document.getElementById('astor-line-sudah-info')) document.getElementById('astor-line-sudah-info').textContent = sudahCbmTot.toFixed(1) + ' CBM';
+    if(document.getElementById('astor-line-belum-info')) document.getElementById('astor-line-belum-info').textContent = belumCbmTot.toFixed(1) + ' CBM';
+
+    // Update BU Breakdown values
+    if(document.getElementById('astor-line-sudah-azko')) document.getElementById('astor-line-sudah-azko').innerHTML = `AZKO: <b>${(buLineSudah.AZKO / LINE_FACTOR).toFixed(1)}</b> Line | <b>${buLineSudah.AZKO.toFixed(1)}</b> CBM`;
+    if(document.getElementById('astor-line-sudah-kwi')) document.getElementById('astor-line-sudah-kwi').innerHTML = `KWI: <b>${(buLineSudah.KWI / LINE_FACTOR).toFixed(1)}</b> Line | <b>${buLineSudah.KWI.toFixed(1)}</b> CBM`;
+    if(document.getElementById('astor-line-belum-azko')) document.getElementById('astor-line-belum-azko').innerHTML = `AZKO: <b>${(buLineBelum.AZKO / LINE_FACTOR).toFixed(1)}</b> Line | <b>${buLineBelum.AZKO.toFixed(1)}</b> CBM`;
+    if(document.getElementById('astor-line-belum-kwi')) document.getElementById('astor-line-belum-kwi').innerHTML = `KWI: <b>${(buLineBelum.KWI / LINE_FACTOR).toFixed(1)}</b> Line | <b>${buLineBelum.KWI.toFixed(1)}</b> CBM`;
+
+    // Update Free Line val
+    const freeEl = document.getElementById('astor-free-line-val');
+    if(freeEl) freeEl.textContent = freeLines.toFixed(1) + ' Lines';
+
+    // Update Occupancy Bar
+    const bar = document.getElementById('astor-occupancy-bar');
+    const pctLabel = document.getElementById('astor-occupancy-pct');
+    if(bar) bar.style.width = occupancyPct + '%';
+    if(pctLabel) pctLabel.textContent = occupancyPct.toFixed(1) + '%';
+
     // Helper to update breakdown text (Tooltip content)
-    const setBrk = (id, obj, isCbm=false, isPct=false) => {
+    const setBrk = (id, obj, isCbm=false, isPct=false, isLine=false) => {
         const el = document.getElementById(id);
         if(!el) return;
         const title = el.querySelector('.brk-title') ? el.querySelector('.brk-title').outerHTML : '<div class="brk-title">Breakdown</div>';
@@ -6449,7 +6557,10 @@ const data = rawAstorData.filter(r => {
             const lp = obj.LP.tot > 0 ? (obj.LP.hit/obj.LP.tot*100).toFixed(0) : '-';
             el.innerHTML = `${title}<span>DK: <b>${dk}%</b></span><span>LK: <b>${lk}%</b></span><span>LP: <b>${lp}%</b></span>`;
         } else {
-            const f = v => isCbm ? v.toFixed(1) : v;
+            const f = v => {
+                if (isLine) return (v / LINE_FACTOR).toFixed(2);
+                return isCbm ? v.toFixed(1) : v;
+            };
             el.innerHTML = `${title}<span>DK: <b>${f(obj.DK)}</b></span><span>LK: <b>${f(obj.LK)}</b></span><span>LP: <b>${f(obj.LP)}</b></span>`;
         }
     };
@@ -6460,6 +6571,11 @@ const data = rawAstorData.filter(r => {
     setBrk('astor-pct-breakdown', byArea, false, true);
     setBrk('astor-os-breakdown', brk.os);
     setBrk('astor-os-cbm-breakdown', brk.osCbm, true);
+
+    // New breakdowns
+    setBrk('astor-line-os-breakdown', brk.osCbm, false, false, true);
+    setBrk('astor-line-sudah-breakdown', brk.lineSudahPlanCbm, false, false, true);
+    setBrk('astor-line-belum-breakdown', brk.lineBelumPlanCbm, false, false, true);
 
     // Chart 1: HIT vs MISS per BU
     const ctx1 = document.getElementById('astorSlaByBuChart').getContext('2d');
