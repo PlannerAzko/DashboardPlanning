@@ -2101,7 +2101,7 @@
                         <div id="astor-free-line-box" style="background:#0f172a; border:1px solid #ffd700; border-radius:6px; padding:6px 15px; margin-right:20px; display:inline-flex; align-items:center; gap:12px; box-shadow:0 0 15px rgba(255,215,0,0.1);">
                             <div style="display: flex; align-items: center; gap: 6px;">
                                 <i class="fas fa-check-circle" style="color: #ffd700; font-size: 0.9em;"></i>
-                                <span style="font-size:0.75em; color:#94a3b8; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;">Free Line:</span>
+                                <span style="font-size:0.75em; color:#94a3b8; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;">FREE LINE ASTOR</span>
                             </div>
                             <span id="astor-free-line-val" style="font-size:1.25em; color:#ffd700; font-weight:900; text-shadow: 0 0 10px rgba(255,215,0,0.3);">—</span>
                         </div>
@@ -2196,7 +2196,7 @@
                         </div>
                         <div style="font-size:0.7em; color:#aaa; margin-top:6px; display:flex; justify-content:space-between; font-weight: 500;">
                             <span>Occupancy: <b id="astor-occupancy-pct" style="color: #ffd700;">0%</b></span>
-                            <span>Cap: 7 Lines</span>
+                            <span>Cap: 5 Lines</span>
                         </div>
                         <div class="astor-kpi-breakdown" id="astor-line-os-breakdown">
                             <div class="brk-title">Line Breakdown (OS)</div>
@@ -6230,7 +6230,7 @@ let rawAstorData = [];
 let astorChartBu = null, astorChartArea = null, astorChartAging = null;
 let astorSort = { key: 'aging', dir: 'desc' };
 
-const ACOL = { TGL:0, RTOD:1, LC:4, CBM:3, BU:7, KOTA:2, REGION:9, AREA:10, STUFFING:11, AGING:12, SLA:13 };
+const ACOL = { TGL:0, RTOD:1, LC:4, CBM:3, BU:7, KOTA:2, REGION:9, AREA:10, STUFFING:15, AGING:12, SLA:13 };
 
 async function fetchAstorData() {
     try {
@@ -6255,7 +6255,7 @@ function parseAstorCSV(csv) {
     const dataRows = allRows.slice(3); // skip 3 baris (2 kosong + 1 header)
 
     dataRows.forEach(row => {
-        if (row.length < 12) return;
+        if (row.length < 16) return;
         const bu = (row[ACOL.BU]||'').trim().toUpperCase();
         if (bu !== 'AZKO' && bu !== 'KWI') return;
         if (!row[ACOL.RTOD] && !row[ACOL.KOTA]) return;
@@ -6445,7 +6445,7 @@ const data = rawAstorData.filter(r => {
     const buLineSudah = { AZKO: 0, KWI: 0 };
     const buLineBelum = { AZKO: 0, KWI: 0 };
     const LINE_FACTOR = 10.5; // (7 pallets midpoint) * 1.5 cbm
-    const MAX_LINES = 7;
+    const MAX_LINES = 5;
 
     let osList = [];
 
@@ -6453,7 +6453,7 @@ const data = rawAstorData.filter(r => {
         const a = r.area; // DK, LK, LP
         const lcVal = (r.lc || '').toString().trim();
         const hasLc = lcVal !== '' && lcVal !== '-';
-        const isKeluarDc = (r.stuffing || '').toUpperCase().includes('KELUAR DC');
+        const isFinished = (r.stuffing || '').toUpperCase().includes('KELUAR') || (r.stuffing || '').toUpperCase().includes('SELESAI');
         
         if (brk.total[a] !== undefined) brk.total[a]++;
 
@@ -6468,7 +6468,9 @@ const data = rawAstorData.filter(r => {
             if(byArea[r.area]){byArea[r.area].miss++;byArea[r.area].tot++;}
             if(brk.miss[a] !== undefined) brk.miss[a]++;
         } else {
-            // OS logic
+            // OS logic - EXCLUDE KELUAR DC & SELESAI
+            if (isFinished) return;
+
             let matchAging = true;
             if (agingF !== 'ALL') {
                 if (agingF === '0-3') matchAging = r.aging <= 3;
@@ -6486,8 +6488,8 @@ const data = rawAstorData.filter(r => {
                 if(brk.os[a] !== undefined) brk.os[a]++;
                 if(brk.osCbm[a] !== undefined) brk.osCbm[a] += r.cbm;
 
-                // Line metrics for Outstanding data ONLY, excluding KELUAR DC
-                if (!isKeluarDc) {
+                // Line metrics for Outstanding data ONLY, excluding KELUAR DC & SELESAI
+                if (!isFinished) {
                     lineOsCbmFiltered += r.cbm;
                     if (hasLc) {
                         if (brk.lineSudahPlanCbm[a] !== undefined) brk.lineSudahPlanCbm[a] += r.cbm;
