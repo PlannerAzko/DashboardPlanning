@@ -107,7 +107,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.95);
-            z-index: 9999;
+            z-index: 15000;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -241,35 +241,184 @@
         body.theme-purple .section-title-banner i {
             color: #0f172a !important;
         }
-        body.theme-purple .floating-btn {
-            background: #6a1b9a !important;
-            box-shadow: 0 4px 15px rgba(106, 27, 154, 0.5) !important;
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 70px;
+            background: #1a1a2e;
+            z-index: 10001;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 100px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 4px 0 25px rgba(0,0,0,0.5);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
         }
-        body.theme-purple .floating-btn::before,
-        body.theme-purple .floating-btn::after {
-            background: #fff;
-        }
-        body.theme-purple .menu-item {
-            background: #6a1b9a !important;
-            border-color: #a855f7 !important;
-        }
-        body.theme-purple .menu-item i {
-            color: #fff !important;
-        }
-        body.theme-purple .menu-label {
-            background: #ffd700 !important;
-            color: #0f172a !important;
-            border-left-color: #fff !important;
-            font-weight: 800 !important;
-        }
-        /* Handle FBI menu distribution when only 3 items are shown */
-        body.theme-purple .circular-menu.fbi-layout.active .menu-item:nth-child(1) { transform: translate(0px, -290px) scale(1); }
-        body.theme-purple .circular-menu.fbi-layout.active .menu-item:nth-child(2) { transform: translate(110px, -210px) scale(1); }
-        body.theme-purple .circular-menu.fbi-layout.active .menu-item:nth-child(4) { transform: translate(140px, -55px) scale(1); }
 
-        body.theme-purple .circular-menu.fbi-layout.active .menu-item:nth-child(1):hover { transform: translate(0px, -290px) scale(1.1) !important; }
-        body.theme-purple .circular-menu.fbi-layout.active .menu-item:nth-child(2):hover { transform: translate(110px, -210px) scale(1.1) !important; }
-        body.theme-purple .circular-menu.fbi-layout.active .menu-item:nth-child(4):hover { transform: translate(140px, -55px) scale(1.1) !important; }
+        .sidebar.expanded {
+            width: 280px;
+            align-items: flex-start;
+        }
+
+        .sidebar-logo {
+            padding: 20px 0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 80px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .sidebar-logo:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar.expanded .sidebar-logo {
+            padding: 20px;
+            justify-content: flex-start;
+        }
+
+        .sidebar-logo i {
+            font-size: 1.8rem;
+            color: #ffd700;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .sidebar-logo span {
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #fff;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sidebar.expanded .sidebar-logo span {
+            opacity: 1;
+        }
+
+        .nav-item {
+            width: 100%;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            padding: 0 22px;
+            cursor: pointer;
+            color: #94bcff;
+            transition: all 0.3s;
+            position: relative;
+            text-decoration: none;
+            margin: 5px 0;
+        }
+
+        .nav-item i {
+            font-size: 1.3rem;
+            min-width: 26px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .nav-item span {
+            margin-left: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar.expanded .nav-item span {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .nav-item:hover i {
+            transform: scale(1.2);
+        }
+
+        .nav-item.active {
+            color: #fff;
+            background: linear-gradient(90deg, rgba(211, 47, 47, 0.2) 0%, transparent 100%);
+            border-left: 4px solid #d32f2f;
+        }
+
+        body.theme-purple .nav-item.active {
+            background: linear-gradient(90deg, rgba(106, 27, 154, 0.2) 0%, transparent 100%);
+            border-left-color: #ffd700;
+            color: #ffd700;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            top: 20px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10002;
+            color: #fff;
+        }
+
+        .sidebar-toggle:hover {
+            background: #d32f2f;
+        }
+
+        body.theme-purple .sidebar-toggle:hover {
+            background: #6a1b9a;
+        }
+
+        /* Content Adjustment */
+        .main-container-wrapper {
+            margin-left: 0;
+            transition: margin-left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100%;
+        }
+
+        body.view-dc .main-container-wrapper {
+            margin-left: 70px;
+            width: calc(100% - 70px);
+        }
+
+        .sidebar.expanded + .main-container-wrapper {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -70px;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .main-container-wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
         body.theme-purple .kpi-card.red {
             background: linear-gradient(135deg, #9c27b0 0%, #6a1b9a 100%);
             border-bottom-color: #4a148c;
@@ -292,6 +441,129 @@
         body.theme-purple table tfoot td {
             box-shadow: inset 0 2px 0 0 #6a1b9a;
         }
+
+        /* New FBI Layout Styles */
+        .fbi-dashboard-header {
+            background: #2e2e5c;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border-bottom: 3px solid #ffd700;
+        }
+        .fbi-dashboard-header h2 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .fbi-kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .fbi-kpi-card {
+            background: #fffefc;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            border: 1px solid #ddd;
+        }
+        .fbi-kpi-card:hover { transform: translateY(-5px); }
+        .fbi-kpi-label {
+            font-size: 0.85rem;
+            color: #555;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .fbi-kpi-value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #2e2e5c;
+        }
+        .fbi-kpi-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            width: 100%;
+        }
+        .fbi-kpi-card.purple::after { background: #5a189a; }
+        .fbi-kpi-card.teal::after { background: #2dd4bf; }
+        .fbi-kpi-card.orange::after { background: #f59e0b; }
+        .fbi-kpi-card.red::after { background: #ef4444; }
+
+        .fbi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            min-height: 500px;
+        }
+        .fbi-grid-item {
+            background: #1a1a2e;
+            border-radius: 12px;
+            border: 1px solid #333;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .fbi-item-header {
+            background: #2e2e5c;
+            color: #fff;
+            padding: 12px 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #444;
+        }
+        .fbi-item-content {
+            flex: 1;
+            padding: 15px;
+            position: relative;
+        }
+        
+        #fbi-google-map { height: 100%; width: 100%; border-radius: 8px; min-height: 400px; }
+
+        .fbi-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .fbi-table th {
+            background: #0f172a;
+            color: #ffd700;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #333;
+            position: sticky;
+            top: 0;
+        }
+        .fbi-table td {
+            padding: 10px;
+            border-bottom: 1px solid #222;
+            color: #eee;
+        }
+        .fbi-table tr:hover { background: rgba(255, 255, 255, 0.05); }
 
         /* Futuristic DC Cards */
         .dc-card-container {
@@ -1564,6 +1836,48 @@
         </div>
     </div>
 
+    <!-- Sidebar Navigation -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-logo" onclick="resetBranchSelection()" title="Klik untuk ganti cabang">
+            <i class="fas fa-truck-fast"></i>
+            <span>FBI SIDOARJO</span>
+        </div>
+        <div class="sidebar-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </div>
+        
+        <div class="nav-item active" id="side-nav-main" onclick="showDashboardSection('main-dashboard-section')">
+            <i class="fas fa-grip"></i>
+            <span>Dashboard</span>
+        </div>
+        
+        <div class="nav-item" id="side-nav-map" onclick="handleSideNavMap()">
+            <i class="fas fa-map-location-dot"></i>
+            <span>Peta Coverage</span>
+        </div>
+
+        <div class="nav-item" id="side-nav-outstanding" onclick="showDashboardSection('outstanding-section')">
+            <i class="fas fa-truck-fast"></i>
+            <span>Outstanding</span>
+        </div>
+
+        <div class="nav-item" id="side-nav-summary" onclick="showDashboardSection('summary-report-section')">
+            <i class="fas fa-route"></i>
+            <span>Summary Report</span>
+        </div>
+
+        <div class="nav-item" id="side-nav-partner" onclick="showDashboardSection('supply-partner-section')">
+            <i class="fas fa-handshake"></i>
+            <span>Partners</span>
+        </div>
+
+        <div class="nav-item" id="side-nav-hub" onclick="showDashboardSection('hub-astor-section')">
+            <i class="fas fa-warehouse"></i>
+            <span>Hub & Astor</span>
+        </div>
+    </div>
+
+    <div class="main-container-wrapper">
     <div class="header">
         <h1>LOGISTICS DASHBOARD | ORDER PLANNING NDC AHI SIDOARJO</h1>
     </div>
@@ -1711,6 +2025,69 @@
             <div class="pagination" id="pagination"></div>
         </div>
         </div> <!-- End main-dashboard-section -->
+
+        <div id="fbi-dashboard-section" class="dash-section" style="display: none; flex-direction: column;">
+            <div class="fbi-dashboard-header">
+                <h2><i class="fas fa-satellite-dish"></i> FBI DELIVERY PLANNING DASHBOARD</h2>
+            </div>
+
+            <div class="fbi-kpi-row">
+                <div class="fbi-kpi-card purple">
+                    <div class="fbi-kpi-label">TOTAL STORES</div>
+                    <div id="fbi-kpi-total-stores" class="fbi-kpi-value">0</div>
+                </div>
+                <div class="fbi-kpi-card teal">
+                    <div class="fbi-kpi-label">SUDAH PLAN</div>
+                    <div id="fbi-kpi-sudah-plan" class="fbi-kpi-value">0</div>
+                </div>
+                <div class="fbi-kpi-card orange">
+                    <div class="fbi-kpi-label">OUTSTANDING ORDER</div>
+                    <div id="fbi-kpi-outstanding-aging" class="fbi-kpi-value">0</div>
+                </div>
+                <div class="fbi-kpi-card red">
+                    <div class="fbi-kpi-label">BELUM PLAN</div>
+                    <div id="fbi-kpi-belum-plan" class="fbi-kpi-value">0</div>
+                </div>
+            </div>
+
+            <div class="fbi-grid">
+                <div class="fbi-grid-item">
+                    <div class="fbi-item-header">
+                        <i class="fas fa-map-location-dot"></i> PETA COVERAGE
+                    </div>
+                    <div class="fbi-item-content" style="padding: 0;">
+                        <div id="fbi-google-map"></div>
+                    </div>
+                </div>
+                <div class="fbi-grid-item">
+                    <div class="fbi-item-header">
+                        <i class="fas fa-clock-rotate-left"></i> OUTSTANDING BELUM PLAN
+                    </div>
+                    <div class="fbi-item-content" style="overflow-y: auto; max-height: 450px;">
+                        <table class="fbi-table">
+                            <thead>
+                                <tr>
+                                    <th>SHIP TO</th>
+                                    <th>CBM</th>
+                                    <th>AGING</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fbi-outstanding-table-body">
+                                <tr><td colspan="3" style="text-align:center; padding: 20px;">Memproses data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="fbi-grid-item">
+                    <div class="fbi-item-header">
+                        <i class="fas fa-chart-line"></i> COVERAGE PER HARI
+                    </div>
+                    <div class="fbi-item-content">
+                        <canvas id="fbiCoverageChart" style="max-height: 400px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div id="summary-report-section" class="dash-section" style="display: none;">
             <div class="section-title-banner">
@@ -2460,32 +2837,8 @@
         </div>
     </div> <!-- End container -->
 
-    <!-- Circular Navigation Menu -->
-    <div class="circular-menu" id="circularMenu">
-        <div class="floating-btn" onclick="toggleCircularMenu()"></div>
-        <div class="menu-items">
-            <div class="menu-item" id="nav-main" onclick="showDashboardSection('main-dashboard-section')">
-                <i class="fas fa-desktop"></i>
-                <div class="menu-label">MAIN DASHBOARD</div>
-            </div>
-            <div class="menu-item" id="nav-summary" onclick="showDashboardSection('summary-report-section')">
-                <i class="fas fa-chart-line"></i>
-                <div class="menu-label">SUMMARY REPORT SLA & CBM SHIPPED</div>
-            </div>
-            <div class="menu-item" id="nav-partner" onclick="showDashboardSection('supply-partner-section')">
-                <i class="fas fa-handshake"></i>
-                <div class="menu-label">SUPPLY PARTNER EVALUATION</div>
-                </div>
-            <div class="menu-item" id="nav-outstanding" onclick="showDashboardSection('outstanding-section')">
-                <i class="fas fa-hourglass-half"></i>
-                <div class="menu-label">MONITORING OUTSTANDING</div>
-            </div>
-            <div class="menu-item" id="nav-hub" onclick="showDashboardSection('hub-astor-section')">
-                <i class="fas fa-warehouse"></i>
-                <div class="menu-label">MONITORING HUB GRW & ASTOR</div>
-            </div>
-        </div>
-    </div>
+    </div> <!-- End main-container-wrapper -->
+
     <!-- Scrolling Marquee Footer -->
     <div class="footer-marquee">
         <div class="marquee-content" id="last-update-text">
@@ -2700,8 +3053,11 @@
                 document.getElementById('welcome-step-1').classList.add('hidden');
                 document.getElementById('welcome-step-2').classList.remove('hidden');
                 
-                const circMenu = document.getElementById('circularMenu');
-                if (circMenu) circMenu.style.display = 'none';
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) sidebar.style.display = 'none';
+                const wrapper = document.querySelector('.main-container-wrapper');
+                if (wrapper) wrapper.style.marginLeft = '0';
+                if (wrapper) wrapper.style.width = '100%';
             }
         }
 
@@ -2749,21 +3105,19 @@
                 if (isValid) {
                     errorMsg.style.display = 'none';
                     // Apply DC view settings
-                    document.body.className = 'view-dc';
-                    const circMenu = document.getElementById('circularMenu');
-                    if (circMenu) circMenu.style.display = 'block';
-                    showDashboardSection('main-dashboard-section');
+                    document.body.classList.add('view-dc');
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar) sidebar.style.display = 'flex';
+                    
+                    // Show branch selection step (Step DC Branch)
+                    document.getElementById('welcome-step-login').classList.add('hidden');
+                    document.getElementById('welcome-step-dc-branch').classList.remove('hidden');
                     
                     // Update welcome message in step 2
                     const step2Question = document.querySelector('#welcome-step-2 .welcome-question');
                     if (step2Question) {
-                        step2Question.innerHTML = `Selamat datang, <strong>${userName}</strong>. Anda berhasil login ke sistem. Silakan gunakan dashboard untuk memantau dan mengelola aktivitas Anda.<br><br>Apakah anda ingin melihat Plan Update terbaru?`;
+                        step2Question.innerHTML = `Selamat datang, <strong>${userName}</strong>. Anda berhasil login ke sistem. Silakan pilih portal operasional Anda di bawah ini:`;
                     }
-
-                    document.getElementById('welcome-step-login').classList.add('hidden');
-                    document.getElementById('welcome-step-dc-branch').classList.remove('hidden');
-                    
-                    toggleFullScreen();
                 } else {
                     errorMsg.style.display = 'block';
                     errorMsg.textContent = "NIK atau Password salah!";
@@ -2785,13 +3139,12 @@
             const welcomeTitle = document.getElementById('welcome-title-main');
             const marquee = document.getElementById('last-update-text');
             
-            const navPartner = document.getElementById('nav-partner');
-            const navHub = document.getElementById('nav-hub');
-            const circMenu = document.getElementById('circularMenu');
+            const sideNavPartner = document.getElementById('side-nav-partner');
+            const sideNavHub = document.getElementById('side-nav-hub');
+            const sideNavMap = document.getElementById('side-nav-map');
             
             if (branch === 'FBI') {
                 body.classList.add('theme-purple');
-                if (circMenu) circMenu.classList.add('fbi-layout');
                 SHEET_ID = SHEET_ID_FBI;
                 SHEET_GID = SHEET_GID_FBI;
                 CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
@@ -2804,11 +3157,17 @@
                 if (marquee) marquee.textContent = marquee.textContent.replace('TIM PLANNER SIDOARJO', 'TIM FBI SIDOARJO');
 
                 // FBI: Hide specific navigation items
-                if (navPartner) navPartner.style.display = 'none';
-                if (navHub) navHub.style.display = 'none';
+                if (sideNavPartner) sideNavPartner.style.display = 'none';
+                if (sideNavHub) sideNavHub.style.display = 'none';
+                if (sideNavMap) sideNavMap.style.display = 'flex';
+
+                const sidebarLogo = document.querySelector('.sidebar-logo span');
+                if (sidebarLogo) sidebarLogo.textContent = 'FBI SIDOARJO';
+
+                // Initial show FBI dashboard
+                showDashboardSection('fbi-dashboard-section');
             } else {
                 body.classList.remove('theme-purple');
-                if (circMenu) circMenu.classList.remove('fbi-layout');
                 SHEET_ID = SHEET_ID_AHI;
                 SHEET_GID = SHEET_GID_AHI;
                 CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
@@ -2821,14 +3180,19 @@
                 if (marquee) marquee.textContent = marquee.textContent.replace('TIM FBI SIDOARJO', 'TIM PLANNER SIDOARJO');
 
                 // AHI: Show all navigation items
-                if (navPartner) navPartner.style.display = 'flex';
-                if (navHub) navHub.style.display = 'flex';
+                if (sideNavPartner) sideNavPartner.style.display = 'flex';
+                if (sideNavHub) sideNavHub.style.display = 'flex';
+                if (sideNavMap) sideNavMap.style.display = 'none';
+
+                const sidebarLogo = document.querySelector('.sidebar-logo span');
+                if (sidebarLogo) sidebarLogo.textContent = 'AHI SIDOARJO';
+
+                showDashboardSection('main-dashboard-section');
             }
 
             document.getElementById('welcome-step-dc-branch').classList.add('hidden');
             document.getElementById('welcome-step-2').classList.remove('hidden');
             
-            showDashboardSection('main-dashboard-section');
             fetchPivotData();
             fetchHubData();
             fetchAstorData();
@@ -3049,15 +3413,64 @@
         let pivotStatusPlanOptions = new Set();
         let pivotHeaderNames = [];
 
-        function toggleCircularMenu() {
-            const menu = document.getElementById('circularMenu');
-            if (menu) menu.classList.toggle('active');
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) sidebar.classList.toggle('expanded');
+        }
+
+        function resetBranchSelection() {
+            // Show welcome screen and branch selection step
+            const welcomeOverlay = document.getElementById('welcome-overlay');
+            const branchStep = document.getElementById('welcome-step-dc-branch');
+            
+            if (welcomeOverlay && branchStep) {
+                welcomeOverlay.classList.remove('hidden');
+                branchStep.classList.remove('hidden');
+                
+                // Hide other steps
+                ['welcome-step-1', 'welcome-step-login', 'welcome-step-2'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('hidden');
+                });
+                
+                // Keep view-dc but we want to show the overlay again
+                // document.body.classList.remove('view-dc'); // Actually we can keep it, sidebar will still show logo
+                
+                // Hide all sections while selecting
+                const sections = document.querySelectorAll('.dash-section');
+                sections.forEach(s => s.style.display = 'none');
+            }
+        }
+
+        function handleSideNavMap() {
+            if (!document.body.classList.contains('theme-purple')) {
+                showDashboardSection('main-dashboard-section');
+                setTimeout(() => {
+                    const mapEl = document.getElementById('map');
+                    if (mapEl) mapEl.scrollIntoView({ behavior: 'smooth' });
+                }, 300);
+            } else {
+                showDashboardSection('main-dashboard-section'); // Will redirect to fbi-dashboard-section
+                setTimeout(() => {
+                    const mapEl = document.getElementById('fbi-google-map');
+                    if (mapEl) mapEl.scrollIntoView({ behavior: 'smooth' });
+                }, 300);
+            }
         }
 
         function showDashboardSection(sectionId) {
+            // FBI Special Handling: Redirect main-dashboard to fbi-dashboard if theme is purple
+            if (sectionId === 'main-dashboard-section' && document.body.classList.contains('theme-purple')) {
+                sectionId = 'fbi-dashboard-section';
+            }
+
             const sections = document.querySelectorAll('.dash-section');
             sections.forEach(s => s.style.display = 'none');
             
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+
             const globalFilter = document.getElementById('global-filter-section');
             const showFilterFor = ['main-dashboard-section', 'summary-report-section', 'supply-partner-section'];
             if (globalFilter) {
@@ -3066,16 +3479,185 @@
 
             const target = document.getElementById(sectionId);
             if (target) {
-                target.style.display = 'block';
+                target.style.display = sectionId === 'fbi-dashboard-section' ? 'flex' : 'block';
+                
+                // Highlight corresponding sidebar item
+                let navId = '';
+                if (sectionId === 'main-dashboard-section' || sectionId === 'fbi-dashboard-section') navId = 'side-nav-main';
+                else if (sectionId === 'summary-report-section') navId = 'side-nav-summary';
+                else if (sectionId === 'supply-partner-section') navId = 'side-nav-partner';
+                else if (sectionId === 'outstanding-section') navId = 'side-nav-outstanding';
+                else if (sectionId === 'hub-astor-section') navId = 'side-nav-hub';
+
+                const navItem = document.getElementById(navId);
+                if (navItem) navItem.classList.add('active');
+
                 // Trigger chart resize if visible
                 window.dispatchEvent(new Event('resize'));
+                
+                if (sectionId === 'fbi-dashboard-section') {
+                    setTimeout(renderFBIDashboard, 100);
+                }
             }
-            
-            const menu = document.getElementById('circularMenu');
-            if (menu) menu.classList.remove('active');
             
             // Scroll to top of dashboard
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // FBI Dashboard Logic
+        let fbiMap = null;
+        let fbiChart = null;
+
+        function renderFBIDashboard() {
+            if (!rawPivotData || rawPivotData.length === 0) return;
+
+            // 1. Calculate KPIs
+            const uniqueStores = new Set();
+            let sudahPlan = 0;
+            let outstandingOrder = 0;
+            let belumPlan = 0;
+            
+            const outstandingList = [];
+            const coverageData = {}; // By Day
+
+            rawPivotData.forEach(row => {
+                const colI = row.rawColumns && row.rawColumns.I ? row.rawColumns.I.trim() : "";
+                const colBC = row.status ? row.status.trim() : ""; // Column BC
+                const colF = row.rawColumns && row.rawColumns.F ? row.rawColumns.F.trim() : ""; // Column F
+
+                // "Total Stores" is the unique count of Column I
+                if (colI) {
+                    uniqueStores.add(colI);
+                }
+                
+                // "Sudah Plan" is the count of rows in Column BC
+                if (colBC) {
+                    sudahPlan++;
+                }
+
+                // "Outstanding Order" is the count of rows in Column F
+                if (colF) {
+                    outstandingOrder++;
+                    outstandingList.push({
+                        name: row.storeBookingName || 'Unknown Store',
+                        cbm: row.cbm || 0,
+                        aging: row.aging || 0
+                    });
+                }
+
+                // Belum Plan: Rows with Column I but no data in Column BC
+                if (colI && !colBC) {
+                    belumPlan++;
+                }
+
+                // Coverage per Hari (based on Stuffing Date/Tanggal)
+                const date = row.stuffingDate || 'No Date';
+                if (!coverageData[date]) coverageData[date] = 0;
+                coverageData[date] += row.cbm;
+            });
+
+            // Update KPI DOM
+            updateVal('fbi-kpi-total-stores', uniqueStores.size);
+            updateVal('fbi-kpi-sudah-plan', sudahPlan);
+            updateVal('fbi-kpi-outstanding-aging', outstandingOrder);
+            updateVal('fbi-kpi-belum-plan', belumPlan);
+
+            // 2. Render Outstanding Table
+            const tbody = document.getElementById('fbi-outstanding-table-body');
+            if (tbody) {
+                const topOutstanding = outstandingList.sort((a,b) => b.aging - a.aging).slice(0, 15);
+                tbody.innerHTML = topOutstanding.map(item => `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td style="color: #ffd700; font-weight: bold;">${item.cbm.toFixed(2)}</td>
+                        <td style="color: ${item.aging > 3 ? '#ff6b6b' : '#eee'};">${item.aging} Days</td>
+                    </tr>
+                `).join('') || '<tr><td colspan="3" style="text-align:center;">No Outstanding</td></tr>';
+            }
+
+            // 3. Render Chart
+            renderFBIChart(coverageData);
+
+            // 4. Initialize Map
+            initFBIMap();
+        }
+
+        function updateVal(id, val) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+        }
+
+        function renderFBIChart(data) {
+            const ctx = document.getElementById('fbiCoverageChart');
+            if (!ctx) return;
+
+            const labels = Object.keys(data).sort();
+            const values = labels.map(l => data[l]);
+
+            if (fbiChart) fbiChart.destroy();
+
+            fbiChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Volume (CBM)',
+                        data: values,
+                        borderColor: '#ba68c8',
+                        backgroundColor: 'rgba(186, 104, 200, 0.2)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#ba68c8',
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#aaa' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#aaa' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initFBIMap() {
+            const mapEl = document.getElementById('fbi-google-map');
+            if (!mapEl) return;
+
+            if (!fbiMap) {
+                // Initialize Leaflet Map (mimicking Google Maps)
+                fbiMap = L.map('fbi-google-map').setView([-7.45, 112.7], 10);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                    attribution: '© OpenStreetMap, © CARTO'
+                }).addTo(fbiMap);
+            } else {
+                fbiMap.invalidateSize();
+            }
+
+            // Add some dummy markers for visualization
+            const markers = [
+                { lat: -7.4478, lng: 112.7183, name: 'Sidoarjo Center' },
+                { lat: -7.345, lng: 112.737, name: 'Surabaya Border' }
+            ];
+
+            markers.forEach(m => {
+                L.marker([m.lat, m.lng]).addTo(fbiMap)
+                    .bindPopup(m.name);
+            });
         }
 
         async function fetchPivotData(retries = 2) {
@@ -3156,7 +3738,10 @@
                 status: 54, // BC
                 aging: 56,  // BE
                 allocStatus: 6, // G
-                areaBB: 53 // BB
+                areaBB: 53, // BB
+                colI: 8,   // Column I
+                colF: 5,   // Column F
+                stuffingDate: 40 // Column AO (as seen in other code parts)
             };
 
             rawPivotData = [];
@@ -3220,10 +3805,12 @@
                     aging: agingVal,
                     status: (values[idx.status] || '').trim(),
                     allocStatus: (values[idx.allocStatus] || '').trim(),
+                    stuffingDate: (values[idx.stuffingDate] || '').trim(),
                     rawColumns: {
                         E: values[4] || '',
                         F: values[5] || '',
                         G: values[6] || '',
+                        I: values[8] || '',
                         J: values[9] || '',
                         K: values[10] || '',
                         Y: values[24] || '',
@@ -3231,7 +3818,8 @@
                         AB: values[27] || '',
                         AC: values[28] || '',
                         AI: values[34] || '',
-                        AK: values[36] || ''
+                        AK: values[36] || '',
+                        AO: values[40] || ''
                     }
                 };
 
