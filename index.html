@@ -208,9 +208,172 @@
             animation: corePulse 1.5s ease-in-out infinite;
         }
 
-        .scanning-bar {
+        /* Purple Theme Overrides */
+        body.theme-purple::before {
+            background: radial-gradient(circle at 50% 50%, rgba(106, 27, 154, 0.1) 0%, transparent 50%);
+        }
+        body.theme-purple .header {
+            background: linear-gradient(90deg, #6a1b9a 0%, #4a148c 100%);
+        }
+        body.theme-purple .footer-marquee {
+            background: linear-gradient(90deg, #6a1b9a 0%, #4a148c 100%);
+        }
+        body.theme-purple .welcome-content {
+            border-color: #6a1b9a;
+            box-shadow: 0 0 50px rgba(106, 27, 154, 0.3);
+        }
+        body.theme-purple .btn-iya {
+            background: linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%);
+            box-shadow: 0 4px 15px rgba(106, 27, 154, 0.3);
+        }
+        body.theme-purple .table-header {
+            border-bottom-color: #6a1b9a;
+        }
+        body.theme-purple .section-title-banner {
+            background: linear-gradient(90deg, #ffd700 0%, #1a1a1a 100%);
+            border-left-color: #ffd700;
+            color: #0f172a !important;
+        }
+        body.theme-purple .section-title-banner h2 {
+            color: #0f172a !important;
+            text-shadow: none !important;
+        }
+        body.theme-purple .section-title-banner i {
+            color: #0f172a !important;
+        }
+        body.theme-purple .floating-btn {
+            background: #6a1b9a !important;
+            box-shadow: 0 4px 15px rgba(106, 27, 154, 0.5) !important;
+        }
+        body.theme-purple .floating-btn::before,
+        body.theme-purple .floating-btn::after {
+            background: #fff;
+        }
+        body.theme-purple .menu-item {
+            background: #6a1b9a !important;
+            border-color: #a855f7 !important;
+        }
+        body.theme-purple .menu-item i {
+            color: #fff !important;
+        }
+        body.theme-purple .menu-label {
+            background: #ffd700 !important;
+            color: #0f172a !important;
+            border-left-color: #fff !important;
+            font-weight: 800 !important;
+        }
+        /* Handle FBI menu distribution when only 3 items are shown */
+        body.theme-purple .circular-menu.fbi-layout.active .menu-item:nth-child(1) { transform: translate(0px, -290px) scale(1); }
+        body.theme-purple .circular-menu.fbi-layout.active .menu-item:nth-child(2) { transform: translate(110px, -210px) scale(1); }
+        body.theme-purple .circular-menu.fbi-layout.active .menu-item:nth-child(4) { transform: translate(140px, -55px) scale(1); }
+
+        body.theme-purple .circular-menu.fbi-layout.active .menu-item:nth-child(1):hover { transform: translate(0px, -290px) scale(1.1) !important; }
+        body.theme-purple .circular-menu.fbi-layout.active .menu-item:nth-child(2):hover { transform: translate(110px, -210px) scale(1.1) !important; }
+        body.theme-purple .circular-menu.fbi-layout.active .menu-item:nth-child(4):hover { transform: translate(140px, -55px) scale(1.1) !important; }
+        body.theme-purple .kpi-card.red {
+            background: linear-gradient(135deg, #9c27b0 0%, #6a1b9a 100%);
+            border-bottom-color: #4a148c;
+        }
+        body.theme-purple .tech-circle-1 {
+            border-top-color: #9c27b0;
+            border-bottom-color: #9c27b0;
+        }
+        body.theme-purple .tech-core {
+            background: #6a1b9a;
+            box-shadow: 0 0 30px #6a1b9a;
+        }
+        body.theme-purple .option-item input[type="checkbox"] {
+            accent-color: #6a1b9a;
+        }
+        body.theme-purple .filter-group select:focus,
+        body.theme-purple .filter-group input:focus {
+            border-bottom: 2px solid #6a1b9a;
+        }
+        body.theme-purple table tfoot td {
+            box-shadow: inset 0 2px 0 0 #6a1b9a;
+        }
+
+        /* Futuristic DC Cards */
+        .dc-card-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 25px;
+        }
+        .dc-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px 20px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            text-align: center;
+        }
+        .dc-card::before {
+            content: '';
             position: absolute;
-            top: 0;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+            z-index: 1;
+        }
+        .dc-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(30, 41, 59, 0.8);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+        .dc-card.ahi:hover {
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+            border-color: #ffd700;
+        }
+        .dc-card.fbi:hover {
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.2);
+            border-color: #a855f7;
+        }
+        .dc-card-icon {
+            font-size: 2.5em;
+            margin-bottom: 5px;
+            transition: transform 0.3s ease;
+        }
+        .dc-card:hover .dc-card-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+        .dc-card-name {
+            font-size: 0.9em;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #fff;
+        }
+        .dc-card-tag {
+            font-size: 0.65em;
+            color: #94a3b8;
+            background: rgba(255,255,255,0.05);
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+        .ahi .dc-card-icon { color: #ffd700; }
+        .fbi .dc-card-icon { color: #a855f7; }
+
+        @media (max-width: 640px) {
+            .dc-card-container { grid-template-columns: 1fr; }
+        }
+
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-card {
+            animation: cardFadeIn 0.6s backwards;
+        }
             left: 0;
             width: 100%;
             height: 2px;
@@ -1348,7 +1511,7 @@
     <!-- Welcome Overlay -->
     <div id="welcome-overlay">
         <div class="welcome-content">
-            <h2 class="welcome-title">Selamat Datang di Dashboard Order Planning AHI</h2>
+            <h2 class="welcome-title" id="welcome-title-main">Selamat Datang di Logistics Dashboard</h2>
             
             <!-- Step 1: Category Selection -->
             <div id="welcome-step-1" class="welcome-step">
@@ -1371,6 +1534,23 @@
                     <button class="welcome-btn btn-tidak" onclick="document.getElementById('welcome-step-login').classList.add('hidden'); document.getElementById('welcome-step-1').classList.remove('hidden');">KEMBALI</button>
                 </div>
                 <div id="login-error" style="color: #ff4444; font-size: 0.85em; margin-top: 15px; display: none;">NIK atau Password salah!</div>
+            </div>
+
+            <!-- Step: DC Branch Selection (AHI SIDOARJO vs FBI SIDOARJO) -->
+            <div id="welcome-step-dc-branch" class="welcome-step hidden">
+                <p class="welcome-question" style="margin-bottom: 5px;">Akses Terverifikasi.</p>
+                <p style="color: #94a3b8; font-size: 0.85em; margin-bottom: 20px;">Silakan pilih portal operasional Anda:</p>
+                
+                <div class="dc-card-container">
+                    <div class="dc-card ahi animate-card" style="animation-delay: 0.1s;" onclick="handleDCBranchSelection('AHI')">
+                        <i class="fas fa-warehouse dc-card-icon"></i>
+                        <span class="dc-card-name">DC AHI<br>SIDOARJO</span>
+                    </div>
+                    <div class="dc-card fbi animate-card" style="animation-delay: 0.2s;" onclick="handleDCBranchSelection('FBI')">
+                        <i class="fas fa-coffee dc-card-icon"></i>
+                        <span class="dc-card-name">DC FBI<br>SIDOARJO</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Step 2: Plan Update Selection -->
@@ -2284,23 +2464,23 @@
     <div class="circular-menu" id="circularMenu">
         <div class="floating-btn" onclick="toggleCircularMenu()"></div>
         <div class="menu-items">
-            <div class="menu-item" onclick="showDashboardSection('main-dashboard-section')">
+            <div class="menu-item" id="nav-main" onclick="showDashboardSection('main-dashboard-section')">
                 <i class="fas fa-desktop"></i>
                 <div class="menu-label">MAIN DASHBOARD</div>
             </div>
-            <div class="menu-item" onclick="showDashboardSection('summary-report-section')">
+            <div class="menu-item" id="nav-summary" onclick="showDashboardSection('summary-report-section')">
                 <i class="fas fa-chart-line"></i>
                 <div class="menu-label">SUMMARY REPORT SLA & CBM SHIPPED</div>
             </div>
-            <div class="menu-item" onclick="showDashboardSection('supply-partner-section')">
+            <div class="menu-item" id="nav-partner" onclick="showDashboardSection('supply-partner-section')">
                 <i class="fas fa-handshake"></i>
                 <div class="menu-label">SUPPLY PARTNER EVALUATION</div>
                 </div>
-            <div class="menu-item" onclick="showDashboardSection('outstanding-section')">
+            <div class="menu-item" id="nav-outstanding" onclick="showDashboardSection('outstanding-section')">
                 <i class="fas fa-hourglass-half"></i>
                 <div class="menu-label">MONITORING OUTSTANDING</div>
             </div>
-            <div class="menu-item" onclick="showDashboardSection('hub-astor-section')">
+            <div class="menu-item" id="nav-hub" onclick="showDashboardSection('hub-astor-section')">
                 <i class="fas fa-warehouse"></i>
                 <div class="menu-label">MONITORING HUB GRW & ASTOR</div>
             </div>
@@ -2315,17 +2495,24 @@
 
     <script>
         // Google Sheets Configuration
-        const SHEET_ID = '1ylgWBQJQgv0HjRiV9Ay-GYs__ywWUk8ZTSeb0KwaPsM';
-        const SHEET_GID = '1144899065';
+        const SHEET_ID_AHI = '1ylgWBQJQgv0HjRiV9Ay-GYs__ywWUk8ZTSeb0KwaPsM';
+        const SHEET_GID_AHI = '1144899065';
+        
+        const SHEET_ID_FBI = '1lRl-Noq63iovsyzOTEM_Dxw4rPOKDF6dsO9o387iHwk';
+        const SHEET_GID_FBI = '1075426956';
+
+        let SHEET_ID = SHEET_ID_AHI;
+        let SHEET_GID = SHEET_GID_AHI;
+        
         // Menggunakan endpoint export yang lebih robust untuk CSV
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+        let CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
 
         // New Spreadsheet for Pivot Table (Unit Distribution Center)
-        const PIVOT_SHEET_ID = '1noBpxmLuT3XQAYzO2Bdv_LrXqzDTqw1ugPN4ST_AYtg';
-        const PIVOT_SHEET_GID = '1075426956';
-        const PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${PIVOT_SHEET_ID}/export?format=csv&gid=${PIVOT_SHEET_GID}`;
-        const HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
-        const USER_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1368870427`;
+        let PIVOT_SHEET_ID = '1noBpxmLuT3XQAYzO2Bdv_LrXqzDTqw1ugPN4ST_AYtg';
+        let PIVOT_SHEET_GID = '1075426956';
+        let PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${PIVOT_SHEET_ID}/export?format=csv&gid=${PIVOT_SHEET_GID}`;
+        let HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
+        const USER_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=1368870427`;
 
         // Column Index Mapping (0-based)
         const COLUMNS = {
@@ -2574,10 +2761,8 @@
                     }
 
                     document.getElementById('welcome-step-login').classList.add('hidden');
-                    document.getElementById('welcome-step-2').classList.remove('hidden');
+                    document.getElementById('welcome-step-dc-branch').classList.remove('hidden');
                     
-                    fetchPivotData();
-                    fetchHubData();
                     toggleFullScreen();
                 } else {
                     errorMsg.style.display = 'block';
@@ -2592,6 +2777,62 @@
                 loginBtn.disabled = false;
                 loginBtn.textContent = "LOGIN";
             }
+        }
+
+        function handleDCBranchSelection(branch) {
+            const body = document.body;
+            const headerTitle = document.querySelector('.header h1');
+            const welcomeTitle = document.getElementById('welcome-title-main');
+            const marquee = document.getElementById('last-update-text');
+            
+            const navPartner = document.getElementById('nav-partner');
+            const navHub = document.getElementById('nav-hub');
+            const circMenu = document.getElementById('circularMenu');
+            
+            if (branch === 'FBI') {
+                body.classList.add('theme-purple');
+                if (circMenu) circMenu.classList.add('fbi-layout');
+                SHEET_ID = SHEET_ID_FBI;
+                SHEET_GID = SHEET_GID_FBI;
+                CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+                PIVOT_CSV_URL = CSV_URL;
+                HUB_CSV_URL = CSV_URL;
+                ASTOR_CSV_URL_DYNAMIC = null;
+                
+                if (headerTitle) headerTitle.textContent = 'LOGISTICS DASHBOARD | ORDER PLANNING DC FBI SIDOARJO';
+                if (welcomeTitle) welcomeTitle.textContent = 'Dashboard DC FBI SIDOARJO';
+                if (marquee) marquee.textContent = marquee.textContent.replace('TIM PLANNER SIDOARJO', 'TIM FBI SIDOARJO');
+
+                // FBI: Hide specific navigation items
+                if (navPartner) navPartner.style.display = 'none';
+                if (navHub) navHub.style.display = 'none';
+            } else {
+                body.classList.remove('theme-purple');
+                if (circMenu) circMenu.classList.remove('fbi-layout');
+                SHEET_ID = SHEET_ID_AHI;
+                SHEET_GID = SHEET_GID_AHI;
+                CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+                PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${PIVOT_SHEET_ID}/export?format=csv&gid=${PIVOT_SHEET_GID}`;
+                HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
+                ASTOR_CSV_URL_DYNAMIC = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1345578811`;
+                
+                if (headerTitle) headerTitle.textContent = 'LOGISTICS DASHBOARD | ORDER PLANNING NDC AHI SIDOARJO';
+                if (welcomeTitle) welcomeTitle.textContent = 'Dashboard DC AHI SIDOARJO';
+                if (marquee) marquee.textContent = marquee.textContent.replace('TIM FBI SIDOARJO', 'TIM PLANNER SIDOARJO');
+
+                // AHI: Show all navigation items
+                if (navPartner) navPartner.style.display = 'flex';
+                if (navHub) navHub.style.display = 'flex';
+            }
+
+            document.getElementById('welcome-step-dc-branch').classList.add('hidden');
+            document.getElementById('welcome-step-2').classList.remove('hidden');
+            
+            showDashboardSection('main-dashboard-section');
+            fetchPivotData();
+            fetchHubData();
+            fetchAstorData();
+            fetchData(); // Trigger main data fetch with new URL
         }
 
         function toggleFullScreen() {
@@ -6224,7 +6465,7 @@ function renderStoringPivotTable(filteredData) {
         fetchData();
         // ===== ASTOR SLA & OUTSTANDING ENGINE =====
 const ASTOR_GID     = '1345578811';
-const ASTOR_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${ASTOR_GID}`;
+let ASTOR_CSV_URL_DYNAMIC = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${ASTOR_GID}`;
 
 let rawAstorData = [];
 let astorChartBu = null, astorChartArea = null, astorChartAging = null;
@@ -6233,8 +6474,16 @@ let astorSort = { key: 'aging', dir: 'desc' };
 const ACOL = { TGL:0, RTOD:1, LC:4, CBM:3, BU:7, KOTA:2, REGION:9, AREA:10, STUFFING:15, AGING:12, SLA:13 };
 
 async function fetchAstorData(retries = 2) {
+    if (!ASTOR_CSV_URL_DYNAMIC) {
+        console.log('Astor data not configured for this branch.');
+        document.getElementById('astor-outstanding-tbody').innerHTML = 
+            `<tr><td colspan="10" style="text-align:center;padding:20px;color:#94a3b8;">
+                Data Outstanding belum dikonfigurasi untuk cabang ini.
+            </td></tr>`;
+        return;
+    }
     try {
-        const res = await fetch(`${ASTOR_CSV_URL}&t=${Date.now()}`);
+        const res = await fetch(`${ASTOR_CSV_URL_DYNAMIC}&t=${Date.now()}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const csv = await res.text();
         if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML');
