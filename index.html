@@ -1151,6 +1151,35 @@
             opacity: 0.9;
         }
 
+        /* FBI Schedule Table Styling */
+        .schedule-fbi-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.85em;
+        }
+
+        .schedule-fbi-table thead tr th {
+            padding: 12px 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #333;
+        }
+
+        .schedule-fbi-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .schedule-fbi-table tbody tr:hover {
+            background: rgba(90, 24, 154, 0.15) !important;
+            box-shadow: inset 4px 0 0 #5a189a;
+        }
+
+        .schedule-fbi-table td {
+            padding: 10px 8px;
+            border: 1px solid #222;
+        }
+
         .kpi-value {
             font-size: 2.2em;
             font-weight: bold;
@@ -2038,6 +2067,64 @@
                     <div class="fbi-item-content">
                         <canvas id="fbiCoverageChart" style="max-height: 400px;"></canvas>
                     </div>
+                </div>
+            </div>
+
+            <!-- New Table: SCHEDULE DELIVERY FBI -->
+            <div class="fbi-grid-item" style="margin-top: 20px; width: 100%;">
+                <div class="fbi-item-header" style="display: flex; justify-content: space-between; align-items: center; background: #331d52;">
+                    <span><i class="fas fa-calendar-alt"></i> SCHEDULE DELIVERY FBI</span>
+                    <div style="display: flex; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="font-size: 0.85em; color: #eee; font-weight: 500;">Pilih Hari:</label>
+                            <select id="fbi-filter-hari" onchange="renderFBIDashboard()" style="background: #1a1a1a; color: #fff; border: 1px solid #5a189a; padding: 4px 10px; border-radius: 4px; outline: none; font-size: 0.85em; cursor: pointer;">
+                                <option value="ALL">SEMUA HARI</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="font-size: 0.85em; color: #eee; font-weight: 500;">Shipping Line:</label>
+                            <select id="fbi-filter-shipping" onchange="renderFBIDashboard()" style="background: #1a1a1a; color: #fff; border: 1px solid #5a189a; padding: 4px 10px; border-radius: 4px; outline: none; font-size: 0.85em; cursor: pointer;">
+                                <option value="ALL">SEMUA SHIPPING</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="font-size: 0.85em; color: #eee; font-weight: 500;">Pilih Wilayah:</label>
+                            <select id="fbi-filter-wilayah" onchange="renderFBIDashboard()" style="background: #1a1a1a; color: #fff; border: 1px solid #5a189a; padding: 4px 10px; border-radius: 4px; outline: none; font-size: 0.85em; cursor: pointer;">
+                                <option value="ALL">SEMUA WILAYAH</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="fbi-item-content" style="overflow-x: auto; padding: 0;">
+                    <table class="fbi-table schedule-fbi-table" style="width: 100%; border-collapse: collapse;">
+                        <thead style="position: sticky; top: 0; z-index: 10;">
+                            <tr>
+                                <th rowspan="2" style="width: 50px; text-align: center; background: #2a1b3d; color: #ffd700;">STOP</th>
+                                <th rowspan="2" style="width: 100px; text-align: center; background: #2a1b3d; color: #ffd700;">SITE CODE</th>
+                                <th rowspan="2" style="background: #2a1b3d; color: #ffd700;">STORE DESCRIPTION</th>
+                                <th rowspan="2" style="background: #2a1b3d; color: #ffd700; text-align: center; width: 120px;">SHIPPINGLINE</th>
+                                <th rowspan="2" style="background: #2a1b3d; color: #ffd700; text-align: center; width: 100px;">WILAYAH</th>
+                                <th rowspan="2" style="background: #2a1b3d; color: #ffd700; text-align: center; width: 100px;">CITY</th>
+                                <th colspan="4" style="text-align: center; background: #3d1b3d; color: #4ade80; border-bottom: 2px solid #4ade80;">AGING SUDAH PLAN (CBM)</th>
+                                <th rowspan="2" style="text-align: center; background: #1a3d3d; color: #fff; width: 80px;">TOTAL</th>
+                                <th colspan="4" style="text-align: center; background: #3d1b1b; color: #fb7185; border-bottom: 2px solid #fb7185;">AGING BELUM PLAN (CBM)</th>
+                                <th rowspan="2" style="text-align: center; background: #3d1b1b; color: #fff; width: 80px;">TOTAL</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align: center; width: 60px; background: #2a1b3d; font-size: 0.8em;">0</th>
+                                <th style="text-align: center; width: 60px; background: #2a1b3d; font-size: 0.8em;">1-3</th>
+                                <th style="text-align: center; width: 60px; background: #2a1b3d; font-size: 0.8em;">4-7</th>
+                                <th style="text-align: center; width: 60px; background: #2a1b3d; font-size: 0.8em;">7 UP</th>
+                                <th style="text-align: center; width: 60px; background: #2a1b3d; font-size: 0.8em;">0</th>
+                                <th style="text-align: center; width: 60px; background: #2a1b3d; font-size: 0.8em;">1-3</th>
+                                <th style="text-align: center; width: 60px; background: #2a1b3d; font-size: 0.8em;">4-7</th>
+                                <th style="text-align: center; width: 60px; background: #2a1b3d; font-size: 0.8em;">7 UP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fbi-schedule-table-body">
+                            <tr><td colspan="13" style="text-align:center; padding: 20px;">Memproses data...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -3130,6 +3217,13 @@
             
             if (bottomNav) bottomNav.classList.remove('hidden');
 
+            // Reset data to avoid showing stale data from previous branch
+            allData = [];
+            rawPivotData = [];
+            rawFBISchedule = [];
+            rawHubData = [];
+            rawAstorData = [];
+
             if (branch === 'FBI') {
                 body.classList.add('theme-purple');
                 SHEET_ID = SHEET_ID_FBI;
@@ -3149,6 +3243,9 @@
 
                 // Initial show FBI dashboard
                 showDashboardSection('fbi-dashboard-section');
+
+                // Fetch FBI Schedule
+                fetchFBIScheduleData();
             } else {
                 body.classList.remove('theme-purple');
                 SHEET_ID = SHEET_ID_AHI;
@@ -3327,6 +3424,25 @@
             return null;
         }
 
+        function getDayName(dateStr) {
+            if (!dateStr) return '';
+            const hariIndo = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
+            let d = null;
+            // coba format DD/MM/YYYY atau D/M/YYYY
+            if (dateStr.includes('/')) {
+                const parts = dateStr.split('/');
+                if (parts.length === 3) {
+                    d = new Date(parts[2], parts[1] - 1, parts[0]);
+                }
+            }
+            // coba format YYYY-MM-DD
+            if (!d || isNaN(d)) {
+                d = new Date(dateStr);
+            }
+            if (!d || isNaN(d)) return '';
+            return hariIndo[d.getDay()] || '';
+        }
+
         function parseNumberWithComma(value) {
             if (!value) return 0;
             let s = String(value).trim().replace(/\s/g, '');
@@ -3375,8 +3491,11 @@
         }
 
         // Pivot Data Storage
+        const SHEET_URL_SCHEDULE = 'https://docs.google.com/spreadsheets/d/1lRl-Noq63iovsyzOTEM_Dxw4rPOKDF6dsO9o387iHwk/export?format=csv&gid=1862882799';
         let rawPivotData = [];
+        let rawFBISchedule = [];
         let rawHubData = [];
+        let rawAstorData = [];
         let hubHeaderNames = [];
         let pivotAreaOptions = new Set();
         let pivotAreaBBOptions = new Set();
@@ -3475,9 +3594,19 @@
         // FBI Dashboard Logic
         let fbiMap = null;
         let fbiChart = null;
+        let fbiMarkersLayer = null;
 
         function renderFBIDashboard() {
-            if (!rawPivotData || rawPivotData.length === 0) return;
+            const tbody = document.getElementById('fbi-outstanding-table-body');
+            
+            if (!rawPivotData || rawPivotData.length === 0) {
+                updateVal('fbi-kpi-total-stores', '0');
+                updateVal('fbi-kpi-sudah-plan', '0');
+                updateVal('fbi-kpi-outstanding-aging', '0');
+                updateVal('fbi-kpi-belum-plan', '0');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">Memproses data...</td></tr>';
+                return;
+            }
 
             // 1. Calculate KPIs
             const uniqueStores = new Set();
@@ -3526,28 +3655,214 @@
 
             // Update KPI DOM
             updateVal('fbi-kpi-total-stores', uniqueStores.size);
-            updateVal('fbi-kpi-sudah-plan', sudahPlan);
-            updateVal('fbi-kpi-outstanding-aging', outstandingOrder);
-            updateVal('fbi-kpi-belum-plan', belumPlan);
+            updateVal('fbi-kpi-sudah-plan', formatIndo(Math.round(sudahPlan)));
+            updateVal('fbi-kpi-outstanding-aging', formatIndo(Math.round(outstandingOrder)));
+            updateVal('fbi-kpi-belum-plan', formatIndo(Math.round(belumPlan)));
 
             // 2. Render Outstanding Table
-            const tbody = document.getElementById('fbi-outstanding-table-body');
             if (tbody) {
                 const topOutstanding = outstandingList.sort((a,b) => b.aging - a.aging).slice(0, 15);
                 tbody.innerHTML = topOutstanding.map(item => `
                     <tr>
                         <td>${item.name}</td>
-                        <td style="color: #ffd700; font-weight: bold;">${item.cbm.toFixed(2)}</td>
+                        <td style="color: #ffd700; font-weight: bold;">${formatIndo(item.cbm)}</td>
                         <td style="color: ${item.aging > 3 ? '#ff6b6b' : '#eee'};">${item.aging} Days</td>
                     </tr>
                 `).join('') || '<tr><td colspan="3" style="text-align:center;">No Outstanding</td></tr>';
             }
 
-            // 3. Render Chart
-            renderFBIChart(coverageData);
+            // 3. Render SCHEDULE DELIVERY FBI Table
+            renderFBIScheduleTable();
 
-            // 4. Initialize Map
+            // 4. Update Map & Chart
             initFBIMap();
+            renderFBIChart(coverageData);
+        }
+
+        function syncFBIDropdowns() {
+            const hariFilterEl = document.getElementById('fbi-filter-hari');
+            const shippingFilter = document.getElementById('fbi-filter-shipping');
+            const wilayahFilter = document.getElementById('fbi-filter-wilayah');
+            
+            if (!hariFilterEl || !shippingFilter || !wilayahFilter) return;
+
+            const hariFilter = hariFilterEl.value;
+            const currentShip = shippingFilter.value;
+            const currentWil = wilayahFilter.value;
+
+            // Filter raw schedule by day first to see what's available
+            const availableRows = rawFBISchedule.filter(s => {
+                if (hariFilter === 'ALL') return true;
+                const stopVal = s.stops[hariFilter];
+                const stopNum = parseInt(stopVal);
+                return !isNaN(stopNum) && stopNum > 0;
+            });
+
+            const uniqueShipping = new Set();
+            const uniqueWilayah = new Set();
+            availableRows.forEach(s => {
+                if (s.shippingLine) uniqueShipping.add(s.shippingLine.trim().toUpperCase());
+                if (s.wilayah) uniqueWilayah.add(s.wilayah.trim().toUpperCase());
+            });
+
+            // Update Shipping Filter
+            shippingFilter.innerHTML = '<option value="ALL">SEMUA SHIPPING</option>';
+            Array.from(uniqueShipping).sort().forEach(w => {
+                const opt = document.createElement('option');
+                opt.value = w;
+                opt.textContent = w;
+                shippingFilter.appendChild(opt);
+            });
+            if (uniqueShipping.has(currentShip)) {
+                shippingFilter.value = currentShip;
+            } else {
+                shippingFilter.value = 'ALL';
+            }
+
+            // Update Wilayah Filter
+            wilayahFilter.innerHTML = '<option value="ALL">SEMUA WILAYAH</option>';
+            Array.from(uniqueWilayah).sort().forEach(w => {
+                const opt = document.createElement('option');
+                opt.value = w;
+                opt.textContent = w;
+                wilayahFilter.appendChild(opt);
+            });
+            if (uniqueWilayah.has(currentWil)) {
+                wilayahFilter.value = currentWil;
+            } else {
+                wilayahFilter.value = 'ALL';
+            }
+        }
+
+        function renderFBIScheduleTable() {
+            const hBody = document.getElementById('fbi-schedule-table-body');
+            if (!hBody) return;
+            if (rawFBISchedule.length === 0) {
+                hBody.innerHTML = '<tr><td colspan="16" style="text-align:center; padding: 20px;">Memuat data schedule...</td></tr>';
+                return;
+            }
+
+            // Sync dropdowns based on Day before reading their values
+            syncFBIDropdowns();
+
+            const hariFilter = document.getElementById('fbi-filter-hari').value;
+            const shipFilter = document.getElementById('fbi-filter-shipping').value;
+            const wilFilter = document.getElementById('fbi-filter-wilayah').value;
+
+            // Group existing pivot data by Site Code
+            const pivotBySite = {};
+            rawPivotData.forEach(row => {
+                const siteCodeCol = row.rawColumns && row.rawColumns.I ? row.rawColumns.I.trim() : "";
+                if (!siteCodeCol) return;
+
+                if (!pivotBySite[siteCodeCol]) {
+                    pivotBySite[siteCodeCol] = {
+                        sudah: { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 },
+                        belum: { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 }
+                    };
+                }
+
+                const cbm = row.cbm || 0;
+                const aging = row.aging || 0;
+                const isSudah = !!row.status; // col BC
+                
+                let bucket = "0";
+                if (aging >= 1 && aging <= 3) bucket = "1-3";
+                else if (aging >= 4 && aging <= 7) bucket = "4-7";
+                else if (aging > 7) bucket = "7UP";
+                
+                const target = isSudah ? pivotBySite[siteCodeCol].sudah : pivotBySite[siteCodeCol].belum;
+                target[bucket] += cbm;
+                target.total += cbm;
+            });
+
+            // Filter schedule data by Day (where STOP value exists) and Wilayah and Shipping
+            const filteredSchedule = rawFBISchedule.filter(s => {
+                const stopVal = s.stops[hariFilter];
+                const stopNum = parseInt(stopVal);
+                
+                // Show if has a valid STOP number for selected day
+                if (hariFilter !== 'ALL' && (isNaN(stopNum) || stopNum <= 0)) return false;
+                if (shipFilter !== 'ALL' && (s.shippingLine || '').trim().toUpperCase() !== shipFilter) return false;
+                if (wilFilter !== 'ALL' && s.wilayah.trim().toUpperCase() !== wilFilter) return false;
+                
+                return true;
+            }).sort((a, b) => {
+                // Primary Sort: SHIPPINGLINE
+                const shipA = (a.shippingLine || '').toString().trim().toUpperCase();
+                const shipB = (b.shippingLine || '').toString().trim().toUpperCase();
+                if (shipA < shipB) return -1;
+                if (shipA > shipB) return 1;
+
+                // Secondary Sort: STOP (Numeric)
+                const stopA = parseInt(a.stops[hariFilter]) || 999;
+                const stopB = parseInt(b.stops[hariFilter]) || 999;
+                return stopA - stopB;
+            });
+
+            let html = '';
+            let totalSudah = { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 };
+            let totalBelum = { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 };
+
+            if (filteredSchedule.length === 0) {
+                html = '<tr><td colspan="16" style="text-align:center; padding:20px; color:#bbb;">Tidak ada jadwal pengiriman untuk filter yang dipilih</td></tr>';
+            } else {
+                filteredSchedule.forEach((s, index) => {
+                    const stats = pivotBySite[s.siteCode] || {
+                        sudah: { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 },
+                        belum: { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 }
+                    };
+
+                    const stopVal = s.stops[hariFilter] || '-';
+
+                    html += `
+                        <tr style="border-bottom: 1px solid #222;">
+                            <td style="text-align:center; color:#ffd700; font-weight:bold;">${stopVal}</td>
+                            <td style="text-align:center; font-weight:bold; color:#ffd700;">${s.siteCode}</td>
+                            <td style="font-size:0.85em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:250px;" title="${s.storeDesc}">${s.storeDesc}</td>
+                            <td style="text-align:center; color:#ffd700; font-size:0.9em;">${s.shippingLine || '-'}</td>
+                            <td style="text-align:center; color:#4ade80; font-size:0.9em;">${s.wilayah || '-'}</td>
+                            <td style="text-align:center; color:#2dd4bf; font-size:0.9em;">${s.city || '-'}</td>
+                            
+                            <td style="text-align:center; color:#4ade80;">${stats.sudah["0"] > 0 ? formatIndo(stats.sudah["0"]) : '-'}</td>
+                            <td style="text-align:center; color:#4ade80;">${stats.sudah["1-3"] > 0 ? formatIndo(stats.sudah["1-3"]) : '-'}</td>
+                            <td style="text-align:center; color:#4ade80;">${stats.sudah["4-7"] > 0 ? formatIndo(stats.sudah["4-7"]) : '-'}</td>
+                            <td style="text-align:center; color:#4ade80;">${stats.sudah["7UP"] > 0 ? formatIndo(stats.sudah["7UP"]) : '-'}</td>
+                            <td style="text-align:center; font-weight:bold; background: rgba(74, 222, 128, 0.1);">${formatIndo(stats.sudah.total)}</td>
+
+                            <td style="text-align:center; color:#fb7185;">${stats.belum["0"] > 0 ? formatIndo(stats.belum["0"]) : '-'}</td>
+                            <td style="text-align:center; color:#fb7185;">${stats.belum["1-3"] > 0 ? formatIndo(stats.belum["1-3"]) : '-'}</td>
+                            <td style="text-align:center; color:#fb7185;">${stats.belum["4-7"] > 0 ? formatIndo(stats.belum["4-7"]) : '-'}</td>
+                            <td style="text-align:center; color:#fb7185;">${stats.belum["7UP"] > 0 ? formatIndo(stats.belum["7UP"]) : '-'}</td>
+                            <td style="text-align:center; font-weight:bold; background: rgba(251, 113, 133, 0.1);">${formatIndo(stats.belum.total)}</td>
+                        </tr>
+                    `;
+
+                    Object.keys(totalSudah).forEach(k => {
+                        totalSudah[k] += stats.sudah[k];
+                        totalBelum[k] += stats.belum[k];
+                    });
+                });
+
+                // Grand Total Row
+                html += `
+                    <tr style="background: #1a1a1a; font-weight: bold; border-top: 2px solid #333;">
+                        <td colspan="6" style="text-align:right; padding:10px; color:#ffd700;">GRAND TOTAL:</td>
+                        <td style="text-align:center; color:#4ade80;">${formatIndo(totalSudah["0"])}</td>
+                        <td style="text-align:center; color:#4ade80;">${formatIndo(totalSudah["1-3"])}</td>
+                        <td style="text-align:center; color:#4ade80;">${formatIndo(totalSudah["4-7"])}</td>
+                        <td style="text-align:center; color:#4ade80;">${formatIndo(totalSudah["7UP"])}</td>
+                        <td style="text-align:center; color:#ffd700; background:rgba(255,215,0,0.1);">${formatIndo(totalSudah.total)}</td>
+                        <td style="text-align:center; color:#fb7185;">${formatIndo(totalBelum["0"])}</td>
+                        <td style="text-align:center; color:#fb7185;">${formatIndo(totalBelum["1-3"])}</td>
+                        <td style="text-align:center; color:#fb7185;">${formatIndo(totalBelum["4-7"])}</td>
+                        <td style="text-align:center; color:#fb7185;">${formatIndo(totalBelum["7UP"])}</td>
+                        <td style="text-align:center; color:#ffd700; background:rgba(255,215,0,0.1);">${formatIndo(totalBelum.total)}</td>
+                    </tr>
+                `;
+            }
+
+            hBody.innerHTML = html;
         }
 
         function updateVal(id, val) {
@@ -3605,27 +3920,113 @@
         function initFBIMap() {
             const mapEl = document.getElementById('fbi-google-map');
             if (!mapEl) return;
-
+        
             if (!fbiMap) {
                 // Initialize Leaflet Map (mimicking Google Maps)
                 fbiMap = L.map('fbi-google-map').setView([-7.45, 112.7], 10);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                     attribution: '© OpenStreetMap, © CARTO'
                 }).addTo(fbiMap);
+                fbiMarkersLayer = L.layerGroup().addTo(fbiMap);
             } else {
                 fbiMap.invalidateSize();
+                if (fbiMarkersLayer) fbiMarkersLayer.clearLayers();
             }
-
+        
             // Add some dummy markers for visualization
             const markers = [
                 { lat: -7.4478, lng: 112.7183, name: 'Sidoarjo Center' },
                 { lat: -7.345, lng: 112.737, name: 'Surabaya Border' }
             ];
-
+        
             markers.forEach(m => {
-                L.marker([m.lat, m.lng]).addTo(fbiMap)
+                L.marker([m.lat, m.lng]).addTo(fbiMarkersLayer)
                     .bindPopup(m.name);
             });
+        }
+
+        async function fetchFBIScheduleData() {
+            try {
+                const response = await fetch(SHEET_URL_SCHEDULE);
+                const csv = await response.text();
+                parseFBIScheduleCSV(csv);
+            } catch (error) {
+                console.error("Error fetching FBI Schedule:", error);
+            }
+        }
+
+        function parseFBIScheduleCSV(csv) {
+            const lines = csv.split('\n');
+            if (lines.length < 3) return; 
+
+            const rows = lines.map(line => {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') inQuotes = !inQuotes;
+                    else if (char === ',' && !inQuotes) {
+                        result.push(current.trim().replace(/^"/, '').replace(/"$/, ''));
+                        current = '';
+                    } else current += char;
+                }
+                result.push(current.trim().replace(/^"/, '').replace(/"$/, ''));
+                return result;
+            });
+
+            const headers = rows[1]; // Row 2
+            const data = rows.slice(2); // Row 3 onwards
+
+            // Day columns: H (7) to O (14)
+            const dayHeaders = [];
+            for (let i = 7; i <= 14; i++) {
+                if (headers[i]) dayHeaders.push({ index: i, name: headers[i].toUpperCase().trim() });
+            }
+
+            rawFBISchedule = data.map(row => {
+                if (!row[1] || row[1] === '') return null; 
+                const stops = {};
+                dayHeaders.forEach(h => {
+                    stops[h.name] = row[h.index] || '';
+                });
+                return {
+                    siteCode: row[1],
+                    storeDesc: row[2],
+                    city: row[3],
+                    wilayah: row[5],
+                    shippingLine: row[6],
+                    stops: stops
+                };
+            }).filter(d => d !== null);
+
+            // Populate Day Filter for FBI
+            const hariFilter = document.getElementById('fbi-filter-hari');
+            if (hariFilter) {
+                // Clear existing except ALL if needed, but here we replace
+                hariFilter.innerHTML = '<option value="ALL">SEMUA HARI</option>';
+                dayHeaders.forEach(h => {
+                    const opt = document.createElement('option');
+                    opt.value = h.name;
+                    opt.textContent = h.name;
+                    hariFilter.appendChild(opt);
+                });
+
+                // Auto-select Tomorrow's Day
+                const tomorrow = new Date(Date.now() + 86400000);
+                const hariIndo = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
+                const tomorrowDay = hariIndo[tomorrow.getDay()];
+                
+                // Try to find matching option
+                const hasMatch = dayHeaders.some(h => h.name.includes(tomorrowDay));
+                if (hasMatch) {
+                    const bestMatch = dayHeaders.find(h => h.name.includes(tomorrowDay));
+                    hariFilter.value = bestMatch.name;
+                }
+            }
+
+            syncFBIDropdowns();
+            renderFBIScheduleTable();
         }
 
         async function fetchPivotData(retries = 2) {
@@ -3801,6 +4202,11 @@
             populateAllocationBBFilter();
             populateAllocationStatusFilter();
             renderPivotTable();
+            
+            // Trigger FBI dashboard refresh if in FBI view
+            if (document.body.classList.contains('theme-purple')) {
+                renderFBIDashboard();
+            }
         }
 
         async function fetchHubData(retries = 2) {
@@ -4019,26 +4425,6 @@ function renderHubTable() {
 
     let statusArmadaIdx = hubHeaderNames.findIndex(h => h.toUpperCase().includes('STATUS ARMADA'));
     if (statusArmadaIdx === -1) statusArmadaIdx = 15;
-
-    // Helper: konversi tanggal ke nama hari
-    function getDayName(dateStr) {
-        if (!dateStr) return '';
-        const hariIndo = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
-        let d = null;
-        // coba format DD/MM/YYYY atau D/M/YYYY
-        if (dateStr.includes('/')) {
-            const parts = dateStr.split('/');
-            if (parts.length === 3) {
-                d = new Date(parts[2], parts[1] - 1, parts[0]);
-            }
-        }
-        // coba format YYYY-MM-DD
-        if (!d || isNaN(d)) {
-            d = new Date(dateStr);
-        }
-        if (!d || isNaN(d)) return '';
-        return hariIndo[d.getDay()] || '';
-    }
 
     // Cari index kolom TANGGAL KEDATANGAN (biasanya kolom A / index 0)
     let tglKedatanganIdx = hubHeaderNames.findIndex(h =>
@@ -7052,7 +7438,7 @@ function renderStoringPivotTable(filteredData) {
 const ASTOR_GID     = '1345578811';
 let ASTOR_CSV_URL_DYNAMIC = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${ASTOR_GID}`;
 
-let rawAstorData = [];
+rawAstorData = [];
 let astorChartBu = null, astorChartArea = null, astorChartAging = null;
 let astorSort = { key: 'aging', dir: 'desc' };
 
