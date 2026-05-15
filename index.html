@@ -329,7 +329,7 @@
         .main-container-wrapper {
             margin-left: 0 !important;
             width: 100% !important;
-            padding-bottom: 60px; /* Space for bottom nav */
+            padding-bottom: 45px; /* Space for bottom nav */
         }
 
         body.theme-purple .kpi-card.red {
@@ -1103,6 +1103,45 @@
 
         .kpi-card.gray:hover {
             box-shadow: 0 0 20px rgba(75, 85, 99, 0.4);
+        }
+
+        .kpi-card.purple {
+            background: linear-gradient(135deg, #6b21a8 0%, #a855f7 100%);
+            color: #fff;
+            border-bottom: 4px solid #581c87;
+        }
+
+        .kpi-card.purple:hover {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        #outstanding-kpi-container {
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 1200px) {
+            #outstanding-kpi-container {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #outstanding-kpi-container {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #outstanding-kpi-container {
+                grid-template-columns: 1fr !important;
+            }
         }
 
         .kpi-label {
@@ -2220,6 +2259,36 @@
             <div class="section-title-banner">
                 <i class="fas fa-hourglass-half"></i> MONITORING OUTSTANDING
             </div>
+
+            <!-- KPI Cards for Outstanding Summary -->
+            <div id="outstanding-kpi-container" class="kpi-grid">
+                <div class="kpi-card purple">
+                    <div class="kpi-label">BACKLOG OUTSTANDING</div>
+                    <div class="kpi-value" id="kpi-backlog-outstanding">0</div>
+                    <div style="font-size: 0.7em; opacity: 0.8; margin-top: 5px;">CBM TOTAL</div>
+                </div>
+                <div class="kpi-card green">
+                    <div class="kpi-label">BACKLOG SUDAH PLAN</div>
+                    <div class="kpi-value" id="kpi-backlog-sudah">0</div>
+                    <div style="font-size: 0.7em; opacity: 0.8; margin-top: 5px;">CBM</div>
+                </div>
+                <div class="kpi-card yellow">
+                    <div class="kpi-label">BACKLOG BELUM PLAN</div>
+                    <div class="kpi-value" id="kpi-backlog-belum">0</div>
+                    <div style="font-size: 0.7em; opacity: 0.8; margin-top: 5px;">CBM</div>
+                </div>
+                <div class="kpi-card red">
+                    <div class="kpi-label">BACKLOG AGING 7 UP</div>
+                    <div class="kpi-value" id="kpi-backlog-aging7">0</div>
+                    <div style="font-size: 0.7em; opacity: 0.8; margin-top: 5px;">CBM</div>
+                </div>
+                <div class="kpi-card blue">
+                    <div class="kpi-label">ALLOCATION UNSUCCESSFUL</div>
+                    <div class="kpi-value" id="kpi-alloc-unsuccessful">0</div>
+                    <div style="font-size: 0.7em; opacity: 0.8; margin-top: 5px;">CBM</div>
+                </div>
+            </div>
+
             <!-- Table: Planning Priority Summary -->
             <div id="planning-priority-container" style="margin-bottom: 30px; border-bottom: 2px solid #333; display: none;">
                 <div class="table-header" style="background: linear-gradient(90deg, #d32f2f 0%, #333 100%); border-left: 4px solid #ffd700; color: #fff; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
@@ -4736,9 +4805,28 @@ Tim Planner DC Sidoarjo`;
                 ? rawPivotData 
                 : rawPivotData.filter(d => d.area === areaFilter);
 
+            // Add KPI summary variables
+            let kpiTotalBacklog = 0;
+            let kpiSudahPlan = 0;
+            let kpiBelumPlan = 0;
+            let kpiAging7Up = 0;
+            let kpiAllocUnsuccessful = 0;
+            const targetKeywords = ['did not allocate', 'pre-allocated', 'part pre-allocated', 'not started'];
+
             // Aggregate data by StoreBooking
             const stores = {};
             filtered.forEach(row => {
+                // Update KPI Counters
+                kpiTotalBacklog += row.cbm;
+                if (row.status === 'Sudah Plan') kpiSudahPlan += row.cbm;
+                if (row.status === 'Belum Plan') kpiBelumPlan += row.cbm;
+                if (row.aging > 7) kpiAging7Up += row.cbm;
+                
+                const allocStatus = (row.allocStatus || '').trim().toLowerCase();
+                if (targetKeywords.some(kw => allocStatus === kw)) {
+                    kpiAllocUnsuccessful += row.cbm;
+                }
+
                 const key = row.storeBooking;
                 const name = row.storeBookingName;
                 
@@ -4775,6 +4863,13 @@ Tim Planner DC Sidoarjo`;
                     stores[key].unplannedTotal += row.cbm;
                 }
             });
+
+            // Update KPI UI
+            document.getElementById('kpi-backlog-outstanding').textContent = formatIndo(kpiTotalBacklog);
+            document.getElementById('kpi-backlog-sudah').textContent = formatIndo(kpiSudahPlan);
+            document.getElementById('kpi-backlog-belum').textContent = formatIndo(kpiBelumPlan);
+            document.getElementById('kpi-backlog-aging7').textContent = formatIndo(kpiAging7Up);
+            document.getElementById('kpi-alloc-unsuccessful').textContent = formatIndo(kpiAllocUnsuccessful);
 
             const storeList = Object.values(stores);
             
