@@ -2043,15 +2043,15 @@
                 </div>
                 <div class="fbi-grid-item">
                     <div class="fbi-item-header">
-                        <i class="fas fa-clock-rotate-left"></i> OUTSTANDING BELUM PLAN
+                        <i class="fas fa-clock-rotate-left"></i> OUTSTANDING BELUM PLAN BESOK
                     </div>
                     <div class="fbi-item-content" style="overflow-y: auto; max-height: 450px;">
                         <table class="fbi-table">
                             <thead>
                                 <tr>
-                                    <th>SHIP TO</th>
-                                    <th>CBM</th>
-                                    <th>AGING</th>
+                                    <th>SITE CODE</th>
+                                    <th>STORE DESCRIPTION</th>
+                                    <th>JUMLAH ORDER</th>
                                 </tr>
                             </thead>
                             <tbody id="fbi-outstanding-table-body">
@@ -3620,16 +3620,101 @@
             updateVal('fbi-kpi-outstanding-aging', formatIndo(Math.round(outstandingOrder)));
             updateVal('fbi-kpi-belum-plan', formatIndo(Math.round(belumPlan)));
 
-            // 2. Render Outstanding Table
+            // 2. Render Outstanding Table (Filtered by FBI Schedule filters)
             if (tbody) {
-                const topOutstanding = outstandingList.sort((a,b) => b.aging - a.aging).slice(0, 15);
-                tbody.innerHTML = topOutstanding.map(item => `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td style="color: #ffd700; font-weight: bold;">${formatIndo(item.cbm)}</td>
-                        <td style="color: ${item.aging > 3 ? '#ff6b6b' : '#eee'};">${item.aging} Days</td>
-                    </tr>
-                `).join('') || '<tr><td colspan="3" style="text-align:center;">No Outstanding</td></tr>';
+                const hariFilter = document.getElementById('fbi-filter-hari')?.value || 'ALL';
+                const shipFilter = document.getElementById('fbi-filter-shipping')?.value || 'ALL';
+                const wilFilter = document.getElementById('fbi-filter-wilayah')?.value || 'ALL';
+
+                // Get list of valid SiteCodes based on FBI Schedule filters
+                const scheduledSiteCodes = new Set();
+                rawFBISchedule.forEach(s => {
+                    const stopVal = s.stops[hariFilter];
+                    const stopNum = parseInt(stopVal);
+                    
+                    let match = true;
+                    if (hariFilter !== 'ALL' && (isNaN(stopNum) || stopNum <= 0)) match = false;
+                    if (shipFilter !== 'ALL' && (s.shippingLine || '').trim().toUpperCase() !== shipFilter) match = false;
+                    if (wilFilter !== 'ALL' && s.wilayah.trim().toUpperCase() !== wilFilter) match = false;
+                    
+                    if (match) {
+                        scheduledSiteCodes.add((s.siteCode || '').trim());
+                    }
+                });
+
+                const outstandingStoresMap = {};
+                
+                const monthNamesIndo = {
+                    'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'mei': 4, 'may': 4,
+                    'jun': 5, 'jul': 6, 'agu': 7, 'aug': 7, 'sep': 8,
+                    'okt': 9, 'oct': 9, 'nov': 10, 'des': 11, 'dec': 11
+                };
+
+                const parseRobustDate = (dateStr) => {
+                    if (!dateStr) return null;
+                    const s = dateStr.toString().trim().toLowerCase();
+                    if (!s) return null;
+                    let d = new Date(s);
+                    if (!isNaN(d.getTime())) return d;
+                    const parts = s.split(/[\/\-\s]+/);
+                    if (parts.length >= 2) {
+                        let day = parseInt(parts[0]);
+                        let mon = -1;
+                        let yr = parts.length >= 3 ? parseInt(parts[2]) : new Date().getFullYear();
+                        const mPart = parts[1].substring(0, 3);
+                        if (monthNamesIndo.hasOwnProperty(mPart)) mon = monthNamesIndo[mPart];
+                        else mon = parseInt(parts[1]) - 1;
+                        if (yr < 100) yr += 2000;
+                        if (!isNaN(day) && mon >= 0 && mon <= 11 && !isNaN(yr)) {
+                            const result = new Date(yr, mon, day);
+                            return isNaN(result.getTime()) ? null : result;
+                        }
+                    }
+                    return null;
+                };
+
+                rawPivotData.forEach(row => {
+                    const statusStr = (row.status || '').toUpperCase().trim();
+                    if (!statusStr.includes('BELUM PLAN')) return;
+
+                    // Group by StoreBooking (same as schedule table for consistency)
+                    const siteCode = (row.storeBooking || row.rawColumns.I || 'UNKNOWN').trim();
+                    
+                    // Filter Sync: Only show if this SiteCode exists in the currently filtered schedule
+                    if (hariFilter !== 'ALL' || shipFilter !== 'ALL' || wilFilter !== 'ALL') {
+                        if (!scheduledSiteCodes.has(siteCode)) return;
+                    }
+
+                    if (!outstandingStoresMap[siteCode]) {
+                        outstandingStoresMap[siteCode] = {
+                            siteCode: siteCode,
+                            description: row.storeBookingName || 'Unknown Store',
+                            orders: new Set(),
+                            dates: new Set(),
+                            totalCbm: 0
+                        };
+                    }
+                    
+                    const orderId = row.rawColumns.E || row.rawColumns.F || (Math.random().toString());
+                    outstandingStoresMap[siteCode].orders.add(orderId);
+                    outstandingStoresMap[siteCode].totalCbm += (row.cbm || 0);
+                    if (row.stuffingDate) outstandingStoresMap[siteCode].dates.add(row.stuffingDate);
+                });
+
+                const tableData = Object.values(outstandingStoresMap).sort((a, b) => b.orders.size - a.orders.size);
+                
+                tbody.innerHTML = tableData.map(item => {
+                    const dateList = Array.from(item.dates).join(', ');
+                    return `
+                        <tr>
+                            <td style="color: #ffd700; font-weight: bold; font-size: 0.9em;">${item.siteCode}</td>
+                            <td style="font-size: 0.85em;">
+                                ${item.description}
+                            </td>
+                            <td style="text-align: center; font-weight: bold; color: #4ade80;">${item.orders.size}</td>
+                        </tr>
+                    `;
+                }).join('') || '<tr><td colspan="3" style="text-align:center; padding: 20px; color: #888;">Tidak ada order Belum Plan sesuai filter</td></tr>';
             }
 
             // 3. Render SCHEDULE DELIVERY FBI Table
@@ -4110,7 +4195,7 @@
                 }
                 values.push(current.trim());
 
-                if (values.length <= Math.max(...Object.values(idx))) continue;
+                if (values.length < 41) continue; // Minimum columns needed (AO is index 40)
 
                 const storeBooking = (values[idx.storeBooking] || '').trim();
                 const storeBookingName = (values[idx.storeBookingName] || '').trim();
@@ -4118,17 +4203,19 @@
                 // Skip summary/total rows
                 const summaryKeywords = ['total', 'jumlah', 'grand', 'subtotal', 'summary'];
                 const isSummary = summaryKeywords.some(k => 
-                    storeBooking.toLowerCase().includes(k) || 
-                    storeBookingName.toLowerCase().includes(k)
+                    (storeBooking && storeBooking.toLowerCase().includes(k)) || 
+                    (storeBookingName && storeBookingName.toLowerCase().includes(k))
                 );
                 if (isSummary) continue;
 
                 const agingRaw = (values[idx.aging] || '').toString().toUpperCase();
                 let agingVal = 0;
-                if (agingRaw.includes('UP') || agingRaw.includes('>')) {
-                    agingVal = 8; // Force to 7 UP bucket
-                } else {
-                    agingVal = parseInt(agingRaw) || 0;
+                if (agingRaw) {
+                    if (agingRaw.includes('UP') || agingRaw.includes('>')) {
+                        agingVal = 8; // Force to 7 UP bucket
+                    } else {
+                        agingVal = parseInt(agingRaw) || 0;
+                    }
                 }
 
                 const row = {
