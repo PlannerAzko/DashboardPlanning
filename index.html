@@ -128,7 +128,7 @@
             width: 100%;
             height: 100%;
             background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
-            z-index: 10000;
+            z-index: 20000;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -241,184 +241,97 @@
         body.theme-purple .section-title-banner i {
             color: #0f172a !important;
         }
-        /* Sidebar Styles */
-        .sidebar {
+        /* New Floating Bottom Navigation Concept */
+        .bottom-nav {
             position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 70px;
-            background: #1a1a2e;
-            z-index: 10001;
-            display: none;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffffff;
+            padding: 6px 10px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2), 0 0 1px rgba(0,0,0,0.1);
+            z-index: 10005;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(0,0,0,0.05);
+            width: auto;
+            max-width: 95vw;
+        }
+
+        .bottom-nav.hidden {
+            bottom: -100px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .bottom-nav-item {
+            display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 100px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 4px 0 25px rgba(0,0,0,0.5);
-            border-right: 1px solid rgba(255,255,255,0.05);
-            overflow: hidden;
-        }
-
-        .sidebar.expanded {
-            width: 280px;
-            align-items: flex-start;
-        }
-
-        .sidebar-logo {
-            padding: 20px 0;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            width: 100%;
-            height: 80px;
+            padding: 8px 12px;
             cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .sidebar-logo:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .sidebar.expanded .sidebar-logo {
-            padding: 20px;
-            justify-content: flex-start;
-        }
-
-        .sidebar-logo i {
-            font-size: 1.8rem;
-            color: #ffd700;
+            transition: all 0.2s ease;
+            border-radius: 40px;
             min-width: 70px;
-            text-align: center;
-        }
-
-        .sidebar-logo span {
-            font-weight: 800;
-            letter-spacing: 1px;
-            color: #fff;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .sidebar.expanded .sidebar-logo span {
-            opacity: 1;
-        }
-
-        .nav-item {
-            width: 100%;
-            height: 55px;
-            display: flex;
-            align-items: center;
-            padding: 0 22px;
-            cursor: pointer;
-            color: #94bcff;
-            transition: all 0.3s;
-            position: relative;
             text-decoration: none;
-            margin: 5px 0;
+            color: #718096;
+            position: relative;
         }
 
-        .nav-item i {
-            font-size: 1.3rem;
-            min-width: 26px;
-            text-align: center;
-            transition: transform 0.3s;
-        }
-
-        .nav-item span {
-            margin-left: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s, visibility 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .sidebar.expanded .nav-item span {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-        }
-
-        .nav-item:hover i {
-            transform: scale(1.2);
-        }
-
-        .nav-item.active {
-            color: #fff;
-            background: linear-gradient(90deg, rgba(211, 47, 47, 0.2) 0%, transparent 100%);
-            border-left: 4px solid #d32f2f;
-        }
-
-        body.theme-purple .nav-item.active {
-            background: linear-gradient(90deg, rgba(106, 27, 154, 0.2) 0%, transparent 100%);
-            border-left-color: #ffd700;
-            color: #ffd700;
-        }
-
-        .sidebar-toggle {
-            position: absolute;
-            top: 20px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+        .bottom-nav-item i {
+            font-size: 1.4rem;
+            margin-bottom: 2px;
             transition: all 0.3s;
-            z-index: 10002;
-            color: #fff;
         }
 
-        .sidebar-toggle:hover {
-            background: #d32f2f;
+        .bottom-nav-item span {
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            white-space: nowrap;
         }
 
-        body.theme-purple .sidebar-toggle:hover {
-            background: #6a1b9a;
+        .bottom-nav-item:hover {
+            color: #d32f2f;
         }
 
-        /* Content Adjustment */
+        .bottom-nav-item.active {
+            color: #ff3d3d;
+            background: rgba(255, 61, 61, 0.08);
+            box-shadow: 0 0 20px rgba(255, 61, 61, 0.15);
+        }
+        
+        .bottom-nav-item.active i {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 5px rgba(255, 61, 61, 0.3));
+        }
+
+        body.theme-purple .bottom-nav-item.active {
+            background: rgba(106, 27, 154, 0.08);
+            color: #6a1b9a;
+            box-shadow: 0 0 20px rgba(106, 27, 154, 0.15);
+        }
+        
+        body.theme-purple .bottom-nav-item.active i {
+            filter: drop-shadow(0 0 5px rgba(106, 27, 154, 0.3));
+        }
+
+        /* Sidebar adjustment - hide sidebar as we use bottom nav now */
+        .sidebar {
+            display: none !important;
+        }
+
         .main-container-wrapper {
-            margin-left: 0;
-            transition: margin-left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 100%;
+            margin-left: 0 !important;
+            width: 100% !important;
+            padding-bottom: 60px; /* Space for bottom nav */
         }
 
-        body.view-dc .main-container-wrapper {
-            margin-left: 70px;
-            width: calc(100% - 70px);
-        }
-
-        .sidebar.expanded + .main-container-wrapper {
-            margin-left: 280px;
-            width: calc(100% - 280px);
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                left: -70px;
-            }
-            .sidebar.active {
-                left: 0;
-            }
-            .main-container-wrapper {
-                margin-left: 0;
-                width: 100%;
-            }
-        }
         body.theme-purple .kpi-card.red {
             background: linear-gradient(135deg, #9c27b0 0%, #6a1b9a 100%);
             border-bottom-color: #4a148c;
@@ -646,6 +559,10 @@
         .animate-card {
             animation: cardFadeIn 0.6s backwards;
         }
+
+        .scanning-bar {
+            position: absolute;
+            top: 0;
             left: 0;
             width: 100%;
             height: 2px;
@@ -1781,7 +1698,7 @@
     </div>
 
     <!-- Welcome Overlay -->
-    <div id="welcome-overlay">
+    <div id="welcome-overlay" onclick="toggleFullScreen()">
         <div class="welcome-content">
             <h2 class="welcome-title" id="welcome-title-main">Selamat Datang di Logistics Dashboard</h2>
             
@@ -1827,53 +1744,46 @@
 
             <!-- Step 2: Plan Update Selection -->
             <div id="welcome-step-2" class="welcome-step hidden">
-                <p class="welcome-question">Apakah anda ingin melihat Plan Update terbaru?</p>
+                <p class="welcome-question">Apakah Anda ingin melihat planning hari ini?</p>
                 <div class="welcome-buttons">
-                    <button class="welcome-btn btn-iya" onclick="handleWelcomeChoice('iya')">Iya</button>
-                    <button class="welcome-btn btn-tidak" onclick="handleWelcomeChoice('tidak')">Tidak</button>
+                    <button class="welcome-btn btn-iya" onclick="handleWelcomeChoice('iya')">IYA</button>
+                    <button class="welcome-btn btn-tidak" onclick="handleWelcomeChoice('tidak')">TIDAK</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Sidebar Navigation -->
-    <div id="sidebar" class="sidebar">
-        <div class="sidebar-logo" onclick="resetBranchSelection()" title="Klik untuk ganti cabang">
-            <i class="fas fa-truck-fast"></i>
-            <span>FBI SIDOARJO</span>
-        </div>
-        <div class="sidebar-toggle" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
+    <!-- Floating Bottom Navigation -->
+    <div id="bottom-nav" class="bottom-nav hidden">
+        <div class="bottom-nav-item active" id="nav-main" onclick="showDashboardSection('main-dashboard-section')">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Main</span>
         </div>
         
-        <div class="nav-item active" id="side-nav-main" onclick="showDashboardSection('main-dashboard-section')">
-            <i class="fas fa-grip"></i>
-            <span>Dashboard</span>
-        </div>
-        
-        <div class="nav-item" id="side-nav-map" onclick="handleSideNavMap()">
-            <i class="fas fa-map-location-dot"></i>
-            <span>Peta Coverage</span>
-        </div>
-
-        <div class="nav-item" id="side-nav-outstanding" onclick="showDashboardSection('outstanding-section')">
-            <i class="fas fa-truck-fast"></i>
+        <div class="bottom-nav-item" id="nav-outstanding" onclick="showDashboardSection('outstanding-section')">
+            <i class="fas fa-truck-loading"></i>
             <span>Outstanding</span>
         </div>
 
-        <div class="nav-item" id="side-nav-summary" onclick="showDashboardSection('summary-report-section')">
-            <i class="fas fa-route"></i>
-            <span>Summary Report</span>
+        <div class="bottom-nav-item" id="nav-partner" onclick="showDashboardSection('supply-partner-section')">
+            <i class="fas fa-users-viewfinder"></i>
+            <span>Vendor</span>
         </div>
 
-        <div class="nav-item" id="side-nav-partner" onclick="showDashboardSection('supply-partner-section')">
-            <i class="fas fa-handshake"></i>
-            <span>Partners</span>
+        <div class="bottom-nav-item" id="nav-summary" onclick="showDashboardSection('summary-report-section')">
+            <i class="fas fa-file-invoice"></i>
+            <span>SLA & CBM</span>
         </div>
 
-        <div class="nav-item" id="side-nav-hub" onclick="showDashboardSection('hub-astor-section')">
+        <div class="bottom-nav-item" id="nav-hub" onclick="showDashboardSection('hub-astor-section')">
             <i class="fas fa-warehouse"></i>
-            <span>Hub & Astor</span>
+            <span>Hub Astor</span>
+        </div>
+
+
+        <div class="bottom-nav-item" id="nav-reset" onclick="resetBranchSelection()">
+            <i class="fas fa-sync-alt"></i>
+            <span>Switch DC</span>
         </div>
     </div>
 
@@ -3062,6 +2972,7 @@
         }
 
         async function handleLogin() {
+            toggleFullScreen();
             const nikInput = document.getElementById('login-nik').value.trim();
             const passInput = document.getElementById('login-pass').value.trim();
             const errorMsg = document.getElementById('login-error');
@@ -3116,7 +3027,7 @@
                     // Update welcome message in step 2
                     const step2Question = document.querySelector('#welcome-step-2 .welcome-question');
                     if (step2Question) {
-                        step2Question.innerHTML = `Selamat datang, <strong>${userName}</strong>. Anda berhasil login ke sistem. Silakan pilih portal operasional Anda di bawah ini:`;
+                        step2Question.innerHTML = `Selamat datang, <strong>${userName}</strong>. Anda berhasil login ke sistem. Apakah Anda ingin melihat planning hari ini?`;
                     }
                 } else {
                     errorMsg.style.display = 'block';
@@ -3134,15 +3045,18 @@
         }
 
         function handleDCBranchSelection(branch) {
+            toggleFullScreen();
             const body = document.body;
             const headerTitle = document.querySelector('.header h1');
             const welcomeTitle = document.getElementById('welcome-title-main');
             const marquee = document.getElementById('last-update-text');
             
-            const sideNavPartner = document.getElementById('side-nav-partner');
-            const sideNavHub = document.getElementById('side-nav-hub');
-            const sideNavMap = document.getElementById('side-nav-map');
+            const bottomNav = document.getElementById('bottom-nav');
+            const navPartner = document.getElementById('nav-partner');
+            const navHub = document.getElementById('nav-hub');
             
+            if (bottomNav) bottomNav.classList.remove('hidden');
+
             if (branch === 'FBI') {
                 body.classList.add('theme-purple');
                 SHEET_ID = SHEET_ID_FBI;
@@ -3157,12 +3071,8 @@
                 if (marquee) marquee.textContent = marquee.textContent.replace('TIM PLANNER SIDOARJO', 'TIM FBI SIDOARJO');
 
                 // FBI: Hide specific navigation items
-                if (sideNavPartner) sideNavPartner.style.display = 'none';
-                if (sideNavHub) sideNavHub.style.display = 'none';
-                if (sideNavMap) sideNavMap.style.display = 'flex';
-
-                const sidebarLogo = document.querySelector('.sidebar-logo span');
-                if (sidebarLogo) sidebarLogo.textContent = 'FBI SIDOARJO';
+                if (navPartner) navPartner.style.display = 'none';
+                if (navHub) navHub.style.display = 'none';
 
                 // Initial show FBI dashboard
                 showDashboardSection('fbi-dashboard-section');
@@ -3180,12 +3090,8 @@
                 if (marquee) marquee.textContent = marquee.textContent.replace('TIM FBI SIDOARJO', 'TIM PLANNER SIDOARJO');
 
                 // AHI: Show all navigation items
-                if (sideNavPartner) sideNavPartner.style.display = 'flex';
-                if (sideNavHub) sideNavHub.style.display = 'flex';
-                if (sideNavMap) sideNavMap.style.display = 'none';
-
-                const sidebarLogo = document.querySelector('.sidebar-logo span');
-                if (sidebarLogo) sidebarLogo.textContent = 'AHI SIDOARJO';
+                if (navPartner) navPartner.style.display = 'flex';
+                if (navHub) navHub.style.display = 'flex';
 
                 showDashboardSection('main-dashboard-section');
             }
@@ -3201,24 +3107,34 @@
 
         function toggleFullScreen() {
             try {
-                if (!document.fullscreenElement) {
+                const isFullScreen = document.fullscreenElement || 
+                                     document.webkitFullscreenElement || 
+                                     document.mozFullScreenElement || 
+                                     document.msFullscreenElement;
+                
+                if (!isFullScreen) {
                     const docElm = document.documentElement;
-                    if (docElm.requestFullscreen) {
-                        docElm.requestFullscreen();
-                    } else if (docElm.mozRequestFullScreen) {
-                        docElm.mozRequestFullScreen();
-                    } else if (docElm.webkitRequestFullScreen) {
-                        docElm.webkitRequestFullScreen();
-                    } else if (docElm.msRequestFullscreen) {
-                        docElm.msRequestFullscreen();
+                    const request = docElm.requestFullscreen || 
+                                  docElm.mozRequestFullScreen || 
+                                  docElm.webkitRequestFullScreen || 
+                                  docElm.msRequestFullscreen;
+
+                    if (request) {
+                        const promise = request.call(docElm);
+                        if (promise && promise.catch) {
+                            promise.catch(() => {
+                                // Silently handle denied request (e.g., inside an iframe without allow="fullscreen")
+                            });
+                        }
                     }
                 }
             } catch (e) {
-                console.warn("Fullscreen request failed:", e);
+                // Silently ignore synchronous errors
             }
         }
 
         function handleWelcomeChoice(choice) {
+            toggleFullScreen();
             welcomeChoice = choice;
             const overlay = document.getElementById('welcome-overlay');
             overlay.classList.add('hidden');
@@ -3244,77 +3160,58 @@
         function applyWelcomeChoice() {
             if (!welcomeChoice) return;
 
+            const now = new Date();
+            const currentMonthIndex = now.getMonth();
+            const currentDay = now.getDate();
+            const currentYear = now.getFullYear();
+
+            const indonesianMonths = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOPEMBER', 'DESEMBER'];
+            const englishMonths = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+            const targetIndo = indonesianMonths[currentMonthIndex];
+            const targetEng = englishMonths[currentMonthIndex];
+
+            // Reset all filters
+            Object.keys(selectedFilters).forEach(k => selectedFilters[k] = []);
+
             if (welcomeChoice === 'iya') {
-                // Cari Stuffing Date terbaru
-                const dates = Array.from(new Set(allData.map(row => row.AO))).filter(d => d && d !== '-' && d.trim() !== '');
-                if (dates.length > 0) {
-                    // Sort tanggal secara robust
-                    const sortedDates = dates.sort((a, b) => {
-                        const parseDate = (s) => {
-                            if (!s) return new Date(0);
-                            // Coba format YYYY-MM-DD
-                            if (s.includes('-')) {
-                                const d = new Date(s);
-                                if (!isNaN(d)) return d;
-                            }
-                            // Coba format DD/MM/YYYY
-                            if (s.includes('/')) {
-                                const parts = s.split('/');
-                                if (parts.length === 3) return new Date(parts[2], parts[1]-1, parts[0]);
-                            }
-                            // Fallback ke Date constructor
-                            const d = new Date(s);
-                            return isNaN(d) ? new Date(0) : d;
-                        };
-                        return parseDate(b) - parseDate(a);
-                    });
-                    
-                    const latestDate = sortedDates[0];
-                    
-                    // Reset semua filter
-                    Object.keys(selectedFilters).forEach(k => selectedFilters[k] = []);
-                    
-                    // Pilih tanggal terbaru
-                    selectedFilters.stuffingDate = [latestDate];
-                    
-                    // Update UI
-                    updateStuffingDateOptions();
-                    
-                    // Trigger apply
-                    applyFilters();
-                }
-            } else if (welcomeChoice === 'tidak') {
-                // Cari Bulan terbaru
+                // Find matching month
                 const months = Array.from(new Set(allData.map(row => row.AX))).filter(m => m && m !== '-' && m.trim() !== '');
-                if (months.length > 0) {
-                    // Sort bulan secara kronologis
-                    const monthOrder = {
-                        'january': 1, 'february': 2, 'march': 3, 'april': 4, 'may': 5, 'june': 6,
-                        'july': 7, 'august': 8, 'september': 9, 'october': 10, 'november': 11, 'december': 12,
-                        'januari': 1, 'februari': 2, 'maret': 3, 'mei': 5, 'juni': 6, 'juli': 7, 'agustus': 8,
-                        'september': 9, 'oktober': 10, 'nopember': 11, 'desember': 12
-                    };
-                    
-                    const sortedMonths = months.sort((a, b) => {
-                        const orderA = monthOrder[a.toLowerCase()] || 0;
-                        const orderB = monthOrder[b.toLowerCase()] || 0;
-                        return orderB - orderA; // Descending
-                    });
-                    
-                    const latestMonth = sortedMonths[0];
-                    
-                    // Reset semua filter
-                    Object.keys(selectedFilters).forEach(k => selectedFilters[k] = []);
-                    
-                    // Pilih bulan terbaru
-                    selectedFilters.bulan = [latestMonth];
-                    
-                    // Update UI
-                    populateFilters();
-                    
-                    // Trigger apply
-                    applyFilters();
+                const matchingMonth = months.find(m => 
+                    m.toUpperCase() === targetIndo || 
+                    m.toUpperCase() === targetEng
+                );
+                if (matchingMonth) {
+                    selectedFilters.bulan = [matchingMonth];
                 }
+
+                // Find matching date
+                const isoToday = now.toISOString().split('T')[0]; // YYYY-MM-DD
+                const dmyToday = `${String(currentDay).padStart(2, '0')}/${String(currentMonthIndex + 1).padStart(2, '0')}/${currentYear}`; // DD/MM/YYYY
+                
+                const dates = Array.from(new Set(allData.map(row => row.AO))).filter(d => d && d !== '-' && d.trim() !== '');
+                const matchingDate = dates.find(d => d === isoToday || d === dmyToday);
+                
+                if (matchingDate) {
+                    selectedFilters.stuffingDate = [matchingDate];
+                }
+
+                // Update UI and Trigger apply
+                populateFilters(); 
+                applyFilters();
+            } else if (welcomeChoice === 'tidak') {
+                // Only find matching month
+                const months = Array.from(new Set(allData.map(row => row.AX))).filter(m => m && m !== '-' && m.trim() !== '');
+                const matchingMonth = months.find(m => 
+                    m.toUpperCase() === targetIndo || 
+                    m.toUpperCase() === targetEng
+                );
+                if (matchingMonth) {
+                    selectedFilters.bulan = [matchingMonth];
+                }
+
+                // Update UI and Trigger apply
+                populateFilters();
+                applyFilters();
             }
             
             welcomeChoice = null;
@@ -3413,16 +3310,14 @@
         let pivotStatusPlanOptions = new Set();
         let pivotHeaderNames = [];
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            if (sidebar) sidebar.classList.toggle('expanded');
-        }
-
         function resetBranchSelection() {
             // Show welcome screen and branch selection step
             const welcomeOverlay = document.getElementById('welcome-overlay');
             const branchStep = document.getElementById('welcome-step-dc-branch');
+            const bottomNav = document.getElementById('bottom-nav');
             
+            if (bottomNav) bottomNav.classList.add('hidden');
+
             if (welcomeOverlay && branchStep) {
                 welcomeOverlay.classList.remove('hidden');
                 branchStep.classList.remove('hidden');
@@ -3467,9 +3362,9 @@
             const sections = document.querySelectorAll('.dash-section');
             sections.forEach(s => s.style.display = 'none');
             
-            // Remove active class from all nav items
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('active'));
+            // Remove active class from all nav items (bottom nav)
+            const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+            bottomNavItems.forEach(item => item.classList.remove('active'));
 
             const globalFilter = document.getElementById('global-filter-section');
             const showFilterFor = ['main-dashboard-section', 'summary-report-section', 'supply-partner-section'];
@@ -3481,13 +3376,13 @@
             if (target) {
                 target.style.display = sectionId === 'fbi-dashboard-section' ? 'flex' : 'block';
                 
-                // Highlight corresponding sidebar item
+                // Highlight corresponding bottom nav item
                 let navId = '';
-                if (sectionId === 'main-dashboard-section' || sectionId === 'fbi-dashboard-section') navId = 'side-nav-main';
-                else if (sectionId === 'summary-report-section') navId = 'side-nav-summary';
-                else if (sectionId === 'supply-partner-section') navId = 'side-nav-partner';
-                else if (sectionId === 'outstanding-section') navId = 'side-nav-outstanding';
-                else if (sectionId === 'hub-astor-section') navId = 'side-nav-hub';
+                if (sectionId === 'main-dashboard-section' || sectionId === 'fbi-dashboard-section') navId = 'nav-main';
+                else if (sectionId === 'summary-report-section') navId = 'nav-summary';
+                else if (sectionId === 'supply-partner-section') navId = 'nav-partner';
+                else if (sectionId === 'outstanding-section') navId = 'nav-outstanding';
+                else if (sectionId === 'hub-astor-section') navId = 'nav-hub';
 
                 const navItem = document.getElementById(navId);
                 if (navItem) navItem.classList.add('active');
@@ -5308,8 +5203,11 @@ function renderStoringPivotTable(filteredData) {
                 // Hide Initial Loader
                 setTimeout(() => {
                     const loader = document.getElementById('init-loader');
-                    if (loader) loader.classList.add('hidden');
-                }, 1500); // Give it a bit of time to show the animation
+                    if (loader) {
+                        loader.onclick = toggleFullScreen;
+                        loader.classList.add('hidden');
+                    }
+                }, 3000); // Give it more time to show the animation
             } catch (error) {
                 console.error('Error fetching data:', error);
                 
