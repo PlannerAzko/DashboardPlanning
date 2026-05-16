@@ -2019,7 +2019,7 @@
                     <div id="fbi-kpi-total-stores" class="fbi-kpi-value">0</div>
                 </div>
                 <div class="fbi-kpi-card teal">
-                    <div class="fbi-kpi-label">SUDAH PLAN</div>
+                    <div class="fbi-kpi-label">SUDAH PLAN (ORDER)</div>
                     <div id="fbi-kpi-sudah-plan" class="fbi-kpi-value">0</div>
                 </div>
                 <div class="fbi-kpi-card orange">
@@ -2027,7 +2027,7 @@
                     <div id="fbi-kpi-outstanding-aging" class="fbi-kpi-value">0</div>
                 </div>
                 <div class="fbi-kpi-card red">
-                    <div class="fbi-kpi-label">BELUM PLAN</div>
+                    <div class="fbi-kpi-label">BELUM PLAN (ORDER)</div>
                     <div id="fbi-kpi-belum-plan" class="fbi-kpi-value">0</div>
                 </div>
             </div>
@@ -2039,7 +2039,7 @@
                     <!-- 1. Left: KPI cards -->
                     <div style="display: flex; gap: 16px; flex: 1.2; min-width: 400px;">
                         <div style="background: #ffffff; border-left: 5px solid #ffc107; border-radius: 12px; padding: 20px; flex: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center;">
-                            <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Total Outstanding (OD)</div>
+                            <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Total Order Realese</div>
                             <div id="chatime-total-od" style="font-size: 3.5rem; font-weight: 800; color: #1e293b; line-height: 1;">0</div>
                         </div>
                         
@@ -2065,17 +2065,16 @@
                         <div style="display: flex; gap: 12px;">
                             <div style="flex: 1; position: relative;">
                                 <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">TANGGAL STUFFING</label>
-                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
-                                    <span id="chatime-date-label">May 16, 2026</span>
-                                    <i class="fas fa-calendar-alt" style="color: #64748b;"></i>
-                                </div>
+                                <select id="chatime-date-filter" onchange="this.size=1; this.blur(); renderChatimeDashboard();" onfocus="this.size=6;" onblur="this.size=1;" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; color: #1e293b; position: absolute; z-index: 10;">
+                                    <option value="ALL">All Dates</option>
+                                </select>
+                                <div style="height: 40px;"></div> <!-- Spacer to maintain layout when select expands -->
                             </div>
                             <div style="flex: 1; position: relative;">
                                 <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">AREA FILTER</label>
-                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
-                                    <span>All Areas</span>
-                                    <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: #64748b;"></i>
-                                </div>
+                                <select id="chatime-area-filter" onchange="renderChatimeDashboard()" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; color: #1e293b;">
+                                    <option value="ALL">All Areas</option>
+                                </select>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 5px; padding-top: 10px; border-top: 1px solid #f1f5f9;">
@@ -3019,6 +3018,7 @@
         let PIVOT_SHEET_ID = '1noBpxmLuT3XQAYzO2Bdv_LrXqzDTqw1ugPN4ST_AYtg';
         let PIVOT_SHEET_GID = '1075426956';
         let PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${PIVOT_SHEET_ID}/export?format=csv&gid=${PIVOT_SHEET_GID}`;
+        const PLANNER_CSV_URL = 'https://docs.google.com/spreadsheets/d/117EFwQPnkWdcEEsdG0mVC2stt68OjlCuEv4PmHZyNMY/export?format=csv&gid=2036643748';
         let HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
         const USER_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=1368870427`;
 
@@ -3589,6 +3589,7 @@
         // Pivot Data Storage
         const SHEET_URL_SCHEDULE = 'https://docs.google.com/spreadsheets/d/1lRl-Noq63iovsyzOTEM_Dxw4rPOKDF6dsO9o387iHwk/export?format=csv&gid=1862882799';
         let rawPivotData = [];
+        let rawPlannerData = [];
         let rawFBISchedule = [];
         let rawHubData = [];
         let rawAstorData = [];
@@ -3713,24 +3714,6 @@
             const uniqueOrdersBelum = new Set();
             
             const coverageData = {}; // By Day for Chart
-            
-            // Chatime Dashboard Stats
-            const chatimeStats = {
-                'Store DK': { total: new Set(), od: new Set() },
-                'Luar Kota': { total: new Set(), od: new Set() },
-                'Luar Pulau': { total: new Set(), od: new Set() }
-            };
-
-            // Site to Wilayah Mapping
-            const siteToArea = {};
-            rawFBISchedule.forEach(s => {
-                const w = (s.wilayah || '').trim().toUpperCase();
-                let area = 'Luar Kota';
-                if (w.includes('DK')) area = 'Store DK';
-                else if (w.includes('PULAU') || w.includes('OUT') || w.includes('LP')) area = 'Luar Pulau';
-                else area = 'Luar Kota';
-                siteToArea[s.siteCode.toUpperCase().trim()] = area;
-            });
 
             rawPivotData.forEach(row => {
                 const colI = row.rawColumns && row.rawColumns.I ? row.rawColumns.I.trim() : "";
@@ -3750,15 +3733,6 @@
                     if (colBC.toUpperCase() === 'BELUM PLAN') {
                         uniqueOrdersBelum.add(colF);
                     }
-
-                    // Chatime area grouping
-                    const area = siteToArea[colI.toUpperCase()] || 'Luar Kota';
-                    if (chatimeStats[area]) {
-                        chatimeStats[area].total.add(colF);
-                        if (colBC.toUpperCase() === 'BELUM PLAN') {
-                            chatimeStats[area].od.add(colF);
-                        }
-                    }
                 }
 
                 // Coverage per Hari (based on Stuffing Date/Tanggal)
@@ -3772,24 +3746,8 @@
             updateVal('fbi-kpi-outstanding-aging', formatIndo(uniqueOrders.size));
             updateVal('fbi-kpi-belum-plan', formatIndo(uniqueOrdersBelum.size));
 
-            // Update Chatime Dashboard KPIs
-            const totalOD = uniqueOrdersBelum.size;
-            const totalCaseId = uniqueOrders.size;
-            const odEl = document.getElementById('chatime-total-od');
-            const ciEl = document.getElementById('chatime-total-case-id');
-            if (odEl) odEl.innerText = formatIndo(totalOD);
-            if (ciEl) ciEl.innerText = formatIndo(totalCaseId);
-
-            // Update Date Label
-            const dateLabel = document.getElementById('chatime-date-label');
-            if (dateLabel) {
-                const tomorrow = new Date(Date.now() + 86400000);
-                const options = { month: 'short', day: 'numeric', year: 'numeric' };
-                dateLabel.innerText = tomorrow.toLocaleDateString('en-US', options);
-            }
-
-            // Render Chatime Charts
-            renderChatimeCharts(chatimeStats);
+            // Render Chatime Dashboard (independent now)
+            renderChatimeDashboard();
 
             // 2. Render Outstanding Table (Filtered by FBI Schedule filters)
             if (tbody) {
@@ -4147,7 +4105,7 @@
                 const labels = ['Store DK', 'Luar Kota', 'Luar Pulau'];
                 legendEl.innerHTML = labels.map((l, i) => `
                     <div>
-                        <div style="color: ${colors[i]}; font-size: 1.1rem; font-weight: 800;">${stats[l].total.size}</div>
+                        <div style="color: ${colors[i]}; font-size: 1.1rem; font-weight: 800;">${stats[l].total}</div>
                         <div style="color: #64748b; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">${l}</div>
                     </div>
                 `).join('');
@@ -4159,8 +4117,8 @@
                 if (chatimeDonutChart) chatimeDonutChart.destroy();
                 
                 const labels = ['Store DK', 'Luar Kota', 'Luar Pulau'];
-                const data = labels.map(l => stats[l].total.size);
-                const total = data.reduce((a, b) => a + b, 0);
+                const data = labels.map(l => stats[l].total);
+                const totalTotal = data.reduce((a, b) => a + b, 0);
                 
                 chatimeDonutChart = new Chart(donutCtx, {
                     type: 'doughnut',
@@ -4203,7 +4161,7 @@
                                 callbacks: {
                                     label: function(context) {
                                         const val = context.raw;
-                                        const pct = total > 0 ? ((val / total) * 100).toFixed(1) + '%' : '0%';
+                                        const pct = totalTotal > 0 ? ((val / totalTotal) * 100).toFixed(1) + '%' : '0%';
                                         return ` ${context.label}: ${val} stores (${pct})`;
                                     }
                                 }
@@ -4223,7 +4181,7 @@
                             ctx.fillText(text, textX, textY);
                             ctx.font = `800 ${(fontSize * 2.2).toFixed(2)}em Inter`;
                             ctx.fillStyle = "#1e293b";
-                            const val = total.toString(), valX = Math.round((width - ctx.measureText(val).width) / 2), valY = height / 2 + 20;
+                            const val = totalTotal.toString(), valX = Math.round((width - ctx.measureText(val).width) / 2), valY = height / 2 + 20;
                             ctx.fillText(val, valX, valY);
                             ctx.save();
                         }
@@ -4237,8 +4195,8 @@
                 if (chatimeBarChart) chatimeBarChart.destroy();
                 
                 const sortedLabels = ['Luar Pulau', 'Store DK', 'Luar Kota'];
-                const caseIdData = sortedLabels.map(l => stats[l] ? stats[l].total.size : 0);
-                const odData = sortedLabels.map(l => stats[l] ? stats[l].od.size : 0);
+                const caseIdData = sortedLabels.map(l => stats[l] ? stats[l].total : 0);
+                const odData = sortedLabels.map(l => stats[l] ? stats[l].od : 0);
                 
                 chatimeBarChart = new Chart(barCtx, {
                     type: 'bar',
@@ -4255,7 +4213,7 @@
                                 barPercentage: 0.9
                             },
                             {
-                                label: 'Total Outstanding (OD)',
+                                label: 'Total Order',
                                 data: odData,
                                 backgroundColor: '#4caf50',
                                 borderRadius: 4,
@@ -4310,6 +4268,159 @@
                     plugins: [ChartDataLabels]
                 });
             }
+        }
+
+        async function fetchPlannerData(retries = 2) {
+            try {
+                const response = await fetch(PLANNER_CSV_URL);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const csv = await response.text();
+                if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML (Google Login required or link not shared)');
+                parsePlannerCSV(csv);
+            } catch (error) {
+                console.error("Error fetching Planner data:", error);
+                if (retries > 0) {
+                    setTimeout(() => fetchPlannerData(retries - 1), 2000);
+                }
+            }
+        }
+
+        function parsePlannerCSV(csv) {
+            const rows = robustCSVParser(csv);
+            if (rows.length < 2) return;
+            
+            // Expected Column Mapping from user request:
+            // A=0: TANGGAL STUFFING
+            // C=2: AREA FILTER
+            // D=3: TOTAL ORDER RELEASE / OUTSTANDING (OD)
+            // E=4: TOTAL CASE ID
+            
+            const data = rows.slice(1); // skip headers
+            rawPlannerData = data.map(row => ({
+                stuffingDate: (row[0] || '').trim(),
+                area: (row[2] || '').trim(),
+                orderRelease: parseNumberWithComma(row[3]),
+                caseId: parseNumberWithComma(row[4])
+            })).filter(d => d.area && d.area !== '');
+
+            populatePlannerFilters();
+            renderChatimeDashboard();
+        }
+
+        function parseDDMMYYYY(str) {
+            if (!str) return new Date(0);
+            const parts = str.split('/');
+            if (parts.length === 3) {
+                let d = parseInt(parts[0], 10);
+                let m = parseInt(parts[1], 10) - 1;
+                let y = parseInt(parts[2], 10);
+                if (y < 100) y += 2000;
+                return new Date(y, m, d);
+            }
+            return new Date(str); // Fallback
+        }
+
+        function populatePlannerFilters() {
+            const dateFilter = document.getElementById('chatime-date-filter');
+            const areaFilter = document.getElementById('chatime-area-filter');
+            if (!dateFilter || !areaFilter) return;
+
+            const selectedDate = dateFilter.value;
+            const selectedArea = areaFilter.value;
+
+            // Date options: Filter out 2025 and sort chronologically DESC (Newest first)
+            const dateMap = {};
+            rawPlannerData.forEach(d => {
+                if (d.stuffingDate && !d.stuffingDate.includes('2025')) {
+                    dateMap[d.stuffingDate] = parseDDMMYYYY(d.stuffingDate);
+                }
+            });
+
+            const sortedDates = Object.keys(dateMap).sort((a, b) => dateMap[b] - dateMap[a]);
+
+            dateFilter.innerHTML = '<option value="ALL">All Dates</option>';
+            sortedDates.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                dateFilter.appendChild(opt);
+            });
+
+            // Default selection logic:
+            if (sortedDates.includes(selectedDate)) {
+                dateFilter.value = selectedDate;
+            } else if (sortedDates.length > 0) {
+                // Try today's date
+                const now = new Date();
+                const todayFormatted = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+                const matchToday = sortedDates.find(d => d === todayFormatted);
+                
+                if (matchToday) {
+                    dateFilter.value = matchToday;
+                } else if (selectedDate === 'ALL') {
+                    dateFilter.value = 'ALL';
+                } else {
+                    dateFilter.value = sortedDates[0];
+                }
+            }
+
+            // Area options: Restricted to "Luar Pulau", "Luar Kota", "Store DK"
+            const allowedAreas = ['Luar Pulau', 'Luar Kota', 'Store DK'];
+            areaFilter.innerHTML = '<option value="ALL">All Areas</option>';
+            allowedAreas.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a;
+                opt.textContent = a;
+                areaFilter.appendChild(opt);
+            });
+            if (allowedAreas.includes(selectedArea)) areaFilter.value = selectedArea;
+        }
+
+        function renderChatimeDashboard() {
+            if (!rawPlannerData || rawPlannerData.length === 0) return;
+
+            const dateFilter = document.getElementById('chatime-date-filter')?.value || 'ALL';
+            const areaFilter = document.getElementById('chatime-area-filter')?.value || 'ALL';
+
+            const filtered = rawPlannerData.filter(d => {
+                const matchDate = dateFilter === 'ALL' || d.stuffingDate === dateFilter;
+                const matchArea = areaFilter === 'ALL' || d.area === areaFilter;
+                return matchDate && matchArea;
+            });
+
+            // KPIs
+            const totalOrderRelease = filtered.reduce((sum, d) => sum + d.orderRelease, 0);
+            const totalCaseId = filtered.reduce((sum, d) => sum + d.caseId, 0);
+
+            const odEl = document.getElementById('chatime-total-od');
+            const ciEl = document.getElementById('chatime-total-case-id');
+            if (odEl) odEl.innerText = formatIndo(totalOrderRelease);
+            if (ciEl) ciEl.innerText = formatIndo(totalCaseId);
+
+            // Chart Data
+            const chartStats = {
+                'Store DK': { total: 0, od: 0 },
+                'Luar Kota': { total: 0, od: 0 },
+                'Luar Pulau': { total: 0, od: 0 }
+            };
+
+            // Calculate breakdown for charts (ignoring area filter for the breakdown itself, or should it respect it?)
+            // Usually, breakdown charts show all areas unless one is selected.
+            // If area filter is selected, we should probably still show the others but they will be 0 or emphasized?
+            // Actually, the user says "pada tabel grafik Case ID Status Breakdown... yang ditampilkan di filter hanya data Luar Pulau, Luar Kota, Store DK"
+            // This suggests the chart shows these 3.
+            
+            // Re-calculate stats for all 3 areas based on date filter ONLY for the charts
+            const areaDateFiltered = rawPlannerData.filter(d => dateFilter === 'ALL' || d.stuffingDate === dateFilter);
+            
+            areaDateFiltered.forEach(d => {
+                if (chartStats[d.area]) {
+                    chartStats[d.area].total += d.caseId;
+                    chartStats[d.area].od += d.orderRelease;
+                }
+            });
+
+            renderChatimeCharts(chartStats);
         }
 
         function initFBIMap() {
@@ -7832,10 +7943,12 @@ function renderStoringPivotTable(filteredData) {
         
         // Auto-refresh every 30 seconds
         setInterval(fetchData, 30000);
+        setInterval(fetchPlannerData, 30000);
 
         // Initialize
         initMap();
         fetchData();
+        fetchPlannerData();
         // ===== ASTOR SLA & OUTSTANDING ENGINE =====
 const ASTOR_GID     = '1345578811';
 let ASTOR_CSV_URL_DYNAMIC = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${ASTOR_GID}`;
