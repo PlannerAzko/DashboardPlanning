@@ -2032,6 +2032,94 @@
                 </div>
             </div>
 
+            <!-- SUMMARY CASE ID CHATIME Section -->
+            <div id="fbi-summary-chatime-dashboard" style="background: #f0f7ff; border-radius: 16px; padding: 24px; margin-bottom: 30px; border: 1px solid #e1e8f0; font-family: 'Inter', sans-serif;">
+                <!-- Header KPI & Filter Row -->
+                <div style="display: flex; justify-content: space-between; align-items: stretch; gap: 20px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <!-- 1. Left: KPI cards -->
+                    <div style="display: flex; gap: 16px; flex: 1.2; min-width: 400px;">
+                        <div style="background: #ffffff; border-left: 5px solid #ffc107; border-radius: 12px; padding: 20px; flex: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Total Outstanding (OD)</div>
+                            <div id="chatime-total-od" style="font-size: 3.5rem; font-weight: 800; color: #1e293b; line-height: 1;">0</div>
+                        </div>
+                        
+                        <div style="background: #ffffff; border-left: 5px solid #6a1b9a; border-radius: 12px; padding: 20px; flex: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Total Case ID</div>
+                            <div id="chatime-total-case-id" style="font-size: 3.5rem; font-weight: 800; color: #1e293b; line-height: 1;">0</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Middle: Logo Section (Centered) -->
+                    <div style="background: #ffffff; padding: 10px 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(106, 27, 154, 0.08); border: 2px solid #f0f4f8; display: flex; align-items: center; justify-content: center; min-width: 320px; flex: 1.2;">
+                         <svg width="320" height="90" viewBox="0 0 450 100" style="display: block;">
+                            <!-- Stylized Leaf -->
+                            <path d="M40 75 Q15 45 50 25 Q85 5 70 45 Q55 85 35 75" fill="#4ade80" />
+                            <path d="M45 65 Q65 45 85 55" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round" />
+                            <!-- Centered Chatime text -->
+                            <text x="240" y="78" font-family="'Inter', 'Trebuchet MS', sans-serif" font-weight="900" font-style="italic" font-size="85" fill="#6a1b9a" text-anchor="middle">Chatime</text>
+                        </svg>
+                    </div>
+
+                    <!-- 3. Right: Filter Area -->
+                    <div style="background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 12px; min-width: 350px; flex: 1.2; border: 1px solid #edf2f7;">
+                        <div style="display: flex; gap: 12px;">
+                            <div style="flex: 1; position: relative;">
+                                <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">TANGGAL STUFFING</label>
+                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
+                                    <span id="chatime-date-label">May 16, 2026</span>
+                                    <i class="fas fa-calendar-alt" style="color: #64748b;"></i>
+                                </div>
+                            </div>
+                            <div style="flex: 1; position: relative;">
+                                <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">AREA FILTER</label>
+                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
+                                    <span>All Areas</span>
+                                    <i class="fas fa-chevron-down" style="font-size: 0.8rem; color: #64748b;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 5px; padding-top: 10px; border-top: 1px solid #f1f5f9;">
+                            <div style="display: flex; align-items: center; gap: 8px; color: #64748b; font-size: 0.85rem;">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Real-time Order Tracking</span>
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <i class="fas fa-download" title="Export" style="cursor: pointer; color: #64748b;"></i>
+                                <i class="fas fa-expand-alt" title="Fullscreen" style="cursor: pointer; color: #64748b;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Container: Responsive Flex Layout -->
+                <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: stretch;">
+                    <!-- LEFT COLUMN: Proportional Distribution -->
+                    <div style="background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; align-items: center; border: 1px solid #f1f5f9; flex: 1 1 400px; min-height: 450px;">
+                        <h4 style="align-self: flex-start; margin: 0 0 20px 0; font-size: 1.1rem; color: #334155; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 4px; height: 18px; background: #6a1b9a; border-radius: 2px;"></span>
+                            Order Distribution By Region
+                        </h4>
+                        <div style="width: 100%; flex-grow: 1; min-height: 300px; position: relative;">
+                            <canvas id="chatimeDonutChart"></canvas>
+                        </div>
+                        <div id="donut-stats-legend" style="width: 100%; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f1f5f9; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Order Aging Metrics -->
+                    <div style="background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; border: 1px solid #f1f5f9; flex: 1.5 1 500px; min-height: 450px;">
+                        <h4 style="margin: 0 0 20px 0; font-size: 1.1rem; color: #334155; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 4px; height: 18px; background: #4caf50; border-radius: 2px;"></span>
+                            Case ID Status Breakdown
+                        </h4>
+                        <div style="width: 100%; flex-grow: 1; min-height: 350px; position: relative;">
+                            <canvas id="chatimeBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="fbi-grid">
                 <div class="fbi-grid-item">
                     <div class="fbi-item-header">
@@ -2477,8 +2565,8 @@
                     <table class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em; background: #1a1a1a; color: #fff;">
                         <thead>
                             <tr class="nested-header">
-                                <th rowspan="2" onclick="sortStoringPivot('areaBB')" style="width: 200px; background: #1a1a1a; border-right: 1px solid #333; cursor: pointer;">AREA STORING <i class="fas fa-sort" style="font-size: 0.7em;"></i></th>
-                                <th rowspan="2" style="width: 100px; background: #333; color: #ffd700; border-right: 1px solid #444;">TOTAL</th>
+                                <th rowspan="2" onclick="sortStoringPivot('areaBB')" style="width: 200px; border-right: 1px solid #333; cursor: pointer;">AREA STORING <i class="fas fa-sort" style="font-size: 0.7em;"></i></th>
+                                <th rowspan="2" style="width: 100px; color: #ffd700; border-right: 1px solid #444;">TOTAL</th>
                                 <th colspan="5" style="background: #2c3e50; color: #ecf0f1; text-align: center; border-right: 1px solid #444;">AGING SUDAH PLAN (CBM)</th>
                                 <th colspan="5" style="background: #27ae60; color: #fff; text-align: center;">AGING BELUM PLAN (CBM)</th>
                             </tr>
@@ -3484,12 +3572,10 @@
 
         // Helper to format numbers like the image (Indo format)
         function formatIndo(val) {
-    if (val === 0) return '0';
-    return val.toLocaleString('id-ID', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-    });
-}
+            if (val === 0) return '0';
+            // Show up to 2 decimal places, but remove trailing zeros. Use dot as requested in prompt "33.5"
+            return parseFloat(val.toFixed(2)).toString();
+        }
 
         // Initialize Map
         function initMap() {
@@ -3605,6 +3691,8 @@
         let fbiMap = null;
         let fbiChart = null;
         let fbiMarkersLayer = null;
+        let chatimeDonutChart = null;
+        let chatimeBarChart = null;
 
         function renderFBIDashboard() {
             const tbody = document.getElementById('fbi-outstanding-table-body');
@@ -3618,18 +3706,37 @@
                 return;
             }
 
-            // 1. Calculate KPIs
+            // 1. Calculate KPIs and Summary
             const uniqueStores = new Set();
             const uniqueOrders = new Set();
             const uniqueOrdersSudah = new Set();
             const uniqueOrdersBelum = new Set();
             
-            const coverageData = {}; // By Day
+            const coverageData = {}; // By Day for Chart
+            
+            // Chatime Dashboard Stats
+            const chatimeStats = {
+                'Store DK': { total: new Set(), od: new Set() },
+                'Luar Kota': { total: new Set(), od: new Set() },
+                'Luar Pulau': { total: new Set(), od: new Set() }
+            };
+
+            // Site to Wilayah Mapping
+            const siteToArea = {};
+            rawFBISchedule.forEach(s => {
+                const w = (s.wilayah || '').trim().toUpperCase();
+                let area = 'Luar Kota';
+                if (w.includes('DK')) area = 'Store DK';
+                else if (w.includes('PULAU') || w.includes('OUT') || w.includes('LP')) area = 'Luar Pulau';
+                else area = 'Luar Kota';
+                siteToArea[s.siteCode.toUpperCase().trim()] = area;
+            });
 
             rawPivotData.forEach(row => {
                 const colI = row.rawColumns && row.rawColumns.I ? row.rawColumns.I.trim() : "";
                 const colBC = row.status ? row.status.trim() : ""; // Column BC
                 const colF = row.rawColumns && row.rawColumns.F ? row.rawColumns.F.trim() : ""; // Column F
+                const date = row.stuffingDate || 'No Date';
 
                 if (colI) {
                     uniqueStores.add(colI.toUpperCase());
@@ -3643,10 +3750,18 @@
                     if (colBC.toUpperCase() === 'BELUM PLAN') {
                         uniqueOrdersBelum.add(colF);
                     }
+
+                    // Chatime area grouping
+                    const area = siteToArea[colI.toUpperCase()] || 'Luar Kota';
+                    if (chatimeStats[area]) {
+                        chatimeStats[area].total.add(colF);
+                        if (colBC.toUpperCase() === 'BELUM PLAN') {
+                            chatimeStats[area].od.add(colF);
+                        }
+                    }
                 }
 
                 // Coverage per Hari (based on Stuffing Date/Tanggal)
-                const date = row.stuffingDate || 'No Date';
                 if (!coverageData[date]) coverageData[date] = 0;
                 coverageData[date] += row.cbm;
             });
@@ -3656,6 +3771,25 @@
             updateVal('fbi-kpi-sudah-plan', formatIndo(uniqueOrdersSudah.size));
             updateVal('fbi-kpi-outstanding-aging', formatIndo(uniqueOrders.size));
             updateVal('fbi-kpi-belum-plan', formatIndo(uniqueOrdersBelum.size));
+
+            // Update Chatime Dashboard KPIs
+            const totalOD = uniqueOrdersBelum.size;
+            const totalCaseId = uniqueOrders.size;
+            const odEl = document.getElementById('chatime-total-od');
+            const ciEl = document.getElementById('chatime-total-case-id');
+            if (odEl) odEl.innerText = formatIndo(totalOD);
+            if (ciEl) ciEl.innerText = formatIndo(totalCaseId);
+
+            // Update Date Label
+            const dateLabel = document.getElementById('chatime-date-label');
+            if (dateLabel) {
+                const tomorrow = new Date(Date.now() + 86400000);
+                const options = { month: 'short', day: 'numeric', year: 'numeric' };
+                dateLabel.innerText = tomorrow.toLocaleDateString('en-US', options);
+            }
+
+            // Render Chatime Charts
+            renderChatimeCharts(chatimeStats);
 
             // 2. Render Outstanding Table (Filtered by FBI Schedule filters)
             if (tbody) {
@@ -4003,6 +4137,179 @@
                     }
                 }
             });
+        }
+
+        function renderChatimeCharts(stats) {
+            // Update Mini Stats Legend below Donut
+            const legendEl = document.getElementById('donut-stats-legend');
+            if (legendEl) {
+                const colors = ['#007bff', '#00bcd4', '#e91e63'];
+                const labels = ['Store DK', 'Luar Kota', 'Luar Pulau'];
+                legendEl.innerHTML = labels.map((l, i) => `
+                    <div>
+                        <div style="color: ${colors[i]}; font-size: 1.1rem; font-weight: 800;">${stats[l].total.size}</div>
+                        <div style="color: #64748b; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">${l}</div>
+                    </div>
+                `).join('');
+            }
+
+            // 1. Donut Chart
+            const donutCtx = document.getElementById('chatimeDonutChart');
+            if (donutCtx) {
+                if (chatimeDonutChart) chatimeDonutChart.destroy();
+                
+                const labels = ['Store DK', 'Luar Kota', 'Luar Pulau'];
+                const data = labels.map(l => stats[l].total.size);
+                const total = data.reduce((a, b) => a + b, 0);
+                
+                chatimeDonutChart = new Chart(donutCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: ['#007bff', '#00bcd4', '#e91e63'],
+                            borderWidth: 4,
+                            borderColor: '#ffffff',
+                            hoverOffset: 15
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: { padding: 5 },
+                        cutout: '65%',
+                        plugins: {
+                            legend: {
+                                display: false // Using custom legend/stats below
+                            },
+                            datalabels: {
+                                color: '#fff',
+                                font: { weight: '800', size: 14, family: "'Inter', sans-serif" },
+                                formatter: (value, ctx) => {
+                                    if (value === 0) return '';
+                                    let sum = 0;
+                                    ctx.dataset.data.forEach(v => sum += v);
+                                    return (value * 100 / sum).toFixed(0) + "%";
+                                },
+                                display: 'auto'
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 13 },
+                                padding: 12,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        const val = context.raw;
+                                        const pct = total > 0 ? ((val / total) * 100).toFixed(1) + '%' : '0%';
+                                        return ` ${context.label}: ${val} stores (${pct})`;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels, {
+                        id: 'centerText',
+                        beforeDraw: function(chart) {
+                            const width = chart.width, height = chart.height, ctx = chart.ctx;
+                            ctx.restore();
+                            const fontSize = (height / 220).toFixed(2);
+                            ctx.font = `800 ${fontSize}em Inter`;
+                            ctx.textBaseline = "middle";
+                            ctx.fillStyle = "#64748b";
+                            const text = "TOTAL", textX = Math.round((width - ctx.measureText(text).width) / 2), textY = height / 2 - 10;
+                            ctx.fillText(text, textX, textY);
+                            ctx.font = `800 ${(fontSize * 2.2).toFixed(2)}em Inter`;
+                            ctx.fillStyle = "#1e293b";
+                            const val = total.toString(), valX = Math.round((width - ctx.measureText(val).width) / 2), valY = height / 2 + 20;
+                            ctx.fillText(val, valX, valY);
+                            ctx.save();
+                        }
+                    }]
+                });
+            }
+
+            // 2. Bar Chart
+            const barCtx = document.getElementById('chatimeBarChart');
+            if (barCtx) {
+                if (chatimeBarChart) chatimeBarChart.destroy();
+                
+                const sortedLabels = ['Luar Pulau', 'Store DK', 'Luar Kota'];
+                const caseIdData = sortedLabels.map(l => stats[l] ? stats[l].total.size : 0);
+                const odData = sortedLabels.map(l => stats[l] ? stats[l].od.size : 0);
+                
+                chatimeBarChart = new Chart(barCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: sortedLabels,
+                        datasets: [
+                            {
+                                label: 'Total Case ID',
+                                data: caseIdData,
+                                backgroundColor: '#9c27b0',
+                                borderRadius: 4,
+                                barThickness: 24,
+                                categoryPercentage: 0.8,
+                                barPercentage: 0.9
+                            },
+                            {
+                                label: 'Total Outstanding (OD)',
+                                data: odData,
+                                backgroundColor: '#4caf50',
+                                borderRadius: 4,
+                                barThickness: 24,
+                                categoryPercentage: 0.8,
+                                barPercentage: 0.9
+                            }
+                        ]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: { padding: { right: 50, top: 10 } },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                align: 'end',
+                                labels: {
+                                    boxWidth: 12,
+                                    usePointStyle: true,
+                                    pointStyle: 'rect',
+                                    color: '#475569',
+                                    padding: 20,
+                                    font: { weight: '700', size: 12, family: "'Inter', sans-serif" }
+                                }
+                            },
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'right',
+                                color: (ctx) => ctx.dataset.backgroundColor,
+                                font: { weight: '800', size: 12, family: "'Inter', sans-serif" },
+                                formatter: (val) => val > 0 ? formatIndo(val) : '0',
+                                display: true,
+                                offset: 8
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9' },
+                                border: { display: false },
+                                ticks: { color: '#94a3b8', font: { size: 11, weight: '600' } }
+                            },
+                            y: {
+                                grid: { display: false },
+                                border: { display: false },
+                                ticks: { color: '#334155', font: { weight: '700', size: 13, family: "'Inter', sans-serif" } }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            }
         }
 
         function initFBIMap() {
@@ -5569,8 +5876,8 @@ function renderStoringPivotTable(filteredData) {
         const totalCbmRow = area.agingTotal + area.unplannedTotal;
 
         html += `<tr>
-            <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold; color: #ffd700;">${area.areaBB}</td>
-            <td style="border: 1px solid #333; padding: 8px; text-align: right; background: #3a2a00; color: #ffd700; font-weight: bold;">${totalCbmRow > 0 ? formatIndo(totalCbmRow) : '-'}</td>`;
+            <td style="background: #222; border: 1px solid #333; padding: 10px 20px; font-weight: bold;">${area.areaBB}</td>
+            <td style="border: 1px solid #333; padding: 8px; text-align: right; background: #222; font-weight: bold;">${totalCbmRow > 0 ? formatIndo(totalCbmRow) : '-'}</td>`;
 
         area.agingCbm.forEach((val, i) => {
             const displayVal = val > 0 ? formatIndo(val) : '-';
