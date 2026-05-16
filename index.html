@@ -3575,10 +3575,12 @@
 
         // Helper to format numbers like the image (Indo format)
         function formatIndo(val) {
-            if (val === 0) return '0';
-            // Show up to 2 decimal places, but remove trailing zeros. Use dot as requested in prompt "33.5"
-            return parseFloat(val.toFixed(2)).toString();
-        }
+    if (val === 0) return '0';
+    return val.toLocaleString('id-ID', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+}
 
         // Initialize Map
         function initMap() {
