@@ -3714,43 +3714,49 @@
             }
 
             // 1. Calculate KPIs and Summary
-            const uniqueStores = new Set();
-            const uniqueOrders = new Set();
-            const uniqueOrdersSudah = new Set();
-            const uniqueOrdersBelum = new Set();
-            
-            const coverageData = {}; // By Day for Chart
+            // GANTI DENGAN INI:
+const uniqueStores = new Set();
+const uniqueOrders = new Set();
+const uniqueOrdersSudah = new Set();
+const uniqueOrdersBelum = new Set();
 
-            rawPivotData.forEach(row => {
-                const colI = row.rawColumns && row.rawColumns.I ? row.rawColumns.I.trim() : "";
-                const colBC = row.status ? row.status.trim() : ""; // Column BC
-                const colF = row.rawColumns && row.rawColumns.F ? row.rawColumns.F.trim() : ""; // Column F
-                const date = row.stuffingDate || 'No Date';
+const coverageData = {}; // By Day for Chart
 
-                if (colI) {
-                    uniqueStores.add(colI.toUpperCase());
-                }
-                
-                if (colF) {
-                    uniqueOrders.add(colF);
-                    if (colBC.toUpperCase() === 'SUDAH PLAN') {
-                        uniqueOrdersSudah.add(colF);
-                    }
-                    if (colBC.toUpperCase() === 'BELUM PLAN') {
-                        uniqueOrdersBelum.add(colF);
-                    }
-                }
+rawPivotData.forEach(row => {
+    const colI = row.rawColumns && row.rawColumns.I ? row.rawColumns.I.trim() : "";
+    const colBC = row.status ? row.status.trim() : ""; // Column BC
 
-                // Coverage per Hari (based on Stuffing Date/Tanggal)
-                if (!coverageData[date]) coverageData[date] = 0;
-                coverageData[date] += row.cbm;
-            });
+    // PERBAIKAN: pakai Column E sebagai primary, Column F sebagai fallback
+    const colE = row.rawColumns && row.rawColumns.E ? row.rawColumns.E.trim() : "";
+    const colF = row.rawColumns && row.rawColumns.F ? row.rawColumns.F.trim() : "";
+    const orderId = colE || colF; // ambil yang ada nilainya
 
-            // Update KPI DOM
-            updateVal('fbi-kpi-total-stores', uniqueStores.size);
-            updateVal('fbi-kpi-sudah-plan', formatIndo(uniqueOrdersSudah.size));
-            updateVal('fbi-kpi-outstanding-aging', formatIndo(uniqueOrders.size));
-            updateVal('fbi-kpi-belum-plan', formatIndo(uniqueOrdersBelum.size));
+    const date = row.stuffingDate || 'No Date';
+
+    if (colI) {
+        uniqueStores.add(colI.toUpperCase());
+    }
+    
+    if (orderId) {
+        uniqueOrders.add(orderId);
+        if (colBC.toUpperCase() === 'SUDAH PLAN') {
+            uniqueOrdersSudah.add(orderId);
+        }
+        if (colBC.toUpperCase() === 'BELUM PLAN') {
+            uniqueOrdersBelum.add(orderId);
+        }
+    }
+
+    // Coverage per Hari (based on Stuffing Date/Tanggal)
+    if (!coverageData[date]) coverageData[date] = 0;
+    coverageData[date] += row.cbm;
+});
+
+// Update KPI DOM
+updateVal('fbi-kpi-total-stores', uniqueStores.size);
+updateVal('fbi-kpi-sudah-plan', formatIndo(uniqueOrdersSudah.size));
+updateVal('fbi-kpi-outstanding-aging', formatIndo(uniqueOrders.size));
+updateVal('fbi-kpi-belum-plan', formatIndo(uniqueOrdersBelum.size));
 
             // Render Chatime Dashboard (independent now)
             renderChatimeDashboard();
