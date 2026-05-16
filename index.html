@@ -4517,7 +4517,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
         
             if (!fbiMap) {
                 // Initialize Leaflet Map (mimicking Google Maps)
-                fbiMap = L.map('fbi-google-map').setView([-7.45, 112.7], 10);
+                fbiMap = L.map('fbi-google-map').setView([-5.0, 115.0], 5);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                     attribution: '© OpenStreetMap, © CARTO'
                 }).addTo(fbiMap);
@@ -4527,17 +4527,46 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 if (fbiMarkersLayer) fbiMarkersLayer.clearLayers();
             }
         
-            // Add some dummy markers for visualization
-            const markers = [
-                { lat: -7.4478, lng: 112.7183, name: 'Sidoarjo Center' },
-                { lat: -7.345, lng: 112.737, name: 'Surabaya Border' }
-            ];
-        
-            markers.forEach(m => {
-                L.marker([m.lat, m.lng]).addTo(fbiMarkersLayer)
-                    .bindPopup(m.name);
-            });
-        }
+            // Wilayah FBI coverage markers
+        const wilayahData = [
+            { name: 'Bali',        lat: -8.4095,  lng: 115.1889, count: 22 },
+            { name: 'Surabaya',    lat: -7.2575,  lng: 112.7521, count: 16 },
+            { name: 'Sidoarjo',    lat: -7.4478,  lng: 112.7183, count: 4  },
+            { name: 'Mojokerto',   lat: -7.4722,  lng: 112.4336, count: 2  },
+            { name: 'Lamongan',    lat: -7.1178,  lng: 112.4153, count: 1  },
+            { name: 'Gresik',      lat: -7.1539,  lng: 112.6561, count: 2  },
+            { name: 'Malang',      lat: -7.9666,  lng: 112.6326, count: 9  },
+            { name: 'Pasuruan',    lat: -7.6457,  lng: 112.9075, count: 1  },
+            { name: 'Madiun',      lat: -7.6298,  lng: 111.5239, count: 2  },
+            { name: 'Kediri',      lat: -7.8169,  lng: 112.0114, count: 1  },
+            { name: 'Tuban',       lat: -6.8944,  lng: 111.9533, count: 1  },
+            { name: 'Jember',      lat: -8.1724,  lng: 113.7000, count: 1  },
+            { name: 'Banyuwangi',  lat: -8.2192,  lng: 114.3691, count: 1  },
+            { name: 'Maluku',      lat: -3.6954,  lng: 128.1814, count: 2  },
+            { name: 'Lombok',      lat: -8.6363,  lng: 116.3150, count: 3  },
+            { name: 'Kupang',      lat: -10.1639, lng: 123.5812, count: 1  },
+            { name: 'Sorong',      lat: -0.8651,  lng: 131.2502, count: 1  },
+            { name: 'Papua',       lat: -4.2699,  lng: 138.0804, count: 1  },
+            { name: 'Manado',      lat: 1.4748,   lng: 124.8228, count: 1  },
+            { name: 'Makassar',    lat: -5.1477,  lng: 119.4327, count: 2  },
+            { name: 'Gorontalo',   lat: 0.5435,   lng: 123.0568, count: 1  },
+            { name: 'Kendari',     lat: -3.9456,  lng: 122.5144, count: 3  },
+            { name: 'Palu',        lat: -0.8917,  lng: 119.8707, count: 3  },
+        ];
+
+        wilayahData.forEach(w => {
+            const radius = Math.min(Math.max(w.count * 2, 8), 28);
+            L.circleMarker([w.lat, w.lng], {
+                radius: radius,
+                fillColor: '#ba68c8',
+                color: '#fff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.85
+            }).addTo(fbiMarkersLayer)
+              .bindPopup(`<strong>${w.name}</strong><br/>Jumlah: ${w.count}`);
+        });
+    }
 
         async function fetchFBIScheduleData() {
             try {
