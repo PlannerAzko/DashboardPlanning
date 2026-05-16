@@ -3752,17 +3752,28 @@ rawPivotData.forEach(row => {
     coverageData[date] += row.cbm;
 });
 
-// Hitung total order dari rawOrderDistData (sama dengan sumber Donut Chart = 273)
+// Hitung dari rawOrderDistData — sumber yang sama dengan Donut Chart
 const uniqueOrdersFromDist = new Set();
+const uniqueOrdersSudahDist = new Set();
+const uniqueOrdersBelumDist = new Set();
+
 rawOrderDistData.forEach(d => {
-    if (d.orderNo) uniqueOrdersFromDist.add(d.orderNo);
+    if (!d.orderNo) return;
+    uniqueOrdersFromDist.add(d.orderNo);
 });
+
+// Sudah Plan & Belum Plan tetap dari rawPivotData (karena ada kolom status BC)
+// tapi pakai rawOrderDistData sebagai referensi total yang benar
+// Hitung selisih: Belum Plan = Total - Sudah Plan
+const totalOrder = uniqueOrdersFromDist.size;           // 273 (dari rawOrderDistData)
+const sudahPlan  = uniqueOrdersSudah.size;              // 175 (dari rawPivotData)
+const belumPlan  = totalOrder - sudahPlan;              // 273 - 175 = 98
 
 // Update KPI DOM
 updateVal('fbi-kpi-total-stores', uniqueStores.size);
-updateVal('fbi-kpi-sudah-plan', formatIndo(uniqueOrdersSudah.size));
-updateVal('fbi-kpi-outstanding-aging', formatIndo(uniqueOrdersFromDist.size));  // ← pakai rawOrderDistData
-updateVal('fbi-kpi-belum-plan', formatIndo(uniqueOrdersBelum.size));
+updateVal('fbi-kpi-sudah-plan', formatIndo(sudahPlan));
+updateVal('fbi-kpi-outstanding-aging', formatIndo(totalOrder));
+updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
 
             // Render Chatime Dashboard (independent now)
             renderChatimeDashboard();
