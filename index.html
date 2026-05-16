@@ -2090,10 +2090,10 @@
                     </div>
                 </div>
 
-                <!-- Charts Container: Responsive Flex Layout -->
-                <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: stretch;">
+                <!-- Charts Container: Horizontal Layout -->
+                <div style="display: flex; gap: 24px; align-items: stretch; margin-bottom: 25px;">
                     <!-- LEFT COLUMN: Proportional Distribution -->
-                    <div style="background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; align-items: center; border: 1px solid #f1f5f9; flex: 1 1 400px; min-height: 450px;">
+                    <div style="background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; align-items: center; border: 1px solid #f1f5f9; flex: 1; min-height: 450px;">
                         <h4 style="align-self: flex-start; margin: 0 0 20px 0; font-size: 1.1rem; color: #334155; font-weight: 700; display: flex; align-items: center; gap: 10px;">
                             <span style="width: 4px; height: 18px; background: #6a1b9a; border-radius: 2px;"></span>
                             Order Distribution By Region
@@ -2107,7 +2107,7 @@
                     </div>
 
                     <!-- RIGHT COLUMN: Order Aging Metrics -->
-                    <div style="background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; border: 1px solid #f1f5f9; flex: 1.5 1 500px; min-height: 450px;">
+                    <div style="background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; border: 1px solid #f1f5f9; flex: 1; min-height: 450px;">
                         <h4 style="margin: 0 0 20px 0; font-size: 1.1rem; color: #334155; font-weight: 700; display: flex; align-items: center; gap: 10px;">
                             <span style="width: 4px; height: 18px; background: #4caf50; border-radius: 2px;"></span>
                             Case ID Status Breakdown
@@ -3019,6 +3019,7 @@
         let PIVOT_SHEET_GID = '1075426956';
         let PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${PIVOT_SHEET_ID}/export?format=csv&gid=${PIVOT_SHEET_GID}`;
         const PLANNER_CSV_URL = 'https://docs.google.com/spreadsheets/d/117EFwQPnkWdcEEsdG0mVC2stt68OjlCuEv4PmHZyNMY/export?format=csv&gid=2036643748';
+        const ORDER_DIST_CSV_URL = 'https://docs.google.com/spreadsheets/d/1lRl-Noq63iovsyzOTEM_Dxw4rPOKDF6dsO9o387iHwk/export?format=csv&gid=1075426956';
         let HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
         const USER_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=1368870427`;
 
@@ -3367,6 +3368,8 @@
                 fetchPivotData();
                 fetchHubData();
                 fetchAstorData();
+                fetchPlannerData();
+                fetchOrderDistData();
                 fetchData(); // Trigger main data fetch with new URL
             }, 500);
         }
@@ -3590,6 +3593,7 @@
         const SHEET_URL_SCHEDULE = 'https://docs.google.com/spreadsheets/d/1lRl-Noq63iovsyzOTEM_Dxw4rPOKDF6dsO9o387iHwk/export?format=csv&gid=1862882799';
         let rawPivotData = [];
         let rawPlannerData = [];
+        let rawOrderDistData = [];
         let rawFBISchedule = [];
         let rawHubData = [];
         let rawAstorData = [];
@@ -4097,28 +4101,33 @@
             });
         }
 
-        function renderChatimeCharts(stats) {
+        function renderChatimeCharts(donorStats, barStats) {
             // Update Mini Stats Legend below Donut
             const legendEl = document.getElementById('donut-stats-legend');
             if (legendEl) {
-                const colors = ['#007bff', '#00bcd4', '#e91e63'];
-                const labels = ['Store DK', 'Luar Kota', 'Luar Pulau'];
+                // Determine colors for dynamic labels
+                const colorPalette = ['#007bff', '#00bcd4', '#e91e63', '#4caf50', '#ff9800', '#9c27b0', '#795548', '#607d8b'];
+                const labels = Object.keys(donorStats);
+                
+                legendEl.style.gridTemplateColumns = `repeat(${Math.min(labels.length, 4)}, 1fr)`;
+                
                 legendEl.innerHTML = labels.map((l, i) => `
                     <div>
-                        <div style="color: ${colors[i]}; font-size: 1.1rem; font-weight: 800;">${stats[l].total}</div>
+                        <div style="color: ${colorPalette[i % colorPalette.length]}; font-size: 1.1rem; font-weight: 800;">${donorStats[l]}</div>
                         <div style="color: #64748b; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">${l}</div>
                     </div>
                 `).join('');
             }
 
-            // 1. Donut Chart
+            // 1. Donut Chart (Order Distribution By Region)
             const donutCtx = document.getElementById('chatimeDonutChart');
             if (donutCtx) {
                 if (chatimeDonutChart) chatimeDonutChart.destroy();
                 
-                const labels = ['Store DK', 'Luar Kota', 'Luar Pulau'];
-                const data = labels.map(l => stats[l].total);
+                const labels = Object.keys(donorStats);
+                const data = labels.map(l => donorStats[l]);
                 const totalTotal = data.reduce((a, b) => a + b, 0);
+                const colorPalette = ['#007bff', '#00bcd4', '#e91e63', '#4caf50', '#ff9800', '#9c27b0', '#795548', '#607d8b'];
                 
                 chatimeDonutChart = new Chart(donutCtx, {
                     type: 'doughnut',
@@ -4126,7 +4135,7 @@
                         labels: labels,
                         datasets: [{
                             data: data,
-                            backgroundColor: ['#007bff', '#00bcd4', '#e91e63'],
+                            backgroundColor: labels.map((_, i) => colorPalette[i % colorPalette.length]),
                             borderWidth: 4,
                             borderColor: '#ffffff',
                             hoverOffset: 15
@@ -4139,16 +4148,17 @@
                         cutout: '65%',
                         plugins: {
                             legend: {
-                                display: false // Using custom legend/stats below
+                                display: false
                             },
                             datalabels: {
                                 color: '#fff',
-                                font: { weight: '800', size: 14, family: "'Inter', sans-serif" },
+                                font: { weight: '800', size: 12, family: "'Inter', sans-serif" },
                                 formatter: (value, ctx) => {
                                     if (value === 0) return '';
                                     let sum = 0;
                                     ctx.dataset.data.forEach(v => sum += v);
-                                    return (value * 100 / sum).toFixed(0) + "%";
+                                    const pct = (value * 100 / sum);
+                                    return pct < 5 ? '' : pct.toFixed(0) + "%";
                                 },
                                 display: 'auto'
                             },
@@ -4162,7 +4172,7 @@
                                     label: function(context) {
                                         const val = context.raw;
                                         const pct = totalTotal > 0 ? ((val / totalTotal) * 100).toFixed(1) + '%' : '0%';
-                                        return ` ${context.label}: ${val} stores (${pct})`;
+                                        return ` ${context.label}: ${val} (${pct})`;
                                     }
                                 }
                             }
@@ -4189,14 +4199,14 @@
                 });
             }
 
-            // 2. Bar Chart
+            // 2. Bar Chart (Case ID Status Breakdown)
             const barCtx = document.getElementById('chatimeBarChart');
             if (barCtx) {
                 if (chatimeBarChart) chatimeBarChart.destroy();
                 
                 const sortedLabels = ['Luar Pulau', 'Store DK', 'Luar Kota'];
-                const caseIdData = sortedLabels.map(l => stats[l] ? stats[l].total : 0);
-                const odData = sortedLabels.map(l => stats[l] ? stats[l].od : 0);
+                const caseIdData = sortedLabels.map(l => barStats[l] ? barStats[l].total : 0);
+                const odData = sortedLabels.map(l => barStats[l] ? barStats[l].od : 0);
                 
                 chatimeBarChart = new Chart(barCtx, {
                     type: 'bar',
@@ -4350,10 +4360,23 @@
             if (sortedDates.includes(selectedDate)) {
                 dateFilter.value = selectedDate;
             } else if (sortedDates.length > 0) {
-                // Try today's date
+                // Try today's date with possible formats (dd/mm/yyyy or d/m/yyyy)
                 const now = new Date();
-                const todayFormatted = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
-                const matchToday = sortedDates.find(d => d === todayFormatted);
+                const d = String(now.getDate());
+                const dd = d.padStart(2, '0');
+                const m = String(now.getMonth() + 1);
+                const mm = m.padStart(2, '0');
+                const yyyy = now.getFullYear();
+                const yy = String(yyyy).substring(2);
+                
+                const todayFormats = [
+                    `${dd}/${mm}/${yyyy}`,
+                    `${d}/${m}/${yyyy}`,
+                    `${dd}/${mm}/${yy}`,
+                    `${d}/${m}/${yy}`
+                ];
+                
+                const matchToday = sortedDates.find(d => todayFormats.includes(d));
                 
                 if (matchToday) {
                     dateFilter.value = matchToday;
@@ -4374,6 +4397,36 @@
                 areaFilter.appendChild(opt);
             });
             if (allowedAreas.includes(selectedArea)) areaFilter.value = selectedArea;
+        }
+
+        async function fetchOrderDistData(retries = 2) {
+            try {
+                const response = await fetch(ORDER_DIST_CSV_URL);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const csv = await response.text();
+                if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML');
+                parseOrderDistCSV(csv);
+            } catch (error) {
+                console.error("Error fetching Order Dist data:", error);
+                if (retries > 0) setTimeout(() => fetchOrderDistData(retries - 1), 2000);
+            }
+        }
+
+        function parseOrderDistCSV(csv) {
+            const rows = robustCSVParser(csv);
+            if (rows.length < 2) return;
+            
+            // Expected Column Mapping from user request (In spreadsheet 1075426956):
+            // E=4: Order Number (Unique check)
+            // BA=52: Region (Breakdown)
+            
+            const data = rows.slice(1);
+            rawOrderDistData = data.map(row => ({
+                orderNo: (row[4] || '').trim(),
+                region: (row[52] || '').trim()
+            })).filter(d => d.region && d.region !== '');
+            
+            renderChatimeDashboard();
         }
 
         function renderChatimeDashboard() {
@@ -4397,30 +4450,34 @@
             if (odEl) odEl.innerText = formatIndo(totalOrderRelease);
             if (ciEl) ciEl.innerText = formatIndo(totalCaseId);
 
-            // Chart Data
-            const chartStats = {
+            // Chart Data 1: Order Distribution (Unique count of orderNo per region)
+            const regionOrderMap = {};
+            rawOrderDistData.forEach(d => {
+                if (!regionOrderMap[d.region]) regionOrderMap[d.region] = new Set();
+                if (d.orderNo) regionOrderMap[d.region].add(d.orderNo);
+            });
+            
+            const donutStats = {};
+            for (const region in regionOrderMap) {
+                donutStats[region] = regionOrderMap[region].size;
+            }
+
+            // Chart Data 2: Bar Chart (Planner source - remains as is)
+            const barStats = {
                 'Store DK': { total: 0, od: 0 },
                 'Luar Kota': { total: 0, od: 0 },
                 'Luar Pulau': { total: 0, od: 0 }
             };
-
-            // Calculate breakdown for charts (ignoring area filter for the breakdown itself, or should it respect it?)
-            // Usually, breakdown charts show all areas unless one is selected.
-            // If area filter is selected, we should probably still show the others but they will be 0 or emphasized?
-            // Actually, the user says "pada tabel grafik Case ID Status Breakdown... yang ditampilkan di filter hanya data Luar Pulau, Luar Kota, Store DK"
-            // This suggests the chart shows these 3.
             
-            // Re-calculate stats for all 3 areas based on date filter ONLY for the charts
             const areaDateFiltered = rawPlannerData.filter(d => dateFilter === 'ALL' || d.stuffingDate === dateFilter);
-            
             areaDateFiltered.forEach(d => {
-                if (chartStats[d.area]) {
-                    chartStats[d.area].total += d.caseId;
-                    chartStats[d.area].od += d.orderRelease;
+                if (barStats[d.area]) {
+                    barStats[d.area].total += d.caseId;
+                    barStats[d.area].od += d.orderRelease;
                 }
             });
 
-            renderChatimeCharts(chartStats);
+            renderChatimeCharts(donutStats, barStats);
         }
 
         function initFBIMap() {
@@ -7944,11 +8001,13 @@ function renderStoringPivotTable(filteredData) {
         // Auto-refresh every 30 seconds
         setInterval(fetchData, 30000);
         setInterval(fetchPlannerData, 30000);
+        setInterval(fetchOrderDistData, 30000);
 
         // Initialize
         initMap();
         fetchData();
         fetchPlannerData();
+        fetchOrderDistData();
         // ===== ASTOR SLA & OUTSTANDING ENGINE =====
 const ASTOR_GID     = '1345578811';
 let ASTOR_CSV_URL_DYNAMIC = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${ASTOR_GID}`;
