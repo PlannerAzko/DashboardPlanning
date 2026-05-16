@@ -2469,7 +2469,7 @@
 
             <!-- Table: MONITORING ORDER AGING BY AREA STORING -->
             <div id="storing-aging-container" style="margin-top: 30px; margin-bottom: 30px; border-bottom: 2px solid #333;">
-                <div class="table-header" style="background: linear-gradient(90deg, #331d52 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
+                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
                     <span><i class="fas fa-warehouse" style="margin-right: 10px; color: #ffd700;"></i> MONITORING ORDER AGING BY AREA STORING</span>
                     <span style="font-size: 0.8em; opacity: 0.8;">Data Aggregated by Area BB</span>
                 </div>
@@ -2478,21 +2478,21 @@
                         <thead>
                             <tr class="nested-header">
                                 <th rowspan="2" onclick="sortStoringPivot('areaBB')" style="width: 200px; background: #1a1a1a; border-right: 1px solid #333; cursor: pointer;">AREA STORING <i class="fas fa-sort" style="font-size: 0.7em;"></i></th>
-                                <th rowspan="2" style="width: 100px; background: #3a2a00; color: #ffd700; border-right: 1px solid #444;">TOTAL</th>
-                                <th colspan="5" style="background: #1b5e20; color: #fff; text-align: center; border-right: 1px solid #444;">AGING SUDAH PLAN (CBM)</th>
-                                <th colspan="5" style="background: #b71c1c; color: #fff; text-align: center;">AGING BELUM PLAN (CBM)</th>
+                                <th rowspan="2" style="width: 100px; background: #333; color: #ffd700; border-right: 1px solid #444;">TOTAL</th>
+                                <th colspan="5" style="background: #2c3e50; color: #ecf0f1; text-align: center; border-right: 1px solid #444;">AGING SUDAH PLAN (CBM)</th>
+                                <th colspan="5" style="background: #27ae60; color: #fff; text-align: center;">AGING BELUM PLAN (CBM)</th>
                             </tr>
                             <tr class="sub-header">
                                 <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('aging0')">0</th>
                                 <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('aging1_3')">1-3</th>
                                 <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('aging4_7')">4-7</th>
                                 <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('aging7up')">7 UP</th>
-                                <th style="cursor: pointer; width: 80px; text-align: center; background: #1a252f;" onclick="sortStoringPivot('agingTotal')">TOTAL</th>
+                                <th style="cursor: pointer; width: 80px; text-align: center; background: #34495e;" onclick="sortStoringPivot('agingTotal')">TOTAL</th>
                                 <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('unplanned0')">0</th>
                                 <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('unplanned1_3')">1-3</th>
                                 <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('unplanned4_7')">4-7</th>
                                 <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('unplanned7up')">7 UP</th>
-                                <th style="cursor: pointer; width: 80px; text-align: center; background: #166534;" onclick="sortStoringPivot('unplannedTotal')">TOTAL</th>
+                                <th style="cursor: pointer; width: 80px; text-align: center; background: #219150;" onclick="sortStoringPivot('unplannedTotal')">TOTAL</th>
                             </tr>
                         </thead>
                         <tbody id="storing-aging-body">
@@ -3146,7 +3146,7 @@
                 loginBtn.textContent = "VERIFYING...";
                 
                 // Fetch user data from spreadsheet
-                const response = await fetch(`${USER_CSV_URL}&t=${Date.now()}`);
+                const response = await fetch(USER_CSV_URL);
                 const csv = await response.text();
                 const lines = csv.split(/\r?\n/);
                 
@@ -3226,13 +3226,17 @@
                 SHEET_ID = SHEET_ID_FBI;
                 SHEET_GID = SHEET_GID_FBI;
                 CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
-                PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=INPUT%20DATA`;
+                PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1075426956`;
                 HUB_CSV_URL = CSV_URL;
                 ASTOR_CSV_URL_DYNAMIC = null;
                 
                 if (headerTitle) headerTitle.textContent = 'LOGISTICS DASHBOARD | ORDER PLANNING DC FBI SIDOARJO';
                 if (welcomeTitle) welcomeTitle.textContent = 'Dashboard DC FBI SIDOARJO';
                 if (marquee) marquee.textContent = marquee.textContent.replace('TIM PLANNER SIDOARJO', 'TIM FBI SIDOARJO');
+                
+                // Hide Storing Aging for FBI
+                const storingContainer = document.getElementById('storing-aging-container');
+                if (storingContainer) storingContainer.style.display = 'none';
 
                 // FBI: Hide specific navigation items
                 if (navPartner) navPartner.style.display = 'none';
@@ -3255,6 +3259,10 @@
                 if (headerTitle) headerTitle.textContent = 'LOGISTICS DASHBOARD | ORDER PLANNING NDC AHI SIDOARJO';
                 if (welcomeTitle) welcomeTitle.textContent = 'Dashboard DC AHI SIDOARJO';
                 if (marquee) marquee.textContent = marquee.textContent.replace('TIM FBI SIDOARJO', 'TIM PLANNER SIDOARJO');
+                
+                // Show Storing Aging for AHI
+                const storingContainer = document.getElementById('storing-aging-container');
+                if (storingContainer) storingContainer.style.display = 'block';
 
                 // AHI: Show all navigation items
                 if (navPartner) navPartner.style.display = 'flex';
@@ -3266,10 +3274,13 @@
             document.getElementById('welcome-step-dc-branch').classList.add('hidden');
             document.getElementById('welcome-step-2').classList.remove('hidden');
             
-            fetchPivotData();
-            fetchHubData();
-            fetchAstorData();
-            fetchData(); // Trigger main data fetch with new URL
+            // Add a small delay to ensure URLs are set and UI is updated
+            setTimeout(() => {
+                fetchPivotData();
+                fetchHubData();
+                fetchAstorData();
+                fetchData(); // Trigger main data fetch with new URL
+            }, 500);
         }
 
         function toggleFullScreen() {
@@ -4106,7 +4117,7 @@
 
         async function fetchPivotData(retries = 2) {
             try {
-                const finalUrl = `${PIVOT_CSV_URL}&t=${Date.now()}`;
+                const finalUrl = PIVOT_CSV_URL;
                 const response = await fetch(finalUrl);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const csv = await response.text();
@@ -4125,12 +4136,13 @@
                 }
                 const tbody = document.getElementById('pivot-table-body');
                 if (tbody) {
-                    const isNetworkError = error.name === 'TypeError' || error.message.includes('fetch');
+                    const isNetworkError = (error && error.name === 'TypeError') || 
+                                           (error && error.message && error.message.includes('fetch'));
                     tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: #d32f2f; padding: 20px;">
                         <i class="fas fa-exclamation-triangle" style="font-size: 2em; margin-bottom: 10px;"></i><br/>
                         <strong>Gagal mengambil data pivot.</strong><br/>
                         <span style="font-size: 0.9em; color: #bbb; display: block; margin-top: 10px;">
-                            ${isNetworkError ? 'Penyebab Umum: Koneksi internet terputus, AdBlocker terlalu ketat, atau Google Sheet belum di-share publik.' : error.message}
+                            ${isNetworkError ? 'Penyebab Umum: Koneksi internet terputus, AdBlocker terlalu ketat, atau Google Sheet belum di-share publik.' : (error ? error.message : 'Unknown Error')}
                         </span>
                         <button onclick="fetchPivotData()" style="margin-top:15px; padding:8px 20px; background:#ffd700; color:#000; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">
                             <i class="fas fa-sync"></i> COBA LAGI
@@ -4293,7 +4305,7 @@
                 const container = document.getElementById('hub-summary-container');
                 if (container) container.style.display = 'block';
                 
-                const finalUrl = `${HUB_CSV_URL}&t=${Date.now()}`;
+                const finalUrl = HUB_CSV_URL;
                 const response = await fetch(finalUrl);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const csv = await response.text();
@@ -4311,7 +4323,7 @@
                 }
                 const tbody = document.getElementById('hub-summary-body');
                 if (tbody) {
-                    tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: #d32f2f; padding: 20px;">Gagal mengambil data Hub: ${error.message}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: #d32f2f; padding: 20px;">Gagal mengambil data Hub: ${error ? error.message : 'Unknown Error'}</td></tr>`;
                 }
             }
         }
@@ -5721,9 +5733,9 @@ function renderStoringPivotTable(filteredData) {
 
         // Fetch Data dari Google Sheets
         async function fetchData(retries = 2) {
+            // Remove timestamp suffix to see if it fixes NetworkError
+            const finalUrl = CSV_URL;
             try {
-                // Menambahkan timestamp untuk menghindari cache
-                const finalUrl = `${CSV_URL}&t=${Date.now()}`;
                 const response = await fetch(finalUrl);
                 
                 if (!response.ok) {
@@ -5773,9 +5785,11 @@ function renderStoringPivotTable(filteredData) {
                     }
                 }, 3000); // Give it more time to show the animation
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching data from URL:', finalUrl);
+                console.error('Error details:', error);
                 
-                const isNetworkError = error.name === 'TypeError' || error.message.includes('fetch');
+                const isNetworkError = (error && error.name === 'TypeError') || 
+                                       (error && error.message && (error.message.includes('fetch') || error.message.includes('NetworkError')));
 
                 if (retries > 0 && isNetworkError) {
                     console.log(`Retrying main data fetch... (${retries} left)`);
@@ -5785,7 +5799,7 @@ function renderStoringPivotTable(filteredData) {
 
                 const errorMsg = isNetworkError ? 
                     'Gagal mengambil data (Network Error). Pastikan Google Sheets telah dibagikan (Anyone with the link can view) dan tidak diblokir oleh ekstensi browser (AdBlock/VPN).' : 
-                    `Terjadi kesalahan: ${error.message}`;
+                    `Terjadi kesalahan: ${error ? error.message : 'Unknown Error'}`;
                 
                 document.getElementById('crm-table-container').innerHTML = 
                     `<div class="loading" style="color: #ff6b6b; padding: 40px; background: rgba(0,0,0,0.3); border-radius: 8px;">
@@ -7532,8 +7546,8 @@ async function fetchAstorData(retries = 2) {
             </td></tr>`;
         return;
     }
-    try {
-        const res = await fetch(`${ASTOR_CSV_URL_DYNAMIC}&t=${Date.now()}`);
+        try {
+            const res = await fetch(ASTOR_CSV_URL_DYNAMIC);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const csv = await res.text();
         if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML');
@@ -7547,7 +7561,7 @@ async function fetchAstorData(retries = 2) {
         }
         document.getElementById('astor-outstanding-tbody').innerHTML =
             `<tr><td colspan="10" style="text-align:center;padding:20px;color:#f87171;">
-                Gagal Koneksi: ${e.message}. Pastikan internet stabil dan spreadsheet dapat diakses.
+                Gagal Koneksi: ${e ? e.message : 'Unknown Error'}. Pastikan internet stabil dan spreadsheet dapat diakses.
                 <button onclick="fetchAstorData()" style="margin-left:10px;padding:5px 12px;background:#d32f2f;color:#fff;border:none;border-radius:4px;cursor:pointer;">Coba Lagi</button>
             </td></tr>`;
     }
