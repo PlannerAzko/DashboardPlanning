@@ -2406,7 +2406,7 @@
 
             <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <span><i class="fas fa-th"></i> MONITORING ORDER AGING DC FBI SIDOARJO</span>
+                    <span><i class="fas fa-th"></i> MONITORING ORDER AGING DC SIDOARJO</span>
                     <div id="pivot-grand-total-display" style="background: rgba(255,215,0,0.1); border: 1px solid #ffd700; color: #ffd700; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em; display: none;">
                         BACKLOG ORDERS: <span id="pivot-grand-total-value">0</span> CBM
                     </div>
@@ -2465,6 +2465,42 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Table: MONITORING ORDER AGING BY AREA STORING -->
+            <div id="storing-aging-container" style="margin-top: 30px; margin-bottom: 30px; border-bottom: 2px solid #333;">
+                <div class="table-header" style="background: linear-gradient(90deg, #331d52 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-warehouse" style="margin-right: 10px; color: #ffd700;"></i> MONITORING ORDER AGING BY AREA STORING</span>
+                    <span style="font-size: 0.8em; opacity: 0.8;">Data Aggregated by Area BB</span>
+                </div>
+                <div class="table-content-large" style="overflow-x: auto; background: #1a1a1a; padding: 0;">
+                    <table class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em; background: #1a1a1a; color: #fff;">
+                        <thead>
+                            <tr class="nested-header">
+                                <th rowspan="2" onclick="sortStoringPivot('areaBB')" style="width: 200px; background: #1a1a1a; border-right: 1px solid #333; cursor: pointer;">AREA STORING <i class="fas fa-sort" style="font-size: 0.7em;"></i></th>
+                                <th rowspan="2" style="width: 100px; background: #3a2a00; color: #ffd700; border-right: 1px solid #444;">TOTAL</th>
+                                <th colspan="5" style="background: #1b5e20; color: #fff; text-align: center; border-right: 1px solid #444;">AGING SUDAH PLAN (CBM)</th>
+                                <th colspan="5" style="background: #b71c1c; color: #fff; text-align: center;">AGING BELUM PLAN (CBM)</th>
+                            </tr>
+                            <tr class="sub-header">
+                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('aging0')">0</th>
+                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('aging1_3')">1-3</th>
+                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('aging4_7')">4-7</th>
+                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('aging7up')">7 UP</th>
+                                <th style="cursor: pointer; width: 80px; text-align: center; background: #1a252f;" onclick="sortStoringPivot('agingTotal')">TOTAL</th>
+                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('unplanned0')">0</th>
+                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('unplanned1_3')">1-3</th>
+                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('unplanned4_7')">4-7</th>
+                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('unplanned7up')">7 UP</th>
+                                <th style="cursor: pointer; width: 80px; text-align: center; background: #166534;" onclick="sortStoringPivot('unplannedTotal')">TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="storing-aging-body">
+                            <tr><td colspan="12" style="text-align: center; padding: 20px;">Processing data area...</td></tr>
+                        </tbody>
+                        <tfoot id="storing-aging-foot"></tfoot>
+                    </table>
+                </div>
             </div>
 
 
@@ -3437,12 +3473,10 @@
 
         // Helper to format numbers like the image (Indo format)
         function formatIndo(val) {
-    if (val === 0) return '0';
-    return val.toLocaleString('id-ID', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-    });
-}
+            if (val === 0) return '0';
+            // Show up to 2 decimal places, but remove trailing zeros. Use dot as requested in prompt "33.5"
+            return parseFloat(val.toFixed(2)).toString();
+        }
 
         // Initialize Map
         function initMap() {
@@ -3573,11 +3607,10 @@
 
             // 1. Calculate KPIs
             const uniqueStores = new Set();
-            let sudahPlan = 0;
-            let outstandingOrder = 0;
-            let belumPlan = 0;
+            const uniqueOrders = new Set();
+            const uniqueOrdersSudah = new Set();
+            const uniqueOrdersBelum = new Set();
             
-            const outstandingList = [];
             const coverageData = {}; // By Day
 
             rawPivotData.forEach(row => {
@@ -3585,29 +3618,18 @@
                 const colBC = row.status ? row.status.trim() : ""; // Column BC
                 const colF = row.rawColumns && row.rawColumns.F ? row.rawColumns.F.trim() : ""; // Column F
 
-                // "Total Stores" is the unique count of Column I
                 if (colI) {
-                    uniqueStores.add(colI);
+                    uniqueStores.add(colI.toUpperCase());
                 }
                 
-                // "Sudah Plan" is the count of rows in Column BC
-                if (colBC.toUpperCase().trim() === 'SUDAH PLAN') {
-                    sudahPlan++;
-                }
-
-                // "Outstanding Order" is the count of rows in Column F
                 if (colF) {
-                    outstandingOrder++;
-                    outstandingList.push({
-                        name: row.storeBookingName || 'Unknown Store',
-                        cbm: row.cbm || 0,
-                        aging: row.aging || 0
-                    });
-                }
-
-                // Belum Plan: Rows with 'Belum Plan' in Column BC
-                if (colBC.toUpperCase().trim() === 'BELUM PLAN') {
-                    belumPlan++;
+                    uniqueOrders.add(colF);
+                    if (colBC.toUpperCase() === 'SUDAH PLAN') {
+                        uniqueOrdersSudah.add(colF);
+                    }
+                    if (colBC.toUpperCase() === 'BELUM PLAN') {
+                        uniqueOrdersBelum.add(colF);
+                    }
                 }
 
                 // Coverage per Hari (based on Stuffing Date/Tanggal)
@@ -3618,9 +3640,9 @@
 
             // Update KPI DOM
             updateVal('fbi-kpi-total-stores', uniqueStores.size);
-            updateVal('fbi-kpi-sudah-plan', formatIndo(Math.round(sudahPlan)));
-            updateVal('fbi-kpi-outstanding-aging', formatIndo(Math.round(outstandingOrder)));
-            updateVal('fbi-kpi-belum-plan', formatIndo(Math.round(belumPlan)));
+            updateVal('fbi-kpi-sudah-plan', formatIndo(uniqueOrdersSudah.size));
+            updateVal('fbi-kpi-outstanding-aging', formatIndo(uniqueOrders.size));
+            updateVal('fbi-kpi-belum-plan', formatIndo(uniqueOrdersBelum.size));
 
             // 2. Render Outstanding Table (Filtered by FBI Schedule filters)
             if (tbody) {
