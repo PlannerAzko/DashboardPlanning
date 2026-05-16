@@ -3752,10 +3752,16 @@ rawPivotData.forEach(row => {
     coverageData[date] += row.cbm;
 });
 
+// Hitung total order dari rawOrderDistData (sama dengan sumber Donut Chart = 273)
+const uniqueOrdersFromDist = new Set();
+rawOrderDistData.forEach(d => {
+    if (d.orderNo) uniqueOrdersFromDist.add(d.orderNo);
+});
+
 // Update KPI DOM
 updateVal('fbi-kpi-total-stores', uniqueStores.size);
 updateVal('fbi-kpi-sudah-plan', formatIndo(uniqueOrdersSudah.size));
-updateVal('fbi-kpi-outstanding-aging', formatIndo(uniqueOrders.size));
+updateVal('fbi-kpi-outstanding-aging', formatIndo(uniqueOrdersFromDist.size));  // ← pakai rawOrderDistData
 updateVal('fbi-kpi-belum-plan', formatIndo(uniqueOrdersBelum.size));
 
             // Render Chatime Dashboard (independent now)
