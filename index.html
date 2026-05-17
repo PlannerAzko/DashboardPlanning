@@ -94,6 +94,12 @@
             transform: translateY(20px);
             animation: pageLoad 1s ease-out forwards;
         }
+        
+        .dash-section {
+            min-width: 0;
+            box-sizing: border-box;
+            max-width: 100%;
+        }
 
         @keyframes pageLoad {
             to { opacity: 1; transform: translateY(0); }
@@ -1130,11 +1136,44 @@
             #outstanding-kpi-container {
                 grid-template-columns: repeat(3, 1fr) !important;
             }
+            .astor-kpi-row, .astor-chart-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+            #hub-summary-container .table-header, .astor-sla-header {
+                flex-wrap: wrap !important;
+                gap: 12px;
+            }
+            #hub-summary-container .table-header > div, .astor-filter-row {
+                flex-wrap: wrap !important;
+            }
+        }
+
+        @media (max-width: 1000px) {
+            #hub-summary-container > div:nth-child(2) {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
         }
 
         @media (max-width: 768px) {
             #outstanding-kpi-container {
                 grid-template-columns: repeat(2, 1fr) !important;
+            }
+            .astor-kpi-row, .astor-chart-grid {
+                grid-template-columns: 1fr !important;
+            }
+            #hub-summary-container .table-header, .astor-sla-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+            .astor-filter-row {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+        }
+
+        @media (max-width: 600px) {
+            #hub-summary-container > div:nth-child(2) {
+                grid-template-columns: 1fr !important;
             }
         }
 
@@ -1433,6 +1472,8 @@
     justify-content: space-between;
     align-items: center;
     border-radius: 4px 4px 0 0;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 .astor-kpi-row {
     display: grid;
@@ -1448,6 +1489,7 @@
     border-bottom: 3px solid #444;
     transition: transform 0.2s;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    min-width: 0;
 }
 .astor-kpi-card:hover { transform: translateY(-4px); }
 .astor-kpi-card.hit  { border-bottom-color: #2dd4bf; }
@@ -1536,6 +1578,7 @@
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    min-width: 0;
 }
 .astor-chart-title {
     background: #111;
@@ -1554,9 +1597,10 @@
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0,0,0,0.4);
     margin-top: 20px;
+    min-width: 0;
 }
-.astor-outstanding-table-wrap { max-height: 350px; overflow-y: auto; }
-.astor-filter-row { display: flex; gap: 12px; align-items: center; }
+.astor-outstanding-table-wrap { max-height: 350px; overflow-y: auto; overflow-x: auto; }
+.astor-filter-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .astor-filter-row select {
     background: #222;
     color: #ffd700;
@@ -2657,9 +2701,9 @@
             </div>
             <!-- Table: MONITORING HUB GRW -->
             <div id="hub-summary-container" style="margin-top: 30px; margin-bottom: 30px; border-bottom: 2px solid #333; display: none;">
-                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center;">
+                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                     <span><i class="fas fa-truck-ramp-box" style="margin-right: 10px; color: #ffd700;"></i> MONITORING HUB GRW</span>
-                    <div style="display: flex; gap: 10px; align-items: center;">
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                         <button onclick="downloadHubExcel()" style="background: #1d6f42; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; display: flex; align-items: center; gap: 6px; font-weight: bold;">
                             <i class="fas fa-file-excel"></i> EXCEL EXPORT
                         </button>
@@ -2720,7 +2764,7 @@
                 <!-- Hub Summaries -->
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; background: #1a1a1a; padding: 20px; border-bottom: 1px solid #333;">
                     <!-- Armada Status -->
-                    <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 15px;">
+                    <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 15px; min-width: 0;">
                         <div style="color: #ffd700; font-size: 0.8em; font-weight: bold; margin-bottom: 15px; text-transform: uppercase;">
                             <i class="fas fa-truck" style="margin-right: 8px;"></i> STATUS ARMADA
                         </div>
@@ -2729,7 +2773,7 @@
                         </div>
                     </div>
                     <!-- Loading Info -->
-                    <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 15px;">
+                    <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 15px; min-width: 0;">
                         <div style="color: #ffd700; font-size: 0.8em; font-weight: bold; margin-bottom: 15px; text-transform: uppercase;">
                             <i class="fas fa-boxes-packing" style="margin-right: 8px;"></i> KETERANGAN LOADING
                         </div>
@@ -2745,7 +2789,7 @@
                         </div>
                     </div>
                     <!-- Aging -->
-                    <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 15px;">
+                    <div style="background: #222; border: 1px solid #444; border-radius: 8px; padding: 15px; min-width: 0;">
                         <div style="color: #ffd700; font-size: 0.8em; font-weight: bold; margin-bottom: 15px; text-transform: uppercase;">
                             <i class="fas fa-clock-rotate-left" style="margin-right: 8px;"></i> AGING (BELUM LOADING)
                         </div>
@@ -2754,7 +2798,7 @@
                         </div>
                     </div>
                     <!-- SLA Card -->
-<div id="hub-sla-card" style="background: #222; border: 2px solid #444; border-radius: 8px; padding: 15px;">
+<div id="hub-sla-card" style="background: #222; border: 2px solid #444; border-radius: 8px; padding: 15px; min-width: 0;">
     <div style="color: #ffd700; font-size: 0.8em; font-weight: bold; margin-bottom: 12px; text-transform: uppercase;">
         <i class="fas fa-bullseye" style="margin-right: 8px;"></i> SLA Hub GRW
     </div>
@@ -2822,35 +2866,45 @@
                             </div>
                             <span id="astor-free-line-val" style="font-size:1.25em; color:#ffd700; font-weight:900; text-shadow: 0 0 10px rgba(255,215,0,0.3);">—</span>
                         </div>
-                        <label style="font-size:0.8em;color:#ccc;">BULAN:</label>
-    <select id="astor-bulan-filter" onchange="renderAstorSLA()">
-        <option value="ALL">SEMUA</option>
-    </select>
-    <label style="font-size:0.8em;color:#ccc;margin-left:6px;">TGL INPUT:</label>
-    <select id="astor-tgl-filter" onchange="renderAstorSLA()">
-        <option value="ALL">SEMUA</option>
-    </select>
-    <label style="font-size:0.8em;color:#ccc;margin-left:6px;">BU:</label>
-                        <select id="astor-bu-filter" onchange="renderAstorSLA()">
-                            <option value="ALL">SEMUA</option>
-                            <option value="AZKO">AZKO</option>
-                            <option value="KWI">KWI</option>
-                        </select>
-                        <label style="font-size:0.8em;color:#ccc;margin-left:10px;">AGING:</label>
-                        <select id="astor-aging-filter" onchange="renderAstorSLA()">
-                            <option value="ALL">SEMUA</option>
-                            <option value="0-3">0-3</option>
-                            <option value="3-5">3-5</option>
-                            <option value="5-7">5-7</option>
-                            <option value="7 UP">7 UP</option>
-                        </select>
-                        <label style="font-size:0.8em;color:#ccc;margin-left:10px;">AREA:</label>
-                        <select id="astor-area-filter" onchange="renderAstorSLA()">
-                            <option value="ALL">SEMUA</option>
-                            <option value="DK">DK</option>
-                            <option value="LK">LK</option>
-                            <option value="LP">LP</option>
-                        </select>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size:0.8em;color:#ccc;">BULAN:</label>
+                            <select id="astor-bulan-filter" onchange="renderAstorSLA()">
+                                <option value="ALL">SEMUA</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size:0.8em;color:#ccc;">TGL INPUT:</label>
+                            <select id="astor-tgl-filter" onchange="renderAstorSLA()">
+                                <option value="ALL">SEMUA</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size:0.8em;color:#ccc;">BU:</label>
+                            <select id="astor-bu-filter" onchange="renderAstorSLA()">
+                                <option value="ALL">SEMUA</option>
+                                <option value="AZKO">AZKO</option>
+                                <option value="KWI">KWI</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size:0.8em;color:#ccc;">AGING:</label>
+                            <select id="astor-aging-filter" onchange="renderAstorSLA()">
+                                <option value="ALL">SEMUA</option>
+                                <option value="0-3">0-3</option>
+                                <option value="3-5">3-5</option>
+                                <option value="5-7">5-7</option>
+                                <option value="7 UP">7 UP</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size:0.8em;color:#ccc;">AREA:</label>
+                            <select id="astor-area-filter" onchange="renderAstorSLA()">
+                                <option value="ALL">SEMUA</option>
+                                <option value="DK">DK</option>
+                                <option value="LK">LK</option>
+                                <option value="LP">LP</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="astor-kpi-row">
