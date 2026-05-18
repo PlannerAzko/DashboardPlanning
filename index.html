@@ -4778,8 +4778,8 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             // Specific column indices based on user request:
             // J=9, K=10, AI=34, BA=52, BC=54, BE=56
             const idx = {
-                storeBooking: 9,
-                storeBookingName: 10,
+                storeBooking: 12,
+                storeBookingName: 13,
                 cbm: 34,
                 area: 52,
                 status: 54, // BC
@@ -4822,7 +4822,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 }
                 values.push(current.trim());
 
-                if (values.length < 41) continue; // Minimum columns needed (AO is index 40)
+                if (values.length < 54) continue; // Minimum columns needed (AO is index 40)
 
                 const storeBooking = (values[idx.storeBooking] || '').trim();
                 const storeBookingName = (values[idx.storeBookingName] || '').trim();
@@ -4860,8 +4860,8 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                         F: values[5] || '',
                         G: values[6] || '',
                         I: values[8] || '',
-                        J: values[9] || '',
-                        K: values[10] || '',
+                        J: values[12] || '',
+                        K: values[13] || '',
                         Y: values[24] || '',
                         Z: values[25] || '',
                         AB: values[27] || '',
@@ -5509,7 +5509,7 @@ function hubSort(colIdx) {
 
             const exportData = filtered.map(row => {
                 const data = {};
-                const targetIndices = [4, 5, 6, 9, 10, 24, 25, 27, 28, 34, 36]; // E,F,G,J,K,Y,Z,AB,AC,AI,AK
+                const targetIndices = [4, 5, 6, 12, 13, 24, 25, 27, 28, 34, 36]; // E,F,G,J,K,Y,Z,AB,AC,AI,AK
                 
                 targetIndices.forEach(idx => {
                     const headerName = pivotHeaderNames[idx] || `Kolom ${String.fromCharCode(65 + idx)}`;
@@ -5517,8 +5517,8 @@ function hubSort(colIdx) {
                     if (idx === 4) val = row.rawColumns.E;
                     else if (idx === 5) val = row.rawColumns.F;
                     else if (idx === 6) val = row.rawColumns.G;
-                    else if (idx === 9) val = row.rawColumns.J;
-                    else if (idx === 10) val = row.rawColumns.K;
+                    else if (idx === 12) val = row.rawColumns.J;
+                    else if (idx === 13) val = row.rawColumns.K;
                     else if (idx === 24) val = row.rawColumns.Y;
                     else if (idx === 25) val = row.rawColumns.Z;
                     else if (idx === 27) val = row.rawColumns.AB;
@@ -5690,15 +5690,15 @@ function hubSort(colIdx) {
 
             const exportData = filtered.map(row => {
                 const data = {};
-                const targetIndices = [4, 5, 6, 9, 10, 24, 25, 27, 28, 34, 36];
+                const targetIndices = [4, 5, 6, 12, 13, 24, 25, 27, 28, 34, 36];
                 targetIndices.forEach(idx => {
                     const headerName = pivotHeaderNames[idx] || `Kolom ${String.fromCharCode(65 + idx)}`;
                     let val = '';
                     if (idx === 4) val = row.rawColumns.E;
                     else if (idx === 5) val = row.rawColumns.F;
                     else if (idx === 6) val = row.rawColumns.G;
-                    else if (idx === 9) val = row.rawColumns.J;
-                    else if (idx === 10) val = row.rawColumns.K;
+                    else if (idx === 12) val = row.rawColumns.J;
+                    else if (idx === 13) val = row.rawColumns.K;
                     else if (idx === 24) val = row.rawColumns.Y;
                     else if (idx === 25) val = row.rawColumns.Z;
                     else if (idx === 27) val = row.rawColumns.AB;
