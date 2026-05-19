@@ -1872,6 +1872,12 @@
             <span>Main</span>
         </div>
         
+        <!-- PLANNING MENU (FBI ONLY) -->
+        <div class="bottom-nav-item" id="nav-planning" style="display: none;" onclick="showDashboardSection('fbi-planning-section')">
+            <i class="fas fa-tasks"></i>
+            <span>Planning</span>
+        </div>
+        
         <div class="bottom-nav-item" id="nav-outstanding" onclick="showDashboardSection('outstanding-section')">
             <i class="fas fa-truck-loading"></i>
             <span>Outstanding</span>
@@ -2167,8 +2173,30 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
+                <!-- NEW KPI ROW: SLA GRW DK & LK -->
+                <div style="display: flex; gap: 24px; margin-top: 10px;">
+                    <div style="background: #ffffff; border-left: 6px solid #2dd4bf; border-radius: 16px; padding: 24px; flex: 1; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: center; border-right: 1px solid #f1f5f9; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9;">
+                        <div style="font-size: 0.9rem; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-shipping-fast" style="color: #2dd4bf;"></i> SLA GRW DK
+                        </div>
+                        <div id="fbi-main-sla-dk" style="font-size: 3.8rem; font-weight: 900; color: #1e293b; line-height: 1;">0%</div>
+                        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 8px; font-weight: 600;">Based on selected Delivery Date</div>
+                    </div>
+                    
+                    <div style="background: #ffffff; border-left: 6px solid #3b82f6; border-radius: 16px; padding: 24px; flex: 1; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: center; border-right: 1px solid #f1f5f9; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9;">
+                        <div style="font-size: 0.9rem; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-truck-moving" style="color: #3b82f6;"></i> SLA GRW LK
+                        </div>
+                        <div id="fbi-main-sla-lk" style="font-size: 3.8rem; font-weight: 900; color: #1e293b; line-height: 1;">0%</div>
+                        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 8px; font-weight: 600;">Based on selected Delivery Date</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW FBI PLANNING SECTION -->
+        <div id="fbi-planning-section" class="dash-section" style="display: none; flex-direction: column;">
             <div class="fbi-grid">
                 <div class="fbi-grid-item">
                     <div class="fbi-item-header">
@@ -2199,7 +2227,7 @@
                 </div>
                 <div class="fbi-grid-item">
                     <div class="fbi-item-header">
-                        <i class="fas fa-chart-line"></i> COVERAGE PER HARI
+                        <i class="fas fa-chart-line"></i> TREN CASE ID HARIAN
                     </div>
                     <div class="fbi-item-content">
                         <canvas id="fbiCoverageChart" style="max-height: 400px;"></canvas>
@@ -2270,36 +2298,58 @@
             <div class="section-title-banner">
                 <i class="fas fa-chart-line"></i> SUMMARY REPORT SLA & CBM SHIPPED
             </div>
-        <div class="chart-section">
-            <div class="chart-container">
-                <div class="table-header">
-                    <i class="fas fa-chart-line"></i> SLA PERFORMANCE (CUSTOMER vs GRW)
+            
+            <!-- FBI LAYOUT (DK/LK) -->
+            <div id="fbi-charts-layout" class="chart-section" style="display: none;">
+                <div class="chart-container">
+                    <div class="table-header">
+                        <i class="fas fa-chart-line"></i> SLA PERFORMANCE DK
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="slaChartDK"></canvas>
+                    </div>
                 </div>
-                <div class="chart-body">
-                    <canvas id="slaChart"></canvas>
-                </div>
-                <div class="table-header" style="margin-top: 15px; background: #1a1a1a; border-top: 1px solid #333;">
-                    <i class="fas fa-trophy"></i> SUMMARY TOP 10 KOTA (BY CBM)
-                </div>
-                <div class="table-content-extra" id="top-cities-table" style="height: 430px;">
-                    <div class="loading">Calculating...</div>
-                </div>
-            </div>
-            <div class="chart-container">
-                <div class="table-header">
-                    <i class="fas fa-chart-area"></i> CBM PLAN-TO-ACTUAL RATIO (%)
-                </div>
-                <div class="chart-body">
-                    <canvas id="cbmRatioChart"></canvas>
-                </div>
-                <div class="table-header" style="margin-top: 15px; background: #1a1a1a; border-top: 1px solid #333;">
-                    <i class="fas fa-arrow-down"></i> SUMMARY BOTTOM 10 KOTA (BY CBM)
-                </div>
-                <div class="table-content-extra" id="bottom-cities-table" style="height: 430px;">
-                    <div class="loading">Calculating...</div>
+                <div class="chart-container">
+                    <div class="table-header">
+                        <i class="fas fa-chart-line"></i> SLA PERFORMANCE LK
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="slaChartLK"></canvas>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <!-- AHI LAYOUT (Combined + CBM Ratio + Cities) -->
+            <div id="ahi-charts-layout" class="chart-section" style="display: none;">
+                <div class="chart-container">
+                    <div class="table-header">
+                        <i class="fas fa-chart-line"></i> SLA PERFORMANCE (CUSTOMER vs GRW)
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="slaChart"></canvas>
+                    </div>
+                    <div class="table-header" style="margin-top: 15px; background: #1a1a1a; border-top: 1px solid #333;">
+                        <i class="fas fa-trophy"></i> SUMMARY TOP 10 KOTA (BY CBM)
+                    </div>
+                    <div class="table-content-extra" id="top-cities-table" style="height: 480px;">
+                        <div class="loading">Calculating...</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="table-header">
+                        <i class="fas fa-chart-area"></i> CBM PLAN-TO-ACTUAL RATIO (%)
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="cbmRatioChart"></canvas>
+                    </div>
+                    <div class="table-header" style="margin-top: 15px; background: #1a1a1a; border-top: 1px solid #333;">
+                        <i class="fas fa-arrow-down"></i> SUMMARY BOTTOM 10 KOTA (BY CBM)
+                    </div>
+                    <div class="table-content-extra" id="bottom-cities-table" style="height: 480px;">
+                        <div class="loading">Calculating...</div>
+                    </div>
+                </div>
+            </div>
         </div> <!-- End summary-report-section -->
 
         <div id="supply-partner-section" class="dash-section" style="display: none;">
@@ -3083,6 +3133,39 @@
         let HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
         const USER_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=1368870427`;
 
+        const SLA_FBI_GID = '1915084833';
+        const SLA_FBI_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_FBI}/export?format=csv&gid=${SLA_FBI_GID}`;
+        let rawSlaFbiData = [];
+
+        const MonthsID = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOPEMBER", "DESEMBER"];
+
+        function parseDate(s) {
+            if (!s) return new Date(0);
+            if (s instanceof Date) return s;
+            if (s.includes('-')) {
+                const d = new Date(s);
+                if (!isNaN(d)) return d;
+            }
+            if (s.includes('/')) {
+                const parts = s.split('/');
+                if (parts.length === 3) {
+                   let yr = parseInt(parts[2]);
+                   if (yr < 100) yr += 2000;
+                   return new Date(yr, parts[1]-1, parts[0]);
+                }
+            }
+            const d = new Date(s);
+            return isNaN(d) ? new Date(0) : d;
+        }
+
+        function toISODate(date) {
+            if (!date || isNaN(date.getTime())) return "";
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
         // Column Index Mapping (0-based)
         const COLUMNS = {
             A: 0,         // LC/ID
@@ -3222,6 +3305,8 @@
         let filterTimeout; // Untuk debouncing
         let slaChart = null;
         let cbmRatioChart = null;
+        let slaChartDK = null;
+        let slaChartLK = null;
         let vendorResponseChart = null;
         let agingTerlambatChart = null;
 
@@ -3390,17 +3475,24 @@
                 // FBI: Hide specific navigation items
                 if (navPartner) navPartner.style.display = 'none';
                 if (navHub) navHub.style.display = 'none';
+                const navPlanning = document.getElementById('nav-planning');
+                if (navPlanning) navPlanning.style.display = 'flex';
 
                 // Initial show FBI dashboard
                 showDashboardSection('fbi-dashboard-section');
 
                 // Fetch FBI Schedule
                 fetchFBIScheduleData();
+                fetchSlaFbiData();
             } else {
                 body.classList.remove('theme-purple');
                 SHEET_ID = SHEET_ID_AHI;
                 SHEET_GID = SHEET_GID_AHI;
                 CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+                
+                const navPlanning = document.getElementById('nav-planning');
+                if (navPlanning) navPlanning.style.display = 'none';
+
                 PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${PIVOT_SHEET_ID}/export?format=csv&gid=${PIVOT_SHEET_GID}`;
                 HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
                 ASTOR_CSV_URL_DYNAMIC = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1345578811`;
@@ -3722,18 +3814,19 @@
             bottomNavItems.forEach(item => item.classList.remove('active'));
 
             const globalFilter = document.getElementById('global-filter-section');
-            const showFilterFor = ['main-dashboard-section', 'summary-report-section', 'supply-partner-section'];
+            const showFilterFor = ['main-dashboard-section', 'fbi-dashboard-section', 'summary-report-section', 'supply-partner-section'];
             if (globalFilter) {
                 globalFilter.style.display = showFilterFor.includes(sectionId) ? 'grid' : 'none';
             }
 
             const target = document.getElementById(sectionId);
             if (target) {
-                target.style.display = sectionId === 'fbi-dashboard-section' ? 'flex' : 'block';
+                target.style.display = (sectionId === 'fbi-dashboard-section' || sectionId === 'fbi-planning-section') ? 'flex' : 'block';
                 
                 // Highlight corresponding bottom nav item
                 let navId = '';
                 if (sectionId === 'main-dashboard-section' || sectionId === 'fbi-dashboard-section') navId = 'nav-main';
+                else if (sectionId === 'fbi-planning-section') navId = 'nav-planning';
                 else if (sectionId === 'summary-report-section') navId = 'nav-summary';
                 else if (sectionId === 'supply-partner-section') navId = 'nav-partner';
                 else if (sectionId === 'outstanding-section') navId = 'nav-outstanding';
@@ -3745,7 +3838,7 @@
                 // Trigger chart resize if visible
                 window.dispatchEvent(new Event('resize'));
                 
-                if (sectionId === 'fbi-dashboard-section') {
+                if (sectionId === 'fbi-dashboard-section' || sectionId === 'fbi-planning-section') {
                     setTimeout(renderFBIDashboard, 100);
                 }
             }
@@ -3940,7 +4033,26 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
 
             // 4. Update Map & Chart
             initFBIMap();
-            renderFBIChart(coverageData);
+            // Trend Case ID Harian from rawPlannerData
+            const trendData = {};
+            rawPlannerData.forEach(d => {
+                const dateObj = parseDate(d.stuffingDate);
+                const isoDate = toISODate(dateObj);
+                if (isoDate && !isoDate.startsWith('2025')) {
+                    trendData[isoDate] = (trendData[isoDate] || 0) + (d.caseId || 0);
+                }
+            });
+
+            const sortedTrendKeys = Object.keys(trendData).sort((a, b) => new Date(a) - new Date(b));
+            // Only take the last 7 days
+            const last7Keys = sortedTrendKeys.slice(-7);
+            
+            const finalTrendData = last7Keys.map(key => ({
+                label: key,
+                value: trendData[key]
+            }));
+
+            renderFBIChart(finalTrendData);
         }
 
         function syncFBIDropdowns() {
@@ -4142,9 +4254,9 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
         function renderFBIChart(data) {
             const ctx = document.getElementById('fbiCoverageChart');
             if (!ctx) return;
-
-            const labels = Object.keys(data).sort();
-            const values = labels.map(l => data[l]);
+            
+            const labels = data.map(d => d.label);
+            const values = data.map(d => d.value);
 
             if (fbiChart) fbiChart.destroy();
 
@@ -4153,15 +4265,15 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Volume (CBM)',
+                        label: 'Total Case ID',
                         data: values,
-                        borderColor: '#ba68c8',
-                        backgroundColor: 'rgba(186, 104, 200, 0.2)',
+                        borderColor: '#a855f7',
+                        backgroundColor: 'rgba(168, 85, 247, 0.1)',
                         borderWidth: 3,
                         fill: true,
                         tension: 0.4,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#ba68c8',
+                        pointRadius: 4,
+                        pointBackgroundColor: '#a855f7',
                         pointHoverRadius: 6
                     }]
                 },
@@ -4172,14 +4284,20 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                         legend: { display: false }
                     },
                     scales: {
-                        y: {
+                        y: { 
                             beginAtZero: true,
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: { color: '#aaa' }
+                            grid: { color: '#f1f5f9' },
+                            ticks: { 
+                                color: '#64748b',
+                                font: { weight: '600' }
+                            }
                         },
-                        x: {
+                        x: { 
                             grid: { display: false },
-                            ticks: { color: '#aaa' }
+                            ticks: { 
+                                color: '#64748b',
+                                font: { weight: '600' }
+                            }
                         }
                     }
                 }
@@ -4426,10 +4544,26 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             // Date options: Filter out 2025 and sort chronologically DESC (Newest first)
             const dateMap = {};
             rawPlannerData.forEach(d => {
-                if (d.stuffingDate && !d.stuffingDate.includes('2025')) {
-                    dateMap[d.stuffingDate] = parseDDMMYYYY(d.stuffingDate);
+                const dateObj = parseDate(d.stuffingDate);
+                const isoDate = toISODate(dateObj);
+                if (isoDate && !isoDate.startsWith('2025')) {
+                    dateMap[isoDate] = dateObj;
                 }
             });
+            
+            // Tambahkan juga tanggal dari SLA FBI agar dropdown lengkap
+            if (rawSlaFbiData.length > 2) {
+                for (let i = 2; i < rawSlaFbiData.length; i++) {
+                    const dStr = (rawSlaFbiData[i][0] || '').trim();
+                    if (dStr) {
+                        const dateObj = parseDate(dStr);
+                        const isoDate = toISODate(dateObj);
+                        if (isoDate && !dateMap[isoDate] && !isoDate.startsWith('2025')) {
+                            dateMap[isoDate] = dateObj;
+                        }
+                    }
+                }
+            }
 
             const sortedDates = Object.keys(dateMap).sort((a, b) => dateMap[b] - dateMap[a]);
 
@@ -4445,26 +4579,11 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             if (sortedDates.includes(selectedDate)) {
                 dateFilter.value = selectedDate;
             } else if (sortedDates.length > 0) {
-                // Try today's date with possible formats (dd/mm/yyyy or d/m/yyyy)
-                const now = new Date();
-                const d = String(now.getDate());
-                const dd = d.padStart(2, '0');
-                const m = String(now.getMonth() + 1);
-                const mm = m.padStart(2, '0');
-                const yyyy = now.getFullYear();
-                const yy = String(yyyy).substring(2);
+                // Try today's date in ISO format
+                const todayIso = toISODate(new Date());
                 
-                const todayFormats = [
-                    `${dd}/${mm}/${yyyy}`,
-                    `${d}/${m}/${yyyy}`,
-                    `${dd}/${mm}/${yy}`,
-                    `${d}/${m}/${yy}`
-                ];
-                
-                const matchToday = sortedDates.find(d => todayFormats.includes(d));
-                
-                if (matchToday) {
-                    dateFilter.value = matchToday;
+                if (sortedDates.includes(todayIso)) {
+                    dateFilter.value = todayIso;
                 } else if (selectedDate === 'ALL') {
                     dateFilter.value = 'ALL';
                 } else {
@@ -4497,6 +4616,17 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             }
         }
 
+        async function fetchSlaFbiData() {
+            try {
+                const res = await fetch(SLA_FBI_CSV_URL);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const csv = await res.text();
+                rawSlaFbiData = robustCSVParser(csv);
+                populateFilters();
+                updateCharts();
+            } catch(e) { console.error('SLA FBI fetch error:', e); }
+        }
+
         function parseOrderDistCSV(csv) {
             const rows = robustCSVParser(csv);
             if (rows.length < 2) return;
@@ -4521,7 +4651,8 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             const areaFilter = document.getElementById('chatime-area-filter')?.value || 'ALL';
 
             const filtered = rawPlannerData.filter(d => {
-                const matchDate = dateFilter === 'ALL' || d.stuffingDate === dateFilter;
+                const isoDate = toISODate(parseDate(d.stuffingDate));
+                const matchDate = dateFilter === 'ALL' || isoDate === dateFilter;
                 const matchArea = areaFilter === 'ALL' || d.area === areaFilter;
                 return matchDate && matchArea;
             });
@@ -4554,13 +4685,58 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 'Luar Pulau': { total: 0, od: 0 }
             };
             
-            const areaDateFiltered = rawPlannerData.filter(d => dateFilter === 'ALL' || d.stuffingDate === dateFilter);
+            const areaDateFiltered = rawPlannerData.filter(d => {
+                const isoDate = toISODate(parseDate(d.stuffingDate));
+                return dateFilter === 'ALL' || isoDate === dateFilter;
+            });
             areaDateFiltered.forEach(d => {
                 if (barStats[d.area]) {
                     barStats[d.area].total += d.caseId;
                     barStats[d.area].od += d.orderRelease;
                 }
             });
+
+            // SLA GRW DK & LK calculation from rawSlaFbiData
+            let slaDkValue = 0;
+            let slaLkValue = 0;
+            let dkTotalOT = 0; let dkTotalDelay = 0;
+            let lkTotalOT = 0; let lkTotalDelay = 0;
+
+            if (rawSlaFbiData.length > 2) {
+                for (let i = 2; i < rawSlaFbiData.length; i++) {
+                    const row = rawSlaFbiData[i];
+                    if (row.length < 5) continue;
+                    const rowDate = (row[0] || '').trim();
+                    if (!rowDate) continue;
+
+                    // SYNC: Filter by Month if "ALL" is selected in local filter
+                    const dObj = parseDate(rowDate);
+                    const isoDate = toISODate(dObj);
+                    
+                    let m = "";
+                    if (!isNaN(dObj.getTime())) m = MonthsID[dObj.getMonth()];
+                    
+                    const matchBulan = selectedFilters.bulan.length === 0 || (m && selectedFilters.bulan.includes(m));
+                    const matchDate = dateFilter === 'ALL' || isoDate === dateFilter;
+                    
+                    if (!matchBulan || !matchDate) continue;
+
+                    dkTotalOT += parseNumberWithComma(row[1] || '0');
+                    dkTotalDelay += parseNumberWithComma(row[2] || '0');
+                    lkTotalOT += parseNumberWithComma(row[3] || '0');
+                    lkTotalDelay += parseNumberWithComma(row[4] || '0');
+                }
+
+                const totalDK = dkTotalOT + dkTotalDelay;
+                const totalLK = lkTotalOT + lkTotalDelay;
+                slaDkValue = totalDK > 0 ? (dkTotalOT / totalDK * 100) : 0;
+                slaLkValue = totalLK > 0 ? (lkTotalOT / totalLK * 100) : 0;
+            }
+
+            const slaDkEl = document.getElementById('fbi-main-sla-dk');
+            const slaLkEl = document.getElementById('fbi-main-sla-lk');
+            if (slaDkEl) slaDkEl.innerText = slaDkValue > 0 ? slaDkValue.toFixed(1) + '%' : '0%';
+            if (slaLkEl) slaLkEl.innerText = slaLkValue > 0 ? slaLkValue.toFixed(1) + '%' : '0%';
 
             renderChatimeCharts(donutStats, barStats);
         }
@@ -6404,6 +6580,7 @@ function renderStoringPivotTable(filteredData) {
             }
         }
 
+
         // Helper for robust CSV parsing
         function robustCSVParser(csv) {
             const allRows = [];
@@ -6445,16 +6622,33 @@ function renderStoringPivotTable(filteredData) {
         // Parse CSV
         function parseCSV(csv) {
             const allRows = robustCSVParser(csv);
+            const isFBI = document.body.classList.contains('theme-purple');
 
             allData = [];
             // Start from i=1 to skip header
             for (let i = 1; i < allRows.length; i++) {
                 const values = allRows[i];
 
-                // Check if we have enough columns for basic ID and Date
-                if (values.length > 40) {
-                    const id = (values[COLUMNS.A] || '').trim();
-                    const stuffingDate = (values[COLUMNS.AO] || '').trim();
+                // Check if we have enough columns
+                if (values.length > 5) {
+                    let id = (values[COLUMNS.A] || '').trim();
+                    let stuffingDate = (values[COLUMNS.AO] || '').trim();
+                    let stuffingMonth = (values[COLUMNS.AX] || '').trim();
+
+                    if (isFBI) {
+                        // Untuk FBI, ambil dari Kolom A (index 0)
+                        const colA = (values[0] || '').trim();
+                        stuffingDate = colA; 
+                        
+                        // Extract month from colA if it's a date
+                        const d = parseDate(colA);
+                        if (!isNaN(d.getTime())) {
+                            stuffingMonth = MonthsID[d.getMonth()];
+                        } else {
+                            stuffingMonth = colA; // Fallback
+                        }
+                    }
+
                     const kota = (values[COLUMNS.AR] || '').trim();
                     
                     const cbmPlan = parseNumberWithComma(values[COLUMNS.Z] || '0');
@@ -6501,13 +6695,13 @@ function renderStoringPivotTable(filteredData) {
                         M: values[COLUMNS.M] || '',
                         R: values[COLUMNS.R] || '',
                         Z: values[COLUMNS.Z] || '0',
-                        AO: values[COLUMNS.AO] || '',
+                        AO: stuffingDate,
                         AP: values[COLUMNS.AP] || '',
                         AQ: values[COLUMNS.AQ] || '0',
                         AR: kota,
                         AS: values[COLUMNS.AS] || '',
                         AT: values[COLUMNS.AT] || '',
-                        AX: values[COLUMNS.AX] || '',
+                        AX: stuffingMonth,
                         AY: values[COLUMNS.AY] || '0',
                         AZ: values[COLUMNS.AZ] || '0',
                         BA: values[COLUMNS.BA] || '0',
@@ -6545,8 +6739,33 @@ function renderStoringPivotTable(filteredData) {
                 if (row.AV) ketVendorSet.add(row.AV);
             });
 
+            // FBI Mode: Extra months from SLA FBI Sheet
+            if (document.body.classList.contains('theme-purple') && rawSlaFbiData.length > 2) {
+                for (let i = 2; i < rawSlaFbiData.length; i++) {
+                    const row = rawSlaFbiData[i];
+                    const dateStr = (row[0] || '').trim();
+                    if (dateStr) {
+                        const d = parseDate(dateStr);
+                        if (!isNaN(d.getTime())) {
+                            bulanSet.add(MonthsID[d.getMonth()]);
+                        }
+                    }
+                }
+            }
+
+            // Handle default selection for Bulan (set current month if empty)
+            if (selectedFilters.bulan.length === 0) {
+                const currentMonth = MonthsID[new Date().getMonth()];
+                if (Array.from(bulanSet).includes(currentMonth)) {
+                    selectedFilters.bulan = [currentMonth];
+                }
+            }
+
             // Hanya populate jika belum ada opsi (mencegah reset saat auto-refresh)
-            populateMultiSelect('bulan', Array.from(bulanSet).sort(), 'Bulan');
+            const sortedMonths = Array.from(bulanSet).sort((a, b) => {
+                return MonthsID.indexOf(a) - MonthsID.indexOf(b);
+            });
+            populateMultiSelect('bulan', sortedMonths, 'Bulan');
             populateMultiSelect('kota', Array.from(kotaSet).sort(), 'Kota');
             populateMultiSelect('regional', Array.from(regionalSet).sort(), 'Regional');
             populateMultiSelect('area', Array.from(areaSet).sort(), 'Area');
@@ -6565,6 +6784,7 @@ function renderStoringPivotTable(filteredData) {
         function updateStuffingDateOptions() {
             const stuffingDateSet = new Set();
             const selectedMonths = selectedFilters.bulan;
+            const isFBI = document.body.classList.contains('theme-purple');
 
             allData.forEach(row => {
                 if (row.AO) {
@@ -6574,19 +6794,22 @@ function renderStoringPivotTable(filteredData) {
                 }
             });
 
-            const parseDate = (s) => {
-                if (!s) return new Date(0);
-                if (s.includes('-')) {
-                    const d = new Date(s);
-                    if (!isNaN(d)) return d;
+            // FBI Mode: Extra dates from SLA FBI Sheet
+            if (isFBI && rawSlaFbiData.length > 2) {
+                for (let i = 2; i < rawSlaFbiData.length; i++) {
+                    const row = rawSlaFbiData[i];
+                    const dateStr = (row[0] || '').trim();
+                    if (dateStr) {
+                        const d = parseDate(dateStr);
+                        if (!isNaN(d.getTime())) {
+                            const m = MonthsID[d.getMonth()];
+                            if (selectedMonths.length === 0 || selectedMonths.includes(m)) {
+                                stuffingDateSet.add(dateStr);
+                            }
+                        }
+                    }
                 }
-                if (s.includes('/')) {
-                    const parts = s.split('/');
-                    if (parts.length === 3) return new Date(parts[2], parts[1]-1, parts[0]);
-                }
-                const d = new Date(s);
-                return isNaN(d) ? new Date(0) : d;
-            };
+            }
 
             const options = Array.from(stuffingDateSet).sort((a, b) => parseDate(b) - parseDate(a));
             
@@ -6970,56 +7193,121 @@ function renderStoringPivotTable(filteredData) {
 
         // Update Charts
         function updateCharts() {
-            const dailyData = {};
+            const isFBI = document.body.classList.contains('theme-purple');
             
-            // Aggregate data by date
-            filteredData.forEach(row => {
-                const date = row.AO;
-                if (!date) return;
-                
-                if (!dailyData[date]) {
-                    dailyData[date] = {
-                        cbmPlan: 0,
-                        cbmShipped: 0,
-                        slaCustomerSum: 0,
-                        slaGrwSum: 0,
-                        count: 0
-                    };
-                }
-                
-                dailyData[date].cbmPlan += parseNumberWithComma(row.Z);
-                dailyData[date].cbmShipped += parseNumberWithComma(row.AY);
-                
-                // Ambil data historis dari kolom BC dan BD
-                // Kita asumsikan data di sheet dalam bentuk desimal (0.98) atau persentase (98)
-                // Kita akan merata-ratakannya jika ada beberapa baris di tanggal yang sama
-                dailyData[date].slaCustomerSum += parseNumberWithComma(row.BC);
-                dailyData[date].slaGrwSum += parseNumberWithComma(row.BD);
-                dailyData[date].count++;
-            });
+            // Toggle visibility of layouts
+            const fbiLayout = document.getElementById('fbi-charts-layout');
+            const ahiLayout = document.getElementById('ahi-charts-layout');
+            if (fbiLayout) fbiLayout.style.display = isFBI ? 'grid' : 'none';
+            if (ahiLayout) ahiLayout.style.display = isFBI ? 'none' : 'grid';
 
-            // Sort dates
+            const dailyDataDK = {};
+            const dailyDataLK = {};
+            const dailyDataCombined = {}; // For AHI combined chart
+            
+            if (isFBI && rawSlaFbiData.length > 2) {
+                // SLA FBI Sheet processing
+                for (let i = 2; i < rawSlaFbiData.length; i++) {
+                    const row = rawSlaFbiData[i];
+                    if (row.length < 5) continue;
+                    const date = (row[0] || '').trim();
+                    if (!date) continue;
+
+                    // FILTERING: Check if date/month matches selection
+                    const dObj = parseDate(date);
+                    let m = "";
+                    if (!isNaN(dObj.getTime())) m = MonthsID[dObj.getMonth()];
+                    
+                    const matchBulan = selectedFilters.bulan.length === 0 || (m && selectedFilters.bulan.includes(m));
+                    const matchDate = selectedFilters.stuffingDate.length === 0 || selectedFilters.stuffingDate.includes(date);
+                    
+                    if (!matchBulan || !matchDate) continue;
+                    
+                    const otDK = parseNumberWithComma(row[1] || '0');
+                    const dDK = parseNumberWithComma(row[2] || '0');
+                    const otLK = parseNumberWithComma(row[3] || '0');
+                    const dLK = parseNumberWithComma(row[4] || '0');
+                    
+                    const totalDK = otDK + dDK;
+                    const totalLK = otLK + dLK;
+                    
+                    dailyDataDK[date] = { slaGrwPercent: totalDK > 0 ? (otDK / totalDK * 100) : null };
+                    dailyDataLK[date] = { slaGrwPercent: totalLK > 0 ? (otLK / totalLK * 100) : null };
+                }
+            } else {
+                // Fallback / AHI mode aggregation from filteredData
+                filteredData.forEach(row => {
+                    const date = row.AO;
+                    if (!date) return;
+                    
+                    // For DK/LK splits
+                    const area = (row.BA || '').trim().toUpperCase();
+                    const targetDict = area === 'DK' ? dailyDataDK : (area === 'LK' ? dailyDataLK : null);
+                    if (targetDict) {
+                        if (!targetDict[date]) targetDict[date] = { slaGrwSum: 0, count: 0 };
+                        targetDict[date].slaGrwSum += parseNumberWithComma(row.BD);
+                        targetDict[date].count++;
+                    }
+
+                    // For AHI Combined
+                    if (!dailyDataCombined[date]) {
+                        dailyDataCombined[date] = {
+                            cbmPlan: 0,
+                            cbmShipped: 0,
+                            slaCustomerSum: 0,
+                            slaGrwSum: 0,
+                            count: 0
+                        };
+                    }
+                    dailyDataCombined[date].cbmPlan += parseNumberWithComma(row.Z);
+                    dailyDataCombined[date].cbmShipped += parseNumberWithComma(row.AY);
+                    dailyDataCombined[date].slaCustomerSum += parseNumberWithComma(row.BC);
+                    dailyDataCombined[date].slaGrwSum += parseNumberWithComma(row.BD);
+                    dailyDataCombined[date].count++;
+                });
+
+                // Convert sums to percentages
+                [dailyDataDK, dailyDataLK, dailyDataCombined].forEach(dict => {
+                    Object.keys(dict).forEach(d => {
+                        const item = dict[d];
+                        if (item.count > 0) {
+                            if (item.slaGrwSum !== undefined) {
+                                const val = item.slaGrwSum / item.count;
+                                item.slaGrwPercent = val < 2 ? val * 100 : val;
+                            }
+                            if (item.slaCustomerSum !== undefined) {
+                                const val = item.slaCustomerSum / item.count;
+                                item.slaCustomerPercent = val < 2 ? val * 100 : val;
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Default font family for all charts
+            Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+
+            if (isFBI) {
+                renderSLAChart('slaChartDK', dailyDataDK, 'slaChartDK');
+                renderSLAChart('slaChartLK', dailyDataLK, 'slaChartLK');
+            } else {
+                renderAHICharts(dailyDataCombined);
+                updateTopBottomCityTables();
+            }
+        }
+
+        function renderAHICharts(dailyData) {
             const sortedDates = Object.keys(dailyData).sort();
             const labels = sortedDates;
-            
-            // Prepare datasets
-            const slaCustomerData = sortedDates.map(date => {
-                const d = dailyData[date];
-                if (d.count === 0 || d.slaCustomerSum === 0) return null;
-                const val = d.slaCustomerSum / d.count;
-                // Jika nilai < 2, asumsikan itu desimal (misal 0.98), maka kali 100
-                const finalVal = val < 2 ? val * 100 : val;
-                return finalVal === 0 ? null : finalVal;
-            });
 
-            const slaGrwData = sortedDates.map(date => {
-                const d = dailyData[date];
-                if (d.count === 0 || d.slaGrwSum === 0) return null;
-                const val = d.slaGrwSum / d.count;
-                const finalVal = val < 2 ? val * 100 : val;
-                return finalVal === 0 ? null : finalVal;
+            const slaCustomerData = sortedDates.map(date => {
+                const val = dailyData[date].slaCustomerPercent;
+                return (val === 0 || val === null) ? null : val;
             });
-            
+            const slaGrwData = sortedDates.map(date => {
+                const val = dailyData[date].slaGrwPercent;
+                return (val === 0 || val === null) ? null : val;
+            });
             const cbmRatioData = sortedDates.map(date => {
                 const d = dailyData[date];
                 if (d.cbmPlan === 0) return null;
@@ -7027,18 +7315,9 @@ function renderStoringPivotTable(filteredData) {
                 return ratio === 0 ? null : ratio;
             });
 
-            // Default font family for all charts
-            Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
-
-            // SLA Chart
+            // Combined SLA Chart
             const slaCtx = document.getElementById('slaChart').getContext('2d');
             if (slaChart) slaChart.destroy();
-            
-            // Create Gradients
-            const gradBlueLine = slaCtx.createLinearGradient(0, 0, 0, 400);
-            gradBlueLine.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
-            gradBlueLine.addColorStop(1, 'rgba(59, 130, 246, 0)');
-
             slaChart = new Chart(slaCtx, {
                 type: 'line',
                 data: {
@@ -7069,6 +7348,123 @@ function renderStoringPivotTable(filteredData) {
                             pointBackgroundColor: '#fff',
                             pointBorderColor: '#2dd4bf',
                             pointBorderWidth: 3,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: getCommonChartOptions('%')
+            });
+
+            // CBM Ratio Chart
+            const cbmCtx = document.getElementById('cbmRatioChart').getContext('2d');
+            if (cbmRatioChart) cbmRatioChart.destroy();
+            cbmRatioChart = new Chart(cbmCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'CBM Ratio (%)',
+                        data: cbmRatioData,
+                        borderColor: '#60a5fa',
+                        backgroundColor: 'rgba(96, 165, 250, 0.2)',
+                        fill: true,
+                        borderWidth: 5,
+                        pointRadius: 7,
+                        pointHoverRadius: 11,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#60a5fa',
+                        pointBorderWidth: 4,
+                        tension: 0.4
+                    }]
+                },
+                options: getCommonChartOptions('%')
+            });
+        }
+
+        function getCommonChartOptions(suffix = '') {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 800 },
+                layout: { padding: { top: 30, bottom: 5, left: 10, right: 15 } },
+                scales: {
+                    y: {
+                        ticks: {
+                            color: '#e5e7eb',
+                            font: { size: 12, weight: 'bold' },
+                            callback: value => value + suffix
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                    },
+                    x: {
+                        ticks: { color: '#d1d5db', font: { size: 11 }, maxRotation: 45, minRotation: 45 },
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        align: 'end',
+                        labels: { color: '#fff', font: { size: 12, weight: 'bold' }, usePointStyle: true }
+                    },
+                    datalabels: {
+                        anchor: 'end', align: 'top', offset: 8, color: '#fff',
+                        font: { weight: 'bold', size: 11 },
+                        backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 4, padding: 4,
+                        formatter: (val) => val === null ? '' : val.toFixed(1) + suffix,
+                        display: (ctx) => {
+                            const data = ctx.dataset.data;
+                            const valid = data.filter(v => v !== null);
+                            if (valid.length === 0 || data[ctx.dataIndex] === null) return false;
+                            const max = Math.max(...valid);
+                            const min = Math.min(...valid);
+                            const cur = data[ctx.dataIndex];
+                            // Selalu tampilkan data terakhir
+                            if (ctx.dataIndex === data.length - 1) return true;
+                            // Tampilkan nilai minimum (pertama muncul)
+                            if (cur === min && ctx.dataIndex === data.indexOf(min)) return true;
+                            // Tampilkan nilai maximum jika BUKAN 100% (pertama muncul)
+                            if (cur === max && cur < 100 && ctx.dataIndex === data.indexOf(max)) return true;
+                            return false;
+                        }
+                    }
+                }
+            };
+        }
+
+        function renderSLAChart(canvasId, dailyData, chartVarName) {
+            const sortedDates = Object.keys(dailyData).sort();
+            const labels = sortedDates;
+            
+            const slaGrwData = sortedDates.map(date => {
+                const val = dailyData[date].slaGrwPercent;
+                return (val === 0 || val === null) ? null : val;
+            });
+
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            if (chartVarName === 'slaChartDK') {
+                if (slaChartDK) slaChartDK.destroy();
+            } else {
+                if (slaChartLK) slaChartLK.destroy();
+            }
+
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'SLA GRW (Actual)',
+                            data: slaGrwData,
+                            borderColor: '#2dd4bf',
+                            backgroundColor: 'transparent',
+                            borderWidth: 5,
+                            pointRadius: 7,
+                            pointHoverRadius: 10,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#2dd4bf',
+                            pointBorderWidth: 3,
                             tension: 0.4,
                             fill: false
                         }
@@ -7079,12 +7475,7 @@ function renderStoringPivotTable(filteredData) {
                     maintainAspectRatio: false,
                     animation: { duration: 800 },
                     layout: {
-                        padding: {
-                            top: 15,
-                            bottom: 5,
-                            left: 10,
-                            right: 15
-                        }
+                        padding: { top: 15, bottom: 5, left: 10, right: 15 }
                     },
                     interaction: {
                         mode: 'index',
@@ -7092,10 +7483,10 @@ function renderStoringPivotTable(filteredData) {
                     },
                     scales: {
                         y: {
-                            min: 95,
-                            max: 101,
+                            suggestedMin: 90,
+                            suggestedMax: 100,
                             ticks: {
-                                stepSize: 1,
+                                stepSize: 5,
                                 color: '#e5e7eb',
                                 font: { size: 13, weight: '700' },
                                 padding: 15,
@@ -7142,14 +7533,16 @@ function renderStoringPivotTable(filteredData) {
                                 const data = context.dataset.data;
                                 const validData = data.filter(v => v !== null);
                                 if (validData.length === 0 || data[context.dataIndex] === null) return false;
-                                
                                 const max = Math.max(...validData);
                                 const min = Math.min(...validData);
                                 const currentVal = data[context.dataIndex];
-                                
-                                return (currentVal === max && context.dataIndex === data.indexOf(max)) || 
-                                       (currentVal === min && context.dataIndex === data.indexOf(min)) ||
-                                       (context.dataIndex === data.length - 1); // Also show latest
+                                // Selalu tampilkan data terakhir
+                                if (context.dataIndex === data.length - 1) return true;
+                                // Tampilkan nilai minimum (pertama muncul)
+                                if (currentVal === min && context.dataIndex === data.indexOf(min)) return true;
+                                // Tampilkan nilai maximum jika BUKAN 100% (pertama muncul)
+                                if (currentVal === max && currentVal < 100 && context.dataIndex === data.indexOf(max)) return true;
+                                return false;
                             }
                         },
                         tooltip: {
@@ -7168,105 +7561,79 @@ function renderStoringPivotTable(filteredData) {
                 }
             });
 
-            // CBM Ratio Chart
-            const cbmCtx = document.getElementById('cbmRatioChart').getContext('2d');
-            if (cbmRatioChart) cbmRatioChart.destroy();
+            if (chartVarName === 'slaChartDK') slaChartDK = chart;
+            else slaChartLK = chart;
+        }
 
-            const cbmGrad = cbmCtx.createLinearGradient(0, 0, 0, 400);
-            cbmGrad.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
-            cbmGrad.addColorStop(1, 'rgba(59, 130, 246, 0)');
+        function updateTopBottomCityTables() {
+            const cityCbm = {};
+            let totalCbm = 0;
 
-            cbmRatioChart = new Chart(cbmCtx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'CBM Ratio (%)',
-                        data: cbmRatioData,
-                        borderColor: '#60a5fa',
-                        backgroundColor: cbmGrad,
-                        fill: true,
-                        borderWidth: 5,
-                        pointRadius: 7,
-                        pointHoverRadius: 11,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#60a5fa',
-                        pointBorderWidth: 4,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { duration: 1000 },
-                    layout: {
-                        padding: {
-                            top: 15,
-                            bottom: 5,
-                            left: 10,
-                            right: 15
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            min: Math.min(...cbmRatioData.filter(v => v !== null)) * 0.85,
-                            ticks: {
-                                color: '#e5e7eb',
-                                font: { size: 13, weight: '700' },
-                                padding: 15,
-                                callback: value => value.toFixed(0) + '%'
-                            },
-                            grid: { color: 'rgba(255, 255, 255, 0.08)', drawBorder: false }
-                        },
-                        x: {
-                            ticks: { 
-                                color: '#d1d5db',
-                                font: { size: 12, weight: '600' },
-                                maxRotation: 45,
-                                minRotation: 45,
-                                padding: 5
-                            },
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            align: 'end',
-                            labels: {
-                                color: '#fff',
-                                font: { size: 13, weight: 'bold' },
-                                usePointStyle: true,
-                                boxWidth: 10,
-                                padding: 15
-                            }
-                        },
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'top',
-                            offset: 12,
-                            color: '#fff',
-                            font: { weight: 'bold', size: 13 },
-                            backgroundColor: 'rgba(30, 64, 175, 0.9)',
-                            borderRadius: 6,
-                            padding: 8,
-                            formatter: (value) => value === null ? '' : value.toFixed(1) + '%',
-                            display: (context) => {
-                                const data = context.dataset.data;
-                                const validData = data.filter(v => v !== null);
-                                if (validData.length === 0 || data[context.dataIndex] === null) return false;
-                                const max = Math.max(...validData);
-                                const min = Math.min(...validData);
-                                return (data[context.dataIndex] === max && context.dataIndex === data.indexOf(max)) ||
-                                       (data[context.dataIndex] === min && context.dataIndex === data.indexOf(min)) ||
-                                       (context.dataIndex === data.length - 1);
-                            }
-                        }
-                    }
-                }
+            filteredData.forEach(row => {
+                const city = row.AR || 'UNKNOWN';
+                const cbm = parseNumberWithComma(row.AY || '0'); 
+                cityCbm[city] = (cityCbm[city] || 0) + cbm;
+                totalCbm += cbm;
             });
+
+            const sortedCities = Object.entries(cityCbm)
+                .map(([city, cbm]) => ({ 
+                    city, 
+                    cbm, 
+                    percentage: totalCbm > 0 ? (cbm / totalCbm) * 100 : 0 
+                }))
+                .sort((a, b) => b.cbm - a.cbm);
+
+            const top10 = sortedCities.slice(0, 10);
+            const bottom10 = sortedCities.slice().sort((a, b) => a.cbm - b.cbm).slice(0, 10);
+
+            renderTopBottomTable('top-cities-table', top10);
+            renderTopBottomTable('bottom-cities-table', bottom10);
+        }
+
+        function renderTopBottomTable(elementId, data) {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+
+            let html = `
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px; text-align: center;">#</th>
+                            <th>KOTA</th>
+                            <th style="text-align: right;">CBM</th>
+                            <th style="text-align: right; width: 60px;">%</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.forEach((item, index) => {
+                const rankColor = elementId.includes('top') ? 
+                    (index < 3 ? '#ffd700' : '#eee') : 
+                    (index < 3 ? '#ff6b6b' : '#eee');
+                
+                html += `
+                    <tr>
+                        <td style="text-align: center; font-weight: bold; color: ${rankColor};">${index + 1}</td>
+                        <td style="font-weight: 500;">${item.city}</td>
+                        <td style="text-align: right; font-family: 'Courier New', monospace; font-weight: bold;">${item.cbm.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td style="text-align: right; color: #ffd700;">${item.percentage.toFixed(1)}%</td>
+                    </tr>
+                `;
+            });
+
+            for (let i = data.length; i < 10; i++) {
+                html += `<tr style="height: 40px;"><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>`;
+            }
+
+            if (data.length === 0) {
+                html = `<div style="padding: 40px; text-align: center; color: #666;">No data available</div>`;
+            } else {
+                html += `</tbody></table>`;
+            }
+            
+            container.innerHTML = html;
         }
 
         // Helper: Calculate Aging
@@ -7438,92 +7805,6 @@ function renderStoringPivotTable(filteredData) {
             renderVendorUnsupportedTable(unsupportedList);
             renderVendorDelayedTable(delayedList);
             renderExtraCharts(totalOnTime, totalTerlambat, totalBelumSupport, agingGroups);
-            updateTopBottomCityTables();
-        }
-
-        function updateTopBottomCityTables() {
-            const cityCbm = {};
-            let totalCbm = 0;
-
-            filteredData.forEach(row => {
-                const city = row.AR || 'UNKNOWN';
-                const cbm = parseNumberWithComma(row.AY); // Menggunakan CBM SHIPPED (Kolom AY)
-                cityCbm[city] = (cityCbm[city] || 0) + cbm;
-                totalCbm += cbm;
-            });
-
-            const sortedCities = Object.entries(cityCbm)
-                .map(([city, cbm]) => ({ 
-                    city, 
-                    cbm, 
-                    percentage: totalCbm > 0 ? (cbm / totalCbm) * 100 : 0 
-                }))
-                .sort((a, b) => b.cbm - a.cbm);
-
-            const top10 = sortedCities.slice(0, 10);
-            const bottom10 = sortedCities.slice().sort((a, b) => a.cbm - b.cbm).slice(0, 10);
-
-            renderTopBottomTable('top-cities-table', top10);
-            renderTopBottomTable('bottom-cities-table', bottom10);
-        }
-
-        function renderTopBottomTable(elementId, data) {
-            const container = document.getElementById(elementId);
-            if (!container) return;
-
-            let html = `
-                <table class="summary-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 40px; text-align: center;">#</th>
-                            <th>KOTA</th>
-                            <th style="text-align: right;">CBM</th>
-                            <th style="text-align: right; width: 60px;">%</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            data.forEach((item, index) => {
-                const rankColor = elementId.includes('top') ? 
-                    (index < 3 ? '#ffd700' : '#eee') : 
-                    (index < 3 ? '#ff6b6b' : '#eee');
-                
-                html += `
-                    <tr>
-                        <td style="text-align: center; font-weight: bold; color: ${rankColor};">${index + 1}</td>
-                        <td style="font-weight: 500;">${item.city}</td>
-                        <td style="text-align: right; font-family: 'Courier New', monospace; font-weight: bold;">${item.cbm.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                        <td style="text-align: right; color: #ffd700;">${item.percentage.toFixed(1)}%</td>
-                    </tr>
-                `;
-            });
-
-            // Fill empty rows to maintain height if less than 10
-            for (let i = data.length; i < 10; i++) {
-                html += `
-                    <tr style="height: 45px;">
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                    </tr>
-                `;
-            }
-
-            if (data.length === 0) {
-                html = `
-                    <table class="summary-table">
-                        <tbody>
-                            <tr><td colspan="4" style="text-align:center; padding: 50px;">No data available</td></tr>
-                        </tbody>
-                    </table>
-                `;
-            } else {
-                html += `</tbody></table>`;
-            }
-            
-            container.innerHTML = html;
         }
 
         function renderCitySummaryTable(stats) {
@@ -8116,12 +8397,16 @@ function renderStoringPivotTable(filteredData) {
         setInterval(fetchData, 30000);
         setInterval(fetchPlannerData, 30000);
         setInterval(fetchOrderDistData, 30000);
+        setInterval(() => {
+            if (document.body.classList.contains('theme-purple')) fetchSlaFbiData();
+        }, 30000);
 
         // Initialize
         initMap();
         fetchData();
         fetchPlannerData();
         fetchOrderDistData();
+        if (document.body.classList.contains('theme-purple')) fetchSlaFbiData();
         // ===== ASTOR SLA & OUTSTANDING ENGINE =====
 const ASTOR_GID     = '1345578811';
 let ASTOR_CSV_URL_DYNAMIC = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${ASTOR_GID}`;
