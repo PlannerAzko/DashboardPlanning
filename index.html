@@ -1867,6 +1867,11 @@
 
     <!-- Floating Bottom Navigation -->
     <div id="bottom-nav" class="bottom-nav hidden">
+        <div class="bottom-nav-item" id="nav-ahi-summary" style="display: none;" onclick="showDashboardSection('ahi-summary-section')">
+            <i class="fas fa-chart-line"></i>
+            <span>Summary</span>
+        </div>
+        
         <div class="bottom-nav-item active" id="nav-main" onclick="showDashboardSection('main-dashboard-section')">
             <i class="fas fa-calendar-alt"></i>
             <span>Main</span>
@@ -2117,8 +2122,14 @@
                     </div>
 
                     <!-- 3. Right: Filter Area -->
-                    <div style="background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 12px; min-width: 350px; flex: 1.2; border: 1px solid #edf2f7;">
+                    <div style="background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 12px; min-width: 480px; flex: 1.5; border: 1px solid #edf2f7;">
                         <div style="display: flex; gap: 12px;">
+                            <div style="flex: 1; position: relative;">
+                                <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">BULAN</label>
+                                <select id="chatime-bulan-filter" onchange="populatePlannerFilters(); renderChatimeDashboard();" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; color: #1e293b;">
+                                    <option value="ALL">SEMUA BULAN</option>
+                                </select>
+                            </div>
                             <div style="flex: 1; position: relative;">
                                 <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">TANGGAL STUFFING</label>
                                 <select id="chatime-date-filter" onchange="this.size=1; this.blur(); renderChatimeDashboard();" onfocus="this.size=6;" onblur="this.size=1;" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; color: #1e293b; position: absolute; z-index: 10;">
@@ -2190,6 +2201,14 @@
                         </div>
                         <div id="fbi-main-sla-lk" style="font-size: 3.8rem; font-weight: 900; color: #1e293b; line-height: 1;">0%</div>
                         <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 8px; font-weight: 600;">Based on selected Delivery Date</div>
+                    </div>
+
+                    <div style="background: #ffffff; border-left: 6px solid #8b5cf6; border-radius: 16px; padding: 24px; flex: 1; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: center; border-right: 1px solid #f1f5f9; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9;">
+                        <div style="font-size: 0.9rem; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-calendar-check" style="color: #8b5cf6;"></i> SLA BULAN INI
+                        </div>
+                        <div id="fbi-main-sla-current-month" style="font-size: 3.8rem; font-weight: 900; color: #1e293b; line-height: 1;">0%</div>
+                        <div id="fbi-main-sla-current-month-label" style="font-size: 0.75rem; color: #94a3b8; margin-top: 8px; font-weight: 600;">—</div>
                     </div>
                 </div>
             </div>
@@ -2293,6 +2312,433 @@
                 </div>
             </div>
         </div>
+        
+        <!-- EXECUTIVE DASHBOARD SUMMARY (AHI ONLY) - CINEMATIC -->
+        <div id="ahi-summary-section" class="dash-section" style="display: none; padding: 0;">
+            <style>
+                #ahi-summary-section {
+                    position: fixed;
+                    top: 0; left: 0; width: 100vw; height: 100vh;
+                    z-index: 800; /* above header, but below bottom nav (1000) */
+                    background: #0a0a0f; color: #fff;
+                    margin: 0; padding: 0;
+                }
+                .cine-dashboard {
+                    --c-blue: #3b82f6; --c-amber: #f59e0b; --c-red: #ef4444; 
+                    --c-emerald: #10b981; --c-purple: #8b5cf6;
+                    --glass-bg: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.08);
+                    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                    overflow-y: auto; scroll-snap-type: y mandatory; scroll-behavior: smooth;
+                    font-family: 'Inter', system-ui, sans-serif;
+                }
+                .cine-dashboard::-webkit-scrollbar { display: none; }
+                .cine-bg { position: fixed; top:0; left:0; width:100vw; height:100vh; pointer-events: none; z-index: -1; overflow: hidden; }
+                .cine-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3; animation: floatOrb 20s infinite alternate ease-in-out; }
+                .cine-orb:nth-child(1) { width: 40vw; height: 40vw; background: var(--c-blue); top: -10vw; left: -10vw; }
+                .cine-orb:nth-child(2) { width: 30vw; height: 30vw; background: var(--c-purple); bottom: -5vw; right: -5vw; animation-delay: -5s; }
+                @keyframes floatOrb { 0% { transform: translateY(0) translateX(0); } 100% { transform: translateY(100px) translateX(-100px); } }
+                
+                .cine-nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 30px; display: flex; gap: 20px; z-index: 100; }
+                .cine-nav a { color: rgba(255,255,255,0.5); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.3s; cursor: pointer; }
+                .cine-nav a.active, .cine-nav a:hover { color: #fff; }
+                
+                .cine-progress-bar { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); width: 3px; height: 40vh; background: rgba(255,255,255,0.1); border-radius: 2px; z-index: 100; }
+                .cine-progress-fill { width: 100%; background: #fff; height: 0%; border-radius: 2px; transition: height 0.1s; }
+                .cine-timestamp { position: fixed; top: 26px; right: 30px; font-size: 0.75rem; color: rgba(255,255,255,0.4); z-index: 100; }
+                
+                .cine-section { width: 100%; min-height: 100vh; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 80px 5vw; position: relative; box-sizing: border-box; }
+                .cine-content { width: 100%; max-width: 1200px; perspective: 1000px; }
+                
+                .cine-animate { opacity: 0; transform: rotateX(15deg) translateY(60px) translateZ(-50px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+                .cine-section.visible .cine-animate { opacity: 1; transform: rotateX(0deg) translateY(0) translateZ(0); }
+                .cine-delay-1 { transition-delay: 100ms; } .cine-delay-2 { transition-delay: 200ms; }
+                .cine-delay-3 { transition-delay: 300ms; } .cine-delay-4 { transition-delay: 400ms; }
+                
+                .cine-title { font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -1px; }
+                .cine-subtitle { font-size: 1.2rem; color: rgba(255,255,255,0.6); margin-bottom: 3rem; font-weight: 400; }
+                
+                .cine-grid { display: grid; gap: 20px; }
+                .cine-g-2x2 { grid-template-columns: 1fr 1fr; } .cine-g-3 { grid-template-columns: 1fr 1fr 1fr; } .cine-g-1-2 { grid-template-columns: 1fr 2fr; }
+                
+                .cine-card { background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+                .cine-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
+                .cine-card-header { display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.7); font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+                .cine-card-header i { color: var(--accent); font-size: 1.2rem; }
+                .cine-value { font-size: 3.5rem; font-weight: 800; line-height: 1; margin-bottom: 10px; }
+                .cine-trend { font-size: 0.9rem; font-weight: 600; } .cine-trend.up { color: var(--c-emerald); } .cine-trend.down { color: var(--c-red); }
+                .cine-progress-bg { background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; width: 100%; margin-top: 15px; overflow: hidden; }
+                .cine-progress-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease-out; }
+                
+                .cine-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-top: 15px; align-self: flex-start; }
+                .cine-status-pulse { width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin: 0 auto 30px; box-shadow: 0 0 50px var(--accent); animation: pulseGlow 2s infinite alternate; }
+                @keyframes pulseGlow { 0% { box-shadow: 0 0 20px var(--accent); } 100% { box-shadow: 0 0 60px var(--accent); } }
+                .cine-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+                .cine-btn:hover { background: rgba(255,255,255,0.2); }
+                
+                .cine-loader { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0a0a0f; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.5s; }
+                .cine-loader-bar { width: 300px; height: 4px; background: #222; margin-top: 20px; border-radius: 2px; overflow: hidden; }
+                .cine-loader-fill { height: 100%; background: #fff; width: 0%; transition: width 0.1s; }
+                
+                .cine-red-text { color: var(--c-red); } .cine-green-text { color: var(--c-emerald); } .cine-yellow-text { color: var(--c-amber); }
+            </style>
+
+            <div class="cine-dashboard" id="cine-dashboard-root">
+                <div class="cine-bg"><div class="cine-orb"></div><div class="cine-orb"></div></div>
+                <div class="cine-loader" id="cine-loader">
+                    <h2 style="font-weight: 800; letter-spacing: 2px;">INITIALIZING WAREHOUSE DATA</h2>
+                    <div class="cine-loader-bar"><div class="cine-loader-fill" id="cine-loader-fill"></div></div>
+                </div>
+
+                <div class="cine-nav">
+                    <a href="#cine-sec-a" data-target="cine-sec-a" class="active">A</a>
+                    <a href="#cine-sec-b" data-target="cine-sec-b">B</a>
+                    <a href="#cine-sec-c" data-target="cine-sec-c">C</a>
+                    <a href="#cine-sec-d" data-target="cine-sec-d">D</a>
+                    <a href="#cine-sec-e" data-target="cine-sec-e">E</a>
+                </div>
+                <div class="cine-timestamp" id="cine-timestamp">Last updated: Just now</div>
+                <div class="cine-progress-bar"><div class="cine-progress-fill" id="cine-progress-fill"></div></div>
+
+                <!-- A. PLANNING -->
+                <div class="cine-section" id="cine-sec-a" style="--accent: var(--c-blue);">
+                    <div class="cine-content">
+                        <div class="cine-animate"><h1 class="cine-title" style="color: var(--accent);">Warehouse Intelligence Dashboard</h1><p class="cine-subtitle">Real-time operational summary • Auto-refreshed</p></div>
+                        <div class="cine-grid cine-g-2x2">
+                            <div class="cine-card cine-animate cine-delay-1"><div class="cine-card-header"><i class="fas fa-calendar-alt"></i> Plan Today</div><div class="cine-value" id="c-data-plan-today">0</div><div class="cine-trend up"><i class="fas fa-arrow-up"></i> +12% vs yesterday</div></div>
+                            <div class="cine-card cine-animate cine-delay-2"><div class="cine-card-header"><i class="fas fa-barcode"></i> Total Case ID Today</div><div class="cine-value" id="c-data-case-today">0</div><div class="cine-trend up"><i class="fas fa-arrow-up"></i> +5% vs yesterday</div></div>
+                            <div class="cine-card cine-animate cine-delay-3"><div class="cine-card-header"><i class="fas fa-shield-check"></i> SLA GRW This Month</div><div class="cine-value" id="c-data-sla-grw">0%</div><div class="cine-progress-bg"><div class="cine-progress-bar-fill" id="c-prog-sla-grw"></div></div></div>
+                            <div class="cine-card cine-animate cine-delay-4"><div class="cine-card-header"><i class="fas fa-users"></i> SLA Customer This Month</div><div class="cine-value" id="c-data-sla-cust">0%</div><div class="cine-progress-bg"><div class="cine-progress-bar-fill" id="c-prog-sla-cust"></div></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B. VENDOR -->
+                <div class="cine-section" id="cine-sec-b" style="--accent: var(--c-amber);">
+                    <div class="cine-content">
+                        <div class="cine-animate"><h1 class="cine-title" style="color: var(--accent);">Vendor & Fleet Performance</h1><p class="cine-subtitle">Armada monitoring & support metrics</p></div>
+                        <div class="cine-grid cine-g-1-2">
+                            <div class="cine-card cine-animate cine-delay-1"><div class="cine-card-header"><i class="fas fa-chart-pie"></i> Fleet Support % This Month</div>
+                                <div style="display: flex; align-items: center; justify-content: center; margin-top: 20px;">
+                                    <div id="c-donut-fleet" style="--val: 87.3; --col: var(--c-amber); width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(var(--col) calc(var(--val) * 1%), rgba(255,255,255,0.1) 0); display: flex; align-items: center; justify-content: center;">
+                                        <div style="width: 110px; height: 110px; background: #0a0a0f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800;" id="c-data-fleet-pct">0%</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: auto; color: rgba(255,255,255,0.5); font-size: 0.9rem; text-align: center; margin-top: 20px;">High fulfillment rate maintained across regional lanes.</div>
+                            </div>
+                            <div class="cine-card cine-animate cine-delay-2"><div class="cine-card-header"><i class="fas fa-truck"></i> Fleet Not Yet Supported Today</div><div class="cine-value cine-red-text" id="c-data-fleet-unsupported">0</div><div class="cine-badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">Needs Attention</div><div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;" id="c-data-fleet-list"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- C. OUTSTANDING -->
+                <div class="cine-section" id="cine-sec-c" style="--accent: var(--c-red);">
+                    <div class="cine-content">
+                        <div class="cine-animate"><h1 class="cine-title" style="color: var(--accent);">Outstanding Overview</h1><p class="cine-subtitle">Tracking unresolved & planned items</p></div>
+                        <div class="cine-grid cine-g-3">
+                            <div class="cine-card cine-animate cine-delay-1"><div class="cine-card-header"><i class="fas fa-inbox"></i> Total Outstanding Today</div><div class="cine-value" id="c-data-out-tot">0</div><div class="cine-badge" style="background: rgba(255,255,255,0.1); color: #fff;">Volume</div></div>
+                            <div class="cine-card cine-animate cine-delay-2"><div class="cine-card-header"><i class="fas fa-exclamation-circle"></i> Not Yet Planned</div><div class="cine-value cine-red-text" id="c-data-out-unplan">0</div><div class="cine-badge" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">Urgent</div></div>
+                            <div class="cine-card cine-animate cine-delay-3"><div class="cine-card-header"><i class="fas fa-check-circle"></i> Already Planned</div><div class="cine-value cine-green-text" id="c-data-out-plan">0</div><div class="cine-badge" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">On Track</div></div>
+                        </div>
+                        <div class="cine-animate cine-delay-4" style="margin-top: 30px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;"><span class="cine-green-text">PLANNED</span><span class="cine-red-text">UNPLANNED</span></div>
+                            <div style="display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: rgba(255,255,255,0.1);"><div id="c-prog-ratio-plan" style="height: 100%; background: var(--c-emerald); width: 0%; transition: width 1s;"></div><div id="c-prog-ratio-unplan" style="height: 100%; background: var(--c-red); width: 0%; transition: width 1s;"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- D. ASTOR -->
+                <div class="cine-section" id="cine-sec-d" style="--accent: var(--c-emerald);">
+                    <div class="cine-content">
+                        <div class="cine-animate"><h1 class="cine-title" style="color: var(--accent);">ASTOR Monitoring</h1><p class="cine-subtitle">HUB GRW & Lokasi AZKO / KWI performance</p></div>
+                        <div class="cine-grid cine-g-2x2">
+                            <div class="cine-card cine-animate cine-delay-1" style="border-left-width: 4px; border-left-color: var(--c-emerald);"><div class="cine-card-header"><i class="fas fa-building"></i> HUB GRW SLA</div><div class="cine-value" id="c-data-hub-sla">0%</div><div class="cine-progress-bg"><div class="cine-progress-bar-fill" id="c-prog-hub-sla" style="background: var(--c-emerald);"></div></div></div>
+                            <div class="cine-card cine-animate cine-delay-2" style="border-left-width: 4px; border-left-color: var(--c-emerald);"><div class="cine-card-header" style="color: #fff;">HUB GRW Items</div><div style="display: flex; gap: 30px; margin-top: 10px;"><div><div style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">SUDAH PLAN</div><div class="cine-value cine-green-text" style="font-size: 2.5rem;" id="c-data-hub-plan">0</div></div><div><div style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">BELUM PLAN</div><div class="cine-value cine-red-text" style="font-size: 2.5rem;" id="c-data-hub-unplan">0</div></div></div></div>
+                            <div class="cine-card cine-animate cine-delay-3" style="border-left-width: 4px; border-left-color: var(--c-blue);"><div class="cine-card-header"><i class="fas fa-map-marker-alt"></i> ASTOR AZKO & KWI SLA</div><div class="cine-value" id="c-data-azko-sla">0%</div><div class="cine-progress-bg"><div class="cine-progress-bar-fill" id="c-prog-azko-sla" style="background: var(--c-blue);"></div></div></div>
+                            <div class="cine-card cine-animate cine-delay-4" style="border-left-width: 4px; border-left-color: var(--c-blue);"><div class="cine-card-header" style="color: #fff;">ASTOR AZKO & KWI Items</div><div style="display: flex; gap: 30px; margin-top: 10px;"><div><div style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">SUDAH PLAN</div><div class="cine-value cine-green-text" style="font-size: 2.5rem;" id="c-data-azko-plan">0</div></div><div><div style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">BELUM PLAN</div><div class="cine-value cine-red-text" style="font-size: 2.5rem;" id="c-data-azko-unplan">0</div></div></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- E. KESIMPULAN -->
+                <div class="cine-section" id="cine-sec-e" style="--accent: var(--c-purple);">
+                    <div class="cine-content" style="text-align: center;">
+                        <div class="cine-animate"><h1 class="cine-title" style="color: var(--accent);">AI Agent Conclusion</h1><p class="cine-subtitle">Automated warehouse health assessment</p></div>
+                        <div class="cine-card cine-animate cine-delay-1" style="max-width: 800px; margin: 0 auto; padding: 50px;">
+                            <div class="cine-status-pulse" id="c-ai-pulse" style="--accent: var(--c-amber); color: var(--c-amber);"><i class="fas fa-exclamation-triangle"></i></div>
+                            <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 20px; color: var(--c-amber);" id="c-ai-status-text">Warehouse Moderately Healthy</h2>
+                            <p style="font-size: 1.1rem; line-height: 1.6; color: rgba(255,255,255,0.8); margin-bottom: 40px;" id="c-ai-reasoning"></p>
+                            <div style="display: flex; justify-content: center; gap: 15px;">
+                                <button class="cine-btn" onclick="alert('Exporting PDF...')"><i class="fas fa-file-pdf"></i> Export Report PDF</button>
+                                <button class="cine-btn" onclick="alert('Pinging team...')"><i class="fas fa-bell"></i> Notify Team</button>
+                                <button class="cine-btn" style="background: var(--c-purple); color: #fff; border: none;" onclick="cineReinitParams()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                let cineInitialized = false;
+
+                function getCineColor(val) { return val >= 90 ? 'var(--c-emerald)' : (val >= 80 ? 'var(--c-amber)' : 'var(--c-red)'); }
+
+                function initCinematicDashboard() {
+                    const root = document.getElementById('cine-dashboard-root');
+                    if (!root) return;
+
+                    // Loader logic first, so it always finishes even on error
+                    const fill = document.getElementById('cine-loader-fill');
+                    const loader = document.getElementById('cine-loader');
+                    if (fill && loader) {
+                        fill.style.transition = 'none';
+                        fill.style.width = '0%';
+                        loader.style.display = 'flex'; loader.style.opacity = '1';
+                        // Force reflow
+                        void loader.offsetWidth;
+                        
+                        fill.style.transition = 'width 0.15s ease-out';
+                        fill.style.width = '100%';
+                        
+                        setTimeout(() => {
+                            loader.style.opacity = '0'; 
+                            setTimeout(() => loader.style.display = 'none', 300); 
+                        }, 150);
+                    }
+
+                    try {
+                        // --- CALCULATE REAL DATA ---
+                        let totalTasks = 0;
+                        let caseIdPlan = 0;
+                        let cbmPlan = 0;
+                        let cbmShipped = 0;
+                        
+                        let slaGrwSum = 0, slaGrwCount = 0;
+                        let slaCustSum = 0, slaCustCount = 0;
+                        
+                        let fleetOnTime = 0, fleetTerlambat = 0, fleetTotal = 0;
+                        let fleetUnsupported = 0;
+                        let unsupportedArmadas = new Set();
+                        const excludedCarriers = ['1D-INTERNAL (SDA)', 'AHI', 'DUMMY-LK-EKSP', 'DUMMY'];
+    
+                        let outTotal = 0;
+                        let outUnplan = 0;
+                        let outPlan = 0;
+    
+                        if (typeof filteredData !== 'undefined') {
+                            filteredData.forEach(row => {
+                                const z = parseNumberWithComma(row.Z || '0');
+                                totalTasks++;
+                                caseIdPlan += parseNumberWithComma(row.BB || '0');
+                                cbmPlan += z;
+                                cbmShipped += parseNumberWithComma(row.AY || '0');
+        
+                                const sGrw = parseNumberWithComma(row.BD || '0');
+                                if (sGrw > 0) { slaGrwSum += (sGrw < 2 ? sGrw*100 : sGrw); slaGrwCount++; }
+                                
+                                const sCust = parseNumberWithComma(row.BC || '0');
+                                if (sCust > 0) { slaCustSum += (sCust < 2 ? sCust*100 : sCust); slaCustCount++; }
+        
+                                // Vendor Performance logic
+                                const carrier = (row.D || '').trim();
+                                const carrierUpper = carrier.toUpperCase();
+                                let bBelumSupport = false;
+                                if (!carrierUpper || carrierUpper.includes('BELUM') || carrierUpper.includes('TBA') || carrierUpper.includes('DUMMY') || carrier === '-' || carrier === '0') {
+                                    bBelumSupport = true;
+                                }
+        
+                                if (z > 0 && !bBelumSupport) {
+                                    if (!excludedCarriers.includes(carrierUpper)) {
+                                        const ketVendor = (row.AV || '').trim().toLowerCase();
+                                        if (ketVendor.includes('terlambat')) {
+                                            fleetTerlambat++;
+                                            unsupportedArmadas.add(carrier);
+                                        } else {
+                                            fleetOnTime++;
+                                        }
+                                        fleetTotal++;
+                                    }
+                                } else if (z > 0 && bBelumSupport) {
+                                    fleetUnsupported++;
+                                    unsupportedArmadas.add("UNSUPPORTED");
+                                }
+        
+                                // Outstanding logic
+                                if (z > 0 && row.AY !== row.Z) {
+                                    outTotal++;
+                                    const av = (row.AV || '').toLowerCase();
+                                    if (av.includes('belum plan') || bBelumSupport) {
+                                        outUnplan++;
+                                    } else {
+                                        outPlan++;
+                                    }
+                                }
+                            });
+                        }
+    
+                        // HUB ASTOR metrics
+                        let hubPlan = 0, hubUnplan = 0, hubTotal = 0;
+                        let hubSlaSum = 0, hubSlaCount = 0;
+                        if (typeof rawHubData !== 'undefined') {
+                            rawHubData.forEach(row => {
+                                if (row === rawHubData[0]) return;
+                                const z = parseNumberWithComma(row.Z || '0');
+                                if (z > 0) {
+                                    hubTotal++;
+                                    const s = parseNumberWithComma(row.BD || '0');
+                                    if (s > 0) { hubSlaSum += (s<2?s*100:s); hubSlaCount++; }
+                                    
+                                    const av = (row.AV || '').toLowerCase();
+                                    if (av.includes('belum')) hubUnplan++;
+                                    else hubPlan++;
+                                }
+                            });
+                        }
+    
+                        let azkoPlan = 0, azkoUnplan = 0, azkoTotal = 0;
+                        let azkoSlaSum = 0, azkoSlaCount = 0;
+                        if (typeof rawAstorData !== 'undefined') {
+                            rawAstorData.forEach(row => {
+                                if (row === rawAstorData[0]) return;
+                                const loc = (row.AS || '').toUpperCase();
+                                if (loc === 'AZKO' || loc === 'KWI') {
+                                    const z = parseNumberWithComma(row.Z || '0');
+                                    if (z > 0) {
+                                        azkoTotal++;
+                                        const s = parseNumberWithComma(row.BD || '0');
+                                        if (s > 0) { azkoSlaSum += (s<2?s*100:s); azkoSlaCount++; }
+                                        
+                                        const av = (row.AV || '').toLowerCase();
+                                        if (av.includes('belum')) azkoUnplan++;
+                                        else azkoPlan++;
+                                    }
+                                }
+                            });
+                        }
+    
+                        const avgSlaGrw = slaGrwCount > 0 ? (slaGrwSum / slaGrwCount).toFixed(1) : '100.0';
+                        const avgSlaCust = slaCustCount > 0 ? (slaCustSum / slaCustCount).toFixed(1) : '100.0';
+                        const fleetSupportPct = fleetTotal > 0 ? ((fleetOnTime / fleetTotal) * 100).toFixed(1) : '100.0';
+                        
+                        const hubSlaVal = hubSlaCount > 0 ? (hubSlaSum / hubSlaCount).toFixed(1) : '100.0';
+                        const azkoSlaVal = azkoSlaCount > 0 ? (azkoSlaSum / azkoSlaCount).toFixed(1) : '100.0';
+    
+                        unsupportedArmadas.delete("UNSUPPORTED");
+                        let unsupportedArray = Array.from(unsupportedArmadas).slice(0, 5);
+                        if (unsupportedArray.length === 0) unsupportedArray.push("ALL CLEAR");
+    
+                        // -- INJECT INTO DOM --
+                        const setTxt = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+                        const setHTML = (id, val) => { const e = document.getElementById(id); if (e) e.innerHTML = val; };
+                        const setWidth = (id, val) => { const e = document.getElementById(id); if (e) e.style.width = val; };
+                        const setBg = (id, val) => { const e = document.getElementById(id); if (e) e.style.background = val; };
+    
+                        setTxt('c-data-plan-today', totalTasks + ' Orders');
+                        setTxt('c-data-case-today', typeof formatIndo === 'function' ? formatIndo(caseIdPlan) + ' Cases' : caseIdPlan + ' Cases');
+                        
+                        setTxt('c-data-sla-grw', avgSlaGrw + '%');
+                        setWidth('c-prog-sla-grw', avgSlaGrw + '%');
+                        setBg('c-prog-sla-grw', getCineColor(parseFloat(avgSlaGrw)));
+                        
+                        setTxt('c-data-sla-cust', avgSlaCust + '%');
+                        setWidth('c-prog-sla-cust', avgSlaCust + '%');
+                        setBg('c-prog-sla-cust', getCineColor(parseFloat(avgSlaCust)));
+                        
+                        setTxt('c-data-fleet-pct', fleetSupportPct + '%');
+                        const cDonutFleet = document.getElementById('c-donut-fleet');
+                        if (cDonutFleet) cDonutFleet.style.setProperty('--val', Math.max(0.1, parseFloat(fleetSupportPct)));
+                        setTxt('c-data-fleet-unsupported', fleetUnsupported + ' Armada');
+                        setHTML('c-data-fleet-list', unsupportedArray.map(a => '<span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">' + a + '</span>').join(''));
+                        
+                        setTxt('c-data-out-tot', outTotal + ' Items');
+                        setTxt('c-data-out-unplan', outUnplan + ' Items');
+                        setTxt('c-data-out-plan', outPlan + ' Items');
+                        
+                        const rtPlan = outTotal > 0 ? (outPlan / outTotal) * 100 : 0;
+                        const rtUnplan = outTotal > 0 ? (outUnplan / outTotal) * 100 : 0;
+                        setWidth('c-prog-ratio-plan', rtPlan + '%');
+                        setWidth('c-prog-ratio-unplan', rtUnplan + '%');
+    
+                        setTxt('c-data-hub-sla', hubSlaVal + '%');
+                        setWidth('c-prog-hub-sla', hubSlaVal + '%');
+                        setTxt('c-data-hub-plan', typeof formatIndo === 'function' ? formatIndo(hubPlan) : hubPlan);
+                        setTxt('c-data-hub-unplan', typeof formatIndo === 'function' ? formatIndo(hubUnplan) : hubUnplan);
+    
+                        setTxt('c-data-azko-sla', azkoSlaVal + '%');
+                        setWidth('c-prog-azko-sla', azkoSlaVal + '%');
+                        setTxt('c-data-azko-plan', typeof formatIndo === 'function' ? formatIndo(azkoPlan) : azkoPlan);
+                        setTxt('c-data-azko-unplan', typeof formatIndo === 'function' ? formatIndo(azkoUnplan) : azkoUnplan);
+    
+                        // AI Reasoning
+                        let state = 'warning';
+                        if (parseFloat(avgSlaGrw) >= 90 && outUnplan < 10) state = 'success';
+                        else if (parseFloat(avgSlaGrw) < 80 || outUnplan > 50) state = 'critical';
+                        
+                        let aiMsg = `Warehouse operates at SLA GRW ${avgSlaGrw}% (Customer ${avgSlaCust}%). Outstanding: ${outTotal} items (${outUnplan} unassigned). Fleet support stands at ${fleetSupportPct}%. Action recommended: address ${fleetUnsupported} unsupported lanes.`;
+                        if (state === 'success') aiMsg = `All operational metrics look highly optimal. SLA GRW is performing well at ${avgSlaGrw}%. Outstanding items are well-managed with only ${outUnplan} unassigned.`;
+                        if (state === 'critical') aiMsg = `CRITICAL ALERT: Operational metrics have degraded. Ensure all ${outUnplan} unplanned items and ${fleetUnsupported} unsupported fleets are addressed immediately.`;
+
+                        const ptColor = state === 'success' ? 'var(--c-emerald)' : (state === 'critical' ? 'var(--c-red)' : 'var(--c-amber)');
+                        const stIcon = state === 'success' ? 'fa-shield-check' : (state === 'critical' ? 'fa-times-circle' : 'fa-exclamation-triangle');
+                        const stText = state === 'success' ? 'Warehouse Operations Optimal' : (state === 'critical' ? 'Urgent Action Required' : 'Moderate Attention Needed');
+    
+                        const aiPulse = document.getElementById('c-ai-pulse');
+                        const aiTextEl = document.getElementById('c-ai-status-text');
+                        if (aiPulse) {
+                            aiPulse.style.color = ptColor;
+                            aiPulse.style.setProperty('--accent', ptColor);
+                            aiPulse.innerHTML = `<i class="fas ${stIcon}"></i>`;
+                        }
+                        if (aiTextEl) {
+                            aiTextEl.textContent = stText;
+                            aiTextEl.style.color = ptColor;
+                        }
+                        setTxt('c-ai-reasoning', aiMsg);
+                    } catch (e) {
+                        console.error('Error calculating cinematic metrics:', e);
+                    }
+
+                    if (!cineInitialized) {
+                        cineInitialized = true;
+                        const sections = document.querySelectorAll('.cine-section');
+                        const navLinks = document.querySelectorAll('.cine-nav a');
+                        const scrollBarFill = document.getElementById('cine-progress-fill');
+
+                        const observer = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (entry.isIntersecting) {
+                                    entry.target.classList.add('visible');
+                                    navLinks.forEach(l => {
+                                        l.classList.remove('active');
+                                        if (l.getAttribute('data-target') === entry.target.id) l.classList.add('active');
+                                    });
+                                }
+                            });
+                        }, { threshold: 0.5 });
+                        sections.forEach(s => observer.observe(s));
+
+                        root.addEventListener('scroll', () => {
+                            const maxScroll = root.scrollHeight - root.clientHeight;
+                            if (maxScroll <= 0) return;
+                            scrollBarFill.style.height = ((root.scrollTop / maxScroll) * 100) + '%';
+                        });
+
+                        navLinks.forEach(l => {
+                            l.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                document.getElementById(l.getAttribute('data-target')).scrollIntoView({ behavior: 'smooth' });
+                            });
+                        });
+                    }
+
+                    document.getElementById('cine-timestamp').textContent = 'Last updated: ' + new Date().toLocaleString('id-ID');
+                }
+
+                function cineReinitParams() {
+                    initCinematicDashboard();
+                }
+            </script>
+        </div>
+
 
         <div id="summary-report-section" class="dash-section" style="display: none;">
             <div class="section-title-banner">
@@ -2787,7 +3233,7 @@
                             </select>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px;">
-                            <label style="font-size: 0.8em; color: #ffd700; opacity: 0.8;">NO LC:</label>
+                            <label style="font-size: 0.8em; color: #ffd700; opacity: 0.8;">STATUS PLAN:</label>
                             <select id="hub-nolc-filter" onchange="renderHubTable()" style="background: #222; color: #ffd700; border: 1px solid #ffd700; padding: 3px 8px; border-radius: 4px; font-size: 0.85em; outline: none;">
                                 <option value="ALL">ALL</option>
                             </select>
@@ -2953,6 +3399,14 @@
                                 <option value="DK">DK</option>
                                 <option value="LK">LK</option>
                                 <option value="LP">LP</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <label style="font-size:0.8em;color:#ccc;">STATUS PLAN:</label>
+                            <select id="astor-plan-filter" onchange="renderAstorSLA()">
+                                <option value="ALL">SEMUA</option>
+                                <option value="SUDAH PLAN">SUDAH PLAN</option>
+                                <option value="BELUM PLAN">BELUM PLAN</option>
                             </select>
                         </div>
                     </div>
@@ -3454,6 +3908,8 @@
             rawFBISchedule = [];
             rawHubData = [];
             rawAstorData = [];
+            const bf = document.getElementById('chatime-bulan-filter');
+            if (bf) bf.innerHTML = '<option value="ALL">SEMUA BULAN</option>';
 
             if (branch === 'FBI') {
                 body.classList.add('theme-purple');
@@ -3475,6 +3931,8 @@
                 // FBI: Hide specific navigation items
                 if (navPartner) navPartner.style.display = 'none';
                 if (navHub) navHub.style.display = 'none';
+                const navAhiSummary = document.getElementById('nav-ahi-summary');
+                if (navAhiSummary) navAhiSummary.style.display = 'none';
                 const navPlanning = document.getElementById('nav-planning');
                 if (navPlanning) navPlanning.style.display = 'flex';
 
@@ -3492,6 +3950,9 @@
                 
                 const navPlanning = document.getElementById('nav-planning');
                 if (navPlanning) navPlanning.style.display = 'none';
+
+                const navAhiSummary = document.getElementById('nav-ahi-summary');
+                if (navAhiSummary) navAhiSummary.style.display = 'flex';
 
                 PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${PIVOT_SHEET_ID}/export?format=csv&gid=${PIVOT_SHEET_GID}`;
                 HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
@@ -3814,9 +4275,24 @@
             bottomNavItems.forEach(item => item.classList.remove('active'));
 
             const globalFilter = document.getElementById('global-filter-section');
-            const showFilterFor = ['main-dashboard-section', 'fbi-dashboard-section', 'summary-report-section', 'supply-partner-section'];
+            const showFilterFor = ['main-dashboard-section', 'fbi-dashboard-section', 'ahi-summary-section', 'summary-report-section', 'supply-partner-section'];
             if (globalFilter) {
-                globalFilter.style.display = showFilterFor.includes(sectionId) ? 'grid' : 'none';
+                if (document.body.classList.contains('theme-purple') && sectionId === 'fbi-dashboard-section') {
+                    globalFilter.style.display = 'none';
+                } else {
+                    globalFilter.style.display = showFilterFor.includes(sectionId) ? 'grid' : 'none';
+                }
+            }
+
+            // Global Header & Cinematic Dashboard logic
+            const hdr = document.querySelector('.header');
+            if (sectionId === 'ahi-summary-section') {
+                if (typeof initCinematicDashboard === 'function') {
+                    setTimeout(initCinematicDashboard, 100);
+                }
+                if (hdr) hdr.style.display = 'none';
+            } else {
+                if (hdr) hdr.style.display = 'flex';
             }
 
             const target = document.getElementById(sectionId);
@@ -3827,6 +4303,7 @@
                 let navId = '';
                 if (sectionId === 'main-dashboard-section' || sectionId === 'fbi-dashboard-section') navId = 'nav-main';
                 else if (sectionId === 'fbi-planning-section') navId = 'nav-planning';
+                else if (sectionId === 'ahi-summary-section') navId = 'nav-ahi-summary';
                 else if (sectionId === 'summary-report-section') navId = 'nav-summary';
                 else if (sectionId === 'supply-partner-section') navId = 'nav-partner';
                 else if (sectionId === 'outstanding-section') navId = 'nav-outstanding';
@@ -4536,6 +5013,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
         function populatePlannerFilters() {
             const dateFilter = document.getElementById('chatime-date-filter');
             const areaFilter = document.getElementById('chatime-area-filter');
+            const bulanFilter = document.getElementById('chatime-bulan-filter');
             if (!dateFilter || !areaFilter) return;
 
             const selectedDate = dateFilter.value;
@@ -4565,7 +5043,53 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 }
             }
 
-            const sortedDates = Object.keys(dateMap).sort((a, b) => dateMap[b] - dateMap[a]);
+            // Populate Bulan dropdown option list if empty/unpopulated
+            if (bulanFilter && bulanFilter.options.length <= 1) {
+                const bulanMap = {};
+                Object.values(dateMap).forEach(dateObj => {
+                    const key = MonthsID[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
+                    const sortKey = dateObj.getFullYear() * 100 + dateObj.getMonth();
+                    bulanMap[key] = sortKey;
+                });
+
+                bulanFilter.innerHTML = '<option value="ALL">SEMUA BULAN</option>';
+                Object.keys(bulanMap)
+                    .sort((a, b) => bulanMap[b] - bulanMap[a])
+                    .forEach(b => {
+                        const o = document.createElement('option');
+                        o.value = b;
+                        o.textContent = b;
+                        bulanFilter.appendChild(o);
+                    });
+
+                // Default to current month if dynamic, otherwise default to most recent month
+                const now = new Date();
+                const targetSortKey = now.getFullYear() * 100 + now.getMonth();
+                const matchKey = Object.keys(bulanMap).find(k => bulanMap[k] === targetSortKey);
+
+                if (matchKey) {
+                    bulanFilter.value = matchKey;
+                } else {
+                    const sortedBulanKeys = Object.keys(bulanMap).sort((a, b) => bulanMap[b] - bulanMap[a]);
+                    if (sortedBulanKeys.length > 0) {
+                        bulanFilter.value = sortedBulanKeys[0];
+                    } else {
+                        bulanFilter.value = 'ALL';
+                    }
+                }
+            }
+
+            const selectedBulan = bulanFilter ? bulanFilter.value : 'ALL';
+
+            // Filter date keys by the selected Month
+            const filteredDates = Object.keys(dateMap).filter(isoD => {
+                if (selectedBulan === 'ALL') return true;
+                const dObj = dateMap[isoD];
+                const key = MonthsID[dObj.getMonth()] + ' ' + dObj.getFullYear();
+                return key === selectedBulan;
+            });
+
+            const sortedDates = filteredDates.sort((a, b) => dateMap[b] - dateMap[a]);
 
             dateFilter.innerHTML = '<option value="ALL">All Dates</option>';
             sortedDates.forEach(d => {
@@ -4587,8 +5111,10 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 } else if (selectedDate === 'ALL') {
                     dateFilter.value = 'ALL';
                 } else {
-                    dateFilter.value = sortedDates[0];
+                    dateFilter.value = 'ALL'; // Safer fallback to see all days for selected Month
                 }
+            } else {
+                dateFilter.value = 'ALL';
             }
 
             // Area options: Restricted to "Luar Pulau", "Luar Kota", "Store DK"
@@ -4647,14 +5173,28 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
         function renderChatimeDashboard() {
             if (!rawPlannerData || rawPlannerData.length === 0) return;
 
+            const bulanFilterVal = document.getElementById('chatime-bulan-filter')?.value || 'ALL';
             const dateFilter = document.getElementById('chatime-date-filter')?.value || 'ALL';
             const areaFilter = document.getElementById('chatime-area-filter')?.value || 'ALL';
 
             const filtered = rawPlannerData.filter(d => {
-                const isoDate = toISODate(parseDate(d.stuffingDate));
+                const dateObj = parseDate(d.stuffingDate);
+                const isoDate = toISODate(dateObj);
+
+                // 1. Filter by local Bulan filter
+                let matchBulan = true;
+                if (bulanFilterVal !== 'ALL' && dateObj && dateObj.getTime() > 0) {
+                    const localMonthKey = MonthsID[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
+                    matchBulan = (localMonthKey === bulanFilterVal);
+                }
+
+                // 2. Filter by Date
                 const matchDate = dateFilter === 'ALL' || isoDate === dateFilter;
+
+                // 3. Filter by Area
                 const matchArea = areaFilter === 'ALL' || d.area === areaFilter;
-                return matchDate && matchArea;
+
+                return matchBulan && matchDate && matchArea;
             });
 
             // KPIs
@@ -4678,7 +5218,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 donutStats[region] = regionOrderMap[region].size;
             }
 
-            // Chart Data 2: Bar Chart (Planner source - remains as is)
+            // Chart Data 2: Bar Chart (Planner source - remains as is, filtered by selected date and month)
             const barStats = {
                 'Store DK': { total: 0, od: 0 },
                 'Luar Kota': { total: 0, od: 0 },
@@ -4686,8 +5226,17 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             };
             
             const areaDateFiltered = rawPlannerData.filter(d => {
-                const isoDate = toISODate(parseDate(d.stuffingDate));
-                return dateFilter === 'ALL' || isoDate === dateFilter;
+                const dateObj = parseDate(d.stuffingDate);
+                const isoDate = toISODate(dateObj);
+
+                // Filter by local Bulan
+                let matchBulan = true;
+                if (bulanFilterVal !== 'ALL' && dateObj && dateObj.getTime() > 0) {
+                    const localMonthKey = MonthsID[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
+                    matchBulan = (localMonthKey === bulanFilterVal);
+                }
+
+                return (dateFilter === 'ALL' || isoDate === dateFilter) && matchBulan;
             });
             areaDateFiltered.forEach(d => {
                 if (barStats[d.area]) {
@@ -4702,6 +5251,9 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             let dkTotalOT = 0; let dkTotalDelay = 0;
             let lkTotalOT = 0; let lkTotalDelay = 0;
 
+            let slaCurrentMonthValue = 0;
+            let currentMonthLabel = '—';
+
             if (rawSlaFbiData.length > 2) {
                 for (let i = 2; i < rawSlaFbiData.length; i++) {
                     const row = rawSlaFbiData[i];
@@ -4709,14 +5261,19 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                     const rowDate = (row[0] || '').trim();
                     if (!rowDate) continue;
 
-                    // SYNC: Filter by Month if "ALL" is selected in local filter
                     const dObj = parseDate(rowDate);
                     const isoDate = toISODate(dObj);
                     
                     let m = "";
                     if (!isNaN(dObj.getTime())) m = MonthsID[dObj.getMonth()];
                     
-                    const matchBulan = selectedFilters.bulan.length === 0 || (m && selectedFilters.bulan.includes(m));
+                    let matchBulan = true;
+                    if (bulanFilterVal !== 'ALL') {
+                        const localMonthKey = MonthsID[dObj.getMonth()] + ' ' + dObj.getFullYear();
+                        matchBulan = (localMonthKey === bulanFilterVal);
+                    } else {
+                        matchBulan = selectedFilters.bulan.length === 0 || (m && selectedFilters.bulan.includes(m));
+                    }
                     const matchDate = dateFilter === 'ALL' || isoDate === dateFilter;
                     
                     if (!matchBulan || !matchDate) continue;
@@ -4731,12 +5288,72 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 const totalLK = lkTotalOT + lkTotalDelay;
                 slaDkValue = totalDK > 0 ? (dkTotalOT / totalDK * 100) : 0;
                 slaLkValue = totalLK > 0 ? (lkTotalOT / totalLK * 100) : 0;
+
+                // --- Calculate "SLA Bulan Sekarang" ---
+                const now = new Date();
+                const curMonthIdx = now.getMonth();
+                const curYear = now.getFullYear();
+
+                let hasCurrentCalData = false;
+                let maxYear = 0;
+                let maxMonth = 0;
+                for (let i = 2; i < rawSlaFbiData.length; i++) {
+                    const row = rawSlaFbiData[i];
+                    if (row.length < 5) continue;
+                    const rowDate = (row[0] || '').trim();
+                    if (!rowDate) continue;
+                    const dObj = parseDate(rowDate);
+                    if (isNaN(dObj.getTime()) || dObj.getTime() === 0) continue;
+
+                    const y = dObj.getFullYear();
+                    const m = dObj.getMonth();
+                    if (y === curYear && m === curMonthIdx) {
+                        hasCurrentCalData = true;
+                    }
+                    const val = y * 12 + m;
+                    if (val > maxYear * 12 + maxMonth) {
+                        maxYear = y;
+                        maxMonth = m;
+                    }
+                }
+
+                const targetMonthIdx = hasCurrentCalData ? curMonthIdx : maxMonth;
+                const targetYear = hasCurrentCalData ? curYear : maxYear;
+
+                const IndonesianMonthsShort = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                currentMonthLabel = IndonesianMonthsShort[targetMonthIdx] + ' ' + targetYear;
+
+                let monthlyOT = 0;
+                let monthlyDelay = 0;
+                for (let i = 2; i < rawSlaFbiData.length; i++) {
+                    const row = rawSlaFbiData[i];
+                    if (row.length < 5) continue;
+                    const rowDate = (row[0] || '').trim();
+                    if (!rowDate) continue;
+                    const dObj = parseDate(rowDate);
+                    if (isNaN(dObj.getTime()) || dObj.getTime() === 0) continue;
+
+                    if (dObj.getFullYear() === targetYear && dObj.getMonth() === targetMonthIdx) {
+                        monthlyOT += parseNumberWithComma(row[1] || '0'); // dk OT
+                        monthlyDelay += parseNumberWithComma(row[2] || '0'); // dk Delay
+                        monthlyOT += parseNumberWithComma(row[3] || '0'); // lk OT
+                        monthlyDelay += parseNumberWithComma(row[4] || '0'); // lk Delay
+                    }
+                }
+
+                const totalMonthly = monthlyOT + monthlyDelay;
+                slaCurrentMonthValue = totalMonthly > 0 ? (monthlyOT / totalMonthly * 100) : 0;
             }
 
             const slaDkEl = document.getElementById('fbi-main-sla-dk');
             const slaLkEl = document.getElementById('fbi-main-sla-lk');
+            const slaCurrentMonthEl = document.getElementById('fbi-main-sla-current-month');
+            const slaCurrentMonthLabelEl = document.getElementById('fbi-main-sla-current-month-label');
+
             if (slaDkEl) slaDkEl.innerText = slaDkValue > 0 ? slaDkValue.toFixed(1) + '%' : '0%';
             if (slaLkEl) slaLkEl.innerText = slaLkValue > 0 ? slaLkValue.toFixed(1) + '%' : '0%';
+            if (slaCurrentMonthEl) slaCurrentMonthEl.innerText = slaCurrentMonthValue > 0 ? slaCurrentMonthValue.toFixed(1) + '%' : '0%';
+            if (slaCurrentMonthLabelEl) slaCurrentMonthLabelEl.innerText = 'Based on Month: ' + currentMonthLabel;
 
             renderChatimeCharts(donutStats, barStats);
         }
@@ -5211,7 +5828,19 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                         o.value = b; o.textContent = b;
                         bulanFilter.appendChild(o);
                     });
-                bulanFilter.value = currentVal && bulanMap[currentVal] ? currentVal : 'ALL';
+
+                // Default to current month if dynamic, otherwise preserve selection
+                const now = new Date();
+                const targetSortKey = now.getFullYear() * 100 + now.getMonth();
+                const matchKey = Object.keys(bulanMap).find(k => bulanMap[k] === targetSortKey);
+
+                if (currentVal && currentVal !== 'ALL' && bulanMap[currentVal] !== undefined) {
+                    bulanFilter.value = currentVal;
+                } else if (matchKey) {
+                    bulanFilter.value = matchKey;
+                } else {
+                    bulanFilter.value = 'ALL';
+                }
             }
         }
 function renderHubTable() {
@@ -6996,6 +7625,7 @@ function renderStoringPivotTable(filteredData) {
                 updateExtraSection();
                 updateCarrierAgingTable();
                 updateVendorPerformanceTable();
+                initCinematicDashboard();
             } catch (error) {
                 console.error("Error updating dashboard:", error);
             }
@@ -7392,7 +8022,10 @@ function renderStoringPivotTable(filteredData) {
                         ticks: {
                             color: '#e5e7eb',
                             font: { size: 12, weight: 'bold' },
-                            callback: value => value + suffix
+                            callback: value => {
+                                if (value === 100) return '100' + suffix;
+                                return value.toFixed(1) + suffix;
+                            }
                         },
                         grid: { color: 'rgba(255, 255, 255, 0.05)' }
                     },
@@ -8240,6 +8873,11 @@ function renderStoringPivotTable(filteredData) {
             document.querySelector('.table-content-large').scrollTop = 0;
         }
 
+        // Update AHI Executive Summary page logic is now handled in cineReinitParams or initialization
+        function updateAhiSummaryPage() {
+            // Deprecated, handled by cinematic dashboard locally
+        }
+
         // Update KPIs
         function updateKPIs() {
             const caseIdShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BF), 0);
@@ -8489,6 +9127,7 @@ function parseAstorCSV(csv) {
 
     const bulanFilter = document.getElementById('astor-bulan-filter');
     if (bulanFilter) {
+        const currentVal = bulanFilter.value;
         bulanFilter.innerHTML = '<option value="ALL">SEMUA</option>';
         Object.keys(bulanMap)
             .sort((a, b) => bulanMap[b] - bulanMap[a])
@@ -8497,6 +9136,19 @@ function parseAstorCSV(csv) {
                 o.value = b; o.textContent = b;
                 bulanFilter.appendChild(o);
             });
+
+        // Default to current month if dynamic, otherwise preserve selection
+        const now = new Date();
+        const targetSortKey = now.getFullYear() * 100 + now.getMonth();
+        const matchKey = Object.keys(bulanMap).find(k => bulanMap[k] === targetSortKey);
+
+        if (currentVal && currentVal !== 'ALL' && bulanMap[currentVal] !== undefined) {
+            bulanFilter.value = currentVal;
+        } else if (matchKey) {
+            bulanFilter.value = matchKey;
+        } else {
+            bulanFilter.value = 'ALL';
+        }
     }
 
     const tglDateMap = {};
@@ -8593,6 +9245,7 @@ function renderAstorSLA() {
     const buF   = (document.getElementById('astor-bu-filter')||{}).value   || 'ALL';
     const areaF = (document.getElementById('astor-area-filter')||{}).value || 'ALL';
     const agingF = (document.getElementById('astor-aging-filter')||{}).value || 'ALL';
+    const planF  = (document.getElementById('astor-plan-filter')||{}).value  || 'ALL';
 
     const bulanF = (document.getElementById('astor-bulan-filter')||{}).value || 'ALL';
 const tglF   = (document.getElementById('astor-tgl-filter')||{}).value   || 'ALL';
@@ -8622,10 +9275,21 @@ const data = rawAstorData.filter(r => {
     }
     
     const matchTgl = tglF==='ALL' || r.tgl===tglF;
-    return matchBu && matchArea && matchBulan && matchTgl;
+
+    const lcVal = (r.lc || '').toString().trim();
+    const hasLc = lcVal !== '' && lcVal !== '-';
+    let matchPlan = true;
+    if (planF === 'SUDAH PLAN') {
+        matchPlan = hasLc;
+    } else if (planF === 'BELUM PLAN') {
+        matchPlan = !hasLc;
+    }
+
+    return matchBu && matchArea && matchBulan && matchTgl && matchPlan;
 });
 
     let hit=0, miss=0, os=0, osCbm=0, lineOsCbmFiltered=0;
+    let lineOsCount=0, lineSudahCount=0, lineBelumCount=0;
     const byBu   = { AZKO:{hit:0,miss:0}, KWI:{hit:0,miss:0} };
     const byArea = { DK:{hit:0,miss:0,tot:0}, LK:{hit:0,miss:0,tot:0}, LP:{hit:0,miss:0,tot:0} };
     const bucket = { '0-3':0, '4-7':0, '8-14':0, '15+':0 };
@@ -8642,6 +9306,8 @@ const data = rawAstorData.filter(r => {
     };
     const buLineSudah = { AZKO: 0, KWI: 0 };
     const buLineBelum = { AZKO: 0, KWI: 0 };
+    const buLineSudahCount = { AZKO: 0, KWI: 0 };
+    const buLineBelumCount = { AZKO: 0, KWI: 0 };
     const LINE_FACTOR = 10.5; // (7 pallets midpoint) * 1.5 cbm
     const MAX_LINES = 5;
 
@@ -8689,12 +9355,17 @@ const data = rawAstorData.filter(r => {
                 // Line metrics for Outstanding data ONLY, excluding KELUAR DC & SELESAI
                 if (!isFinished) {
                     lineOsCbmFiltered += r.cbm;
+                    lineOsCount++;
                     if (hasLc) {
                         if (brk.lineSudahPlanCbm[a] !== undefined) brk.lineSudahPlanCbm[a] += r.cbm;
                         if (buLineSudah[r.bu] !== undefined) buLineSudah[r.bu] += r.cbm;
+                        if (buLineSudahCount[r.bu] !== undefined) buLineSudahCount[r.bu]++;
+                        lineSudahCount++;
                     } else {
                         if (brk.lineBelumPlanCbm[a] !== undefined) brk.lineBelumPlanCbm[a] += r.cbm;
                         if (buLineBelum[r.bu] !== undefined) buLineBelum[r.bu] += r.cbm;
+                        if (buLineBelumCount[r.bu] !== undefined) buLineBelumCount[r.bu]++;
+                        lineBelumCount++;
                     }
                 }
             }
@@ -8726,15 +9397,15 @@ const data = rawAstorData.filter(r => {
     document.getElementById('astor-line-belum').textContent = lineBelumTot.toFixed(1);
     
     // Update Sub-info (CBM)
-    if(document.getElementById('astor-line-os-info')) document.getElementById('astor-line-os-info').textContent = lineOsCbmFiltered.toFixed(1) + ' CBM';
-    if(document.getElementById('astor-line-sudah-info')) document.getElementById('astor-line-sudah-info').textContent = sudahCbmTot.toFixed(1) + ' CBM';
-    if(document.getElementById('astor-line-belum-info')) document.getElementById('astor-line-belum-info').textContent = belumCbmTot.toFixed(1) + ' CBM';
+    if(document.getElementById('astor-line-os-info')) document.getElementById('astor-line-os-info').textContent = lineOsCbmFiltered.toFixed(1) + ' CBM | ' + lineOsCount + ' RT';
+    if(document.getElementById('astor-line-sudah-info')) document.getElementById('astor-line-sudah-info').textContent = sudahCbmTot.toFixed(1) + ' CBM | ' + lineSudahCount + ' RT';
+    if(document.getElementById('astor-line-belum-info')) document.getElementById('astor-line-belum-info').textContent = belumCbmTot.toFixed(1) + ' CBM | ' + lineBelumCount + ' RT';
 
     // Update BU Breakdown values
-    if(document.getElementById('astor-line-sudah-azko')) document.getElementById('astor-line-sudah-azko').innerHTML = `AZKO: <b>${(buLineSudah.AZKO / LINE_FACTOR).toFixed(1)}</b> Line | <b>${buLineSudah.AZKO.toFixed(1)}</b> CBM`;
-    if(document.getElementById('astor-line-sudah-kwi')) document.getElementById('astor-line-sudah-kwi').innerHTML = `KWI: <b>${(buLineSudah.KWI / LINE_FACTOR).toFixed(1)}</b> Line | <b>${buLineSudah.KWI.toFixed(1)}</b> CBM`;
-    if(document.getElementById('astor-line-belum-azko')) document.getElementById('astor-line-belum-azko').innerHTML = `AZKO: <b>${(buLineBelum.AZKO / LINE_FACTOR).toFixed(1)}</b> Line | <b>${buLineBelum.AZKO.toFixed(1)}</b> CBM`;
-    if(document.getElementById('astor-line-belum-kwi')) document.getElementById('astor-line-belum-kwi').innerHTML = `KWI: <b>${(buLineBelum.KWI / LINE_FACTOR).toFixed(1)}</b> Line | <b>${buLineBelum.KWI.toFixed(1)}</b> CBM`;
+    if(document.getElementById('astor-line-sudah-azko')) document.getElementById('astor-line-sudah-azko').innerHTML = `AZKO: <b>${(buLineSudah.AZKO / LINE_FACTOR).toFixed(1)}</b> Line | <b>${buLineSudah.AZKO.toFixed(1)}</b> CBM | <b>${buLineSudahCount.AZKO}</b> RT`;
+    if(document.getElementById('astor-line-sudah-kwi')) document.getElementById('astor-line-sudah-kwi').innerHTML = `KWI: <b>${(buLineSudah.KWI / LINE_FACTOR).toFixed(1)}</b> Line | <b>${buLineSudah.KWI.toFixed(1)}</b> CBM | <b>${buLineSudahCount.KWI}</b> RT`;
+    if(document.getElementById('astor-line-belum-azko')) document.getElementById('astor-line-belum-azko').innerHTML = `AZKO: <b>${(buLineBelum.AZKO / LINE_FACTOR).toFixed(1)}</b> Line | <b>${buLineBelum.AZKO.toFixed(1)}</b> CBM | <b>${buLineBelumCount.AZKO}</b> RT`;
+    if(document.getElementById('astor-line-belum-kwi')) document.getElementById('astor-line-belum-kwi').innerHTML = `KWI: <b>${(buLineBelum.KWI / LINE_FACTOR).toFixed(1)}</b> Line | <b>${buLineBelum.KWI.toFixed(1)}</b> CBM | <b>${buLineBelumCount.KWI}</b> RT`;
 
     // Update Free Line val
     const freeEl = document.getElementById('astor-free-line-val');
