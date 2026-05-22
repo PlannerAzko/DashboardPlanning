@@ -2048,7 +2048,25 @@
                 <div class="kpi-value" id="caseIdPlanB4">0</div>
             </div>
         </div>
-
+<div class="kpi-container-four">
+    <div class="kpi-card gray">
+        <div class="kpi-label">CBM PLAN B1</div>
+        <div class="kpi-value" id="cbmPlanB1">0</div>
+    </div>
+    <div class="kpi-card gray">
+        <div class="kpi-label">CBM PLAN B2</div>
+        <div class="kpi-value" id="cbmPlanB2">0</div>
+    </div>
+    <div class="kpi-card gray">
+        <div class="kpi-label">CBM PLAN B3</div>
+        <div class="kpi-value" id="cbmPlanB3">0</div>
+    </div>
+    <div class="kpi-card gray">
+        <div class="kpi-label">CBM PLAN B4</div>
+        <div class="kpi-value" id="cbmPlanB4">0</div>
+    </div>
+</div>
+            
         <div class="bottom-table">
             <div class="table-header">
                 <i class="fas fa-ship"></i> SHIPPING LINE DETAILS
@@ -8892,6 +8910,7 @@ function renderStoringPivotTable(filteredData) {
 
             // Calculate B1, B2, B3, B4
             let b1 = 0, b2 = 0, b3 = 0, b4 = 0;
+            let cbmB1 = 0, cbmB2 = 0, cbmB3 = 0, cbmB4 = 0;
             let cbmShift1 = 0, cbmShift2 = 0;
             
             filteredData.forEach(row => {
@@ -8914,10 +8933,10 @@ function renderStoringPivotTable(filteredData) {
                 if (jam >= 8 && jam <= 15) cbmShift1 += cbmVal;
                 else if (jam >= 16 && jam <= 23) cbmShift2 += cbmVal;
 
-                if (jam >= 8 && jam <= 10) b1 += val;
-                else if (Math.floor(jam) === 13) b2 += val;
-                else if (jam >= 16 && jam <= 18) b3 += val;
-                else if (jam >= 19 && jam <= 21) b4 += val;
+                if (jam >= 8 && jam <= 10) { b1 += val; cbmB1 += cbmVal; }
+                else if (Math.floor(jam) === 13) { b2 += val; cbmB2 += cbmVal; }
+                else if (jam >= 16 && jam <= 18) { b3 += val; cbmB3 += cbmVal; }
+                else if (jam >= 19 && jam <= 21) { b4 += val; cbmB4 += cbmVal; }
             });
 
             const caseIdRatio = caseIdPlan > 0 ? (caseIdShipped / caseIdPlan) * 100 : 0;
@@ -8952,6 +8971,10 @@ function renderStoringPivotTable(filteredData) {
             document.getElementById('caseIdPlanB2').textContent = Math.round(b2).toLocaleString('id-ID');
             document.getElementById('caseIdPlanB3').textContent = Math.round(b3).toLocaleString('id-ID');
             document.getElementById('caseIdPlanB4').textContent = Math.round(b4).toLocaleString('id-ID');
+            document.getElementById('cbmPlanB1').textContent = formatIndo(cbmB1);
+            document.getElementById('cbmPlanB2').textContent = formatIndo(cbmB2);
+            document.getElementById('cbmPlanB3').textContent = formatIndo(cbmB3);
+            document.getElementById('cbmPlanB4').textContent = formatIndo(cbmB4);
         }
 
         // Update Map - More accurate city locations
