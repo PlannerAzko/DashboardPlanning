@@ -2546,7 +2546,7 @@
                             filteredData.forEach(row => {
                                 const z = parseNumberWithComma(row.Z || '0');
                                 totalTasks++;
-                                caseIdPlan += parseNumberWithComma(row.BB || '0');
+                                caseIdPlan += parseNumberWithComma(row.BB || '0', true);
                                 cbmPlan += z;
                                 cbmShipped += parseNumberWithComma(row.AY || '0');
         
@@ -4173,10 +4173,15 @@
             return hariIndo[d.getDay()] || '';
         }
 
-        function parseNumberWithComma(value) {
+        function parseNumberWithComma(value, isInteger = false) {
             if (!value) return 0;
             let s = String(value).trim().replace(/\s/g, '');
             if (!s) return 0;
+            
+            if (isInteger) {
+                // Untuk integer, hilangkan semua koma dan titik pemisah ribuan
+                return parseFloat(s.replace(/[,.]/g, '')) || 0;
+            }
             
             const commaCount = (s.match(/,/g) || []).length;
             const dotCount = (s.match(/\./g) || []).length;
@@ -7299,9 +7304,9 @@ function renderStoringPivotTable(filteredData) {
                     const kota = (values[COLUMNS.AR] || '').trim();
                     
                     const cbmPlan = parseNumberWithComma(values[COLUMNS.Z] || '0');
-                    const caseIdPlan = parseNumberWithComma(values[COLUMNS.BB] || '0');
+                    const caseIdPlan = parseNumberWithComma(values[COLUMNS.BB] || '0', true);
                     const cbmShipped = parseNumberWithComma(values[COLUMNS.AY] || '0');
-                    const caseIdShipped = parseNumberWithComma(values[COLUMNS.BF] || '0');
+                    const caseIdShipped = parseNumberWithComma(values[COLUMNS.BF] || '0', true);
                     
                     const idLower = id.toLowerCase();
                     const kotaLower = kota.toLowerCase();
@@ -8796,7 +8801,7 @@ function renderStoringPivotTable(filteredData) {
                 pageData.forEach((row, index) => {
                     const rowNum = start + index + 1;
                     const jamColorClass = getJamColorClass(row.AP);
-                    const estimasiKoli = parseNumberWithComma(row.BA);
+                    const estimasiKoli = parseNumberWithComma(row.BA, true);
                     html += `
                         <tr class="${jamColorClass}">
                             <td>${rowNum}</td>
@@ -8812,7 +8817,7 @@ function renderStoringPivotTable(filteredData) {
                             <td>${row.nomor || '-'}</td>
                             <td>${estimasiKoli.toFixed(0) || '-'}</td>
                             <td>${parseNumberWithComma(row.AY).toFixed(2) || '-'}</td>
-                            <td>${parseNumberWithComma(row.AQ).toFixed(0) || '-'}</td>
+                            <td>${parseNumberWithComma(row.AQ, true).toFixed(0) || '-'}</td>
                         </tr>
                     `;
                 });
@@ -8840,7 +8845,7 @@ function renderStoringPivotTable(filteredData) {
                 pageData.forEach((row, index) => {
                     const rowNum = start + index + 1;
                     const jamColorClass = getJamColorClass(row.AP);
-                    const estimasiCaseId = parseNumberWithComma(row.BA);
+                    const estimasiCaseId = parseNumberWithComma(row.BA, true);
                     html += `
                         <tr class="${jamColorClass}">
                             <td>${rowNum}</td>
@@ -8853,7 +8858,7 @@ function renderStoringPivotTable(filteredData) {
                             <td>${row.M || '-'}</td>
                             <td>${parseNumberWithComma(row.Z).toFixed(2) || '-'}</td>
                             <td>${parseNumberWithComma(row.AY).toFixed(2) || '-'}</td>
-                            <td>${parseNumberWithComma(row.AQ).toFixed(0) || '-'}</td>
+                            <td>${parseNumberWithComma(row.AQ, true).toFixed(0) || '-'}</td>
                             <td>${estimasiCaseId.toFixed(0) || '-'}</td>
                         </tr>
                     `;
@@ -8898,8 +8903,8 @@ function renderStoringPivotTable(filteredData) {
 
         // Update KPIs
         function updateKPIs() {
-            const caseIdShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BF), 0);
-            const caseIdPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BB), 0);
+            const caseIdShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BF, true), 0);
+            const caseIdPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BB, true), 0);
             const cbmPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.Z), 0);
             const cbmShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.AY), 0);
 
@@ -8915,7 +8920,7 @@ function renderStoringPivotTable(filteredData) {
             
             filteredData.forEach(row => {
                 const jam = parseFloat(row.AP);
-                const val = parseNumberWithComma(row.BB);
+                const val = parseNumberWithComma(row.BB, true);
                 const cbmVal = parseNumberWithComma(row.Z);
                 
                 // SLA Calculation
