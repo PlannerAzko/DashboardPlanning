@@ -3675,16 +3675,15 @@
       }
     }
 
-    /* ✅ FIX: Fallback yang benar sesuai struktur sheet
-       Col A(0)=kosong, B(1)=AREA, C(2)=WILAYAH,
-       D(3)=SENIN-KIRIM ... J(9)=MINGGU-KIRIM,
-       K(10)=separator, L(11)=SENIN-LOADING ... R(17)=MINGGU-LOADING */
+    /* Fallback:
+       A(0)=kosong, B(1)=AREA, C(2)=WILAYAH,
+       D(3)=SENIN-KIRIM...J(9)=MINGGU-KIRIM,
+       K(10)=separator, L(11)=SENIN-LOADING...R(17)=MINGGU-LOADING */
     if (kirimStart   === -1) kirimStart   = 3;
     if (loadingStart === -1) loadingStart = 11;
 
     console.log(`Transit: kirimStart=${kirimStart}, loadingStart=${loadingStart}`);
 
-    /* Parse baris data */
     DATA = [];
     let lastArea = '';
 
@@ -3695,12 +3694,11 @@
       const cols = parseCSVLine(line);
       if (cols.length < 3) return;
 
-      /* ✅ FIX: cols[1]=AREA (kolom B), cols[2]=WILAYAH (kolom C) */
+      /* cols[1]=AREA (kolom B), cols[2]=WILAYAH (kolom C) */
       const area    = (cols[1] || '').trim() || lastArea;
       const wilayah = (cols[2] || '').trim();
       if (!wilayah) return;
 
-      /* Skip baris judul / total / header */
       const wLower = wilayah.toLowerCase();
       if (wLower.includes('wilayah') ||
           wLower.includes('area')    ||
@@ -3709,13 +3707,9 @@
 
       if (area) lastArea = area;
 
-      /* Ambil 7 kolom KIRIM */
       const kArr = DAYS.map((_, i) => normalizeCell(cols[kirimStart  + i] || ''));
-
-      /* Ambil 7 kolom LOADING */
       const lArr = DAYS.map((_, i) => normalizeCell(cols[loadingStart + i] || ''));
 
-      /* Skip baris yang semua kosong */
       if (kArr.every(v => !v) && lArr.every(v => !v)) return;
 
       DATA.push([lastArea, wilayah, kArr, lArr]);
@@ -3723,7 +3717,6 @@
 
     console.log(`Transit: ${DATA.length} baris berhasil dimuat`);
 
-    /* Rebuild UI */
     trPopulateFilters();
     trInitDaySelect();
     trRenderTable('ALL');
@@ -3744,16 +3737,20 @@
     const tr = document.getElementById('tr-day-headers');
     if (!tr) return;
     let h = '';
-    DAYS.forEach(d => {
+
+    /* KIRIM headers - kolom terakhir (MIN) dapat border-right sebagai separator */
+    DAYS.forEach((d, idx) => {
       const cls = d === todayDay ? ' tr-today-head' : '';
-      h += `<th class="${cls}">${d.substring(0,3)}</th>`;
+      const sep = idx === DAYS.length - 1 ? ' style="border-right:3px solid #2d6a47;"' : '';
+      h += `<th class="${cls}"${sep}>${d.substring(0,3)}</th>`;
     });
-    /* ✅ FIX: separator tipis, bukan kotak hitam kosong */
-    h += '<th style="width:3px;padding:0;background:#2d6a47;border:none;"></th>';
+
+    /* LOADING headers */
     DAYS.forEach(d => {
       const cls = 'tr-load-head' + (d === todayDay ? ' tr-today-head' : '');
       h += `<th class="${cls}">${d.substring(0,3)}</th>`;
     });
+
     tr.innerHTML = h;
   }
 
@@ -3777,7 +3774,6 @@
       return;
     }
 
-    /* Hitung rowspan per area */
     const areaCount = {};
     filtered.forEach(r => { areaCount[r[0]] = (areaCount[r[0]] || 0) + 1; });
     const areaRendered = {};
@@ -3792,27 +3788,27 @@
         ? `<td class="tr-area-cell" rowspan="${areaCount[area]}">${area}</td>`
         : '';
 
+      /* KIRIM cells - kolom terakhir (MIN) dapat border-right sebagai separator */
       let kCells = '';
       kArr.forEach((v, i) => {
         const isToday = DAYS[i] === todayDay;
-        const cls = isToday && v === 'KIRIM' ? ' class="tr-today-k"' : '';
-        kCells += `<td${cls}>${v === 'KIRIM' ? pillK() : ''}</td>`;
+        const cls     = isToday && v === 'KIRIM' ? ' class="tr-today-k"' : '';
+        const sep     = i === DAYS.length - 1 ? ' style="border-right:3px solid #2d6a47;"' : '';
+        kCells += `<td${cls}${sep}>${v === 'KIRIM' ? pillK() : ''}</td>`;
       });
 
+      /* LOADING cells */
       let lCells = '';
       lArr.forEach((v, i) => {
         const isToday = DAYS[i] === todayDay;
-        const cls = isToday && v === 'LOADING' ? ' class="tr-today-l"' : '';
+        const cls     = isToday && v === 'LOADING' ? ' class="tr-today-l"' : '';
         lCells += `<td${cls}>${v === 'LOADING' ? pillL() : ''}</td>`;
       });
 
       html += `<tr class="${isFirst ? 'tr-area-start' : ''}">
         ${areaCell}
         <td class="tr-wil-cell">${wil}</td>
-        ${kCells}
-        <!-- ✅ FIX: separator tipis hijau, bukan kotak hitam -->
-        <td style="width:3px;padding:0;background:#2d6a47;border:none;"></td>
-        ${lCells}
+        ${kCells}${lCells}
       </tr>`;
     });
 
@@ -3870,7 +3866,7 @@
 
   /* ── Init + Auto-refresh ── */
   fetchTransitData();
-  setInterval(fetchTransitData, 300000); /* refresh tiap 5 menit */
+  setInterval(fetchTransitData, 300000);
 
 })();
 </script>
