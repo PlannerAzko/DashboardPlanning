@@ -3663,7 +3663,7 @@
       return;
     }
 
-    /* Deteksi kolom LOADING (cari kolom ke-2 yang ada SENIN) */
+    /* Deteksi kolom KIRIM & LOADING (cari 2x kemunculan SENIN) */
     const headerCols = parseCSVLine(lines[headerRowIdx]);
     let kirimStart = -1;
     let loadingStart = -1;
@@ -3675,9 +3675,12 @@
       }
     }
 
-    /* Fallback kolom jika auto-detect gagal */
-    if (kirimStart === -1)   kirimStart   = 2;   /* Kolom C */
-    if (loadingStart === -1) loadingStart = 10;  /* Kolom K */
+    /* ✅ FIX: Fallback yang benar sesuai struktur sheet
+       Col A(0)=kosong, B(1)=AREA, C(2)=WILAYAH,
+       D(3)=SENIN-KIRIM ... J(9)=MINGGU-KIRIM,
+       K(10)=separator, L(11)=SENIN-LOADING ... R(17)=MINGGU-LOADING */
+    if (kirimStart   === -1) kirimStart   = 3;
+    if (loadingStart === -1) loadingStart = 11;
 
     console.log(`Transit: kirimStart=${kirimStart}, loadingStart=${loadingStart}`);
 
@@ -3692,18 +3695,22 @@
       const cols = parseCSVLine(line);
       if (cols.length < 3) return;
 
-      const area    = (cols[0] || '').trim() || lastArea;
-      const wilayah = (cols[1] || '').trim();
+      /* ✅ FIX: cols[1]=AREA (kolom B), cols[2]=WILAYAH (kolom C) */
+      const area    = (cols[1] || '').trim() || lastArea;
+      const wilayah = (cols[2] || '').trim();
       if (!wilayah) return;
 
-      /* Skip baris judul / total */
+      /* Skip baris judul / total / header */
       const wLower = wilayah.toLowerCase();
-      if (wLower.includes('wilayah') || wLower.includes('schedule') || wLower.includes('total')) return;
+      if (wLower.includes('wilayah') ||
+          wLower.includes('area')    ||
+          wLower.includes('schedule')||
+          wLower.includes('total'))  return;
 
       if (area) lastArea = area;
 
       /* Ambil 7 kolom KIRIM */
-      const kArr = DAYS.map((_, i) => normalizeCell(cols[kirimStart + i] || ''));
+      const kArr = DAYS.map((_, i) => normalizeCell(cols[kirimStart  + i] || ''));
 
       /* Ambil 7 kolom LOADING */
       const lArr = DAYS.map((_, i) => normalizeCell(cols[loadingStart + i] || ''));
