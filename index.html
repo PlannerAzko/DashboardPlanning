@@ -3597,7 +3597,7 @@
   async function fetchTransitData() {
     const tbody = document.getElementById('tr-tbody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="18" style="text-align:center;padding:30px;color:#7de0a4;">
+      tbody.innerHTML = `<tr><td colspan="16" style="text-align:center;padding:30px;color:#7de0a4;">
         <i class="fas fa-spinner fa-spin" style="font-size:1.5em;display:block;margin-bottom:8px;"></i>
         Memuat jadwal transit dari spreadsheet...
       </td></tr>`;
@@ -3614,7 +3614,7 @@
     } catch (e) {
       console.error('Transit fetch error:', e);
       if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="18" style="text-align:center;padding:30px;color:#f87171;">
+        tbody.innerHTML = `<tr><td colspan="16" style="text-align:center;padding:30px;color:#f87171;">
           <i class="fas fa-exclamation-triangle" style="font-size:1.5em;display:block;margin-bottom:8px;"></i>
           <strong>Gagal memuat data:</strong> ${e.message}
           <br/><button onclick="fetchTransitData()" style="margin-top:12px;padding:6px 16px;background:#2d6a47;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;">
@@ -3748,7 +3748,8 @@
       const cls = d === todayDay ? ' tr-today-head' : '';
       h += `<th class="${cls}">${d.substring(0,3)}</th>`;
     });
-    h += '<th class="tr-sep"></th>';
+    /* ✅ FIX: separator tipis, bukan kotak hitam kosong */
+    h += '<th style="width:3px;padding:0;background:#2d6a47;border:none;"></th>';
     DAYS.forEach(d => {
       const cls = 'tr-load-head' + (d === todayDay ? ' tr-today-head' : '');
       h += `<th class="${cls}">${d.substring(0,3)}</th>`;
@@ -3766,13 +3767,13 @@
     if (!tbody) return;
 
     if (DATA.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="18" style="text-align:center;padding:30px;color:#555;">Data belum tersedia.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:30px;color:#555;">Data belum tersedia.</td></tr>';
       return;
     }
 
     const filtered = DATA.filter(r => filter === 'ALL' || r[0] === filter);
     if (!filtered.length) {
-      tbody.innerHTML = '<tr><td colspan="18" style="text-align:center;padding:30px;color:#555;">Tidak ada data untuk area ini.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:30px;color:#555;">Tidak ada data untuk area ini.</td></tr>';
       return;
     }
 
@@ -3808,7 +3809,10 @@
       html += `<tr class="${isFirst ? 'tr-area-start' : ''}">
         ${areaCell}
         <td class="tr-wil-cell">${wil}</td>
-        ${kCells}<td class="tr-sep-col"></td>${lCells}
+        ${kCells}
+        <!-- ✅ FIX: separator tipis hijau, bukan kotak hitam -->
+        <td style="width:3px;padding:0;background:#2d6a47;border:none;"></td>
+        ${lCells}
       </tr>`;
     });
 
@@ -3870,7 +3874,7 @@
 
 })();
 </script>
-
+    
 </div>
 <!-- ============================================================ END TRANSIT SECTION ============================================================ -->
         
