@@ -3208,7 +3208,559 @@
                 </div>
             </div>
         </div> <!-- End outstanding-section -->
+<!-- ============================================================
+     SKEMA TRANSIT NDC AHI JABABEKA → NDC AHI SIDOARJO
+     Tambahkan blok ini SEBELUM: <div id="hub-astor-section" ...>
+     ============================================================ -->
+<div id="transit-schema-section" class="dash-section" style="display: none;">
 
+  <!-- Internal CSS untuk section ini saja -->
+  <style>
+    /* ── Root variables ── */
+    #transit-schema-section {
+      --tr-green:   #1a3a2a;
+      --tr-green2:  #2d6a47;
+      --tr-accent:  #7de0a4;
+      --tr-gold:    #ffd864;
+      --tr-kirim:   #f59e42;
+      --tr-load:    #22a86b;
+      --tr-row-alt: rgba(255,255,255,0.03);
+      font-family: 'Inter','Segoe UI',sans-serif;
+    }
+
+    /* ── Section Banner ── */
+    .tr-banner {
+      background: linear-gradient(90deg, var(--tr-green) 0%, #0f2419 100%);
+      border-left: 6px solid var(--tr-gold);
+      padding: 18px 28px;
+      margin-bottom: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .tr-banner h2 {
+      color: #fff;
+      font-size: 1.4em;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 0;
+      text-shadow: 1px 2px 6px rgba(0,0,0,0.5);
+    }
+    .tr-banner i { color: var(--tr-gold); font-size: 1.6em; }
+
+    /* ── Route Bar ── */
+    .tr-route-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .tr-wh-pill {
+      background: var(--tr-green2);
+      border: 1px solid var(--tr-accent);
+      color: var(--tr-accent);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 7px 18px;
+      border-radius: 30px;
+      letter-spacing: 0.5px;
+    }
+    .tr-arrow { color: #7de0a4; font-size: 22px; }
+    .tr-eta {
+      background: rgba(255,216,100,0.12);
+      border: 1px solid rgba(255,216,100,0.35);
+      color: var(--tr-gold);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-left: 4px;
+    }
+
+    /* ── Controls Bar ── */
+    .tr-controls {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .tr-controls label { font-size: 12px; color: #aaa; white-space: nowrap; font-weight: 600; }
+    .tr-filter-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tr-fbtn {
+      font-size: 11px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      border: 1px solid #333;
+      background: #222;
+      color: #888;
+      transition: all 0.15s;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .tr-fbtn:hover { border-color: var(--tr-green2); color: #ccc; }
+    .tr-fbtn.active {
+      background: var(--tr-green);
+      color: var(--tr-accent);
+      border-color: var(--tr-green2);
+    }
+    .tr-day-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+    .tr-day-wrap label { color: #888; font-size: 12px; }
+    .tr-day-wrap select {
+      background: #222;
+      color: #ffd700;
+      border: 1px solid #ffd700;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* ── Legend ── */
+    .tr-legend {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+    .tr-leg { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; font-weight: 600; }
+    .tr-dot { width: 12px; height: 12px; border-radius: 3px; }
+    .tr-dot-k { background: var(--tr-kirim); }
+    .tr-dot-l { background: var(--tr-load); }
+    .tr-dot-e { background: #2a2a2a; border: 1px solid #444; }
+
+    /* ── Table Wrapper ── */
+    .tr-table-wrap {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      overflow: hidden;
+      overflow-x: auto;
+    }
+    .tr-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+
+    /* ── Table Header ── */
+    .tr-table thead tr.tr-h1 th {
+      background: var(--tr-green);
+      color: var(--tr-accent);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 11px 8px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .tr-table thead tr.tr-h1 th.tr-left { text-align: left; padding-left: 14px; }
+    .tr-table thead tr.tr-h2 th {
+      background: #1e3d2a;
+      color: var(--tr-accent);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 7px 6px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+    .tr-table thead tr.tr-h2 th.tr-load-head { background: #162d1e; }
+    th.tr-sep { background: #111 !important; width: 6px; padding: 0 !important; }
+
+    /* ── Table Body ── */
+    .tr-table tbody tr { border-bottom: 1px solid #222; transition: background 0.1s; }
+    .tr-table tbody tr:hover { background: rgba(45,106,70,0.12); }
+    .tr-table tbody tr.tr-area-start td { border-top: 2px solid #2d6a47; }
+    .tr-table td {
+      padding: 6px 5px;
+      text-align: center;
+      font-size: 11px;
+      vertical-align: middle;
+    }
+    .tr-table td.tr-area-cell {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--tr-gold);
+      text-align: left;
+      padding: 6px 14px;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+    }
+    .tr-table td.tr-wil-cell {
+      font-size: 11px;
+      color: #ccc;
+      text-align: left;
+      padding: 6px 14px;
+      white-space: nowrap;
+    }
+    td.tr-sep-col {
+      background: #111;
+      width: 6px;
+      padding: 0;
+      border-left: 1px solid #2a2a2a;
+      border-right: 1px solid #2a2a2a;
+    }
+
+    /* ── Pills ── */
+    .tr-pill-k {
+      background: rgba(245,158,66,0.18);
+      color: var(--tr-kirim);
+      border: 1px solid rgba(245,158,66,0.5);
+      border-radius: 4px;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 8px;
+      display: inline-block;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .tr-pill-l {
+      background: rgba(34,168,107,0.18);
+      color: var(--tr-load);
+      border: 1px solid rgba(34,168,107,0.5);
+      border-radius: 4px;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2px 8px;
+      display: inline-block;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    /* ── Note Bar ── */
+    .tr-note {
+      background: rgba(255,216,100,0.08);
+      border: 1px solid rgba(255,216,100,0.25);
+      border-radius: 6px;
+      padding: 10px 20px;
+      font-size: 12px;
+      color: #ffd864;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 16px;
+      font-weight: 600;
+    }
+
+    /* ── KPI Row ── */
+    .tr-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .tr-kpi-card {
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: transform 0.2s;
+    }
+    .tr-kpi-card:hover { transform: translateY(-3px); }
+    .tr-kpi-label { font-size: 10px; color: #666; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .tr-kpi-val { font-size: 2em; font-weight: 800; }
+    .tr-kpi-card.tr-k1 { border-bottom: 3px solid var(--tr-kirim); }
+    .tr-kpi-card.tr-k2 { border-bottom: 3px solid var(--tr-load); }
+    .tr-kpi-card.tr-k3 { border-bottom: 3px solid #60a5fa; }
+    .tr-kpi-card.tr-k4 { border-bottom: 3px solid var(--tr-gold); }
+    .tr-kpi-card.tr-k1 .tr-kpi-val { color: var(--tr-kirim); }
+    .tr-kpi-card.tr-k2 .tr-kpi-val { color: var(--tr-load); }
+    .tr-kpi-card.tr-k3 .tr-kpi-val { color: #60a5fa; }
+    .tr-kpi-card.tr-k4 .tr-kpi-val { color: var(--tr-gold); }
+
+    /* ── Day Highlight ── */
+    .tr-table td.tr-today-k { background: rgba(245,158,66,0.07); }
+    .tr-table td.tr-today-l { background: rgba(34,168,107,0.07); }
+    .tr-table th.tr-today-head { background: #1a3a1a !important; box-shadow: inset 0 -3px 0 var(--tr-gold); }
+  </style>
+
+  <!-- Banner -->
+  <div class="tr-banner">
+    <i class="fas fa-route"></i>
+    <div>
+      <h2>Skema Transit Titip Kirim</h2>
+      <div style="font-size:12px;color:#9dc9b0;margin-top:3px;">Jadwal pengiriman &amp; loading per wilayah distribusi</div>
+    </div>
+  </div>
+
+  <!-- Route + KPI -->
+  <div class="tr-route-bar">
+    <span class="tr-wh-pill"><i class="fas fa-warehouse" style="margin-right:6px;"></i>WH JABABEKA</span>
+    <span class="tr-arrow">⟶</span>
+    <span class="tr-wh-pill"><i class="fas fa-warehouse" style="margin-right:6px;"></i>WH SIDOARJO</span>
+    <span class="tr-eta"><i class="fas fa-clock" style="margin-right:5px;"></i>Lead Time 2–3 Hari</span>
+  </div>
+
+  <!-- KPI cards -->
+  <div class="tr-kpi-row" id="tr-kpi-row">
+    <div class="tr-kpi-card tr-k1"><div class="tr-kpi-label">Jadwal Kirim Hari Ini</div><div class="tr-kpi-val" id="tr-kv1">—</div></div>
+    <div class="tr-kpi-card tr-k2"><div class="tr-kpi-label">Jadwal Loading Hari Ini</div><div class="tr-kpi-val" id="tr-kv2">—</div></div>
+    <div class="tr-kpi-card tr-k3"><div class="tr-kpi-label">Total Wilayah</div><div class="tr-kpi-val" id="tr-kv3">—</div></div>
+    <div class="tr-kpi-card tr-k4"><div class="tr-kpi-label">Total Area</div><div class="tr-kpi-val" id="tr-kv4">—</div></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="tr-controls">
+    <label>Filter Area:</label>
+    <div class="tr-filter-btns" id="tr-filter-btns">
+      <button class="tr-fbtn active" onclick="trFilterArea('ALL',this)">Semua</button>
+    </div>
+    <div class="tr-legend" style="margin-left:auto;">
+      <div class="tr-leg"><div class="tr-dot tr-dot-k"></div>Kirim (Jababeka)</div>
+      <div class="tr-leg"><div class="tr-dot tr-dot-l"></div>Loading (Sidoarjo)</div>
+      <div class="tr-leg"><div class="tr-dot tr-dot-e"></div>Tidak ada</div>
+    </div>
+    <div class="tr-day-wrap">
+      <label>Sorot Hari:</label>
+      <select id="tr-day-select" onchange="trRenderTable(trCurrentFilter)">
+        <option value="">— Pilih —</option>
+        <option>SENIN</option><option>SELASA</option><option>RABU</option>
+        <option>KAMIS</option><option>JUMAT</option><option>SABTU</option><option>MINGGU</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="tr-table-wrap">
+    <table class="tr-table" id="tr-main-table">
+      <thead>
+        <tr class="tr-h1">
+          <th class="tr-left" rowspan="2">Area</th>
+          <th class="tr-left" rowspan="2">Wilayah</th>
+          <th colspan="7" style="border-right:2px solid #2d6a47;">Schedule Kirim dari Jababeka</th>
+          <th class="tr-sep" rowspan="2"></th>
+          <th colspan="7">Schedule Loading dari Sidoarjo</th>
+        </tr>
+        <tr class="tr-h2" id="tr-day-headers">
+          <!-- filled by JS -->
+        </tr>
+      </thead>
+      <tbody id="tr-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Note -->
+  <div class="tr-note">
+    <i class="fas fa-info-circle" style="font-size:16px;"></i>
+    <span><strong>Catatan:</strong> Lead Time Jababeka – Sidoarjo estimasi <strong>2–3 hari</strong>.
+    Jadwal dapat berubah sesuai ketersediaan armada. Hubungi Tim Planner untuk konfirmasi.</span>
+  </div>
+
+  <!-- ── JavaScript untuk section transit ── -->
+  <script>
+  (function() {
+
+    /* ── DATA ── */
+    const DAYS = ['SENIN','SELASA','RABU','KAMIS','JUMAT','SABTU','MINGGU'];
+    const K = 'KIRIM';
+    const L = 'LOADING';
+    const _ = '';
+
+    /* [area, wilayah, [k_sen,k_sel,k_rab,k_kam,k_jum,k_sab,k_min], [l_sen,l_sel,l_rab,l_kam,l_jum,l_sab,l_min]] */
+    const DATA = [
+      ['DALAM KOTA','SIDOARJO',   [K,_,_,K,K,K,K],[L,L,L,L,_,_,L]],
+      ['DALAM KOTA','GRESIK',     [K,_,_,K,K,K,_],[L,L,L,L,_,_,L]],
+      ['DALAM KOTA','SURABAYA',   [K,_,_,K,K,K,_],[L,L,L,L,_,_,L]],
+      ['DALAM KOTA','MOJOKERTO',  [K,_,_,_,K,K,_],[L,L,L,L,_,_,_]],
+      ['LK JATIM',  'TUBAN',      [_,_,_,_,K,_,K],[L,_,L,_,_,_,_]],
+      ['LK JATIM',  'PASURUAN',   [_,_,_,_,K,_,_],[L,_,L,_,_,_,_]],
+      ['LK JATIM',  'MADIUN',     [_,_,_,_,_,_,K],[L,_,L,_,_,_,_]],
+      ['LK JATIM',  'JEMBER',     [K,_,_,_,K,_,_],[L,_,_,L,_,_,_]],
+      ['LK JATIM',  'MALANG',     [K,_,_,_,_,K,_],[_,L,_,L,_,_,L]],
+      ['LK JATIM',  'KEDIRI',     [K,_,_,K,_,K,_],[_,L,_,L,_,_,_]],
+      ['LK JATIM',  'BANYUWANGI', [_,_,K,_,_,_,K],[_,L,_,_,L,_,_]],
+      ['BALI',      'ALL STORE BALI',[K,_,K,K,K,K,K],[L,L,L,L,L,L,L]],
+      ['YOGYA & JATENG','YOGYAKARTA',[K,_,_,K,_,K,_],[_,L,_,L,_,_,L]],
+      ['YOGYA & JATENG','MAGELANG',  [K,_,_,K,_,K,_],[_,L,_,L,_,_,_]],
+      ['YOGYA & JATENG','SOLO',      [_,_,_,_,K,_,K],[L,_,L,_,_,_,_]],
+      ['YOGYA & JATENG','SEMARANG',  [_,_,K,_,K,_,_],[L,_,L,_,_,L,_]],
+      ['YOGYA & JATENG','KUDUS',     [_,_,_,K,_,_,K],[_,_,L,_,_,_,L]],
+      ['NTB',       'LOMBOK',     [_,K,_,_,_,K,_],[_,L,_,_,L,_,_]],
+      ['MALUKU',    'MALUKU',     [K,_,_,_,_,_,_],[_,_,L,_,_,_,_]],
+      ['MALUKU',    'TERNATE',    [K,_,_,_,_,_,_],[_,_,L,_,_,_,_]],
+      ['NTT',       'KUPANG',     [_,_,_,_,_,_,K],[_,_,L,_,_,_,_]],
+      ['SULAWESI',  'MAKASSAR',   [_,K,_,K,K,_,K],[L,_,L,_,L,_,L]],
+      ['SULAWESI',  'KENDARI',    [_,_,_,K,_,_,_],[_,_,_,_,L,_,_]],
+      ['SULAWESI',  'GORONTALO',  [_,_,_,_,K,_,_],[_,_,_,_,_,_,L]],
+      ['SULAWESI',  'MANADO',     [_,_,_,_,K,_,_],[_,_,_,_,_,_,L]],
+      ['SULAWESI',  'PALOPO',     [_,K,_,_,_,_,_],[_,_,_,L,_,_,_]],
+      ['SULAWESI',  'PARE-PARE',  [_,K,_,_,_,_,_],[_,_,_,L,_,_,_]],
+      ['SULAWESI',  'BITUNG',     [_,K,_,_,_,_,_],[_,_,_,L,_,_,_]],
+      ['SULAWESI',  'PALU',       [_,_,_,K,_,_,_],[_,_,_,_,L,_,_]],
+      ['SULAWESI',  'KOLAKA',     [_,_,_,K,_,_,_],[_,_,_,_,L,_,_]],
+      ['PAPUA',     'JAYAPURA',   [_,_,K,_,_,_,_],[_,_,_,_,L,_,_]],
+      ['PAPUA',     'SORONG',     [_,_,K,_,_,_,_],[_,_,_,_,L,_,_]],
+      ['PAPUA',     'TIMIKA',     [_,_,K,_,_,_,_],[_,_,_,_,L,_,_]],
+    ];
+
+    /* ── STATE ── */
+    window.trCurrentFilter = 'ALL';
+
+    /* ── detect today's day ── */
+    function getTodayDayName() {
+      const d = ['MINGGU','SENIN','SELASA','RABU','KAMIS','JUMAT','SABTU'];
+      return d[new Date().getDay()];
+    }
+
+    /* ── pill HTML ── */
+    function pillK() { return '<span class="tr-pill-k">KIRIM</span>'; }
+    function pillL() { return '<span class="tr-pill-l">LOADING</span>'; }
+
+    /* ── render sub-header days ── */
+    function trRenderDayHeaders(todayDay) {
+      const tr = document.getElementById('tr-day-headers');
+      if (!tr) return;
+      let h = '';
+      DAYS.forEach(d => {
+        const cls = d === todayDay ? ' tr-today-head' : '';
+        h += `<th class="${cls}">${d.substring(0,3)}</th>`;
+      });
+      h += '<th class="tr-sep"></th>';
+      DAYS.forEach(d => {
+        const cls = 'tr-load-head' + (d === todayDay ? ' tr-today-head' : '');
+        h += `<th class="${cls}">${d.substring(0,3)}</th>`;
+      });
+      tr.innerHTML = h;
+    }
+
+    /* ── render table body ── */
+    window.trRenderTable = function(filter) {
+      window.trCurrentFilter = filter || 'ALL';
+      const todayDay = document.getElementById('tr-day-select')
+        ? document.getElementById('tr-day-select').value || getTodayDayName()
+        : getTodayDayName();
+
+      trRenderDayHeaders(todayDay);
+
+      const tbody = document.getElementById('tr-tbody');
+      if (!tbody) return;
+
+      const filtered = DATA.filter(r => filter === 'ALL' || r[0] === filter);
+      if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="18" style="text-align:center;padding:30px;color:#555;">Tidak ada data.</td></tr>'; return; }
+
+      /* count rows per area for rowspan */
+      const areaCount = {};
+      filtered.forEach(r => { areaCount[r[0]] = (areaCount[r[0]]||0)+1; });
+      const areaRendered = {};
+
+      let html = '';
+      filtered.forEach(row => {
+        const [area, wil, kArr, lArr] = row;
+        const isFirst = !areaRendered[area];
+        if (isFirst) areaRendered[area] = true;
+
+        const areaCell = isFirst
+          ? `<td class="tr-area-cell" rowspan="${areaCount[area]}">${area}</td>`
+          : '';
+
+        /* kirim cells */
+        let kCells = '';
+        kArr.forEach((v, i) => {
+          const isToday = DAYS[i] === todayDay;
+          const cls = isToday && v === K ? ' class="tr-today-k"' : '';
+          kCells += `<td${cls}>${v === K ? pillK() : ''}</td>`;
+        });
+
+        /* separator */
+        const sep = '<td class="tr-sep-col"></td>';
+
+        /* loading cells */
+        let lCells = '';
+        lArr.forEach((v, i) => {
+          const isToday = DAYS[i] === todayDay;
+          const cls = isToday && v === L ? ' class="tr-today-l"' : '';
+          lCells += `<td${cls}>${v === L ? pillL() : ''}</td>`;
+        });
+
+        html += `<tr class="${isFirst ? 'tr-area-start' : ''}">
+          ${areaCell}
+          <td class="tr-wil-cell">${wil}</td>
+          ${kCells}${sep}${lCells}
+        </tr>`;
+      });
+
+      tbody.innerHTML = html;
+      trUpdateKPI(filtered, todayDay);
+    };
+
+    /* ── KPI update ── */
+    function trUpdateKPI(filtered, todayDay) {
+      const dayIdx = DAYS.indexOf(todayDay);
+      let kToday = 0, lToday = 0;
+      filtered.forEach(r => {
+        if (dayIdx >= 0) {
+          if (r[2][dayIdx] === K) kToday++;
+          if (r[3][dayIdx] === L) lToday++;
+        }
+      });
+      const areas = new Set(filtered.map(r => r[0]));
+      document.getElementById('tr-kv1').textContent = kToday;
+      document.getElementById('tr-kv2').textContent = lToday;
+      document.getElementById('tr-kv3').textContent = filtered.length;
+      document.getElementById('tr-kv4').textContent = areas.size;
+    }
+
+    /* ── filter area ── */
+    window.trFilterArea = function(area, btn) {
+      document.querySelectorAll('.tr-fbtn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      trRenderTable(area);
+    };
+
+    /* ── populate area filter buttons ── */
+    function trPopulateFilters() {
+      const areas = [...new Set(DATA.map(r => r[0]))];
+      const wrap = document.getElementById('tr-filter-btns');
+      if (!wrap) return;
+      // keep the "Semua" button, add area buttons
+      areas.forEach(a => {
+        const btn = document.createElement('button');
+        btn.className = 'tr-fbtn';
+        btn.textContent = a;
+        btn.onclick = function() { trFilterArea(a, this); };
+        wrap.appendChild(btn);
+      });
+    }
+
+    /* ── auto-select today in day dropdown ── */
+    function trInitDaySelect() {
+      const sel = document.getElementById('tr-day-select');
+      if (!sel) return;
+      const today = getTodayDayName();
+      for (let i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === today) { sel.selectedIndex = i; break; }
+      }
+    }
+
+    /* ── init ── */
+    trPopulateFilters();
+    trInitDaySelect();
+    trRenderTable('ALL');
+
+  })();
+  </script>
+
+</div>
+<!-- ============================================================ END TRANSIT SECTION ============================================================ -->
+        
         <div id="hub-astor-section" class="dash-section" style="display: none;">
             <div class="section-title-banner">
                 <i class="fas fa-warehouse"></i> MONITORING HUB GRW & ASTOR
