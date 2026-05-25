@@ -3570,198 +3570,299 @@
   </div>
 
   <!-- ── JavaScript untuk section transit ── -->
-  <script>
-  (function() {
+  <!-- ============================================================
+     GANTI SELURUH BLOK <script> di dalam #transit-schema-section
+     Dari: (function() { ... /* DATA hardcoded */ ... })();
+     Sampai: })();
+     Dengan kode di bawah ini:
+     ============================================================ -->
+<script>
+(function () {
 
-    /* ── DATA ── */
-    const DAYS = ['SENIN','SELASA','RABU','KAMIS','JUMAT','SABTU','MINGGU'];
-    const K = 'KIRIM';
-    const L = 'LOADING';
-    const _ = '';
+  /* ── CONFIG SPREADSHEET ── */
+  const TRANSIT_SHEET_ID = '1noBpxmLuT3XQAYzO2Bdv_LrXqzDTqw1ugPN4ST_AYtg';
+  const TRANSIT_GID      = '1362466245';
+  const TRANSIT_CSV_URL  = `https://docs.google.com/spreadsheets/d/${TRANSIT_SHEET_ID}/export?format=csv&gid=${TRANSIT_GID}`;
 
-    /* [area, wilayah, [k_sen,k_sel,k_rab,k_kam,k_jum,k_sab,k_min], [l_sen,l_sel,l_rab,l_kam,l_jum,l_sab,l_min]] */
-    const DATA = [
-      ['DALAM KOTA','SIDOARJO',   [K,_,_,K,K,K,K],[L,L,L,L,_,_,L]],
-      ['DALAM KOTA','GRESIK',     [K,_,_,K,K,K,_],[L,L,L,L,_,_,L]],
-      ['DALAM KOTA','SURABAYA',   [K,_,_,K,K,K,_],[L,L,L,L,_,_,L]],
-      ['DALAM KOTA','MOJOKERTO',  [K,_,_,_,K,K,_],[L,L,L,L,_,_,_]],
-      ['LK JATIM',  'TUBAN',      [_,_,_,_,K,_,K],[L,_,L,_,_,_,_]],
-      ['LK JATIM',  'PASURUAN',   [_,_,_,_,K,_,_],[L,_,L,_,_,_,_]],
-      ['LK JATIM',  'MADIUN',     [_,_,_,_,_,_,K],[L,_,L,_,_,_,_]],
-      ['LK JATIM',  'JEMBER',     [K,_,_,_,K,_,_],[L,_,_,L,_,_,_]],
-      ['LK JATIM',  'MALANG',     [K,_,_,_,_,K,_],[_,L,_,L,_,_,L]],
-      ['LK JATIM',  'KEDIRI',     [K,_,_,K,_,K,_],[_,L,_,L,_,_,_]],
-      ['LK JATIM',  'BANYUWANGI', [_,_,K,_,_,_,K],[_,L,_,_,L,_,_]],
-      ['BALI',      'ALL STORE BALI',[K,_,K,K,K,K,K],[L,L,L,L,L,L,L]],
-      ['YOGYA & JATENG','YOGYAKARTA',[K,_,_,K,_,K,_],[_,L,_,L,_,_,L]],
-      ['YOGYA & JATENG','MAGELANG',  [K,_,_,K,_,K,_],[_,L,_,L,_,_,_]],
-      ['YOGYA & JATENG','SOLO',      [_,_,_,_,K,_,K],[L,_,L,_,_,_,_]],
-      ['YOGYA & JATENG','SEMARANG',  [_,_,K,_,K,_,_],[L,_,L,_,_,L,_]],
-      ['YOGYA & JATENG','KUDUS',     [_,_,_,K,_,_,K],[_,_,L,_,_,_,L]],
-      ['NTB',       'LOMBOK',     [_,K,_,_,_,K,_],[_,L,_,_,L,_,_]],
-      ['MALUKU',    'MALUKU',     [K,_,_,_,_,_,_],[_,_,L,_,_,_,_]],
-      ['MALUKU',    'TERNATE',    [K,_,_,_,_,_,_],[_,_,L,_,_,_,_]],
-      ['NTT',       'KUPANG',     [_,_,_,_,_,_,K],[_,_,L,_,_,_,_]],
-      ['SULAWESI',  'MAKASSAR',   [_,K,_,K,K,_,K],[L,_,L,_,L,_,L]],
-      ['SULAWESI',  'KENDARI',    [_,_,_,K,_,_,_],[_,_,_,_,L,_,_]],
-      ['SULAWESI',  'GORONTALO',  [_,_,_,_,K,_,_],[_,_,_,_,_,_,L]],
-      ['SULAWESI',  'MANADO',     [_,_,_,_,K,_,_],[_,_,_,_,_,_,L]],
-      ['SULAWESI',  'PALOPO',     [_,K,_,_,_,_,_],[_,_,_,L,_,_,_]],
-      ['SULAWESI',  'PARE-PARE',  [_,K,_,_,_,_,_],[_,_,_,L,_,_,_]],
-      ['SULAWESI',  'BITUNG',     [_,K,_,_,_,_,_],[_,_,_,L,_,_,_]],
-      ['SULAWESI',  'PALU',       [_,_,_,K,_,_,_],[_,_,_,_,L,_,_]],
-      ['SULAWESI',  'KOLAKA',     [_,_,_,K,_,_,_],[_,_,_,_,L,_,_]],
-      ['PAPUA',     'JAYAPURA',   [_,_,K,_,_,_,_],[_,_,_,_,L,_,_]],
-      ['PAPUA',     'SORONG',     [_,_,K,_,_,_,_],[_,_,_,_,L,_,_]],
-      ['PAPUA',     'TIMIKA',     [_,_,K,_,_,_,_],[_,_,_,_,L,_,_]],
-    ];
+  /* ── KONSTANTA ── */
+  const DAYS = ['SENIN','SELASA','RABU','KAMIS','JUMAT','SABTU','MINGGU'];
 
-    /* ── STATE ── */
-    window.trCurrentFilter = 'ALL';
+  /* ── STATE ── */
+  let DATA = [];
+  window.trCurrentFilter = 'ALL';
 
-    /* ── detect today's day ── */
-    function getTodayDayName() {
-      const d = ['MINGGU','SENIN','SELASA','RABU','KAMIS','JUMAT','SABTU'];
-      return d[new Date().getDay()];
+  /* ══════════════════════════════════════════
+     FETCH & PARSE
+  ══════════════════════════════════════════ */
+  async function fetchTransitData() {
+    const tbody = document.getElementById('tr-tbody');
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="18" style="text-align:center;padding:30px;color:#7de0a4;">
+        <i class="fas fa-spinner fa-spin" style="font-size:1.5em;display:block;margin-bottom:8px;"></i>
+        Memuat jadwal transit dari spreadsheet...
+      </td></tr>`;
     }
 
-    /* ── pill HTML ── */
-    function pillK() { return '<span class="tr-pill-k">KIRIM</span>'; }
-    function pillL() { return '<span class="tr-pill-l">LOADING</span>'; }
+    try {
+      const res = await fetch(TRANSIT_CSV_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const csv = await res.text();
+      if (csv.trim().startsWith('<!DOCTYPE')) {
+        throw new Error('Sheet belum di-share publik. Pastikan "Anyone with the link can view".');
+      }
+      parseTransitCSV(csv);
+    } catch (e) {
+      console.error('Transit fetch error:', e);
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="18" style="text-align:center;padding:30px;color:#f87171;">
+          <i class="fas fa-exclamation-triangle" style="font-size:1.5em;display:block;margin-bottom:8px;"></i>
+          <strong>Gagal memuat data:</strong> ${e.message}
+          <br/><button onclick="fetchTransitData()" style="margin-top:12px;padding:6px 16px;background:#2d6a47;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;">
+            <i class="fas fa-sync"></i> Coba Lagi
+          </button>
+        </td></tr>`;
+      }
+    }
+  }
 
-    /* ── render sub-header days ── */
-    function trRenderDayHeaders(todayDay) {
-      const tr = document.getElementById('tr-day-headers');
-      if (!tr) return;
-      let h = '';
-      DAYS.forEach(d => {
-        const cls = d === todayDay ? ' tr-today-head' : '';
-        h += `<th class="${cls}">${d.substring(0,3)}</th>`;
-      });
-      h += '<th class="tr-sep"></th>';
-      DAYS.forEach(d => {
-        const cls = 'tr-load-head' + (d === todayDay ? ' tr-today-head' : '');
-        h += `<th class="${cls}">${d.substring(0,3)}</th>`;
-      });
-      tr.innerHTML = h;
+  /* ── Parser CSV ── */
+  function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQuotes = !inQuotes; }
+      else if (c === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
+      else { current += c; }
+    }
+    result.push(current.trim());
+    return result;
+  }
+
+  function normalizeCell(val) {
+    const v = (val || '').trim().toUpperCase();
+    if (v.includes('KIRIM'))   return 'KIRIM';
+    if (v.includes('LOADING')) return 'LOADING';
+    return '';
+  }
+
+  function parseTransitCSV(csv) {
+    const lines = csv.split(/\r?\n/);
+
+    /* Cari baris header hari (mengandung SENIN) */
+    let headerRowIdx = -1;
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].toUpperCase().includes('SENIN')) {
+        headerRowIdx = i;
+        break;
+      }
+    }
+    if (headerRowIdx === -1) {
+      console.error('Header hari tidak ditemukan di sheet');
+      return;
     }
 
-    /* ── render table body ── */
-    window.trRenderTable = function(filter) {
-      window.trCurrentFilter = filter || 'ALL';
-      const todayDay = document.getElementById('tr-day-select')
-        ? document.getElementById('tr-day-select').value || getTodayDayName()
-        : getTodayDayName();
-
-      trRenderDayHeaders(todayDay);
-
-      const tbody = document.getElementById('tr-tbody');
-      if (!tbody) return;
-
-      const filtered = DATA.filter(r => filter === 'ALL' || r[0] === filter);
-      if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="18" style="text-align:center;padding:30px;color:#555;">Tidak ada data.</td></tr>'; return; }
-
-      /* count rows per area for rowspan */
-      const areaCount = {};
-      filtered.forEach(r => { areaCount[r[0]] = (areaCount[r[0]]||0)+1; });
-      const areaRendered = {};
-
-      let html = '';
-      filtered.forEach(row => {
-        const [area, wil, kArr, lArr] = row;
-        const isFirst = !areaRendered[area];
-        if (isFirst) areaRendered[area] = true;
-
-        const areaCell = isFirst
-          ? `<td class="tr-area-cell" rowspan="${areaCount[area]}">${area}</td>`
-          : '';
-
-        /* kirim cells */
-        let kCells = '';
-        kArr.forEach((v, i) => {
-          const isToday = DAYS[i] === todayDay;
-          const cls = isToday && v === K ? ' class="tr-today-k"' : '';
-          kCells += `<td${cls}>${v === K ? pillK() : ''}</td>`;
-        });
-
-        /* separator */
-        const sep = '<td class="tr-sep-col"></td>';
-
-        /* loading cells */
-        let lCells = '';
-        lArr.forEach((v, i) => {
-          const isToday = DAYS[i] === todayDay;
-          const cls = isToday && v === L ? ' class="tr-today-l"' : '';
-          lCells += `<td${cls}>${v === L ? pillL() : ''}</td>`;
-        });
-
-        html += `<tr class="${isFirst ? 'tr-area-start' : ''}">
-          ${areaCell}
-          <td class="tr-wil-cell">${wil}</td>
-          ${kCells}${sep}${lCells}
-        </tr>`;
-      });
-
-      tbody.innerHTML = html;
-      trUpdateKPI(filtered, todayDay);
-    };
-
-    /* ── KPI update ── */
-    function trUpdateKPI(filtered, todayDay) {
-      const dayIdx = DAYS.indexOf(todayDay);
-      let kToday = 0, lToday = 0;
-      filtered.forEach(r => {
-        if (dayIdx >= 0) {
-          if (r[2][dayIdx] === K) kToday++;
-          if (r[3][dayIdx] === L) lToday++;
-        }
-      });
-      const areas = new Set(filtered.map(r => r[0]));
-      document.getElementById('tr-kv1').textContent = kToday;
-      document.getElementById('tr-kv2').textContent = lToday;
-      document.getElementById('tr-kv3').textContent = filtered.length;
-      document.getElementById('tr-kv4').textContent = areas.size;
-    }
-
-    /* ── filter area ── */
-    window.trFilterArea = function(area, btn) {
-      document.querySelectorAll('.tr-fbtn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      trRenderTable(area);
-    };
-
-    /* ── populate area filter buttons ── */
-    function trPopulateFilters() {
-      const areas = [...new Set(DATA.map(r => r[0]))];
-      const wrap = document.getElementById('tr-filter-btns');
-      if (!wrap) return;
-      // keep the "Semua" button, add area buttons
-      areas.forEach(a => {
-        const btn = document.createElement('button');
-        btn.className = 'tr-fbtn';
-        btn.textContent = a;
-        btn.onclick = function() { trFilterArea(a, this); };
-        wrap.appendChild(btn);
-      });
-    }
-
-    /* ── auto-select today in day dropdown ── */
-    function trInitDaySelect() {
-      const sel = document.getElementById('tr-day-select');
-      if (!sel) return;
-      const today = getTodayDayName();
-      for (let i = 0; i < sel.options.length; i++) {
-        if (sel.options[i].value === today) { sel.selectedIndex = i; break; }
+    /* Deteksi kolom LOADING (cari kolom ke-2 yang ada SENIN) */
+    const headerCols = parseCSVLine(lines[headerRowIdx]);
+    let kirimStart = -1;
+    let loadingStart = -1;
+    for (let i = 0; i < headerCols.length; i++) {
+      const v = headerCols[i].toUpperCase().trim();
+      if (v === 'SENIN' || v.includes('SENIN')) {
+        if (kirimStart === -1) kirimStart = i;
+        else if (loadingStart === -1) { loadingStart = i; break; }
       }
     }
 
-    /* ── init ── */
+    /* Fallback kolom jika auto-detect gagal */
+    if (kirimStart === -1)   kirimStart   = 2;   /* Kolom C */
+    if (loadingStart === -1) loadingStart = 10;  /* Kolom K */
+
+    console.log(`Transit: kirimStart=${kirimStart}, loadingStart=${loadingStart}`);
+
+    /* Parse baris data */
+    DATA = [];
+    let lastArea = '';
+
+    const dataLines = lines.slice(headerRowIdx + 1);
+    dataLines.forEach(line => {
+      if (!line.trim()) return;
+
+      const cols = parseCSVLine(line);
+      if (cols.length < 3) return;
+
+      const area    = (cols[0] || '').trim() || lastArea;
+      const wilayah = (cols[1] || '').trim();
+      if (!wilayah) return;
+
+      /* Skip baris judul / total */
+      const wLower = wilayah.toLowerCase();
+      if (wLower.includes('wilayah') || wLower.includes('schedule') || wLower.includes('total')) return;
+
+      if (area) lastArea = area;
+
+      /* Ambil 7 kolom KIRIM */
+      const kArr = DAYS.map((_, i) => normalizeCell(cols[kirimStart + i] || ''));
+
+      /* Ambil 7 kolom LOADING */
+      const lArr = DAYS.map((_, i) => normalizeCell(cols[loadingStart + i] || ''));
+
+      /* Skip baris yang semua kosong */
+      if (kArr.every(v => !v) && lArr.every(v => !v)) return;
+
+      DATA.push([lastArea, wilayah, kArr, lArr]);
+    });
+
+    console.log(`Transit: ${DATA.length} baris berhasil dimuat`);
+
+    /* Rebuild UI */
     trPopulateFilters();
     trInitDaySelect();
     trRenderTable('ALL');
+  }
 
-  })();
-  </script>
+  /* ══════════════════════════════════════════
+     RENDER TABEL
+  ══════════════════════════════════════════ */
+  function getTodayDayName() {
+    const d = ['MINGGU','SENIN','SELASA','RABU','KAMIS','JUMAT','SABTU'];
+    return d[new Date().getDay()];
+  }
+
+  function pillK() { return '<span class="tr-pill-k">KIRIM</span>'; }
+  function pillL() { return '<span class="tr-pill-l">LOADING</span>'; }
+
+  function trRenderDayHeaders(todayDay) {
+    const tr = document.getElementById('tr-day-headers');
+    if (!tr) return;
+    let h = '';
+    DAYS.forEach(d => {
+      const cls = d === todayDay ? ' tr-today-head' : '';
+      h += `<th class="${cls}">${d.substring(0,3)}</th>`;
+    });
+    h += '<th class="tr-sep"></th>';
+    DAYS.forEach(d => {
+      const cls = 'tr-load-head' + (d === todayDay ? ' tr-today-head' : '');
+      h += `<th class="${cls}">${d.substring(0,3)}</th>`;
+    });
+    tr.innerHTML = h;
+  }
+
+  window.trRenderTable = function (filter) {
+    window.trCurrentFilter = filter || 'ALL';
+    const todayDay = (document.getElementById('tr-day-select')?.value) || getTodayDayName();
+
+    trRenderDayHeaders(todayDay);
+
+    const tbody = document.getElementById('tr-tbody');
+    if (!tbody) return;
+
+    if (DATA.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="18" style="text-align:center;padding:30px;color:#555;">Data belum tersedia.</td></tr>';
+      return;
+    }
+
+    const filtered = DATA.filter(r => filter === 'ALL' || r[0] === filter);
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="18" style="text-align:center;padding:30px;color:#555;">Tidak ada data untuk area ini.</td></tr>';
+      return;
+    }
+
+    /* Hitung rowspan per area */
+    const areaCount = {};
+    filtered.forEach(r => { areaCount[r[0]] = (areaCount[r[0]] || 0) + 1; });
+    const areaRendered = {};
+
+    let html = '';
+    filtered.forEach(row => {
+      const [area, wil, kArr, lArr] = row;
+      const isFirst = !areaRendered[area];
+      if (isFirst) areaRendered[area] = true;
+
+      const areaCell = isFirst
+        ? `<td class="tr-area-cell" rowspan="${areaCount[area]}">${area}</td>`
+        : '';
+
+      let kCells = '';
+      kArr.forEach((v, i) => {
+        const isToday = DAYS[i] === todayDay;
+        const cls = isToday && v === 'KIRIM' ? ' class="tr-today-k"' : '';
+        kCells += `<td${cls}>${v === 'KIRIM' ? pillK() : ''}</td>`;
+      });
+
+      let lCells = '';
+      lArr.forEach((v, i) => {
+        const isToday = DAYS[i] === todayDay;
+        const cls = isToday && v === 'LOADING' ? ' class="tr-today-l"' : '';
+        lCells += `<td${cls}>${v === 'LOADING' ? pillL() : ''}</td>`;
+      });
+
+      html += `<tr class="${isFirst ? 'tr-area-start' : ''}">
+        ${areaCell}
+        <td class="tr-wil-cell">${wil}</td>
+        ${kCells}<td class="tr-sep-col"></td>${lCells}
+      </tr>`;
+    });
+
+    tbody.innerHTML = html;
+    trUpdateKPI(filtered, todayDay);
+  };
+
+  /* ── KPI ── */
+  function trUpdateKPI(filtered, todayDay) {
+    const dayIdx = DAYS.indexOf(todayDay);
+    let kToday = 0, lToday = 0;
+    filtered.forEach(r => {
+      if (dayIdx >= 0) {
+        if (r[2][dayIdx] === 'KIRIM')   kToday++;
+        if (r[3][dayIdx] === 'LOADING') lToday++;
+      }
+    });
+    const areas = new Set(filtered.map(r => r[0]));
+    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setEl('tr-kv1', kToday);
+    setEl('tr-kv2', lToday);
+    setEl('tr-kv3', filtered.length);
+    setEl('tr-kv4', areas.size);
+  }
+
+  /* ── Filter Area ── */
+  window.trFilterArea = function (area, btn) {
+    document.querySelectorAll('.tr-fbtn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    trRenderTable(area);
+  };
+
+  function trPopulateFilters() {
+    const areas = [...new Set(DATA.map(r => r[0]))];
+    const wrap = document.getElementById('tr-filter-btns');
+    if (!wrap) return;
+    wrap.innerHTML = '<button class="tr-fbtn active" onclick="trFilterArea(\'ALL\',this)">Semua</button>';
+    areas.forEach(a => {
+      const btn = document.createElement('button');
+      btn.className = 'tr-fbtn';
+      btn.textContent = a;
+      btn.onclick = function () { trFilterArea(a, this); };
+      wrap.appendChild(btn);
+    });
+  }
+
+  function trInitDaySelect() {
+    const sel = document.getElementById('tr-day-select');
+    if (!sel) return;
+    const today = getTodayDayName();
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === today) { sel.selectedIndex = i; break; }
+    }
+  }
+
+  /* ── Init + Auto-refresh ── */
+  fetchTransitData();
+  setInterval(fetchTransitData, 300000); /* refresh tiap 5 menit */
+
+})();
+</script>
 
 </div>
 <!-- ============================================================ END TRANSIT SECTION ============================================================ -->
