@@ -1903,6 +1903,11 @@
             <span>Hub Astor</span>
         </div>
 
+        <div class="bottom-nav-item" id="nav-transit" onclick="showDashboardSection('transit-schema-section')">
+    <i class="fas fa-route"></i>
+    <span>Skema Transit</span>
+</div>
+        
         <div class="bottom-nav-item" id="nav-jadwal-dc" onclick="window.open('https://script.google.com/a/macros/kawanlamacorp.com/s/AKfycbz-otD-56iTVsM8KiVcC0orH2f2F9450cVZx1N40Og3fPQAfuMbL3EVFFXpBqSf3U1f/exec', '_blank')">
             <i class="fas fa-clock"></i>
             <span>JADWAL DC</span>
@@ -4883,6 +4888,7 @@
                 else if (sectionId === 'supply-partner-section') navId = 'nav-partner';
                 else if (sectionId === 'outstanding-section') navId = 'nav-outstanding';
                 else if (sectionId === 'hub-astor-section') navId = 'nav-hub';
+                else if (sectionId === 'transit-schema-section') navId = 'nav-transit';
 
                 const navItem = document.getElementById(navId);
                 if (navItem) navItem.classList.add('active');
