@@ -9168,16 +9168,21 @@ function renderStoringPivotTable(filteredData) {
             return list.sort((a, b) => {
                 let valA, valB;
 
+                let lookupKey = key;
+                if (key === 'AU' && SHEET_ID === SHEET_ID_AHI) {
+                    lookupKey = 'Q';
+                }
+
                 // Handle numeric sorting for CBM and AGING
-                if (key === 'Z') {
-                    valA = parseNumberWithComma(a[key] || '0');
-                    valB = parseNumberWithComma(b[key] || '0');
-                } else if (key === 'AW') {
+                if (lookupKey === 'Z') {
+                    valA = parseNumberWithComma(a[lookupKey] || '0');
+                    valB = parseNumberWithComma(b[lookupKey] || '0');
+                } else if (lookupKey === 'AW') {
                     valA = getDelayHours(a);
                     valB = getDelayHours(b);
                 } else {
-                    valA = String(a[key] || '').toLowerCase();
-                    valB = String(b[key] || '').toLowerCase();
+                    valA = String(a[lookupKey] || '').toLowerCase();
+                    valB = String(b[lookupKey] || '').toLowerCase();
                 }
 
                 if (valA < valB) return direction === 'asc' ? -1 : 1;
@@ -9695,13 +9700,19 @@ function renderStoringPivotTable(filteredData) {
 
             pageData.forEach((row, i) => {
                 const aging = row.AW || '0';
+                let loadDateDisplay = '';
+                if (SHEET_ID === SHEET_ID_AHI) {
+                    loadDateDisplay = row.Q || '-';
+                } else {
+                    loadDateDisplay = `${row.AU || ''} ${row.AP || ''}`.trim() || '-';
+                }
                 html += `
                     <tr>
                         <td>${start + i + 1}</td>
                         <td>${row.A}</td>
                         <td>${row.D || '-'}</td>
                         <td>${row.M || '-'}</td>
-                        <td>${row.AU} ${row.AP}</td>
+                        <td>${loadDateDisplay}</td>
                         <td>${parseNumberWithComma(row.Z).toFixed(2)}</td>
                         <td>${aging}</td>
                     </tr>
