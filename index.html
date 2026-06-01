@@ -2939,14 +2939,15 @@
         <!-- Extra Section (New Tables & Charts) -->
         <div class="extra-section">
             <div class="extra-left">
-                <!-- Table 1: CBM & City Summary -->
+                <!-- Table 3: Vendor Response Delayed -->
                 <div class="bottom-table">
                     <div class="table-header" style="color: #ffd700;">
-                        <i class="fas fa-city"></i> CBM & CONTAINER BY CITY : UNSUPPORTED & DELAYED
+                        <i class="fas fa-clock"></i> VENDOR RESPONSE DELAYED
                     </div>
-                    <div class="table-content-extra" id="city-summary-table">
+                    <div class="table-content-extra" id="vendor-delayed-table">
                         <div class="loading">Processing data...</div>
                     </div>
+                    <div class="pagination" id="delayed-pagination"></div>
                 </div>
                 
                 <!-- Percentage Breakdown Charts -->
@@ -2975,15 +2976,14 @@
                     <div class="pagination" id="unsupported-pagination"></div>
                 </div>
                 
-                <!-- Table 3: Vendor Response Delayed -->
+                <!-- Table 1: CBM & City Summary -->
                 <div class="bottom-table">
                     <div class="table-header" style="color: #ffd700;">
-                        <i class="fas fa-clock"></i> VENDOR RESPONSE DELAYED
+                        <i class="fas fa-city"></i> CBM & CONTAINER BY CITY : UNSUPPORTED & DELAYED
                     </div>
-                    <div class="table-content-extra" id="vendor-delayed-table">
+                    <div class="table-content-extra" id="city-summary-table">
                         <div class="loading">Processing data...</div>
                     </div>
-                    <div class="pagination" id="delayed-pagination"></div>
                 </div>
             </div>
         </div>
@@ -4514,8 +4514,8 @@
         const extraItemsPerPage = 15;
 
         // Sort State for Extra Tables
-        let unsupportedSort = { key: 'A', dir: 'asc' };
-        let delayedSort = { key: 'AU', dir: 'desc' };
+        let unsupportedSort = { key: 'Q', dir: 'desc' };
+        let delayedSort = { key: 'Q', dir: 'desc' };
 
         // Register ChartDataLabels plugin globally
         Chart.register(ChartDataLabels);
@@ -8183,10 +8183,18 @@ function renderStoringPivotTable(filteredData) {
             const isVendor = isVendorActive();
 
             allData.forEach(row => {
-                const dateVal = isVendor ? (row.AU || '').trim() : (row.AO || '').trim();
-                if (dateVal && dateVal !== '-' && dateVal !== '0') {
-                    if (selectedMonths.length === 0 || selectedMonths.includes(row.AX)) {
-                        stuffingDateSet.add(dateVal);
+                if (selectedMonths.length === 0 || selectedMonths.includes(row.AX)) {
+                    if (isVendor) {
+                        const auVal = (row.AU || '').trim();
+                        if (auVal && auVal !== '-' && auVal !== '0') stuffingDateSet.add(auVal);
+                        
+                        const aoVal = (row.AO || '').trim();
+                        if (aoVal && aoVal !== '-' && aoVal !== '0') stuffingDateSet.add(aoVal);
+                    } else {
+                        const dateVal = (row.AO || '').trim();
+                        if (dateVal && dateVal !== '-' && dateVal !== '0') {
+                            stuffingDateSet.add(dateVal);
+                        }
                     }
                 }
             });
@@ -8346,8 +8354,11 @@ function renderStoringPivotTable(filteredData) {
             filteredData = allData.filter(row => {
                 const matchBulan = selectedFilters.bulan.length === 0 || selectedFilters.bulan.includes(row.AX);
                 
-                const dateVal = isVendor ? (row.AU || '').trim() : (row.AO || '').trim();
-                const matchDate = selectedFilters.stuffingDate.length === 0 || selectedFilters.stuffingDate.includes(dateVal);
+                let matchDate = true;
+                if (!isVendor) {
+                    const dateVal = (row.AO || '').trim();
+                    matchDate = selectedFilters.stuffingDate.length === 0 || selectedFilters.stuffingDate.includes(dateVal);
+                }
                 
                 const matchKota = selectedFilters.kota.length === 0 || selectedFilters.kota.includes(row.AR);
                 const matchRegional = selectedFilters.regional.length === 0 || selectedFilters.regional.includes(row.AT);
@@ -8414,6 +8425,11 @@ function renderStoringPivotTable(filteredData) {
             filteredData.forEach(row => {
                 // Filter: Use isBelumSupport logic to match VENDOR SUPPORT NOT AVAILABLE
                 if (!isBelumSupport(row)) return;
+
+                if (isVendorActive() && selectedFilters.stuffingDate.length > 0) {
+                    const dateVal = (row.AU || '').trim();
+                    if (!selectedFilters.stuffingDate.includes(dateVal)) return;
+                }
 
                 const carrier = (row.D || '').trim();
                 if (!carrier || carrier === '-' || carrier === 'CARRIER') return;
@@ -8514,6 +8530,8 @@ function renderStoringPivotTable(filteredData) {
             let grandTotal = 0;
             const excludedCarriers = ['1D-INTERNAL (SDA)', 'AHI', 'DUMMY-LK-EKSP', 'DUMMY'];
 
+            const isVendor = isVendorActive();
+
             filteredData.forEach(row => {
                 const carrier = (row.D || '').trim();
                 if (!carrier || carrier === '-' || carrier === 'CARRIER') return;
@@ -8522,11 +8540,17 @@ function renderStoringPivotTable(filteredData) {
                 const carrierUpper = carrier.toUpperCase();
                 if (excludedCarriers.includes(carrierUpper) || carrierUpper.includes('DUMMY')) return;
 
+                const isBelumSpt = isBelumSupport(row);
+
+                // --- STUFFING DATE FILTER FOR VENDOR TAB ---
+                if (isVendor && selectedFilters.stuffingDate.length > 0) {
+                    const checkDate = isBelumSpt ? (row.AU || '').trim() : (row.AO || '').trim();
+                    if (!selectedFilters.stuffingDate.includes(checkDate)) return;
+                }
+
                 if (!perfData[carrier]) {
                     perfData[carrier] = { carrier: carrier, onTime: 0, terlambat: 0, total: 0, achievement: 0 };
                 }
-
-                const isBelumSpt = isBelumSupport(row);
 
                 if (isBelumSpt) {
                     perfData[carrier].terlambat++;
@@ -9168,21 +9192,21 @@ function renderStoringPivotTable(filteredData) {
             return list.sort((a, b) => {
                 let valA, valB;
 
-                let lookupKey = key;
-                if (key === 'AU' && SHEET_ID === SHEET_ID_AHI) {
-                    lookupKey = 'Q';
-                }
-
                 // Handle numeric sorting for CBM and AGING
-                if (lookupKey === 'Z') {
-                    valA = parseNumberWithComma(a[lookupKey] || '0');
-                    valB = parseNumberWithComma(b[lookupKey] || '0');
-                } else if (lookupKey === 'AW') {
+                if (key === 'Z') {
+                    valA = parseNumberWithComma(a[key] || '0');
+                    valB = parseNumberWithComma(b[key] || '0');
+                } else if (key === 'AW') {
                     valA = getDelayHours(a);
                     valB = getDelayHours(b);
+                } else if (key === 'Q') {
+                    const dA = parseDateCustom(a.Q);
+                    const dB = parseDateCustom(b.Q);
+                    valA = dA ? dA.getTime() : 0;
+                    valB = dB ? dB.getTime() : 0;
                 } else {
-                    valA = String(a[lookupKey] || '').toLowerCase();
-                    valB = String(b[lookupKey] || '').toLowerCase();
+                    valA = String(a[key] || '').toLowerCase();
+                    valB = String(b[key] || '').toLowerCase();
                 }
 
                 if (valA < valB) return direction === 'asc' ? -1 : 1;
@@ -9247,6 +9271,14 @@ function renderStoringPivotTable(filteredData) {
                 // Pengecualian: Jangan tampilkan jika carrier adalah 1D-INTERNAL (SDA) atau AHI
                 if (carrier === '1D-INTERNAL (SDA)' || carrier === 'AHI') return;
 
+                const isBelumSpt = isBelumSupport(row);
+
+                // --- STUFFING DATE FILTER FOR VENDOR TAB ---
+                if (isVendorActive() && selectedFilters.stuffingDate.length > 0) {
+                    const checkDate = isBelumSpt ? (row.AU || '').trim() : (row.AO || '').trim();
+                    if (!selectedFilters.stuffingDate.includes(checkDate)) return;
+                }
+
                 // --- APPLY EXTRA FILTERS ---
                 const matchType = selectedFilters.typeArmada.length === 0 || selectedFilters.typeArmada.includes(typeArmada);
                 const matchKet = selectedFilters.ketVendor.length === 0 || selectedFilters.ketVendor.includes(ketVendor);
@@ -9280,7 +9312,7 @@ function renderStoringPivotTable(filteredData) {
                     };
                 }
 
-                if (isBelumSupport(row)) {
+                if (isBelumSpt) {
                     cityStats[kotaSummary].uCbm += cbm;
                     cityStats[kotaSummary].uQty++; // Menghitung total baris sesuai ekspektasi user
                     unsupportedList.push(row);
@@ -9695,17 +9727,12 @@ function renderStoringPivotTable(filteredData) {
             const pageData = list.slice(start, end);
 
             let html = `
-                <table>\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th onclick="toggleSort('unsupported', 'A')" style="cursor:pointer">LC ${getSortIcon(unsupportedSort, 'A')}</th>\n                            <th onclick="toggleSort('unsupported', 'D')" style="cursor:pointer">CARRIER ${getSortIcon(unsupportedSort, 'D')}</th>\n                            <th onclick="toggleSort('unsupported', 'M')" style="cursor:pointer">JALUR ${getSortIcon(unsupportedSort, 'M')}</th>\n                            <th onclick="toggleSort('unsupported', 'AU')" style="cursor:pointer">LOAD DATE ${getSortIcon(unsupportedSort, 'AU')}</th>\n                            <th onclick="toggleSort('unsupported', 'Z')" style="cursor:pointer">CBM ${getSortIcon(unsupportedSort, 'Z')}</th>\n                            <th onclick="toggleSort('unsupported', 'AW')" style="cursor:pointer">AGING LC ${getSortIcon(unsupportedSort, 'AW')}</th>\n                        </tr>\n                    </thead>\n                    <tbody>
+                <table>\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th onclick="toggleSort('unsupported', 'A')" style="cursor:pointer">LC ${getSortIcon(unsupportedSort, 'A')}</th>\n                            <th onclick="toggleSort('unsupported', 'D')" style="cursor:pointer">CARRIER ${getSortIcon(unsupportedSort, 'D')}</th>\n                            <th onclick="toggleSort('unsupported', 'M')" style="cursor:pointer">JALUR ${getSortIcon(unsupportedSort, 'M')}</th>\n                            <th onclick="toggleSort('unsupported', 'Q')" style="cursor:pointer">LOAD DATE ${getSortIcon(unsupportedSort, 'Q')}</th>\n                            <th onclick="toggleSort('unsupported', 'Z')" style="cursor:pointer">CBM ${getSortIcon(unsupportedSort, 'Z')}</th>\n                            <th onclick="toggleSort('unsupported', 'AW')" style="cursor:pointer">AGING LC ${getSortIcon(unsupportedSort, 'AW')}</th>\n                        </tr>\n                    </thead>\n                    <tbody>
             `;
 
             pageData.forEach((row, i) => {
                 const aging = row.AW || '0';
-                let loadDateDisplay = '';
-                if (SHEET_ID === SHEET_ID_AHI) {
-                    loadDateDisplay = row.Q || '-';
-                } else {
-                    loadDateDisplay = `${row.AU || ''} ${row.AP || ''}`.trim() || '-';
-                }
+                const loadDateDisplay = row.Q || '-';
                 html += `
                     <tr>
                         <td>${start + i + 1}</td>
@@ -9740,7 +9767,7 @@ function renderStoringPivotTable(filteredData) {
             const pageData = list.slice(start, end);
 
             let html = `
-                <table>\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th onclick="toggleSort('delayed', 'A')" style="cursor:pointer">LC ${getSortIcon(delayedSort, 'A')}</th>\n                            <th onclick="toggleSort('delayed', 'D')" style="cursor:pointer">CARRIER ${getSortIcon(delayedSort, 'D')}</th>\n                            <th onclick="toggleSort('delayed', 'M')" style="cursor:pointer">JALUR ${getSortIcon(delayedSort, 'M')}</th>\n                            <th onclick="toggleSort('delayed', 'AU')" style="cursor:pointer">LOAD DATE ${getSortIcon(delayedSort, 'AU')}</th>\n                            <th onclick="toggleSort('delayed', 'Z')" style="cursor:pointer">CBM ${getSortIcon(delayedSort, 'Z')}</th>\n                            <th onclick="toggleSort('delayed', 'AW')" style="cursor:pointer">TERLAMBAT ${getSortIcon(delayedSort, 'AW')}</th>\n                        </tr>\n                    </thead>\n                    <tbody>
+                <table>\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th onclick="toggleSort('delayed', 'A')" style="cursor:pointer">LC ${getSortIcon(delayedSort, 'A')}</th>\n                            <th onclick="toggleSort('delayed', 'D')" style="cursor:pointer">CARRIER ${getSortIcon(delayedSort, 'D')}</th>\n                            <th onclick="toggleSort('delayed', 'M')" style="cursor:pointer">JALUR ${getSortIcon(delayedSort, 'M')}</th>\n                            <th onclick="toggleSort('delayed', 'Q')" style="cursor:pointer">LOAD DATE ${getSortIcon(delayedSort, 'Q')}</th>\n                            <th onclick="toggleSort('delayed', 'Z')" style="cursor:pointer">CBM ${getSortIcon(delayedSort, 'Z')}</th>\n                            <th onclick="toggleSort('delayed', 'AW')" style="cursor:pointer">TERLAMBAT ${getSortIcon(delayedSort, 'AW')}</th>\n                        </tr>\n                    </thead>\n                    <tbody>
             `;
 
             pageData.forEach((row, i) => {
@@ -9751,7 +9778,7 @@ function renderStoringPivotTable(filteredData) {
                         <td>${row.A}</td>
                         <td>${row.D || '-'}</td>
                         <td>${row.M || '-'}</td>
-                        <td>${row.AU} ${row.AP}</td>
+                        <td>${row.Q || '-'}</td>
                         <td>${parseNumberWithComma(row.Z).toFixed(2)}</td>
                         <td>${delayText}</td>
                     </tr>
