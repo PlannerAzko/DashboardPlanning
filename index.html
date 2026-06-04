@@ -6449,40 +6449,15 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 if (container) container.style.display = 'block';
                 
                 const finalUrl = HUB_CSV_URL;
-                const csvTasks = [
-                    fetch(finalUrl).then(async r => {
-                        if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
-                        const text = await r.text();
-                        if (text.trim().startsWith('<!DOCTYPE')) {
-                            throw new Error("Diterima format HTML. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
-                        }
-                        return text;
-                    })
-                ];
-
-                // Jika sedang pada DC AHI SIDOARJO, ambil juga data JUNI ASTOR
-                if (SHEET_ID === SHEET_ID_AHI) {
-                    const juneUrl = "https://docs.google.com/spreadsheets/d/1U_hqPV0VjW0o4-KQylONoxQeF30Hdtr0sfIQx5EzRsM/export?format=csv&gid=289897194";
-                    csvTasks.push(
-                        fetch(juneUrl).then(async r => {
-                            if (!r.ok) throw new Error(`HTTP error JUNI ASTOR! status: ${r.status}`);
-                            const text = await r.text();
-                            if (text.trim().startsWith('<!DOCTYPE')) {
-                                throw new Error("Diterima format HTML JUNI ASTOR. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
-                            }
-                            return text;
-                        }).catch(err => {
-                            console.error("Gagal mengambil data Juni Astor:", err);
-                            return null;
-                        })
-                    );
+                const response = await fetch(finalUrl);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const csv = await response.text();
+                
+                if (csv.trim().startsWith('<!DOCTYPE')) {
+                    throw new Error("Diterima format HTML. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
                 }
-
-                const results = await Promise.all(csvTasks);
-                const mainCsv = results[0];
-                const juneCsv = results[1] || null;
-
-                parseHubCSV(mainCsv, juneCsv);
+                
+                parseHubCSV(csv);
             } catch (error) {
                 console.error("Error fetching hub data:", error);
                 if (retries > 0) {
@@ -6496,7 +6471,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             }
         }
 
-        function parseHubCSV(csv, juneCsv) {
+        function parseHubCSV(csv) {
             const lines = csv.split(/\r?\n/);
             if (lines.length < 1) return;
 
@@ -6521,7 +6496,10 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             const loadingOptions = new Set();
             const nolcOptions = new Set();
 
-            function parseCSVLine(line, delim) {
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
                 const values = [];
                 let current = '';
                 let inQuotes = false;
@@ -6529,35 +6507,15 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                     const char = line[j];
                     if (char === '"') {
                         if (inQuotes && line[j+1] === '"') { current += '"'; j++; } else { inQuotes = !inQuotes; }
-                    } else if (char === delim && !inQuotes) {
+                    } else if (char === delimiter && !inQuotes) {
                         values.push(current.trim()); current = '';
                     } else { current += char; }
                 }
                 values.push(current.trim());
-                return values;
-            }
-
-            // Parse raw Hub data utama (May / dsb - baris mulai dari 1)
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-
-                const values = parseCSVLine(line, delimiter);
                 if (values.length >= hubHeaderNames.length) {
-                    // Verifikasi kolom kritikal (Tanggal Kedatangan, Store Name, Kode Store, LC Pembawa)
-                    // untuk menyaring baris kosong dari template
-                    const valTgl = (values[0] || '').trim();
-                    const valLC = (values[1] || '').trim();
-                    const valKode = (values[3] || '').trim();
-                    const valStore = (values[4] || '').trim();
-
-                    if (!valTgl && !valLC && !valKode && !valStore) {
-                        continue; // Abaikan baris template kosong
-                    }
-
                     rawHubData.push(values);
                     
-                    // Column N (index 13) for Keterangan Loading (Sudah/Belum Loading)
+                    // Column N for Keterangan Loading (Sudah/Belum Loading)
                     const statusN = (values[13] || '').trim() || 'KOSONG';
                     if (statusN) loadingOptions.add(statusN);
                     
@@ -6566,51 +6524,6 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                     if (noLcIdx !== -1) {
                         const lcVal = (values[noLcIdx] || '').trim();
                         nolcOptions.add(lcVal ? 'SUDAH PLAN' : 'BELUM PLAN');
-                    }
-                }
-            }
-
-            // Parse JUNI ASTOR jika ada
-            if (juneCsv) {
-                const juneLines = juneCsv.split(/\r?\n/);
-                let jDelimiter = ',';
-                if (juneLines.length > 3 && juneLines[3].includes(';')) jDelimiter = ';';
-
-                // Data JUNI ASTOR dimulai dari baris indeks 4 (baris indeks 3 adalah header)
-                for (let i = 4; i < juneLines.length; i++) {
-                    const line = juneLines[i].trim();
-                    if (!line) continue;
-
-                    const values = parseCSVLine(line, jDelimiter);
-                    if (values.length >= 8) { // Pastikan memiliki kolom yang memadai
-                        const rowValues = [];
-                        // Ambil 16 kolom pertama agar selaras dengan skema May
-                        for (let u = 0; u < 16; u++) {
-                            rowValues.push(values[u] || '');
-                        }
-
-                        // Verifikasi kolom kritikal (Tanggal Kedatangan, Store Name, Kode Store, LC Pembawa)
-                        // untuk menyaring baris kosong dari template
-                        const valTgl = (rowValues[0] || '').trim();
-                        const valLC = (rowValues[1] || '').trim();
-                        const valKode = (rowValues[3] || '').trim();
-                        const valStore = (rowValues[4] || '').trim();
-
-                        if (!valTgl && !valLC && !valKode && !valStore) {
-                            continue; // Abaikan baris template kosong yang tidak beridentitas
-                        }
-
-                        rawHubData.push(rowValues);
-
-                        // Extract loading and LC options
-                        const statusN = (rowValues[13] || '').trim() || 'KOSONG';
-                        if (statusN) loadingOptions.add(statusN);
-
-                        let noLcIdx = hubHeaderNames.findIndex(h => h.toUpperCase().includes('NO LC'));
-                        if (noLcIdx !== -1) {
-                            const lcVal = (rowValues[noLcIdx] || '').trim();
-                            nolcOptions.add(lcVal ? 'SUDAH PLAN' : 'BELUM PLAN');
-                        }
                     }
                 }
             }
