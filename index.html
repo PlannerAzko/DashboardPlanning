@@ -4960,7 +4960,7 @@
         let rawPlannerData = [];
         let rawOrderDistData = [];
         let rawFBISchedule = [];
-        let batchTargets = { B1: 0, B2: 0, B3: 0, B4: 0 };
+        let batchTargets = { B1: 198, B2: 133, B3: 80, B4: 84 };
         let rawHubData = [];
         let rawAstorData = [];
         let hubHeaderNames = [];
@@ -10869,24 +10869,10 @@ function sortAstorOS(key) {
 fetchAstorData();
 setInterval(fetchAstorData, 60000);
             // ===== BATCH TARGET FETCH =====
-const BATCH_TARGET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=1005852835`;
-
-async function fetchBatchTargets() {
-    try {
-        const res = await fetch(BATCH_TARGET_URL);
-        const csv = await res.text();
-        const rows = robustCSVParser(csv);
-        // N20:O23 = row index 19-22, kolom O = index 14
-        ['B1','B2','B3','B4'].forEach((b, i) => {
-            const row = rows[19 + i];
-            if (row && row[14] !== undefined) {
-                batchTargets[b] = parseNumberWithComma(row[14]);
-            }
-        });
-        applyBatchColors();
-    } catch(e) {
-        console.error('Batch target fetch error:', e);
-    }
+function fetchBatchTargets() {
+    // Target hardcoded: B1=198, B2=133, B3=80, B4=84
+    batchTargets = { B1: 198, B2: 133, B3: 80, B4: 84 };
+    applyBatchColors();
 }
 
 function applyBatchColors() {
