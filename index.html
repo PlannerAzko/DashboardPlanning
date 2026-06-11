@@ -9167,26 +9167,32 @@ function updateDashboard() {
         }
 
         function getDelayHours(row) {
-            const dateQ = parseDateCustom(row.Q);
-            const dateBJ = parseDateCustom(row.BJ);
-            if (dateQ && dateBJ) {
-                const diffMs = dateBJ.getTime() - dateQ.getTime();
-                const diffHours = diffMs / (1000 * 60 * 60);
-                if (diffHours > 0) {
-                    return Math.round(diffHours);
-                }
-            }
-            const aging = parseInt(row.AW) || 0;
-            return aging * 24;
+    const dateQ = parseDateCustom(row.Q);
+    const dateBJ = parseDateCustom(row.BJ);
+    if (dateQ && dateBJ) {
+        const diffMs = dateBJ.getTime() - dateQ.getTime();
+        const diffHours = diffMs / (1000 * 60 * 60);
+        if (diffHours > 2) {
+            return Math.round(diffHours);
         }
+    }
+    return 0; // jangan fallback ke aging * 24
+}
 
         function getDelayHoursText(row) {
-            const hrs = getDelayHours(row);
-            if (hrs > 0) {
-                return `${hrs} Jam`;
-            }
-            return '-';
+    const dateQ = parseDateCustom(row.Q);
+    const dateBJ = parseDateCustom(row.BJ);
+    if (dateQ && dateBJ) {
+        const diffMs = dateBJ.getTime() - dateQ.getTime();
+        const diffHours = diffMs / (1000 * 60 * 60);
+        if (diffHours > 2) {
+            return Math.round(diffHours) + ' Jam';
         }
+    }
+    // Fallback: tampilkan aging dalam HARI (bukan dikali 24)
+    const aging = parseInt(row.AW) || 0;
+    return aging > 0 ? aging + ' Hari' : '-';
+}
 
         // Helper: Sort Data
         function sortDataList(list, key, direction) {
