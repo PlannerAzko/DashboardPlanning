@@ -2054,21 +2054,21 @@
             </div>
         </div>
 <div class="kpi-container-four">
-    <div class="kpi-card gray">
-        <div class="kpi-label">CBM PLAN B1</div>
-        <div class="kpi-value" id="cbmPlanB1">0</div>
-    </div>
-    <div class="kpi-card gray">
-        <div class="kpi-label">CBM PLAN B2</div>
-        <div class="kpi-value" id="cbmPlanB2">0</div>
-    </div>
-    <div class="kpi-card gray">
-        <div class="kpi-label">CBM PLAN B3</div>
-        <div class="kpi-value" id="cbmPlanB3">0</div>
-    </div>
-    <div class="kpi-card gray">
-        <div class="kpi-label">CBM PLAN B4</div>
-        <div class="kpi-value" id="cbmPlanB4">0</div>
+    <div class="kpi-card gray" id="cbmPlanB1-card">
+    <div class="kpi-label">CBM PLAN B1</div>
+    <div class="kpi-value" id="cbmPlanB1">0</div>
+</div>
+<div class="kpi-card gray" id="cbmPlanB2-card">
+    <div class="kpi-label">CBM PLAN B2</div>
+    <div class="kpi-value" id="cbmPlanB2">0</div>
+</div>
+<div class="kpi-card gray" id="cbmPlanB3-card">
+    <div class="kpi-label">CBM PLAN B3</div>
+    <div class="kpi-value" id="cbmPlanB3">0</div>
+</div>
+<div class="kpi-card gray" id="cbmPlanB4-card">
+    <div class="kpi-label">CBM PLAN B4</div>
+    <div class="kpi-value" id="cbmPlanB4">0</div>
     </div>
 </div>
             
@@ -4960,6 +4960,7 @@
         let rawPlannerData = [];
         let rawOrderDistData = [];
         let rawFBISchedule = [];
+        let batchTargets = { B1: 0, B2: 0, B3: 0, B4: 0 };
         let rawHubData = [];
         let rawAstorData = [];
         let hubHeaderNames = [];
@@ -8397,10 +8398,10 @@ function renderStoringPivotTable(filteredData) {
         }
 
         // Update Dashboard
-        function updateDashboard() {
-            try {
-                // Jalankan update secara berurutan agar tidak membekukan browser
-                updateKPIs();
+function updateDashboard() {
+    try {
+        updateKPIs();
+        applyBatchColors();
                 updateCRMTable();
                 updateShippingTable();
                 updateMap();
@@ -10867,6 +10868,64 @@ function sortAstorOS(key) {
 // Fetch & auto-refresh
 fetchAstorData();
 setInterval(fetchAstorData, 60000);
+            // ===== BATCH TARGET FETCH =====
+const BATCH_TARGET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=1005852835`;
+
+async function fetchBatchTargets() {
+    try {
+        const res = await fetch(BATCH_TARGET_URL);
+        const csv = await res.text();
+        const rows = robustCSVParser(csv);
+        // N20:O23 = row index 19-22, kolom O = index 14
+        ['B1','B2','B3','B4'].forEach((b, i) => {
+            const row = rows[19 + i];
+            if (row && row[14] !== undefined) {
+                batchTargets[b] = parseNumberWithComma(row[14]);
+            }
+        });
+        applyBatchColors();
+    } catch(e) {
+        console.error('Batch target fetch error:', e);
+    }
+}
+
+function applyBatchColors() {
+    const isSingleDate = selectedFilters.stuffingDate.length === 1;
+
+    [
+        { valueId: 'cbmPlanB1', cardId: 'cbmPlanB1-card', target: batchTargets.B1 },
+        { valueId: 'cbmPlanB2', cardId: 'cbmPlanB2-card', target: batchTargets.B2 },
+        { valueId: 'cbmPlanB3', cardId: 'cbmPlanB3-card', target: batchTargets.B3 },
+        { valueId: 'cbmPlanB4', cardId: 'cbmPlanB4-card', target: batchTargets.B4 },
+    ].forEach(b => {
+        const el   = document.getElementById(b.valueId);
+        const card = document.getElementById(b.cardId);
+        if (!el || !card) return;
+
+        // Parse nilai yang ditampilkan (format indo: titik ribuan, koma desimal)
+        const raw = el.textContent.replace(/\./g, '').replace(',', '.');
+        const val = parseFloat(raw) || 0;
+
+        if (isSingleDate && b.target > 0) {
+            if (val >= b.target) {
+                // HIJAU
+                card.style.background    = 'linear-gradient(135deg, #1a5c2a 0%, #2d9144 100%)';
+                card.style.borderBottom  = '4px solid #15803d';
+                card.style.boxShadow     = '0 0 12px rgba(45,145,68,0.4)';
+            } else {
+                // MERAH
+                card.style.background    = 'linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)';
+                card.style.borderBottom  = '4px solid #991b1b';
+                card.style.boxShadow     = '0 0 12px rgba(220,38,38,0.4)';
+            }
+        } else {
+            // RESET ke abu-abu default
+            card.style.background    = 'linear-gradient(135deg, #4b5563 0%, #1f2937 100%)';
+            card.style.borderBottom  = '4px solid #111827';
+            card.style.boxShadow     = '';
+        }
+    });
+}
     </script>
 </body>
 </html>
