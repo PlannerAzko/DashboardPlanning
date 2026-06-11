@@ -9109,43 +9109,64 @@ function updateDashboard() {
         }
 
         function parseDateCustom(str) {
-            if (!str) return null;
-            str = String(str).trim();
-            if (!str || str === '-' || str === '0') return null;
+    if (!str) return null;
+    str = String(str).trim();
+    if (!str || str === '-' || str === '0') return null;
 
-            let parts = str.split(/[\sT]+/);
-            let datePart = parts[0];
-            let timePart = parts[1] || '00:00:00';
+    // Coba parse langsung dulu (handles ISO format: 2026-06-05 11:01:00)
+    let parts = str.split(/[\sT]+/);
+    let datePart = parts[0];
+    let timePart = parts[1] || '00:00:00';
+    
+    let dParts = datePart.split(/[-/]/);
+    let tParts = timePart.split(':');
+    
+    if (dParts.length === 3) {
+        let year, month, day;
+        
+        if (dParts[0].length === 4) {
+            // Format: YYYY-MM-DD (ISO)
+            year  = parseInt(dParts[0], 10);
+            month = parseInt(dParts[1], 10) - 1;
+            day   = parseInt(dParts[2], 10);
+        } else {
+            // Format M/D/YYYY atau D/M/YYYY
+            // Deteksi: jika bagian ke-1 (bulan/hari) > 12, pasti format D/M/YYYY
+            // Jika bagian ke-0 > 12, pasti format M/D/YYYY
+            const p0 = parseInt(dParts[0], 10);
+            const p1 = parseInt(dParts[1], 10);
+            let yr   = parseInt(dParts[2], 10);
+            if (yr < 100) yr += 2000;
             
-            let dParts = datePart.split(/[-/]/);
-            let tParts = timePart.split(':');
-            
-            if (dParts.length === 3) {
-                let year, month, day;
-                if (dParts[0].length === 4) {
-                    year = parseInt(dParts[0], 10);
-                    month = parseInt(dParts[1], 10) - 1;
-                    day = parseInt(dParts[2], 10);
-                } else if (dParts[2].length === 4) {
-                    day = parseInt(dParts[0], 10);
-                    month = parseInt(dParts[1], 10) - 1;
-                    year = parseInt(dParts[2], 10);
-                } else {
-                    const d = new Date(str);
-                    return isNaN(d.getTime()) ? null : d;
-                }
-                
-                let hour = parseInt(tParts[0], 10) || 0;
-                let minute = parseInt(tParts[1], 10) || 0;
-                let second = parseInt(tParts[2], 10) || 0;
-                
-                const d = new Date(year, month, day, hour, minute, second);
-                return isNaN(d.getTime()) ? null : d;
+            if (p0 > 12) {
+                // p0 pasti hari, p1 pasti bulan → D/M/YYYY
+                day   = p0;
+                month = p1 - 1;
+                year  = yr;
+            } else if (p1 > 12) {
+                // p1 pasti hari, p0 pasti bulan → M/D/YYYY
+                month = p0 - 1;
+                day   = p1;
+                year  = yr;
+            } else {
+                // Ambiguous: default ke M/D/YYYY karena Google Sheets pakai format ini
+                month = p0 - 1;
+                day   = p1;
+                year  = yr;
             }
-            
-            const d = new Date(str);
-            return isNaN(d.getTime()) ? null : d;
         }
+        
+        let hour   = parseInt(tParts[0], 10) || 0;
+        let minute = parseInt(tParts[1], 10) || 0;
+        let second = parseInt(tParts[2], 10) || 0;
+        
+        const d = new Date(year, month, day, hour, minute, second);
+        return isNaN(d.getTime()) ? null : d;
+    }
+    
+    const d = new Date(str);
+    return isNaN(d.getTime()) ? null : d;
+}
 
         function isTerlambat(row) {
             if (isCityExcluded(row)) return false;
