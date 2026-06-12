@@ -10906,10 +10906,10 @@ function applyBatchColors() {
     const isSingleDate = selectedFilters.stuffingDate.length === 1;
 
     [
-        { valueId: 'cbmPlanB1', cardId: 'cbmPlanB1-card', target: batchTargets.B1, inverted: true },
-        { valueId: 'cbmPlanB2', cardId: 'cbmPlanB2-card', target: batchTargets.B2, inverted: false },
-        { valueId: 'cbmPlanB3', cardId: 'cbmPlanB3-card', target: batchTargets.B3, inverted: false },
-        { valueId: 'cbmPlanB4', cardId: 'cbmPlanB4-card', target: batchTargets.B4, inverted: true },
+        { valueId: 'cbmPlanB1', cardId: 'cbmPlanB1-card', target: batchTargets.B1 },
+        { valueId: 'cbmPlanB2', cardId: 'cbmPlanB2-card', target: batchTargets.B2 },
+        { valueId: 'cbmPlanB3', cardId: 'cbmPlanB3-card', target: batchTargets.B3 },
+        { valueId: 'cbmPlanB4', cardId: 'cbmPlanB4-card', target: batchTargets.B4 },
     ].forEach(b => {
         const el   = document.getElementById(b.valueId);
         const card = document.getElementById(b.cardId);
@@ -10919,25 +10919,31 @@ function applyBatchColors() {
         const val = parseFloat(raw) || 0;
 
         if (isSingleDate && b.target > 0) {
-            const meetsTarget = val >= b.target;
-            const showGreen = b.inverted ? !meetsTarget : meetsTarget;
-
-            if (showGreen) {
-                // HIJAU
-                card.style.background    = 'linear-gradient(135deg, #1a5c2a 0%, #2d9144 100%)';
-                card.style.borderBottom  = '4px solid #15803d';
-                card.style.boxShadow     = '0 0 12px rgba(45,145,68,0.4)';
-            } else {
-                // MERAH
+            if (val > b.target) {
+                // MERAH - di atas target
                 card.style.background    = 'linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)';
                 card.style.borderBottom  = '4px solid #991b1b';
                 card.style.boxShadow     = '0 0 12px rgba(220,38,38,0.4)';
+                card.style.color         = '';
+            } else if (val === b.target) {
+                // KUNING - sama dengan target
+                card.style.background    = 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)';
+                card.style.borderBottom  = '4px solid #b8860b';
+                card.style.boxShadow     = '0 0 12px rgba(255,215,0,0.4)';
+                card.style.color         = '#000';
+            } else {
+                // HIJAU - di bawah target
+                card.style.background    = 'linear-gradient(135deg, #1a5c2a 0%, #2d9144 100%)';
+                card.style.borderBottom  = '4px solid #15803d';
+                card.style.boxShadow     = '0 0 12px rgba(45,145,68,0.4)';
+                card.style.color         = '';
             }
         } else {
-            // RESET ke abu-abu default
+            // RESET ke abu-abu default (saat tanggal tidak dipilih tunggal)
             card.style.background    = 'linear-gradient(135deg, #4b5563 0%, #1f2937 100%)';
             card.style.borderBottom  = '4px solid #111827';
             card.style.boxShadow     = '';
+            card.style.color         = '';
         }
     });
 }
