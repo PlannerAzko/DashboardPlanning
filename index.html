@@ -10906,10 +10906,10 @@ function applyBatchColors() {
     const isSingleDate = selectedFilters.stuffingDate.length === 1;
 
     [
-        { valueId: 'cbmPlanB1', cardId: 'cbmPlanB1-card', target: batchTargets.B1 },
-        { valueId: 'cbmPlanB2', cardId: 'cbmPlanB2-card', target: batchTargets.B2 },
-        { valueId: 'cbmPlanB3', cardId: 'cbmPlanB3-card', target: batchTargets.B3 },
-        { valueId: 'cbmPlanB4', cardId: 'cbmPlanB4-card', target: batchTargets.B4 },
+        { valueId: 'cbmPlanB1', cardId: 'cbmPlanB1-card', labelId: 'cbmPlanB1-label', target: batchTargets.B1 },
+        { valueId: 'cbmPlanB2', cardId: 'cbmPlanB2-card', labelId: 'cbmPlanB2-label', target: batchTargets.B2 },
+        { valueId: 'cbmPlanB3', cardId: 'cbmPlanB3-card', labelId: 'cbmPlanB3-label', target: batchTargets.B3 },
+        { valueId: 'cbmPlanB4', cardId: 'cbmPlanB4-card', labelId: 'cbmPlanB4-label', target: batchTargets.B4 },
     ].forEach(b => {
         const el   = document.getElementById(b.valueId);
         const card = document.getElementById(b.cardId);
@@ -10918,32 +10918,55 @@ function applyBatchColors() {
         const raw = el.textContent.replace(/\./g, '').replace(',', '.');
         const val = parseFloat(raw) || 0;
 
+        // Buat atau update elemen keterangan selisih
+        let diffEl = document.getElementById(b.labelId);
+        if (!diffEl) {
+            diffEl = document.createElement('div');
+            diffEl.id = b.labelId;
+            diffEl.style.cssText = 'font-size:0.72em; font-weight:700; margin-top:6px; padding:3px 10px; border-radius:20px; display:inline-block; letter-spacing:0.5px;';
+            el.parentNode.appendChild(diffEl);
+        }
+
         if (isSingleDate && b.target > 0) {
+            const diff = val - b.target;
+            const diffFixed = Math.abs(diff).toFixed(1);
+            const sign = diff > 0 ? '+' : diff < 0 ? '-' : '';
+            const diffText = `${sign}${diffFixed} CBM dari Target (${b.target})`;
+
+            diffEl.style.display = 'inline-block';
+
             if (val > b.target) {
-                // MERAH - di atas target
-                card.style.background    = 'linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)';
-                card.style.borderBottom  = '4px solid #991b1b';
-                card.style.boxShadow     = '0 0 12px rgba(220,38,38,0.4)';
-                card.style.color         = '';
+                card.style.background   = 'linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)';
+                card.style.borderBottom = '4px solid #991b1b';
+                card.style.boxShadow    = '0 0 12px rgba(220,38,38,0.4)';
+                card.style.color        = '';
+                diffEl.textContent      = diffText;
+                diffEl.style.background = 'rgba(255,255,255,0.2)';
+                diffEl.style.color      = '#fff';
             } else if (val === b.target) {
-                // KUNING - sama dengan target
-                card.style.background    = 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)';
-                card.style.borderBottom  = '4px solid #b8860b';
-                card.style.boxShadow     = '0 0 12px rgba(255,215,0,0.4)';
-                card.style.color         = '#000';
+                card.style.background   = 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)';
+                card.style.borderBottom = '4px solid #b8860b';
+                card.style.boxShadow    = '0 0 12px rgba(255,215,0,0.4)';
+                card.style.color        = '#000';
+                diffEl.textContent      = '± 0 CBM (Tepat Target)';
+                diffEl.style.background = 'rgba(0,0,0,0.15)';
+                diffEl.style.color      = '#000';
             } else {
-                // HIJAU - di bawah target
-                card.style.background    = 'linear-gradient(135deg, #1a5c2a 0%, #2d9144 100%)';
-                card.style.borderBottom  = '4px solid #15803d';
-                card.style.boxShadow     = '0 0 12px rgba(45,145,68,0.4)';
-                card.style.color         = '';
+                card.style.background   = 'linear-gradient(135deg, #1a5c2a 0%, #2d9144 100%)';
+                card.style.borderBottom = '4px solid #15803d';
+                card.style.boxShadow    = '0 0 12px rgba(45,145,68,0.4)';
+                card.style.color        = '';
+                diffEl.textContent      = diffText;
+                diffEl.style.background = 'rgba(255,255,255,0.2)';
+                diffEl.style.color      = '#fff';
             }
         } else {
-            // RESET ke abu-abu default (saat tanggal tidak dipilih tunggal)
-            card.style.background    = 'linear-gradient(135deg, #4b5563 0%, #1f2937 100%)';
-            card.style.borderBottom  = '4px solid #111827';
-            card.style.boxShadow     = '';
-            card.style.color         = '';
+            // RESET ke abu-abu default
+            card.style.background   = 'linear-gradient(135deg, #4b5563 0%, #1f2937 100%)';
+            card.style.borderBottom = '4px solid #111827';
+            card.style.boxShadow    = '';
+            card.style.color        = '';
+            if (diffEl) diffEl.style.display = 'none';
         }
     });
 }
