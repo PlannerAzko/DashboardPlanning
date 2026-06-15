@@ -2884,7 +2884,7 @@
             </div>
 
             <!-- KPI Cards Row -->
-            <div class="vendor-kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px;">
+            <div class="vendor-kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 15px; margin-bottom: 20px;">
                 <!-- KPI 1 -->
                 <div class="vendor-kpi-card" style="background: #242424; border: 1px solid #3d3d3d; border-radius: 6px; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                     <div>
@@ -2921,17 +2921,28 @@
                 <!-- KPI 4 -->
                 <div class="vendor-kpi-card" style="background: #242424; border: 1px solid #3d3d3d; border-radius: 6px; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                     <div>
-                        <div style="font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px;">Total Delayed LC</div>
-                        <div id="kpi-delayed-lc" style="font-size: 1.8em; font-weight: bold; color: #f87171; margin-top: 5px;">0</div>
-                        <div style="font-size: 0.7em; color: #888; margin-top: 2px;">Requires Dispatch Follow-up</div>
+                        <div style="font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px;">Delayed Support LC</div>
+                        <div id="kpi-delayed-lc" style="font-size: 1.8em; font-weight: bold; color: #ff9f43; margin-top: 5px;">0</div>
+                        <div style="font-size: 0.7em; color: #888; margin-top: 2px;">Delayed Admin Support</div>
                     </div>
-                    <div style="background: rgba(248, 113, 113, 0.1); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(248, 113, 113, 0.2);">
-                        <i class="fas fa-exclamation-triangle" style="color: #f87171; font-size: 1.2em;"></i>
+                    <div style="background: rgba(255, 159, 67, 0.1); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 159, 67, 0.2);">
+                        <i class="fas fa-clock" style="color: #ff9f43; font-size: 1.2em;"></i>
+                    </div>
+                </div>
+                <!-- KPI 5 -->
+                <div class="vendor-kpi-card" style="background: #242424; border: 1px solid #3d3d3d; border-radius: 6px; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                    <div>
+                        <div style="font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px;">Terlambat LC</div>
+                        <div id="kpi-terlambat-lc" style="font-size: 1.8em; font-weight: bold; color: #ef4444; margin-top: 5px;">0</div>
+                        <div style="font-size: 0.7em; color: #888; margin-top: 2px;">Requires Dispatch Followup</div>
+                    </div>
+                    <div style="background: rgba(239, 68, 68, 0.1); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(239, 68, 68, 0.2);">
+                        <i class="fas fa-exclamation-triangle" style="color: #ef4444; font-size: 1.2em;"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="chart-body" style="height: 320px; position: relative;">
+            <div class="chart-body" style="height: 380px; position: relative;">
                 <canvas id="dailyVendorPerfChart"></canvas>
             </div>
         </div>
@@ -2951,14 +2962,80 @@
                 </div>
                 
                 <!-- Percentage Breakdown Charts -->
-                <div class="chart-container">
-                    <div class="table-header" style="color: #ffd700;">
+                <div class="chart-container" style="background: #1e1e1e; border: 1px solid #333; border-radius: 6px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                    <div class="table-header" style="color: #ffd700; font-size: 1.15em; font-weight: bold; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px;">
                         <i class="fas fa-percentage"></i> PERCENTAGE BREAKDOWN
                     </div>
-                    <div class="chart-body" style="height: 280px;">
-                        <canvas id="vendorResponseChart"></canvas>
+                    
+                    <!-- Delay Metrics Info Cards -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                        <div style="background: #141414; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; text-align: center; border-left: 4px solid #ff9f43; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
+                            <div style="font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">Rerata Terlambat</div>
+                            <div id="average-delay-hours" style="font-size: 1.6em; font-weight: bold; color: #ff9f43; text-shadow: 0 0 5px rgba(255,159,67,0.3);">0 Jam</div>
+                        </div>
+                        <div style="background: #141414; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; text-align: center; border-left: 4px solid #ef4444; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
+                            <div style="font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">Terlambat Terlama</div>
+                            <div id="max-delay-hours" style="font-size: 1.6em; font-weight: bold; color: #ef4444; text-shadow: 0 0 5px rgba(239,68,68,0.3);">0 Jam</div>
+                        </div>
                     </div>
-                    <div class="chart-body" style="height: 280px; border-top: 1px solid #333;">
+
+                    <!-- Side-by-side visual & mini-table breakdown layout -->
+                    <div style="background: rgba(0,0,0,0.25); border-radius: 6px; padding: 15px; margin-bottom: 20px; border: 1px solid #2d2d2d; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: center;">
+                        <!-- Left: Thicker, more professional circular Doughnut Chart with center percentage overlay -->
+                        <div style="flex: 1; min-width: 180px; height: 180px; position: relative; display: flex; justify-content: center; align-items: center;">
+                            <canvas id="vendorResponseChart" style="max-height: 100%; max-width: 100%;"></canvas>
+                            <div style="position: absolute; pointer-events: none; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                <div id="doughnut-center-pct" style="font-size: 1.85em; font-weight: 850; color: #10b981; line-height: 1; text-shadow: 0 0 10px rgba(16,185,129,0.3);">0%</div>
+                                <div style="font-size: 0.6em; color: #888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; margin-top: 4px;">ON TIME</div>
+                            </div>
+                        </div>
+                        <!-- Right: Professional mini-table analytic panel to make the container "berisi" -->
+                        <div style="flex: 1.25; min-width: 220px;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.85em; text-align: left; color: #fff;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid #333; color: #888; font-size: 0.8em; text-transform: uppercase; font-weight: bold;">
+                                        <th style="padding: 6px 4px;">REKAP PROGRESS</th>
+                                        <th style="padding: 6px 4px; text-align: right;">TOTAL DETAIL</th>
+                                        <th style="padding: 6px 4px; text-align: right;">PERSENTASE</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid #1f1f1f;">
+                                        <td style="padding: 8px 4px; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #ddd;">
+                                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.5);"></span>
+                                            On Time
+                                        </td>
+                                        <td id="breakdown-ontime-count" style="padding: 8px 4px; text-align: right; color: #10b981; font-weight: bold; font-family: monospace; font-size: 1.1em;">0</td>
+                                        <td id="breakdown-ontime-pct" style="padding: 8px 4px; text-align: right; color: #fff; font-weight: bold; font-size: 1.1em;">0%</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #1f1f1f;">
+                                        <td style="padding: 8px 4px; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #ddd;">
+                                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.5);"></span>
+                                            Terlambat
+                                        </td>
+                                        <td id="breakdown-terlambat-count" style="padding: 8px 4px; text-align: right; color: #ef4444; font-weight: bold; font-family: monospace; font-size: 1.1em;">0</td>
+                                        <td id="breakdown-terlambat-pct" style="padding: 8px 4px; text-align: right; color: #fff; font-weight: bold; font-size: 1.1em;">0%</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #1f1f1f;">
+                                        <td style="padding: 8px 4px; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #ddd;">
+                                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ff9f43; box-shadow: 0 0 8px rgba(255,159,67,0.5);"></span>
+                                            Delay Support
+                                        </td>
+                                        <td id="breakdown-support-count" style="padding: 8px 4px; text-align: right; color: #ff9f43; font-weight: bold; font-family: monospace; font-size: 1.1em;">0</td>
+                                        <td id="breakdown-support-pct" style="padding: 8px 4px; text-align: right; color: #fff; font-weight: bold; font-size: 1.1em;">0%</td>
+                                    </tr>
+                                    <tr style="font-weight: bold; background: rgba(255,215,0,0.04);">
+                                        <td style="padding: 10px 4px; color: #ffd700;">
+                                            TOTAL LC
+                                        </td>
+                                        <td id="breakdown-total-count" style="padding: 10px 4px; text-align: right; color: #ffd700; font-family: monospace; font-size: 1.15em;">0</td>
+                                        <td style="padding: 10px 4px; text-align: right; color: #ffd700; font-size: 1.15em;">100%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="chart-body" style="height: 280px; border-top: 1px solid #333; padding-top: 15px;">
                         <canvas id="agingTerlambatChart"></canvas>
                     </div>
                 </div>
@@ -2993,25 +3070,25 @@
             
             <!-- Table: DELIVERY DELAY AGING PER CARRIER -->
             <div id="carrier-aging-container" style="margin-top: 40px; margin-bottom: 30px; border-bottom: 2px solid #333;">
-                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em;">
+                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 1.1em;">
                     <i class="fas fa-history" style="margin-right: 10px; color: #ffd700;"></i> DELIVERY DELAY AGING PER CARRIER
                 </div>
                 <div class="table-content-large" style="overflow-x: auto; background: #1a1a1a; padding: 0;">
-                    <table class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em; background: #1a1a1a; color: #fff;">
+                    <table class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 1.15em; background: #1a1a1a; color: #fff;">
                         <thead>
                             <tr class="nested-header">
-                                <th rowspan="2" style="width: 50px; background: #1a1a1a; border-right: 1px solid #333; text-align: center;">NO</th>
-                                <th rowspan="2" style="width: 250px; background: #1a1a1a; text-align: left; padding-left: 20px; border-right: 1px solid #333;">CARRIER</th>
-                                <th colspan="6" style="background: #006994; color: #fff; font-weight: bold; border-right: 1px solid #333; text-align: center;">AGING DELAY</th>
-                                <th rowspan="2" style="width: 120px; background: #8b0000; color: #fff; font-weight: bold; text-align: center;">TOTAL DELAY <i class="fas fa-sort-down"></i></th>
+                                <th rowspan="2" style="width: 50px; background: #1a1a1a; border-right: 1px solid #333; text-align: center; font-size: 1.15em; padding: 12px 10px;">NO</th>
+                                <th rowspan="2" style="width: 250px; background: #1a1a1a; text-align: left; padding: 12px 20px; border-right: 1px solid #333; font-size: 1.15em;">CARRIER</th>
+                                <th colspan="6" style="background: #006994; color: #fff; font-weight: bold; border-right: 1px solid #333; text-align: center; font-size: 1.15em; padding: 12px 10px;">AGING DELAY</th>
+                                <th rowspan="2" style="width: 120px; background: #8b0000; color: #fff; font-weight: bold; text-align: center; font-size: 1.15em; padding: 12px 10px;">TOTAL DELAY <i class="fas fa-sort-down"></i></th>
                             </tr>
                             <tr class="sub-header">
-                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center;">1</th>
-                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center;">2</th>
-                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center;">3</th>
-                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center;">4</th>
-                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center;">5</th>
-                                <th style="background: #111; color: #00a8e8; width: 80px; border-right: 1px solid #333; text-align: center;">5 UP</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">1th</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">2nd</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">3rd</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">4th</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">5th</th>
+                                <th style="background: #111; color: #00a8e8; width: 80px; border-right: 1px solid #333; text-align: center; font-size: 1.05em; padding: 8px 10px;">5 UP</th>
                             </tr>
                         </thead>
                         <tbody id="carrier-aging-body">
@@ -3026,27 +3103,30 @@
 
             <!-- Table: Vendor Performance % -->
             <div id="vendor-performance-container" style="margin-bottom: 30px; border-bottom: 2px solid #333;">
-                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 0.9em;">
+                <div class="table-header" style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%); border-left: 4px solid #ffd700; color: #ffd700; padding: 15px 20px; font-weight: bold; text-transform: uppercase; font-size: 1.1em;">
                     <i class="fas fa-medal" style="margin-right: 10px; color: #ffd700;"></i> VENDOR PERFORMANCE %
                 </div>
                 <div class="table-content-large" style="overflow-x: auto; background: #1a1a1a; padding: 0;">
-                    <table class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 0.85em; background: #1a1a1a; color: #fff;">
+                    <table class="pivot-table" style="width: 100%; border-collapse: collapse; font-size: 1.15em; background: #1a1a1a; color: #fff;">
                         <thead>
                             <tr style="background: #222;">
-                                <th style="width: 50px; text-align: center; border: 1px solid #333; padding: 10px;">NO</th>
-                                <th onclick="sortVendorPerformance('carrier')" style="text-align: left; padding: 10px 20px; border: 1px solid #333; cursor: pointer; position: relative;">
+                                <th style="width: 50px; text-align: center; border: 1px solid #333; padding: 12px;">NO</th>
+                                <th onclick="sortVendorPerformance('carrier')" style="text-align: left; padding: 12px 20px; border: 1px solid #333; cursor: pointer; position: relative;">
                                     CARRIER <i class="fas fa-sort" style="font-size: 0.8em; margin-left: 5px; opacity: 0.5;"></i>
                                 </th>
-                                <th onclick="sortVendorPerformance('onTime')" style="width: 100px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative;">
+                                <th onclick="sortVendorPerformance('onTime')" style="width: 120px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative;">
                                     ON TIME <i class="fas fa-sort" style="font-size: 0.8em; margin-left: 5px; opacity: 0.5;"></i>
                                 </th>
-                                <th onclick="sortVendorPerformance('terlambat')" style="width: 150px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative;">
+                                <th onclick="sortVendorPerformance('terlambat')" style="width: 140px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative;">
+                                    TERLAMBAT <i class="fas fa-sort" style="font-size: 0.8em; margin-left: 5px; opacity: 0.5;"></i>
+                                </th>
+                                <th onclick="sortVendorPerformance('belumSupport')" style="width: 180px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative;">
                                     DELAYED SUPPORT <i class="fas fa-sort" style="font-size: 0.8em; margin-left: 5px; opacity: 0.5;"></i>
                                 </th>
-                                <th onclick="sortVendorPerformance('total')" style="width: 100px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative;">
+                                <th onclick="sortVendorPerformance('total')" style="width: 120px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative;">
                                     TOTAL <i class="fas fa-sort" style="font-size: 0.8em; margin-left: 5px; opacity: 0.5;"></i>
                                 </th>
-                                <th onclick="sortVendorPerformance('achievement')" style="width: 150px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative; color: #ffd700;">
+                                <th onclick="sortVendorPerformance('achievement')" style="width: 180px; text-align: center; border: 1px solid #333; cursor: pointer; position: relative; color: #ffd700;">
                                     ACHIEVEMENT % <i class="fas fa-sort" style="font-size: 0.8em; margin-left: 5px; opacity: 0.8;"></i>
                                 </th>
                             </tr>
@@ -8127,8 +8207,14 @@ function renderStoringPivotTable(filteredData) {
                 if (row.AT) regionalSet.add(row.AT);
                 if (row.AS) areaSet.add(row.AS);
                 if (row.G) typeArmadaSet.add(row.G);
-                if (row.AV) ketVendorSet.add(row.AV);
+                if (row.AV) {
+                    const avStr = row.AV.trim().toUpperCase();
+                    if (avStr && avStr !== '-') {
+                        ketVendorSet.add(avStr);
+                    }
+                }
             });
+            ketVendorSet.add('TERLAMBAT');
 
             // FBI Mode: Extra months from SLA FBI Sheet
             if (document.body.classList.contains('theme-purple') && rawSlaFbiData.length > 2) {
@@ -8471,16 +8557,16 @@ function updateDashboard() {
                 const data = carrierData[carrier];
                 html += `
                     <tr style="border-bottom: 1px solid #222;">
-                        <td style="text-align: center; color: #555; background: #151515;">${idx + 1}</td>
+                        <td style="text-align: center; color: #555; background: #151515; padding: 12px 10px;">${idx + 1}</td>
                         <td style="padding: 12px 20px; font-weight: 500;">${carrier}</td>
-                        <td style="text-align: center; color: #00a8e8;">${data[1] || '-'}</td>
-                        <td style="text-align: center; color: #00a8e8;">${data[2] || '-'}</td>
-                        <td style="text-align: center; color: #00a8e8;">${data[3] || '-'}</td>
-                        <td style="text-align: center; color: #00a8e8;">${data[4] || '-'}</td>
-                        <td style="text-align: center; color: #00a8e8;">${data[5] || '-'}</td>
-                        <td style="text-align: center; color: #00a8e8; border-right: 1px solid #333;">${data['5UP'] || '-'}</td>
-                        <td style="text-align: center; padding: 8px;">
-                            <span style="background: #8b0000; color: #fff; padding: 3px 10px; border-radius: 4px; font-weight: bold; display: inline-block; min-width: 35px;">
+                        <td style="text-align: center; color: #00a8e8; padding: 12px 10px;">${data[1] || '-'}</td>
+                        <td style="text-align: center; color: #00a8e8; padding: 12px 10px;">${data[2] || '-'}</td>
+                        <td style="text-align: center; color: #00a8e8; padding: 12px 10px;">${data[3] || '-'}</td>
+                        <td style="text-align: center; color: #00a8e8; padding: 12px 10px;">${data[4] || '-'}</td>
+                        <td style="text-align: center; color: #00a8e8; padding: 12px 10px;">${data[5] || '-'}</td>
+                        <td style="text-align: center; color: #00a8e8; border-right: 1px solid #333; padding: 12px 10px;">${data['5UP'] || '-'}</td>
+                        <td style="text-align: center; padding: 12px 10px;">
+                            <span style="background: #8b0000; color: #fff; padding: 5px 12px; border-radius: 4px; font-weight: bold; display: inline-block; min-width: 35px;">
                                 ${data.total}
                             </span>
                         </td>
@@ -8495,14 +8581,14 @@ function updateDashboard() {
             let footerHtml = `
                 <tr style="background: #111; font-weight: bold; border-top: 2px solid #8b0000;">
                     <td colspan="2" style="color: #ffd700; text-align: left; padding: 15px 20px;">TOTAL</td>
-                    <td style="text-align: center; color: #ffd700;">${totals[1] || '-'}</td>
-                    <td style="text-align: center; color: #ffd700;">${totals[2] || '-'}</td>
-                    <td style="text-align: center; color: #ffd700;">${totals[3] || '-'}</td>
-                    <td style="text-align: center; color: #ffd700;">${totals[4] || '-'}</td>
-                    <td style="text-align: center; color: #ffd700;">${totals[5] || '-'}</td>
-                    <td style="text-align: center; color: #ffd700; border-right: 1px solid #333;">${totals['5UP'] || '-'}</td>
-                    <td style="text-align: center;">
-                        <span style="background: #8b0000; color: #fff; padding: 5px 12px; border-radius: 4px; display: inline-block; min-width: 45px;">
+                    <td style="text-align: center; color: #ffd700; padding: 12px 10px;">${totals[1] || '-'}</td>
+                    <td style="text-align: center; color: #ffd700; padding: 12px 10px;">${totals[2] || '-'}</td>
+                    <td style="text-align: center; color: #ffd700; padding: 12px 10px;">${totals[3] || '-'}</td>
+                    <td style="text-align: center; color: #ffd700; padding: 12px 10px;">${totals[4] || '-'}</td>
+                    <td style="text-align: center; color: #ffd700; padding: 12px 10px;">${totals[5] || '-'}</td>
+                    <td style="text-align: center; color: #ffd700; border-right: 1px solid #333; padding: 12px 10px;">${totals['5UP'] || '-'}</td>
+                    <td style="text-align: center; padding: 12px 10px;">
+                        <span style="background: #8b0000; color: #fff; padding: 6px 14px; border-radius: 4px; display: inline-block; min-width: 45px;">
                             ${totals.grand}
                         </span>
                     </td>
@@ -8528,6 +8614,7 @@ function updateDashboard() {
             const perfData = {};
             let grandOnTime = 0;
             let grandTerlambat = 0;
+            let grandBelumSupport = 0;
             let grandTotal = 0;
             const excludedCarriers = ['1D-INTERNAL (SDA)', 'AHI', 'DUMMY-LK-EKSP', 'DUMMY'];
 
@@ -8550,10 +8637,15 @@ function updateDashboard() {
                 }
 
                 if (!perfData[carrier]) {
-                    perfData[carrier] = { carrier: carrier, onTime: 0, terlambat: 0, total: 0, achievement: 0 };
+                    perfData[carrier] = { carrier: carrier, onTime: 0, terlambat: 0, belumSupport: 0, total: 0, achievement: 0 };
                 }
 
                 if (isBelumSpt) {
+                    perfData[carrier].belumSupport++;
+                    grandBelumSupport++;
+                    perfData[carrier].total++;
+                    grandTotal++;
+                } else if (isTerlambat(row)) {
                     perfData[carrier].terlambat++;
                     grandTerlambat++;
                     perfData[carrier].total++;
@@ -8602,7 +8694,8 @@ function updateDashboard() {
                         <td style="text-align: center; color: #555; background: #151515; border: 1px solid #222;">${idx + 1}</td>
                         <td style="padding: 10px 20px; font-weight: 500; border: 1px solid #222;">${d.carrier}</td>
                         <td style="text-align: center; border: 1px solid #222; color: #00ff00;">${d.onTime}</td>
-                        <td style="text-align: center; border: 1px solid #222; color: #ff3e3e;">${d.terlambat}</td>
+                        <td style="text-align: center; border: 1px solid #222; color: #ef4444;">${d.terlambat}</td>
+                        <td style="text-align: center; border: 1px solid #222; color: #ff9f43;">${d.belumSupport}</td>
                         <td style="text-align: center; border: 1px solid #222; font-weight: bold;">${d.total}</td>
                         <td style="text-align: center; border: 1px solid #222; font-weight: bold; color: #ffd700;">${achievementFormatted}</td>
                     </tr>
@@ -8610,7 +8703,7 @@ function updateDashboard() {
             });
 
             const body = document.getElementById('vendor-performance-body');
-            if (body) body.innerHTML = html || '<tr><td colspan="6" style="text-align:center; padding:20px; color:#666;">Tidak ada data performa</td></tr>';
+            if (body) body.innerHTML = html || '<tr><td colspan="7" style="text-align:center; padding:20px; color:#666;">Tidak ada data performa</td></tr>';
 
             // Grand Total
             const grandAchievement = grandTotal > 0 ? (grandOnTime / grandTotal * 100).toFixed(2) + '%' : '0.00%';
@@ -8618,7 +8711,8 @@ function updateDashboard() {
                 <tr style="background: #111; font-weight: bold; border-top: 2px solid #ffd700;">
                     <td colspan="2" style="padding: 12px 20px; color: #ffd700;">GRAND TOTAL</td>
                     <td style="text-align: center; color: #00ff00; border: 1px solid #222;">${grandOnTime}</td>
-                    <td style="text-align: center; color: #ff3e3e; border: 1px solid #222;">${grandTerlambat}</td>
+                    <td style="text-align: center; color: #ef4444; border: 1px solid #222;">${grandTerlambat}</td>
+                    <td style="text-align: center; color: #ff9f43; border: 1px solid #222;">${grandBelumSupport}</td>
                     <td style="text-align: center; border: 1px solid #222;">${grandTotal}</td>
                     <td style="text-align: center; color: #ffd700; border: 1px solid #222;">${grandAchievement}</td>
                 </tr>
@@ -9281,6 +9375,10 @@ function updateDashboard() {
             let totalTerlambat = 0;
             let totalBelumSupport = 0;
             
+            let totalDelayHoursForAvg = 0;
+            let delayCountForAvg = 0;
+            let maxDelayHoursVal = 0;
+            
             const agingGroups = {
                 '1 Hari': 0,
                 '2 Hari': 0,
@@ -9309,7 +9407,19 @@ function updateDashboard() {
 
                 // --- APPLY EXTRA FILTERS ---
                 const matchType = selectedFilters.typeArmada.length === 0 || selectedFilters.typeArmada.includes(typeArmada);
-                const matchKet = selectedFilters.ketVendor.length === 0 || selectedFilters.ketVendor.includes(ketVendor);
+                
+                let matchKet = false;
+                if (selectedFilters.ketVendor.length === 0) {
+                    matchKet = true;
+                } else {
+                    const rowAVUpper = (row.AV || '').trim().toUpperCase();
+                    if (selectedFilters.ketVendor.includes('TERLAMBAT') && isTerlambat(row)) {
+                        matchKet = true;
+                    }
+                    if (selectedFilters.ketVendor.includes(rowAVUpper)) {
+                        matchKet = true;
+                    }
+                }
                 
                 let agingLabel = '';
                 if (aging === 1) agingLabel = '1 Hari';
@@ -9360,6 +9470,27 @@ function updateDashboard() {
                     delayedList.push(row);
                     
                     totalTerlambat++;
+
+                    // Calculate delay stats in hours
+                    const hours = getDelayHours(row);
+                    if (hours > 0) {
+                        totalDelayHoursForAvg += hours;
+                        delayCountForAvg++;
+                        if (hours > maxDelayHoursVal) {
+                            maxDelayHoursVal = hours;
+                        }
+                    } else {
+                        // Fallback using aging to days * 24
+                        const agingDays = parseInt(row.AW) || 0;
+                        if (agingDays > 0) {
+                            const hoursFallback = agingDays * 24;
+                            totalDelayHoursForAvg += hoursFallback;
+                            delayCountForAvg++;
+                            if (hoursFallback > maxDelayHoursVal) {
+                                maxDelayHoursVal = hoursFallback;
+                            }
+                        }
+                    }
                 } else {
                     // Skip tomorrow's/future (H+1) on time records
                     const isVendor = isVendorActive();
@@ -9376,6 +9507,13 @@ function updateDashboard() {
                     cityStats[kotaSummary].otQty++;
                 }
             });
+
+            // Calculate delay statistics text
+            const avgDelayHours = delayCountForAvg > 0 ? Math.round(totalDelayHoursForAvg / delayCountForAvg) : 0;
+            const avgDelayEl = document.getElementById('average-delay-hours');
+            const maxDelayEl = document.getElementById('max-delay-hours');
+            if (avgDelayEl) avgDelayEl.textContent = avgDelayHours + ' Jam';
+            if (maxDelayEl) maxDelayEl.textContent = maxDelayHoursVal + ' Jam';
 
             // Sort lists based on state
             sortDataList(unsupportedList, unsupportedSort.key, unsupportedSort.dir);
@@ -9415,11 +9553,12 @@ function updateDashboard() {
                 if (!dateVal || dateVal === '-' || dateVal === '0') return;
 
                 if (!dailyAgg[dateVal]) {
-                    dailyAgg[dateVal] = { date: dateVal, onTime: 0, terlambat: 0, total: 0 };
+                    dailyAgg[dateVal] = { date: dateVal, onTime: 0, terlambat: 0, belumSupport: 0, total: 0 };
                 }
 
-                const isBelumSpt = isBelumSupport(row);
-                if (isBelumSpt) {
+                if (isBelumSupport(row)) {
+                    dailyAgg[dateVal].belumSupport++;
+                } else if (isTerlambat(row)) {
                     dailyAgg[dateVal].terlambat++;
                 } else {
                     dailyAgg[dateVal].onTime++;
@@ -9460,19 +9599,22 @@ function updateDashboard() {
 
             const achievementData = [];
             const delayedData = [];
+            const terlambatData = [];
             const onTimeData = [];
 
             sortedDates.forEach(date => {
                 const agg = dailyAgg[date];
                 const achievement = agg.total > 0 ? parseFloat(((agg.onTime / agg.total) * 100).toFixed(1)) : 0;
                 achievementData.push(achievement);
-                delayedData.push(agg.terlambat);
+                delayedData.push(agg.belumSupport || 0);
+                terlambatData.push(agg.terlambat || 0);
                 onTimeData.push(agg.onTime);
             });
 
             let kpiTotalLCVal = 0;
             let kpiOnTimeLCVal = 0;
             let kpiDelayedLCVal = 0;
+            let kpiTerlambatLCVal = 0;
 
             dataForTrend.forEach(row => {
                 const carrier = (row.D || '').trim();
@@ -9482,9 +9624,11 @@ function updateDashboard() {
                 const carrierUpper = carrier.toUpperCase();
                 if (excludedCarriers.includes(carrierUpper) || carrierUpper.includes('DUMMY')) return;
 
-                const isBelumSpt = isBelumSupport(row);
-                if (isBelumSpt) {
+                if (isBelumSupport(row)) {
                     kpiDelayedLCVal++;
+                    kpiTotalLCVal++;
+                } else if (isTerlambat(row)) {
+                    kpiTerlambatLCVal++;
                     kpiTotalLCVal++;
                 } else {
                     const dateVal = isVendor ? (row.AU || '').trim() : (row.AO || '').trim();
@@ -9502,6 +9646,7 @@ function updateDashboard() {
             const kpiTotalLcEl = document.getElementById('kpi-total-lc');
             const kpiOnTimeLcEl = document.getElementById('kpi-ontime-lc');
             const kpiDelayedLcEl = document.getElementById('kpi-delayed-lc');
+            const kpiTerlambatLcEl = document.getElementById('kpi-terlambat-lc');
 
             const kpiSupportingPercentVal = kpiTotalLCVal > 0 
                 ? (kpiOnTimeLCVal / kpiTotalLCVal * 100).toFixed(1) + '%' 
@@ -9511,6 +9656,7 @@ function updateDashboard() {
             if (kpiTotalLcEl) kpiTotalLcEl.textContent = kpiTotalLCVal.toLocaleString('id-ID') + ' LC';
             if (kpiOnTimeLcEl) kpiOnTimeLcEl.textContent = kpiOnTimeLCVal.toLocaleString('id-ID') + ' LC';
             if (kpiDelayedLcEl) kpiDelayedLcEl.textContent = kpiDelayedLCVal.toLocaleString('id-ID') + ' LC';
+            if (kpiTerlambatLcEl) kpiTerlambatLcEl.textContent = kpiTerlambatLCVal.toLocaleString('id-ID') + ' LC';
 
             // Update disclaimer message text based on active tab
             const disclaimerEl = document.getElementById('trend-disclaimer');
@@ -9530,15 +9676,11 @@ function updateDashboard() {
 
             // If no data, display a clean clear empty chart
             if (sortedDates.length === 0) {
-                const kpiSupportingPercentEl = document.getElementById('kpi-supporting-percent');
-                const kpiTotalLcEl = document.getElementById('kpi-total-lc');
-                const kpiOnTimeLcEl = document.getElementById('kpi-ontime-lc');
-                const kpiDelayedLcEl = document.getElementById('kpi-delayed-lc');
-
                 if (kpiSupportingPercentEl) kpiSupportingPercentEl.textContent = '0.0%';
                 if (kpiTotalLcEl) kpiTotalLcEl.textContent = '0 LC';
                 if (kpiOnTimeLcEl) kpiOnTimeLcEl.textContent = '0 LC';
                 if (kpiDelayedLcEl) kpiDelayedLcEl.textContent = '0 LC';
+                if (kpiTerlambatLcEl) kpiTerlambatLcEl.textContent = '0 LC';
 
                 dailyVendorPerfChart = new Chart(ctx, {
                     type: 'bar',
@@ -9576,7 +9718,7 @@ function updateDashboard() {
                                 align: 'top',
                                 anchor: 'end',
                                 color: '#ffd700',
-                                font: { size: 9, weight: 'bold' },
+                                font: { size: 12, weight: 'bold' },
                                 formatter: (val) => val + '%'
                             }
                         },
@@ -9592,9 +9734,19 @@ function updateDashboard() {
                         },
                         {
                             type: 'bar',
+                            label: 'TERLAMBAT (LC)',
+                            data: terlambatData,
+                            backgroundColor: '#ef4444', // Red
+                            yAxisID: 'yCount',
+                            stack: 'count',
+                            borderRadius: 4,
+                            datalabels: { display: false }
+                        },
+                        {
+                            type: 'bar',
                             label: 'DELAYED SUPPORT (LC)',
                             data: delayedData,
-                            backgroundColor: '#d32f2f', // Match delayed/error color
+                            backgroundColor: '#ff9f43', // Match orange/amber color
                             yAxisID: 'yCount',
                             stack: 'count',
                             borderRadius: 4,
@@ -9618,7 +9770,7 @@ function updateDashboard() {
                             position: 'top',
                             labels: {
                                 color: '#eee',
-                                font: { size: 10 },
+                                font: { size: 13, weight: 'bold' },
                                 padding: 15 // Jarak legenda terhadap grafik
                             }
                         },
@@ -9641,10 +9793,14 @@ function updateDashboard() {
                                 display: true,
                                 text: 'Jumlah LC',
                                 color: '#aaa',
-                                font: { size: 11, weight: 'bold' }
+                                font: { size: 13, weight: 'bold' }
                             },
                             grid: { color: '#2a2a2a' },
-                            ticks: { color: '#aaa', precision: 0 }
+                            ticks: { 
+                                color: '#aaa', 
+                                precision: 0,
+                                font: { size: 11, weight: 'bold' }
+                            }
                         },
                         yPercent: {
                             type: 'linear',
@@ -9655,20 +9811,20 @@ function updateDashboard() {
                                 display: true,
                                 text: 'Achievement %',
                                 color: '#ffd700',
-                                font: { size: 11, weight: 'bold' }
+                                font: { size: 13, weight: 'bold' }
                             },
                             grid: { drawOnChartArea: false }, // avoid overlapping horizontal grids
                             ticks: { 
                                 color: '#ffd700', 
                                 callback: (value) => value <= 100 ? value + '%' : '', // Sembunyikan label di atas 100% agar tetap rapi
-                                font: { size: 9 }
+                                font: { size: 11, weight: 'bold' }
                             }
                         },
                         x: {
                             grid: { display: false },
                             ticks: { 
                                 color: '#aaa', 
-                                font: { size: 9 },
+                                font: { size: 11, weight: 'bold' },
                                 maxRotation: 45,
                                 minRotation: 0
                             }
@@ -9832,36 +9988,55 @@ function updateDashboard() {
             const pTerlambat = total ? (terlambat / total * 100).toFixed(0) : 0;
             const pBelumSupport = total ? (belumSupport / total * 100).toFixed(0) : 0;
 
-            // Vendor Response Chart
+            // Dynamically populate mini analytical table text elements
+            const bdOnTimeCount = document.getElementById('breakdown-ontime-count');
+            const bdOnTimePct = document.getElementById('breakdown-ontime-pct');
+            const bdTerlambatCount = document.getElementById('breakdown-terlambat-count');
+            const bdTerlambatPct = document.getElementById('breakdown-terlambat-pct');
+            const bdSupportCount = document.getElementById('breakdown-support-count');
+            const bdSupportPct = document.getElementById('breakdown-support-pct');
+            const bdTotalCount = document.getElementById('breakdown-total-count');
+            const centerPct = document.getElementById('doughnut-center-pct');
+
+            if (bdOnTimeCount) bdOnTimeCount.textContent = onTime.toLocaleString('id-ID');
+            if (bdOnTimePct) bdOnTimePct.textContent = pOnTime + '%';
+            if (bdTerlambatCount) bdTerlambatCount.textContent = terlambat.toLocaleString('id-ID');
+            if (bdTerlambatPct) bdTerlambatPct.textContent = pTerlambat + '%';
+            if (bdSupportCount) bdSupportCount.textContent = belumSupport.toLocaleString('id-ID');
+            if (bdSupportPct) bdSupportPct.textContent = pBelumSupport + '%';
+            if (bdTotalCount) bdTotalCount.textContent = total.toLocaleString('id-ID');
+            if (centerPct) centerPct.textContent = pOnTime + '%';
+
+            // Vendor Response Chart (Doughnut)
             const vrCtx = document.getElementById('vendorResponseChart').getContext('2d');
             if (vendorResponseChart) vendorResponseChart.destroy();
             vendorResponseChart = new Chart(vrCtx, {
-                type: 'bar',
+                type: 'doughnut',
                 data: {
-                    labels: ['TERLAMBAT', 'ON TIME', 'BELUM SUPPORT'],
+                    labels: ['ON TIME', 'TERLAMBAT', 'BELUM SUPPORT'],
                     datasets: [{
-                        label: 'VENDOR RESPONSE',
-                        data: [pTerlambat, pOnTime, pBelumSupport],
-                        backgroundColor: ['#d32f2f', '#3b82f6', '#555'],
-                        borderRadius: 5
+                        data: [pOnTime, pTerlambat, pBelumSupport],
+                        backgroundColor: ['#10b981', '#ef4444', '#ff9f43'],
+                        borderColor: '#1e1e1e',
+                        borderWidth: 2,
+                        hoverOffset: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     animation: false,
+                    cutout: '52%',
                     plugins: {
-                        legend: { display: false },
+                        legend: {
+                            display: false // Disabled default legend to use the beautiful side table instead
+                        },
+                        title: {
+                            display: false // Disabled default title to prevent offset centering
+                        },
                         datalabels: {
-                            anchor: 'end',
-                            align: 'top',
-                            color: '#fff',
-                            formatter: (val) => val + '%'
+                            display: false // Disabled datalabels inside doughnut slice for clean center focus
                         }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, max: 100, grid: { color: '#333' }, ticks: { color: '#aaa' } },
-                        x: { ticks: { color: '#aaa' }, grid: { display: false } }
                     }
                 }
             });
@@ -9881,7 +10056,9 @@ function updateDashboard() {
                     datasets: [{
                         label: 'BELUM SUPPORT',
                         data: agingData.map(v => totalAging ? (v / totalAging * 100).toFixed(0) : 0),
-                        backgroundColor: '#555',
+                        backgroundColor: 'rgba(255, 159, 67, 0.85)', // Matches Belum Support Orange
+                        borderColor: '#ff9f43',
+                        borderWidth: 1,
                         borderRadius: 5
                     }]
                 },
@@ -9892,11 +10069,18 @@ function updateDashboard() {
                     animation: false,
                     plugins: {
                         legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'AGING BELUM SUPPORT %',
+                            color: '#ffd700',
+                            font: { size: 13, weight: 'bold' }
+                        },
                         datalabels: {
                             anchor: 'end',
                             align: 'right',
                             color: '#fff',
-                            formatter: (val) => val + '%'
+                            font: { size: 11, weight: 'bold' },
+                            formatter: (val) => val > 0 ? val + '%' : ''
                         }
                     },
                     scales: {
