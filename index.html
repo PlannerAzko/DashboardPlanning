@@ -3531,25 +3531,58 @@
             Load Date:
         </label>
         <select id="vm-ld-filter"
-                <div style="background: #1e1e1e; border: 1px solid #333; border-top: 0; padding: 12px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-    <label style="font-size: 11px; color: #aaa; font-weight: 700; text-transform: uppercase;">Bulan:</label>
-    <div class="multi-select-container" id="vm-bulan-container" style="min-width: 150px;">
-        <div class="multi-select-display" id="vm-bulan-display">-- Semua Bulan --</div>
-        <div class="multi-select-options" id="vm-bulan-options"></div>
-    </div>
-    <label style="font-size: 11px; color: #aaa; font-weight: 700; text-transform: uppercase;">Load Date:</label>
-    <div class="multi-select-container" id="vm-ld-container" style="min-width: 180px;">
-        <div class="multi-select-display" id="vm-ld-display">-- Semua Tanggal --</div>
-        <div class="multi-select-options" id="vm-ld-options"></div>
-    </div>
-    <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
-        <div style="display: flex; gap: 6px;">
-            <button id="vm-btn-carrier" onclick="setVMView('carrier')" style="background: #b71c1c; color: #fff; border: 1px solid #d32f2f; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;">By Carrier</button>
-            <button id="vm-btn-detail" onclick="setVMView('detail')" style="background: #333; color: #aaa; border: 1px solid #444; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;">Detail</button>
+                onchange="renderKonfirmasiVM()"
+                style="background: #2a2a2a;
+                       color: #ffd700;
+                       border: 1px solid #ffd700;
+                       padding: 5px 12px;
+                       border-radius: 4px;
+                       font-size: 12px;
+                       font-weight: 600;
+                       outline: none;
+                       cursor: pointer;">
+            <option value="ALL">Semua Tanggal</option>
+        </select>
+        <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
+            <div style="display: flex; gap: 6px;">
+                <button id="vm-btn-carrier"
+                        onclick="setVMView('carrier')"
+                        style="background: #b71c1c;
+                               color: #fff;
+                               border: 1px solid #d32f2f;
+                               padding: 4px 12px;
+                               border-radius: 4px;
+                               font-size: 11px;
+                               font-weight: 700;
+                               cursor: pointer;">
+                    By Carrier
+                </button>
+                <button id="vm-btn-detail"
+                        onclick="setVMView('detail')"
+                        style="background: #333;
+                               color: #aaa;
+                               border: 1px solid #444;
+                               padding: 4px 12px;
+                               border-radius: 4px;
+                               font-size: 11px;
+                               font-weight: 700;
+                               cursor: pointer;">
+                    Detail
+                </button>
+            </div>
+            <button onclick="loadKonfirmasiVM()"
+                    style="background: #d32f2f;
+                           color: #fff;
+                           border: none;
+                           padding: 5px 14px;
+                           border-radius: 4px;
+                           font-size: 11px;
+                           font-weight: 700;
+                           cursor: pointer;">
+                <i class="fas fa-sync" style="margin-right: 5px;"></i>Refresh
+            </button>
         </div>
-        <button onclick="loadKonfirmasiVM()" style="background: #d32f2f; color: #fff; border: none; padding: 5px 14px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;"><i class="fas fa-sync" style="margin-right: 5px;"></i>Refresh</button>
     </div>
-</div>
 
     <!-- KPI CARDS -->
     <div style="display: grid;
@@ -11792,10 +11825,6 @@ function applyBatchColors() {
 let rawKonfirmasiVM = [];
 let vmCurrentView   = 'carrier';
 let vmTrendChart    = null;
-let vmSelectedBulan = [];
-let vmSelectedLD    = [];
-let vmSortCarrier   = { key: 'total', dir: 'desc' };
-let vmSortDetail    = { key: 'loadDate', dir: 'asc' };
 
 function setVMView(v) {
     vmCurrentView = v;
@@ -11824,13 +11853,19 @@ function setVMView(v) {
 function parseVMAddDate(s) {
     if (!s) return null;
     s = String(s).trim().replace(/^'/, '');
+    // Coba parse langsung (ISO format: 2026-06-10 21:41:40)
     const direct = new Date(s);
     if (!isNaN(direct.getTime())) return direct;
+    // Fallback manual split
     const parts = s.split(/[\s\/\-:T]+/);
     if (parts.length >= 5) {
         return new Date(
-            parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]),
-            parseInt(parts[3]), parseInt(parts[4]), parseInt(parts[5] || 0)
+            parseInt(parts[0]),
+            parseInt(parts[1]) - 1,
+            parseInt(parts[2]),
+            parseInt(parts[3]),
+            parseInt(parts[4]),
+            parseInt(parts[5] || 0)
         );
     }
     return null;
@@ -11842,178 +11877,118 @@ function formatVMTime(addDateStr) {
     return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
 }
 
-function populateVMMultiSelect(filterId, options, label, stateArr, onChangeFn) {
-    const optionsContainer = document.getElementById(`${filterId}-options`);
-    const displayElement   = document.getElementById(`${filterId}-display`);
-    if (!optionsContainer || !displayElement) return;
-
-    optionsContainer.innerHTML = '';
-
-    const selectAllDiv = document.createElement('div');
-    selectAllDiv.className = 'option-item select-all-btn';
-    selectAllDiv.innerHTML = `<input type="checkbox" id="${filterId}-all"><label for="${filterId}-all">PILIH SEMUA</label>`;
-    optionsContainer.appendChild(selectAllDiv);
-    const allCheckbox = selectAllDiv.querySelector('input');
-
-    options.forEach(option => {
-        const div = document.createElement('div');
-        div.className = 'option-item';
-        div.innerHTML = `<input type="checkbox" value="${option}" id="${filterId}-${option.replace(/\s+/g,'-')}" class="${filterId}-checkbox"><label for="${filterId}-${option.replace(/\s+/g,'-')}">${option}</label>`;
-        optionsContainer.appendChild(div);
-    });
-
-    const checkboxes = optionsContainer.querySelectorAll(`.${filterId}-checkbox`);
-
-    const updateState = () => {
-        const checked = Array.from(checkboxes).filter(c => c.checked).map(c => c.value);
-        stateArr.length = 0;
-        checked.forEach(v => stateArr.push(v));
-        allCheckbox.checked = checkboxes.length > 0 && Array.from(checkboxes).every(c => c.checked);
-
-        const cnt = stateArr.length;
-        const tot = checkboxes.length;
-        if (cnt === 0) displayElement.textContent = `-- Semua ${label} --`;
-        else if (cnt === tot && tot > 0) displayElement.textContent = `Semua Terpilih (${cnt})`;
-        else displayElement.textContent = `${cnt} Terpilih`;
-
-        onChangeFn();
-    };
-
-    allCheckbox.addEventListener('change', () => {
-        checkboxes.forEach(cb => cb.checked = allCheckbox.checked);
-        updateState();
-    });
-    checkboxes.forEach(cb => cb.addEventListener('change', updateState));
-
-    displayElement.onclick = (e) => {
-        e.stopPropagation();
-        document.querySelectorAll('.multi-select-options').forEach(opt => {
-            if (opt.id !== `${filterId}-options`) opt.classList.remove('show');
-        });
-        optionsContainer.classList.toggle('show');
-    };
-}
-
 async function loadKonfirmasiVM(retries = 2) {
     const tbody = document.getElementById('vm-tbody-el');
     if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#ffd700;">
-            <i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i>Memuat data konfirmasi VM...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7"
+            style="text-align:center;padding:30px;color:#ffd700;">
+            <i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i>
+            Memuat data konfirmasi VM...
+        </td></tr>`;
     }
 
     try {
-        const KONFIRMASI_VM_GID = '1583314709';
+        // Gunakan CSV_URL yang sudah ada di dashboard (sheet AHI)
+        const KONFIRMASI_VM_GID = '1583314709'; // gid tab "DUMMY"
         const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=${KONFIRMASI_VM_GID}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const csv = await response.text();
-        if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Sheet belum di-share publik (received HTML).');
+        if (csv.trim().startsWith('<!DOCTYPE')) {
+            throw new Error('Sheet belum di-share publik (received HTML).');
+        }
 
+        // Gunakan robustCSVParser yang sudah ada di dashboard
         const allRows = robustCSVParser(csv);
         rawKonfirmasiVM = [];
 
+        // Skip header (baris 0), mulai dari baris 1
         for (let i = 1; i < allRows.length; i++) {
             const r = allRows[i];
             if (r.length < 9) continue;
-            const lc        = (r[0] || '').trim();
-            const carrier   = (r[1] || '').trim();
-            const shipTo    = (r[2] || '').trim();
-            const shipLine  = (r[3] || '').trim();
-            const tujuan    = (r[4] || '').trim();
-            const addDate   = (r[5] || '').trim();
-            const loadDate  = (r[6] || '').trim();
-            const cbm       = parseNumberWithComma(r[7] || '0');
-            const statusRaw = (r[8] || '').trim().toUpperCase();
+// Mapping kolom sesuai sheet DUMMY (gid=1583314709):
+    // A(0)=LC, B(1)=CARRIER, C(2)=SHIP TO, D(3)=SHIPINGLINE,
+    // E(4)=TUJUAN, F(5)=ADD DATE, G(6)=LOAD DATE, H(7)=CBM, I(8)=KONFIRMASI VM (status final, dari sheet)
+            
+            const lc        = (r[0]  || '').trim();
+const carrier   = (r[1]  || '').trim();
+const shipTo    = (r[2]  || '').trim();
+const shipLine  = (r[3]  || '').trim();
+const tujuan    = (r[4]  || '').trim();
+const addDate   = (r[5]  || '').trim();
+const loadDate  = (r[6]  || '').trim();
+const cbm       = parseNumberWithComma(r[7] || '0');
+const statusRaw = (r[8]  || '').trim().toUpperCase(); // kolom I = KONFIRMASI VM, ambil apa adanya
 
-            if (!lc && !carrier && !addDate) continue;
-            if (lc.toLowerCase() === 'lc' || lc.toLowerCase() === 'lc/id') continue;
+if (!lc && !carrier && !addDate) continue;
+if (lc.toLowerCase() === 'lc' || lc.toLowerCase() === 'lc/id') continue;
 
-            let status = null;
-            if (statusRaw === 'HIT')       status = 'HIT';
-            else if (statusRaw === 'MISS') status = 'MISS';
-            if (!status) continue;
+// status TIDAK dihitung, hanya dibaca persis dari sheet
+let status = null;
+if (statusRaw === 'HIT') status = 'HIT';
+else if (statusRaw === 'MISS') status = 'MISS';
 
-            rawKonfirmasiVM.push({ lc, carrier, shipTo, shipLine, tujuan, addDate, loadDate, cbm, status });
+if (!status) continue; // baris yang kolom I-nya kosong/bukan HIT/MISS dilewati
+
+            rawKonfirmasiVM.push({
+                lc, carrier, shipTo, shipLine,
+                tujuan, addDate, loadDate, cbm, status
+            });
         }
 
-        populateVMFilters();
+        populateVMLoadDateFilter();
         renderKonfirmasiVM();
 
     } catch (error) {
         console.error('Error loading Konfirmasi VM:', error);
-        if (retries > 0) { setTimeout(() => loadKonfirmasiVM(retries - 1), 2000); return; }
+        if (retries > 0) {
+            setTimeout(() => loadKonfirmasiVM(retries - 1), 2000);
+            return;
+        }
         if (tbody) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#f87171;">
+            tbody.innerHTML = `<tr><td colspan="7"
+                style="text-align:center;padding:30px;color:#f87171;">
                 <i class="fas fa-exclamation-triangle" style="margin-right:6px;"></i>
-                Gagal memuat: ${error ? error.message : 'Kesalahan tidak diketahui'}<br>
-                <button onclick="loadKonfirmasiVM()" style="margin-top:10px;padding:6px 14px;background:#d32f2f;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;">
-                    <i class="fas fa-sync"></i> Coba Lagi</button></td></tr>`;
+                Gagal memuat: ${error ? error.message : 'Unknown error'}<br>
+                <button onclick="loadKonfirmasiVM()"
+                    style="margin-top:10px;padding:6px 14px;background:#d32f2f;
+                           color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;">
+                    <i class="fas fa-sync"></i> Coba Lagi
+                </button>
+            </td></tr>`;
         }
     }
 }
 
-function populateVMFilters() {
-    const bulanMap = {};
-    const dateMap  = {};
+function populateVMLoadDateFilter() {
+    const dates = [...new Set(rawKonfirmasiVM.map(r => r.loadDate).filter(Boolean))]
+        .sort((a, b) => new Date(b) - new Date(a));
 
-    rawKonfirmasiVM.forEach(r => {
-        if (!r.loadDate) return;
-        const d = parseDate(r.loadDate);
-        if (!isNaN(d.getTime()) && d.getTime() > 0) {
-            const key     = MonthsID[d.getMonth()] + ' ' + d.getFullYear();
-            const sortKey = d.getFullYear() * 100 + d.getMonth();
-            bulanMap[key] = sortKey;
-        }
-        dateMap[r.loadDate] = parseDate(r.loadDate).getTime() || 0;
+    const sel  = document.getElementById('vm-ld-filter');
+    if (!sel) return;
+    const prev = sel.value;
+
+    sel.innerHTML = '<option value="ALL">Semua Tanggal</option>';
+    dates.forEach(d => {
+        const o   = document.createElement('option');
+        o.value   = d;
+        o.textContent = d;
+        sel.appendChild(o);
     });
 
-    const sortedBulan = Object.keys(bulanMap).sort((a, b) => bulanMap[b] - bulanMap[a]);
-
-    populateVMMultiSelect('vm-bulan', sortedBulan, 'Bulan', vmSelectedBulan, () => {
-        repopulateVMLoadDates();
-        renderKonfirmasiVM();
-    });
-
-    repopulateVMLoadDates();
-}
-
-function repopulateVMLoadDates() {
-    const dateMap = {};
-    rawKonfirmasiVM.forEach(r => {
-        if (!r.loadDate) return;
-        if (vmSelectedBulan.length > 0) {
-            const d = parseDate(r.loadDate);
-            if (!isNaN(d.getTime()) && d.getTime() > 0) {
-                const key = MonthsID[d.getMonth()] + ' ' + d.getFullYear();
-                if (!vmSelectedBulan.includes(key)) return;
-            }
-        }
-        dateMap[r.loadDate] = parseDate(r.loadDate).getTime() || 0;
-    });
-
-    const sortedDates = Object.keys(dateMap).sort((a, b) => dateMap[b] - dateMap[a]);
-    vmSelectedLD.length = 0;
-    populateVMMultiSelect('vm-ld', sortedDates, 'Tanggal', vmSelectedLD, renderKonfirmasiVM);
+    // Pertahankan pilihan sebelumnya jika masih ada
+    if (dates.includes(prev)) sel.value = prev;
 }
 
 function getVMFiltered() {
-    return rawKonfirmasiVM.filter(r => {
-        let matchBulan = true;
-        if (vmSelectedBulan.length > 0 && r.loadDate) {
-            const d = parseDate(r.loadDate);
-            if (!isNaN(d.getTime()) && d.getTime() > 0) {
-                const key = MonthsID[d.getMonth()] + ' ' + d.getFullYear();
-                matchBulan = vmSelectedBulan.includes(key);
-            }
-        }
-        const matchLD = vmSelectedLD.length === 0 || vmSelectedLD.includes(r.loadDate);
-        return matchBulan && matchLD;
-    });
+    const ld = (document.getElementById('vm-ld-filter') || {}).value || 'ALL';
+    return rawKonfirmasiVM.filter(r => ld === 'ALL' || r.loadDate === ld);
 }
 
 function renderKonfirmasiVM() {
     const data = getVMFiltered();
 
+    // Hitung KPI
     let totalHit = 0, totalMiss = 0;
     data.forEach(r => {
         if (r.status === 'HIT')  totalHit++;
@@ -12022,12 +11997,17 @@ function renderKonfirmasiVM() {
     const totalValid = totalHit + totalMiss;
     const pct = totalValid > 0 ? (totalHit / totalValid * 100).toFixed(1) : '0.0';
 
-    const setKPI = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    // Update KPI cards
+    const setKPI = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+    };
     setKPI('vm-kpi-total', totalValid);
     setKPI('vm-kpi-hit',   totalHit);
     setKPI('vm-kpi-miss',  totalMiss);
     setKPI('vm-kpi-pct',   pct + '%');
 
+    // Render chart & tabel
     renderVMChart(data);
     if (vmCurrentView === 'carrier') renderVMByCarrier(data);
     else renderVMDetail(data);
@@ -12038,203 +12018,220 @@ function vmPctBadge(p) {
     if (p >= 80) { bg = 'rgba(45,212,175,0.15)'; color = '#2dd4bf'; }
     else if (p >= 50) { bg = 'rgba(255,215,0,0.12)'; color = '#ffd700'; }
     else { bg = 'rgba(248,113,113,0.12)'; color = '#f87171'; }
-    return `<span style="background:${bg};color:${color};border-radius:4px;padding:2px 8px;font-weight:800;font-size:11px;">${p.toFixed(1)}%</span>`;
-}
-
-function vmSortIcon(currentSort, key) {
-    if (currentSort.key !== key) return '<i class="fas fa-sort" style="opacity:0.3;margin-left:4px;font-size:10px;"></i>';
-    return currentSort.dir === 'asc'
-        ? '<i class="fas fa-sort-up" style="margin-left:4px;font-size:10px;color:#ffd700;"></i>'
-        : '<i class="fas fa-sort-down" style="margin-left:4px;font-size:10px;color:#ffd700;"></i>';
-}
-
-function toggleVMSort(view, key) {
-    if (view === 'carrier') {
-        if (vmSortCarrier.key === key) vmSortCarrier.dir = vmSortCarrier.dir === 'asc' ? 'desc' : 'asc';
-        else { vmSortCarrier.key = key; vmSortCarrier.dir = key === 'carrier' ? 'asc' : 'desc'; }
-    } else {
-        if (vmSortDetail.key === key) vmSortDetail.dir = vmSortDetail.dir === 'asc' ? 'desc' : 'asc';
-        else { vmSortDetail.key = key; vmSortDetail.dir = (key === 'loadDate' || key === 'lc' || key === 'shipTo') ? 'asc' : 'desc'; }
-    }
-    renderKonfirmasiVM();
+    return `<span style="background:${bg};color:${color};border-radius:4px;
+                         padding:2px 8px;font-weight:800;font-size:11px;">
+                ${p.toFixed(1)}%
+            </span>`;
 }
 
 function renderVMByCarrier(data) {
+    // Agregasi per carrier
     const agg = {};
     data.forEach(r => {
         const key = r.carrier || '(Tidak ada)';
-        if (!agg[key]) agg[key] = { hit: 0, miss: 0, totalCbm: 0 };
+        if (!agg[key]) agg[key] = { hit: 0, miss: 0, times: [] };
         if (r.status === 'HIT')  agg[key].hit++;
         if (r.status === 'MISS') agg[key].miss++;
-        agg[key].totalCbm += r.cbm;
+        agg[key].times.push({ t: formatVMTime(r.addDate), s: r.status });
     });
 
-    let sorted = Object.entries(agg);
-    const sk = vmSortCarrier.key;
-    const sd = vmSortCarrier.dir === 'asc' ? 1 : -1;
-    sorted.sort((a, b) => {
-        if (sk === 'carrier')     return a[0].localeCompare(b[0]) * sd;
-        if (sk === 'hit')         return (a[1].hit - b[1].hit) * sd;
-        if (sk === 'miss')        return (a[1].miss - b[1].miss) * sd;
-        if (sk === 'total')       return ((a[1].hit + a[1].miss) - (b[1].hit + b[1].miss)) * sd;
-        if (sk === 'cbm')         return (a[1].totalCbm - b[1].totalCbm) * sd;
-        if (sk === 'achievement') {
-            const pa = (a[1].hit + a[1].miss) > 0 ? a[1].hit / (a[1].hit + a[1].miss) : 0;
-            const pb = (b[1].hit + b[1].miss) > 0 ? b[1].hit / (b[1].hit + b[1].miss) : 0;
-            return (pa - pb) * sd;
-        }
-        return 0;
-    });
+    // Sort by total terbanyak
+    const sorted = Object.entries(agg).sort((a, b) =>
+        (b[1].hit + b[1].miss) - (a[1].hit + a[1].miss)
+    );
 
+    // Header
     const thead = document.getElementById('vm-thead-el');
     if (thead) {
         thead.innerHTML = `<tr style="background:#111;">
             <th style="padding:10px;border:1px solid #333;color:#ffd700;width:40px;text-align:center;">#</th>
-            <th onclick="toggleVMSort('carrier','carrier')" style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;min-width:130px;cursor:pointer;">
-                Carrier ${vmSortIcon(vmSortCarrier,'carrier')}</th>
-            <th onclick="toggleVMSort('carrier','hit')" style="padding:10px;border:1px solid #333;color:#2dd4bf;width:70px;cursor:pointer;">
-                HIT ${vmSortIcon(vmSortCarrier,'hit')}</th>
-            <th onclick="toggleVMSort('carrier','miss')" style="padding:10px;border:1px solid #333;color:#f87171;width:70px;cursor:pointer;">
-                MISS ${vmSortIcon(vmSortCarrier,'miss')}</th>
-            <th onclick="toggleVMSort('carrier','total')" style="padding:10px;border:1px solid #333;color:#aaa;width:65px;cursor:pointer;">
-                Total ${vmSortIcon(vmSortCarrier,'total')}</th>
-            <th onclick="toggleVMSort('carrier','cbm')" style="padding:10px;border:1px solid #333;color:#ffd700;width:100px;cursor:pointer;">
-                CBM ${vmSortIcon(vmSortCarrier,'cbm')}</th>
-            <th onclick="toggleVMSort('carrier','achievement')" style="padding:10px;border:1px solid #333;color:#ffd700;width:150px;cursor:pointer;">
-                Pencapaian % ${vmSortIcon(vmSortCarrier,'achievement')}</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;min-width:130px;">Carrier</th>
+            <th style="padding:10px;border:1px solid #333;color:#2dd4bf;width:70px;">HIT</th>
+            <th style="padding:10px;border:1px solid #333;color:#f87171;width:70px;">MISS</th>
+            <th style="padding:10px;border:1px solid #333;color:#aaa;width:65px;">Total</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;width:140px;">Achievement</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;">Jam Konfirmasi</th>
         </tr>`;
     }
 
+    // Body
     let html = '';
-    let totH = 0, totM = 0, totCbm = 0;
+    let totH = 0, totM = 0;
 
     sorted.forEach(([carrier, s], i) => {
         const tot = s.hit + s.miss;
         const p   = tot > 0 ? (s.hit / tot * 100) : 0;
         const barColor = p >= 80 ? '#2dd4bf' : p >= 50 ? '#ffd700' : '#f87171';
-        totH += s.hit; totM += s.miss; totCbm += s.totalCbm;
+        totH += s.hit;
+        totM += s.miss;
+
+        // Chip waktu (max 12, sisanya tampilkan "+N lainnya")
+        const chips = s.times.slice(0, 12).map(x => {
+            const chipColor = x.s === 'HIT'
+                ? 'background:rgba(45,212,175,0.15);color:#2dd4bf;border:1px solid rgba(45,212,175,0.3);'
+                : 'background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3);';
+            return `<span style="${chipColor}border-radius:3px;padding:1px 6px;
+                                  font-size:10px;font-weight:700;">${x.t}</span>`;
+        }).join(' ');
+        const more = s.times.length > 12
+            ? `<span style="color:#666;font-size:10px;"> +${s.times.length - 12} lainnya</span>`
+            : '';
 
         html += `<tr style="border-bottom:1px solid #1e1e1e;">
             <td style="padding:8px;text-align:center;color:#555;border:1px solid #1e1e1e;">${i + 1}</td>
             <td style="padding:8px;text-align:left;font-weight:600;color:#eee;border:1px solid #1e1e1e;">${carrier}</td>
             <td style="padding:8px;text-align:center;border:1px solid #1e1e1e;">
-                <span style="background:rgba(45,212,175,0.15);color:#2dd4bf;border:1px solid rgba(45,212,175,0.4);border-radius:4px;padding:2px 9px;font-weight:700;font-size:11px;">${s.hit}</span></td>
+                <span style="background:rgba(45,212,175,0.15);color:#2dd4bf;
+                             border:1px solid rgba(45,212,175,0.4);border-radius:4px;
+                             padding:2px 9px;font-weight:700;font-size:11px;">${s.hit}</span>
+            </td>
             <td style="padding:8px;text-align:center;border:1px solid #1e1e1e;">
-                <span style="background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.4);border-radius:4px;padding:2px 9px;font-weight:700;font-size:11px;">${s.miss}</span></td>
+                <span style="background:rgba(248,113,113,0.15);color:#f87171;
+                             border:1px solid rgba(248,113,113,0.4);border-radius:4px;
+                             padding:2px 9px;font-weight:700;font-size:11px;">${s.miss}</span>
+            </td>
             <td style="padding:8px;text-align:center;color:#aaa;font-weight:700;border:1px solid #1e1e1e;">${tot}</td>
-            <td style="padding:8px;text-align:right;color:#ffd700;font-weight:700;border:1px solid #1e1e1e;">${s.totalCbm.toFixed(2)}</td>
             <td style="padding:8px;text-align:center;border:1px solid #1e1e1e;">
                 ${vmPctBadge(p)}
-                <span style="width:55px;height:7px;background:#333;border-radius:4px;display:inline-block;vertical-align:middle;margin-left:6px;overflow:hidden;">
-                    <span style="display:block;height:100%;width:${Math.min(p,100)}%;background:${barColor};border-radius:4px;"></span></span></td>
+                <span style="width:60px;height:7px;background:#333;border-radius:4px;
+                             display:inline-block;vertical-align:middle;margin-left:6px;overflow:hidden;">
+                    <span style="display:block;height:100%;width:${p}%;
+                                 background:${barColor};border-radius:4px;"></span>
+                </span>
+            </td>
+            <td style="padding:8px;text-align:left;border:1px solid #1e1e1e;">${chips}${more}</td>
         </tr>`;
     });
 
     const tbody = document.getElementById('vm-tbody-el');
     if (tbody) {
-        tbody.innerHTML = html || `<tr><td colspan="7" style="text-align:center;padding:30px;color:#666;">Tidak ada data untuk filter ini.</td></tr>`;
+        tbody.innerHTML = html ||
+            `<tr><td colspan="7"
+                style="text-align:center;padding:30px;color:#666;">
+                Tidak ada data untuk filter ini.
+            </td></tr>`;
     }
 
+    // Footer grand total
     const totAll = totH + totM;
     const totP   = totAll > 0 ? (totH / totAll * 100).toFixed(1) : '0.0';
     const tfoot  = document.getElementById('vm-tfoot-el');
     if (tfoot) {
         tfoot.innerHTML = `<tr style="background:#0f0f0f;">
-            <td colspan="2" style="padding:12px 10px;text-align:left;color:#ffd700;font-weight:800;font-size:12px;border-top:2px solid #333;">GRAND TOTAL</td>
-            <td style="padding:12px 10px;text-align:center;color:#2dd4bf;font-weight:800;border-top:2px solid #333;">${totH}</td>
-            <td style="padding:12px 10px;text-align:center;color:#f87171;font-weight:800;border-top:2px solid #333;">${totM}</td>
-            <td style="padding:12px 10px;text-align:center;color:#aaa;font-weight:800;border-top:2px solid #333;">${totAll}</td>
-            <td style="padding:12px 10px;text-align:right;color:#ffd700;font-weight:800;border-top:2px solid #333;">${totCbm.toFixed(2)}</td>
-            <td style="padding:12px 10px;text-align:center;color:#ffd700;font-weight:800;border-top:2px solid #333;">${totP}%</td>
+            <td colspan="2"
+                style="padding:12px 10px;text-align:left;
+                       color:#ffd700;font-weight:800;font-size:12px;
+                       border-top:2px solid #333;">
+                GRAND TOTAL
+            </td>
+            <td style="padding:12px 10px;text-align:center;color:#2dd4bf;
+                       font-weight:800;border-top:2px solid #333;">${totH}</td>
+            <td style="padding:12px 10px;text-align:center;color:#f87171;
+                       font-weight:800;border-top:2px solid #333;">${totM}</td>
+            <td style="padding:12px 10px;text-align:center;color:#aaa;
+                       font-weight:800;border-top:2px solid #333;">${totAll}</td>
+            <td colspan="2"
+                style="padding:12px 10px;text-align:center;
+                       color:#ffd700;font-weight:800;border-top:2px solid #333;">
+                ${totP}%
+            </td>
         </tr>`;
     }
 }
 
 function renderVMDetail(data) {
-    let sorted = [...data];
-    const sk = vmSortDetail.key;
-    const sd = vmSortDetail.dir === 'asc' ? 1 : -1;
-    sorted.sort((a, b) => {
-        if (sk === 'lc')       return (a.lc || '').localeCompare(b.lc || '') * sd;
-        if (sk === 'shipTo')   return (a.shipTo || '').localeCompare(b.shipTo || '') * sd;
-        if (sk === 'loadDate') return (a.loadDate || '').localeCompare(b.loadDate || '') * sd;
-        if (sk === 'cbm')      return (a.cbm - b.cbm) * sd;
-        if (sk === 'addDate')  {
-            const da = parseVMAddDate(a.addDate);
-            const db = parseVMAddDate(b.addDate);
-            return (((da ? da.getTime() : 0) - (db ? db.getTime() : 0)) * sd);
-        }
-        if (sk === 'status') return (a.status || '').localeCompare(b.status || '') * sd;
-        return 0;
+    // Sort by addDate ascending
+    const sorted = [...data].sort((a, b) => {
+        const da = parseVMAddDate(a.addDate);
+        const db = parseVMAddDate(b.addDate);
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        return da - db;
     });
 
+    // Header
     const thead = document.getElementById('vm-thead-el');
     if (thead) {
         thead.innerHTML = `<tr style="background:#111;">
             <th style="padding:10px;border:1px solid #333;color:#ffd700;width:40px;text-align:center;">#</th>
-            <th onclick="toggleVMSort('detail','lc')" style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;min-width:110px;cursor:pointer;">
-                LC / ID ${vmSortIcon(vmSortDetail,'lc')}</th>
-            <th onclick="toggleVMSort('detail','shipTo')" style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;cursor:pointer;">
-                Ship To ${vmSortIcon(vmSortDetail,'shipTo')}</th>
-            <th onclick="toggleVMSort('detail','loadDate')" style="padding:10px;border:1px solid #333;color:#ffd700;width:110px;cursor:pointer;">
-                Tgl. Loading ${vmSortIcon(vmSortDetail,'loadDate')}</th>
-            <th onclick="toggleVMSort('detail','cbm')" style="padding:10px;border:1px solid #333;color:#ffd700;width:90px;cursor:pointer;">
-                CBM ${vmSortIcon(vmSortDetail,'cbm')}</th>
-            <th onclick="toggleVMSort('detail','addDate')" style="padding:10px;border:1px solid #333;color:#ffd700;width:120px;cursor:pointer;">
-                Jam Konfirmasi ${vmSortIcon(vmSortDetail,'addDate')}</th>
-            <th onclick="toggleVMSort('detail','status')" style="padding:10px;border:1px solid #333;color:#ffd700;width:80px;cursor:pointer;">
-                Status ${vmSortIcon(vmSortDetail,'status')}</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;min-width:110px;">LC / ID</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;min-width:110px;">Carrier</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;min-width:120px;">Ship To</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;width:110px;">Load Date</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;width:110px;">Jam Konfirmasi</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;width:80px;">Status</th>
         </tr>`;
     }
 
-    let html = '';
-    let hit = 0, miss = 0, totalCbm = 0;
+    // Body
+    let html  = '';
+    let hit   = 0, miss = 0;
 
     sorted.forEach((r, i) => {
-        const jam   = formatVMTime(r.addDate);
+        const jam = formatVMTime(r.addDate);
         const isHit = r.status === 'HIT';
-        hit      += isHit ? 1 : 0;
-        miss     += isHit ? 0 : 1;
-        totalCbm += r.cbm;
+        hit  += isHit ? 1 : 0;
+        miss += isHit ? 0 : 1;
 
         const chipStyle = isHit
+            ? 'background:rgba(45,212,175,0.15);color:#2dd4bf;border:1px solid rgba(45,212,175,0.4);'
+            : 'background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.4);';
+        const badgeStyle = isHit
             ? 'background:rgba(45,212,175,0.15);color:#2dd4bf;border:1px solid rgba(45,212,175,0.4);'
             : 'background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.4);';
         const rowBg = i % 2 === 0 ? '#1a1a1a' : '#151515';
 
         html += `<tr style="background:${rowBg};border-bottom:1px solid #1e1e1e;">
             <td style="padding:8px;text-align:center;color:#555;border:1px solid #1e1e1e;">${i + 1}</td>
-            <td style="padding:8px;font-family:monospace;font-size:11px;color:#ccc;border:1px solid #1e1e1e;">${r.lc || '-'}</td>
-            <td style="padding:8px;font-size:11px;color:#aaa;border:1px solid #1e1e1e;">${r.shipTo || '-'}</td>
+            <td style="padding:8px;text-align:left;font-family:monospace;font-size:11px;
+                       color:#ccc;border:1px solid #1e1e1e;">${r.lc || '-'}</td>
+            <td style="padding:8px;text-align:left;font-weight:600;color:#eee;border:1px solid #1e1e1e;">${r.carrier || '-'}</td>
+            <td style="padding:8px;text-align:left;font-size:11px;color:#aaa;border:1px solid #1e1e1e;">${r.shipTo || '-'}</td>
             <td style="padding:8px;text-align:center;color:#ccc;border:1px solid #1e1e1e;">${r.loadDate || '-'}</td>
-            <td style="padding:8px;text-align:right;color:#ffd700;font-weight:700;border:1px solid #1e1e1e;">${r.cbm > 0 ? r.cbm.toFixed(2) : '-'}</td>
             <td style="padding:8px;text-align:center;border:1px solid #1e1e1e;">
-                <span style="${chipStyle}border-radius:3px;padding:2px 9px;font-size:12px;font-weight:700;">${jam}</span></td>
+                <span style="${chipStyle}border-radius:3px;padding:2px 9px;
+                             font-size:12px;font-weight:700;">${jam}</span>
+            </td>
             <td style="padding:8px;text-align:center;border:1px solid #1e1e1e;">
-                <span style="${chipStyle}border-radius:4px;padding:2px 9px;font-size:11px;font-weight:700;">${r.status}</span></td>
+                <span style="${badgeStyle}border-radius:4px;padding:2px 9px;
+                             font-size:11px;font-weight:700;">${r.status}</span>
+            </td>
         </tr>`;
     });
 
     const tbody = document.getElementById('vm-tbody-el');
     if (tbody) {
-        tbody.innerHTML = html || `<tr><td colspan="7" style="text-align:center;padding:30px;color:#666;">Tidak ada data.</td></tr>`;
+        tbody.innerHTML = html ||
+            `<tr><td colspan="7"
+                style="text-align:center;padding:30px;color:#666;">
+                Tidak ada data.
+            </td></tr>`;
     }
 
-    const tot = hit + miss;
-    const p   = tot > 0 ? (hit / tot * 100).toFixed(1) : '0.0';
+    // Footer
+    const tot  = hit + miss;
+    const p    = tot > 0 ? (hit / tot * 100).toFixed(1) : '0.0';
     const tfoot = document.getElementById('vm-tfoot-el');
     if (tfoot) {
         tfoot.innerHTML = `<tr style="background:#0f0f0f;">
-            <td colspan="3" style="padding:12px 10px;text-align:left;color:#ffd700;font-weight:800;font-size:12px;border-top:2px solid #333;">GRAND TOTAL</td>
-            <td style="padding:12px 10px;text-align:center;color:#ccc;font-weight:800;border-top:2px solid #333;">${tot} data</td>
-            <td style="padding:12px 10px;text-align:right;color:#ffd700;font-weight:800;border-top:2px solid #333;">${totalCbm.toFixed(2)}</td>
-            <td style="padding:12px 10px;text-align:center;color:#2dd4bf;font-weight:800;border-top:2px solid #333;">${hit} HIT / ${miss} MISS</td>
-            <td style="padding:12px 10px;text-align:center;color:#ffd700;font-weight:800;border-top:2px solid #333;">${p}%</td>
+            <td colspan="4"
+                style="padding:12px 10px;text-align:left;color:#ffd700;
+                       font-weight:800;font-size:12px;border-top:2px solid #333;">
+                GRAND TOTAL — ${tot} konfirmasi
+            </td>
+            <td style="padding:12px 10px;text-align:center;color:#2dd4bf;
+                       font-weight:800;border-top:2px solid #333;">${hit} HIT</td>
+            <td style="padding:12px 10px;text-align:center;color:#f87171;
+                       font-weight:800;border-top:2px solid #333;">${miss} MISS</td>
+            <td style="padding:12px 10px;text-align:center;color:#ffd700;
+                       font-weight:800;border-top:2px solid #333;">${p}%</td>
         </tr>`;
     }
 }
 
 function renderVMChart(data) {
+    // Agregasi per load date
     const agg = {};
     data.forEach(r => {
         const key = r.loadDate || '-';
@@ -12245,7 +12242,7 @@ function renderVMChart(data) {
 
     const sorted = Object.entries(agg)
         .sort((a, b) => new Date(a[0]) - new Date(b[0]))
-        .slice(-14);
+        .slice(-14); // Tampilkan max 14 tanggal terakhir
 
     const labels = sorted.map(([d]) => d);
     const hits   = sorted.map(([, s]) => s.hit);
@@ -12258,41 +12255,102 @@ function renderVMChart(data) {
     const canvas = document.getElementById('vm-trend-chart');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+
     if (vmTrendChart) vmTrendChart.destroy();
 
     vmTrendChart = new Chart(ctx, {
         data: {
             labels,
             datasets: [
-                { type:'bar',  label:'HIT',  data:hits,   backgroundColor:'rgba(45,212,175,0.7)',  borderRadius:3, stack:'vm', order:2 },
-                { type:'bar',  label:'MISS', data:misses, backgroundColor:'rgba(248,113,113,0.7)', borderRadius:3, stack:'vm', order:2 },
-                { type:'line', label:'Pencapaian %', data:pcts,
-                  borderColor:'#ffd700', backgroundColor:'transparent',
-                  borderWidth:2, pointRadius:4, pointBackgroundColor:'#ffd700',
-                  tension:0.3, yAxisID:'yPct', order:1 }
+                {
+                    type: 'bar',
+                    label: 'HIT',
+                    data: hits,
+                    backgroundColor: 'rgba(45,212,175,0.7)',
+                    borderRadius: 3,
+                    stack: 'vm',
+                    order: 2
+                },
+                {
+                    type: 'bar',
+                    label: 'MISS',
+                    data: misses,
+                    backgroundColor: 'rgba(248,113,113,0.7)',
+                    borderRadius: 3,
+                    stack: 'vm',
+                    order: 2
+                },
+                {
+                    type: 'line',
+                    label: 'Achievement %',
+                    data: pcts,
+                    borderColor: '#ffd700',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#ffd700',
+                    tension: 0.3,
+                    yAxisID: 'yPct',
+                    order: 1
+                }
             ]
         },
         options: {
-            responsive:true, maintainAspectRatio:false,
+            responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                legend: { display:true, position:'top', align:'end',
-                    labels:{ color:'#aaa', font:{size:11,weight:'bold'}, boxWidth:10, padding:14 } },
-                tooltip: { backgroundColor:'#111', titleColor:'#ffd700', bodyColor:'#fff', borderColor:'#333', borderWidth:1 },
-                datalabels:{ display:false }
+                legend: {
+                    display: true,
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        color: '#aaa',
+                        font: { size: 11, weight: 'bold' },
+                        boxWidth: 10,
+                        padding: 14
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#111',
+                    titleColor: '#ffd700',
+                    bodyColor: '#fff',
+                    borderColor: '#333',
+                    borderWidth: 1
+                },
+                datalabels: { display: false }
             },
             scales: {
-                x:    { stacked:true, ticks:{color:'#888',font:{size:10},maxRotation:45}, grid:{display:false} },
-                y:    { stacked:true, beginAtZero:true, ticks:{color:'#888',font:{size:11},precision:0}, grid:{color:'#2a2a2a'} },
-                yPct: { position:'right', min:0, max:110,
-                    ticks:{color:'#ffd700',font:{size:10},callback:v=>v<=100?v+'%':''},
-                    grid:{drawOnChartArea:false} }
+                x: {
+                    stacked: true,
+                    ticks: { color: '#888', font: { size: 10 }, maxRotation: 45 },
+                    grid: { display: false }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    ticks: { color: '#888', font: { size: 11 }, precision: 0 },
+                    grid: { color: '#2a2a2a' }
+                },
+                yPct: {
+                    position: 'right',
+                    min: 0,
+                    max: 110,
+                    ticks: {
+                        color: '#ffd700',
+                        font: { size: 10 },
+                        callback: v => v <= 100 ? v + '%' : ''
+                    },
+                    grid: { drawOnChartArea: false }
+                }
             }
         }
     });
 }
 
+// Auto-load saat section Vendor dibuka
+// Panggil manual pertama kali, auto-refresh setiap 60 detik
 loadKonfirmasiVM();
-setInterval(loadKonfirmasiVM, 60000);
+setInterval(loadKonfirmasiVM, 600000);
 // ===== END REKAP KONFIRMASI VM =====
     </script>
 </body>
