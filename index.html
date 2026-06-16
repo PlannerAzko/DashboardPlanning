@@ -3491,6 +3491,221 @@
                     </table>
                 </div>
             </div>
+            <!-- ============================================================
+     REKAP KONFIRMASI VM
+     Letakkan SETELAH: </div> (End vendor-performance-container)
+     Masih di dalam: <div id="supply-partner-section" ...>
+     ============================================================ -->
+<div id="konfirmasi-vm-container" style="margin-top: 40px; margin-bottom: 30px;">
+
+    <!-- HEADER BANNER -->
+    <div style="background: linear-gradient(90deg, #1a1a1a 0%, #333 100%);
+                border-left: 4px solid #ffd700;
+                color: #ffd700;
+                padding: 15px 20px;
+                font-weight: bold;
+                text-transform: uppercase;
+                font-size: 1.1em;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;">
+        <span>
+            <i class="fas fa-clock" style="margin-right: 10px; color: #ffd700;"></i>
+            REKAP KONFIRMASI VM — PEMENUHAN VENDOR
+        </span>
+        <span style="font-size: 0.75em; color: #aaa; font-weight: normal; font-style: italic;">
+            HIT = konfirmasi sebelum 13:00 &nbsp;|&nbsp; MISS = konfirmasi ≥ 13:00
+        </span>
+    </div>
+
+    <!-- FILTER LOAD DATE -->
+    <div style="background: #1e1e1e;
+                border: 1px solid #333;
+                border-top: 0;
+                padding: 12px 18px;
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                flex-wrap: wrap;">
+        <label style="font-size: 11px; color: #aaa; font-weight: 700; text-transform: uppercase;">
+            Load Date:
+        </label>
+        <select id="vm-ld-filter"
+                onchange="renderKonfirmasiVM()"
+                style="background: #2a2a2a;
+                       color: #ffd700;
+                       border: 1px solid #ffd700;
+                       padding: 5px 12px;
+                       border-radius: 4px;
+                       font-size: 12px;
+                       font-weight: 600;
+                       outline: none;
+                       cursor: pointer;">
+            <option value="ALL">Semua Tanggal</option>
+        </select>
+        <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
+            <div style="display: flex; gap: 6px;">
+                <button id="vm-btn-carrier"
+                        onclick="setVMView('carrier')"
+                        style="background: #b71c1c;
+                               color: #fff;
+                               border: 1px solid #d32f2f;
+                               padding: 4px 12px;
+                               border-radius: 4px;
+                               font-size: 11px;
+                               font-weight: 700;
+                               cursor: pointer;">
+                    By Carrier
+                </button>
+                <button id="vm-btn-detail"
+                        onclick="setVMView('detail')"
+                        style="background: #333;
+                               color: #aaa;
+                               border: 1px solid #444;
+                               padding: 4px 12px;
+                               border-radius: 4px;
+                               font-size: 11px;
+                               font-weight: 700;
+                               cursor: pointer;">
+                    Detail
+                </button>
+            </div>
+            <button onclick="loadKonfirmasiVM()"
+                    style="background: #d32f2f;
+                           color: #fff;
+                           border: none;
+                           padding: 5px 14px;
+                           border-radius: 4px;
+                           font-size: 11px;
+                           font-weight: 700;
+                           cursor: pointer;">
+                <i class="fas fa-sync" style="margin-right: 5px;"></i>Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div style="display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+                padding: 14px 18px;
+                background: #1a1a1a;
+                border: 1px solid #333;
+                border-top: 0;">
+
+        <div style="background: #242424;
+                    border-radius: 6px;
+                    padding: 14px;
+                    text-align: center;
+                    border-bottom: 3px solid #60a5fa;">
+            <div style="font-size: 10px; color: #aaa; text-transform: uppercase;
+                        letter-spacing: 1px; font-weight: 700; margin-bottom: 6px;">
+                Total Vendor
+            </div>
+            <div id="vm-kpi-total"
+                 style="font-size: 1.8em; font-weight: 800; color: #60a5fa;">—</div>
+            <div style="font-size: 10px; color: #555; margin-top: 4px; font-style: italic;">
+                konfirmasi masuk
+            </div>
+        </div>
+
+        <div style="background: #242424;
+                    border-radius: 6px;
+                    padding: 14px;
+                    text-align: center;
+                    border-bottom: 3px solid #2dd4bf;">
+            <div style="font-size: 10px; color: #aaa; text-transform: uppercase;
+                        letter-spacing: 1px; font-weight: 700; margin-bottom: 6px;">
+                HIT
+            </div>
+            <div id="vm-kpi-hit"
+                 style="font-size: 1.8em; font-weight: 800; color: #2dd4bf;">—</div>
+            <div style="font-size: 10px; color: #555; margin-top: 4px; font-style: italic;">
+                konfirmasi &lt; 13:00
+            </div>
+        </div>
+
+        <div style="background: #242424;
+                    border-radius: 6px;
+                    padding: 14px;
+                    text-align: center;
+                    border-bottom: 3px solid #f87171;">
+            <div style="font-size: 10px; color: #aaa; text-transform: uppercase;
+                        letter-spacing: 1px; font-weight: 700; margin-bottom: 6px;">
+                MISS
+            </div>
+            <div id="vm-kpi-miss"
+                 style="font-size: 1.8em; font-weight: 800; color: #f87171;">—</div>
+            <div style="font-size: 10px; color: #555; margin-top: 4px; font-style: italic;">
+                konfirmasi ≥ 13:00
+            </div>
+        </div>
+
+        <div style="background: #242424;
+                    border-radius: 6px;
+                    padding: 14px;
+                    text-align: center;
+                    border-bottom: 3px solid #ffd700;">
+            <div style="font-size: 10px; color: #aaa; text-transform: uppercase;
+                        letter-spacing: 1px; font-weight: 700; margin-bottom: 6px;">
+                Achievement
+            </div>
+            <div id="vm-kpi-pct"
+                 style="font-size: 1.8em; font-weight: 800; color: #ffd700;">—</div>
+            <div style="font-size: 10px; color: #555; margin-top: 4px; font-style: italic;">
+                HIT rate
+            </div>
+        </div>
+    </div>
+
+    <!-- CHART -->
+    <div style="background: #1a1a1a;
+                border: 1px solid #333;
+                border-top: 0;
+                padding: 14px 18px;">
+        <div style="font-size: 11px; color: #aaa; font-weight: 700;
+                    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">
+            Tren HIT vs MISS per Load Date
+        </div>
+        <div style="position: relative; width: 100%; height: 180px;">
+            <canvas id="vm-trend-chart"
+                    role="img"
+                    aria-label="Chart tren HIT vs MISS konfirmasi VM per load date">
+                Tren HIT dan MISS konfirmasi vendor per tanggal loading.
+            </canvas>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div style="background: #1a1a1a;
+                border: 1px solid #333;
+                border-top: 0;
+                overflow-x: auto;
+                max-height: 420px;
+                overflow-y: auto;">
+        <table id="vm-main-table"
+               style="width: 100%;
+                      border-collapse: collapse;
+                      font-size: 12px;
+                      min-width: 650px;">
+            <thead id="vm-thead-el"></thead>
+            <tbody id="vm-tbody-el">
+                <tr>
+                    <td colspan="7"
+                        style="text-align: center;
+                               padding: 30px;
+                               color: #ffd700;">
+                        <i class="fas fa-spinner fa-spin" style="margin-right: 6px;"></i>
+                        Memuat data...
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot id="vm-tfoot-el"></tfoot>
+        </table>
+    </div>
+
+</div>
+<!-- ============================================================ END REKAP KONFIRMASI VM ============================================================ -->
         </div> <!-- End supply-partner-section -->
 
         <div id="outstanding-section" class="dash-section" style="display: none;">
@@ -11606,6 +11821,543 @@ function applyBatchColors() {
         }
     });
 }
+   // ===== REKAP KONFIRMASI VM =====
+let rawKonfirmasiVM = [];
+let vmCurrentView   = 'carrier';
+let vmTrendChart    = null;
+
+function setVMView(v) {
+    vmCurrentView = v;
+    const btnCarrier = document.getElementById('vm-btn-carrier');
+    const btnDetail  = document.getElementById('vm-btn-detail');
+    if (btnCarrier && btnDetail) {
+        if (v === 'carrier') {
+            btnCarrier.style.background  = '#b71c1c';
+            btnCarrier.style.color       = '#fff';
+            btnCarrier.style.borderColor = '#d32f2f';
+            btnDetail.style.background   = '#333';
+            btnDetail.style.color        = '#aaa';
+            btnDetail.style.borderColor  = '#444';
+        } else {
+            btnDetail.style.background   = '#b71c1c';
+            btnDetail.style.color        = '#fff';
+            btnDetail.style.borderColor  = '#d32f2f';
+            btnCarrier.style.background  = '#333';
+            btnCarrier.style.color       = '#aaa';
+            btnCarrier.style.borderColor = '#444';
+        }
+    }
+    renderKonfirmasiVM();
+}
+
+function parseVMAddDate(s) {
+    if (!s) return null;
+    s = String(s).trim().replace(/^'/, '');
+    // Coba parse langsung (ISO format: 2026-06-10 21:41:40)
+    const direct = new Date(s);
+    if (!isNaN(direct.getTime())) return direct;
+    // Fallback manual split
+    const parts = s.split(/[\s\/\-:T]+/);
+    if (parts.length >= 5) {
+        return new Date(
+            parseInt(parts[0]),
+            parseInt(parts[1]) - 1,
+            parseInt(parts[2]),
+            parseInt(parts[3]),
+            parseInt(parts[4]),
+            parseInt(parts[5] || 0)
+        );
+    }
+    return null;
+}
+
+function classifyVMByTime(addDateStr) {
+    const d = parseVMAddDate(addDateStr);
+    if (!d || isNaN(d.getTime())) return null;
+    const totalMinutes = d.getHours() * 60 + d.getMinutes();
+    // HIT  = sebelum jam 13:00 (< 780 menit)
+    // MISS = jam 13:00 ke atas (>= 780 menit)
+    return totalMinutes < 780 ? 'HIT' : 'MISS';
+}
+
+function formatVMTime(addDateStr) {
+    const d = parseVMAddDate(addDateStr);
+    if (!d || isNaN(d.getTime())) return '-';
+    return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+async function loadKonfirmasiVM(retries = 2) {
+    const tbody = document.getElementById('vm-tbody-el');
+    if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="7"
+            style="text-align:center;padding:30px;color:#ffd700;">
+            <i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i>
+            Memuat data konfirmasi VM...
+        </td></tr>`;
+    }
+
+    try {
+        // Gunakan CSV_URL yang sudah ada di dashboard (sheet AHI)
+        const url      = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=${SHEET_GID_AHI}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const csv = await response.text();
+        if (csv.trim().startsWith('<!DOCTYPE')) {
+            throw new Error('Sheet belum di-share publik (received HTML).');
+        }
+
+        // Gunakan robustCSVParser yang sudah ada di dashboard
+        const allRows = robustCSVParser(csv);
+        rawKonfirmasiVM = [];
+
+        // Skip header (baris 0), mulai dari baris 1
+        for (let i = 1; i < allRows.length; i++) {
+            const r = allRows[i];
+            if (r.length < 6) continue;
+
+            // Mapping kolom sesuai sheet AHI (gid=1144899065):
+            // A(0)=LC, B(1)=CARRIER, C(2)=SHIP TO, D(3)=SHIPINGLINE
+            // E(4)=TUJUAN, F(5)=ADD DATE, G(6)=LOAD DATE, H(7)=CBM, I(8)=KONFIRMASI VM
+            const lc       = (r[0]  || '').trim();
+            const carrier  = (r[1]  || '').trim();
+            const shipTo   = (r[2]  || '').trim();
+            const shipLine = (r[3]  || '').trim();
+            const tujuan   = (r[4]  || '').trim();
+            const addDate  = (r[5]  || '').trim();
+            const loadDate = (r[6]  || '').trim();
+            const cbm      = parseNumberWithComma(r[7] || '0');
+
+            // Skip baris kosong atau header yang berulang
+            if (!lc && !carrier && !addDate) continue;
+            if (lc.toLowerCase() === 'lc' || lc.toLowerCase() === 'lc/id') continue;
+
+            const status = classifyVMByTime(addDate);
+
+            // Hanya masukkan data yang punya ADD DATE dan bisa diklasifikasi
+            if (!status) continue;
+
+            rawKonfirmasiVM.push({
+                lc, carrier, shipTo, shipLine,
+                tujuan, addDate, loadDate, cbm, status
+            });
+        }
+
+        populateVMLoadDateFilter();
+        renderKonfirmasiVM();
+
+    } catch (error) {
+        console.error('Error loading Konfirmasi VM:', error);
+        if (retries > 0) {
+            setTimeout(() => loadKonfirmasiVM(retries - 1), 2000);
+            return;
+        }
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="7"
+                style="text-align:center;padding:30px;color:#f87171;">
+                <i class="fas fa-exclamation-triangle" style="margin-right:6px;"></i>
+                Gagal memuat: ${error ? error.message : 'Unknown error'}<br>
+                <button onclick="loadKonfirmasiVM()"
+                    style="margin-top:10px;padding:6px 14px;background:#d32f2f;
+                           color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:bold;">
+                    <i class="fas fa-sync"></i> Coba Lagi
+                </button>
+            </td></tr>`;
+        }
+    }
+}
+
+function populateVMLoadDateFilter() {
+    const dates = [...new Set(rawKonfirmasiVM.map(r => r.loadDate).filter(Boolean))]
+        .sort((a, b) => new Date(b) - new Date(a));
+
+    const sel  = document.getElementById('vm-ld-filter');
+    if (!sel) return;
+    const prev = sel.value;
+
+    sel.innerHTML = '<option value="ALL">Semua Tanggal</option>';
+    dates.forEach(d => {
+        const o   = document.createElement('option');
+        o.value   = d;
+        o.textContent = d;
+        sel.appendChild(o);
+    });
+
+    // Pertahankan pilihan sebelumnya jika masih ada
+    if (dates.includes(prev)) sel.value = prev;
+}
+
+function getVMFiltered() {
+    const ld = (document.getElementById('vm-ld-filter') || {}).value || 'ALL';
+    return rawKonfirmasiVM.filter(r => ld === 'ALL' || r.loadDate === ld);
+}
+
+function renderKonfirmasiVM() {
+    const data = getVMFiltered();
+
+    // Hitung KPI
+    let totalHit = 0, totalMiss = 0;
+    data.forEach(r => {
+        if (r.status === 'HIT')  totalHit++;
+        if (r.status === 'MISS') totalMiss++;
+    });
+    const totalValid = totalHit + totalMiss;
+    const pct = totalValid > 0 ? (totalHit / totalValid * 100).toFixed(1) : '0.0';
+
+    // Update KPI cards
+    const setKPI = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+    };
+    setKPI('vm-kpi-total', totalValid);
+    setKPI('vm-kpi-hit',   totalHit);
+    setKPI('vm-kpi-miss',  totalMiss);
+    setKPI('vm-kpi-pct',   pct + '%');
+
+    // Render chart & tabel
+    renderVMChart(data);
+    if (vmCurrentView === 'carrier') renderVMByCarrier(data);
+    else renderVMDetail(data);
+}
+
+function vmPctBadge(p) {
+    let bg, color;
+    if (p >= 80) { bg = 'rgba(45,212,175,0.15)'; color = '#2dd4bf'; }
+    else if (p >= 50) { bg = 'rgba(255,215,0,0.12)'; color = '#ffd700'; }
+    else { bg = 'rgba(248,113,113,0.12)'; color = '#f87171'; }
+    return `<span style="background:${bg};color:${color};border-radius:4px;
+                         padding:2px 8px;font-weight:800;font-size:11px;">
+                ${p.toFixed(1)}%
+            </span>`;
+}
+
+function renderVMByCarrier(data) {
+    // Agregasi per carrier
+    const agg = {};
+    data.forEach(r => {
+        const key = r.carrier || '(Tidak ada)';
+        if (!agg[key]) agg[key] = { hit: 0, miss: 0, times: [] };
+        if (r.status === 'HIT')  agg[key].hit++;
+        if (r.status === 'MISS') agg[key].miss++;
+        agg[key].times.push({ t: formatVMTime(r.addDate), s: r.status });
+    });
+
+    // Sort by total terbanyak
+    const sorted = Object.entries(agg).sort((a, b) =>
+        (b[1].hit + b[1].miss) - (a[1].hit + a[1].miss)
+    );
+
+    // Header
+    const thead = document.getElementById('vm-thead-el');
+    if (thead) {
+        thead.innerHTML = `<tr style="background:#111;">
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;width:40px;text-align:center;">#</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;min-width:130px;">Carrier</th>
+            <th style="padding:10px;border:1px solid #333;color:#2dd4bf;width:70px;">HIT</th>
+            <th style="padding:10px;border:1px solid #333;color:#f87171;width:70px;">MISS</th>
+            <th style="padding:10px;border:1px solid #333;color:#aaa;width:65px;">Total</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;width:140px;">Achievement</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;">Jam Konfirmasi</th>
+        </tr>`;
+    }
+
+    // Body
+    let html = '';
+    let totH = 0, totM = 0;
+
+    sorted.forEach(([carrier, s], i) => {
+        const tot = s.hit + s.miss;
+        const p   = tot > 0 ? (s.hit / tot * 100) : 0;
+        const barColor = p >= 80 ? '#2dd4bf' : p >= 50 ? '#ffd700' : '#f87171';
+        totH += s.hit;
+        totM += s.miss;
+
+        // Chip waktu (max 12, sisanya tampilkan "+N lainnya")
+        const chips = s.times.slice(0, 12).map(x => {
+            const chipColor = x.s === 'HIT'
+                ? 'background:rgba(45,212,175,0.15);color:#2dd4bf;border:1px solid rgba(45,212,175,0.3);'
+                : 'background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3);';
+            return `<span style="${chipColor}border-radius:3px;padding:1px 6px;
+                                  font-size:10px;font-weight:700;">${x.t}</span>`;
+        }).join(' ');
+        const more = s.times.length > 12
+            ? `<span style="color:#666;font-size:10px;"> +${s.times.length - 12} lainnya</span>`
+            : '';
+
+        html += `<tr style="border-bottom:1px solid #1e1e1e;">
+            <td style="padding:8px;text-align:center;color:#555;border:1px solid #1e1e1e;">${i + 1}</td>
+            <td style="padding:8px;text-align:left;font-weight:600;color:#eee;border:1px solid #1e1e1e;">${carrier}</td>
+            <td style="padding:8px;text-align:center;border:1px solid #1e1e1e;">
+                <span style="background:rgba(45,212,175,0.15);color:#2dd4bf;
+                             border:1px solid rgba(45,212,175,0.4);border-radius:4px;
+                             padding:2px 9px;font-weight:700;font-size:11px;">${s.hit}</span>
+            </td>
+            <td style="padding:8px;text-align:center;border:1px solid #1e1e1e;">
+                <span style="background:rgba(248,113,113,0.15);color:#f87171;
+                             border:1px solid rgba(248,113,113,0.4);border-radius:4px;
+                             padding:2px 9px;font-weight:700;font-size:11px;">${s.miss}</span>
+            </td>
+            <td style="padding:8px;text-align:center;color:#aaa;font-weight:700;border:1px solid #1e1e1e;">${tot}</td>
+            <td style="padding:8px;text-align:center;border:1px solid #1e1e1e;">
+                ${vmPctBadge(p)}
+                <span style="width:60px;height:7px;background:#333;border-radius:4px;
+                             display:inline-block;vertical-align:middle;margin-left:6px;overflow:hidden;">
+                    <span style="display:block;height:100%;width:${p}%;
+                                 background:${barColor};border-radius:4px;"></span>
+                </span>
+            </td>
+            <td style="padding:8px;text-align:left;border:1px solid #1e1e1e;">${chips}${more}</td>
+        </tr>`;
+    });
+
+    const tbody = document.getElementById('vm-tbody-el');
+    if (tbody) {
+        tbody.innerHTML = html ||
+            `<tr><td colspan="7"
+                style="text-align:center;padding:30px;color:#666;">
+                Tidak ada data untuk filter ini.
+            </td></tr>`;
+    }
+
+    // Footer grand total
+    const totAll = totH + totM;
+    const totP   = totAll > 0 ? (totH / totAll * 100).toFixed(1) : '0.0';
+    const tfoot  = document.getElementById('vm-tfoot-el');
+    if (tfoot) {
+        tfoot.innerHTML = `<tr style="background:#0f0f0f;">
+            <td colspan="2"
+                style="padding:12px 10px;text-align:left;
+                       color:#ffd700;font-weight:800;font-size:12px;
+                       border-top:2px solid #333;">
+                GRAND TOTAL
+            </td>
+            <td style="padding:12px 10px;text-align:center;color:#2dd4bf;
+                       font-weight:800;border-top:2px solid #333;">${totH}</td>
+            <td style="padding:12px 10px;text-align:center;color:#f87171;
+                       font-weight:800;border-top:2px solid #333;">${totM}</td>
+            <td style="padding:12px 10px;text-align:center;color:#aaa;
+                       font-weight:800;border-top:2px solid #333;">${totAll}</td>
+            <td colspan="2"
+                style="padding:12px 10px;text-align:center;
+                       color:#ffd700;font-weight:800;border-top:2px solid #333;">
+                ${totP}%
+            </td>
+        </tr>`;
+    }
+}
+
+function renderVMDetail(data) {
+    // Sort by addDate ascending
+    const sorted = [...data].sort((a, b) => {
+        const da = parseVMAddDate(a.addDate);
+        const db = parseVMAddDate(b.addDate);
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        return da - db;
+    });
+
+    // Header
+    const thead = document.getElementById('vm-thead-el');
+    if (thead) {
+        thead.innerHTML = `<tr style="background:#111;">
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;width:40px;text-align:center;">#</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;min-width:110px;">LC / ID</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;min-width:110px;">Carrier</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;min-width:120px;">Ship To</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;width:110px;">Load Date</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;width:110px;">Jam Konfirmasi</th>
+            <th style="padding:10px;border:1px solid #333;color:#ffd700;width:80px;">Status</th>
+        </tr>`;
+    }
+
+    // Body
+    let html  = '';
+    let hit   = 0, miss = 0;
+
+    sorted.forEach((r, i) => {
+        const jam = formatVMTime(r.addDate);
+        const isHit = r.status === 'HIT';
+        hit  += isHit ? 1 : 0;
+        miss += isHit ? 0 : 1;
+
+        const chipStyle = isHit
+            ? 'background:rgba(45,212,175,0.15);color:#2dd4bf;border:1px solid rgba(45,212,175,0.4);'
+            : 'background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.4);';
+        const badgeStyle = isHit
+            ? 'background:rgba(45,212,175,0.15);color:#2dd4bf;border:1px solid rgba(45,212,175,0.4);'
+            : 'background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.4);';
+        const rowBg = i % 2 === 0 ? '#1a1a1a' : '#151515';
+
+        html += `<tr style="background:${rowBg};border-bottom:1px solid #1e1e1e;">
+            <td style="padding:8px;text-align:center;color:#555;border:1px solid #1e1e1e;">${i + 1}</td>
+            <td style="padding:8px;text-align:left;font-family:monospace;font-size:11px;
+                       color:#ccc;border:1px solid #1e1e1e;">${r.lc || '-'}</td>
+            <td style="padding:8px;text-align:left;font-weight:600;color:#eee;border:1px solid #1e1e1e;">${r.carrier || '-'}</td>
+            <td style="padding:8px;text-align:left;font-size:11px;color:#aaa;border:1px solid #1e1e1e;">${r.shipTo || '-'}</td>
+            <td style="padding:8px;text-align:center;color:#ccc;border:1px solid #1e1e1e;">${r.loadDate || '-'}</td>
+            <td style="padding:8px;text-align:center;border:1px solid #1e1e1e;">
+                <span style="${chipStyle}border-radius:3px;padding:2px 9px;
+                             font-size:12px;font-weight:700;">${jam}</span>
+            </td>
+            <td style="padding:8px;text-align:center;border:1px solid #1e1e1e;">
+                <span style="${badgeStyle}border-radius:4px;padding:2px 9px;
+                             font-size:11px;font-weight:700;">${r.status}</span>
+            </td>
+        </tr>`;
+    });
+
+    const tbody = document.getElementById('vm-tbody-el');
+    if (tbody) {
+        tbody.innerHTML = html ||
+            `<tr><td colspan="7"
+                style="text-align:center;padding:30px;color:#666;">
+                Tidak ada data.
+            </td></tr>`;
+    }
+
+    // Footer
+    const tot  = hit + miss;
+    const p    = tot > 0 ? (hit / tot * 100).toFixed(1) : '0.0';
+    const tfoot = document.getElementById('vm-tfoot-el');
+    if (tfoot) {
+        tfoot.innerHTML = `<tr style="background:#0f0f0f;">
+            <td colspan="4"
+                style="padding:12px 10px;text-align:left;color:#ffd700;
+                       font-weight:800;font-size:12px;border-top:2px solid #333;">
+                GRAND TOTAL — ${tot} konfirmasi
+            </td>
+            <td style="padding:12px 10px;text-align:center;color:#2dd4bf;
+                       font-weight:800;border-top:2px solid #333;">${hit} HIT</td>
+            <td style="padding:12px 10px;text-align:center;color:#f87171;
+                       font-weight:800;border-top:2px solid #333;">${miss} MISS</td>
+            <td style="padding:12px 10px;text-align:center;color:#ffd700;
+                       font-weight:800;border-top:2px solid #333;">${p}%</td>
+        </tr>`;
+    }
+}
+
+function renderVMChart(data) {
+    // Agregasi per load date
+    const agg = {};
+    data.forEach(r => {
+        const key = r.loadDate || '-';
+        if (!agg[key]) agg[key] = { hit: 0, miss: 0 };
+        if (r.status === 'HIT')  agg[key].hit++;
+        if (r.status === 'MISS') agg[key].miss++;
+    });
+
+    const sorted = Object.entries(agg)
+        .sort((a, b) => new Date(a[0]) - new Date(b[0]))
+        .slice(-14); // Tampilkan max 14 tanggal terakhir
+
+    const labels = sorted.map(([d]) => d);
+    const hits   = sorted.map(([, s]) => s.hit);
+    const misses = sorted.map(([, s]) => s.miss);
+    const pcts   = sorted.map(([, s]) => {
+        const t = s.hit + s.miss;
+        return t > 0 ? parseFloat((s.hit / t * 100).toFixed(1)) : 0;
+    });
+
+    const canvas = document.getElementById('vm-trend-chart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    if (vmTrendChart) vmTrendChart.destroy();
+
+    vmTrendChart = new Chart(ctx, {
+        data: {
+            labels,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: 'HIT',
+                    data: hits,
+                    backgroundColor: 'rgba(45,212,175,0.7)',
+                    borderRadius: 3,
+                    stack: 'vm',
+                    order: 2
+                },
+                {
+                    type: 'bar',
+                    label: 'MISS',
+                    data: misses,
+                    backgroundColor: 'rgba(248,113,113,0.7)',
+                    borderRadius: 3,
+                    stack: 'vm',
+                    order: 2
+                },
+                {
+                    type: 'line',
+                    label: 'Achievement %',
+                    data: pcts,
+                    borderColor: '#ffd700',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#ffd700',
+                    tension: 0.3,
+                    yAxisID: 'yPct',
+                    order: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        color: '#aaa',
+                        font: { size: 11, weight: 'bold' },
+                        boxWidth: 10,
+                        padding: 14
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#111',
+                    titleColor: '#ffd700',
+                    bodyColor: '#fff',
+                    borderColor: '#333',
+                    borderWidth: 1
+                },
+                datalabels: { display: false }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    ticks: { color: '#888', font: { size: 10 }, maxRotation: 45 },
+                    grid: { display: false }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    ticks: { color: '#888', font: { size: 11 }, precision: 0 },
+                    grid: { color: '#2a2a2a' }
+                },
+                yPct: {
+                    position: 'right',
+                    min: 0,
+                    max: 110,
+                    ticks: {
+                        color: '#ffd700',
+                        font: { size: 10 },
+                        callback: v => v <= 100 ? v + '%' : ''
+                    },
+                    grid: { drawOnChartArea: false }
+                }
+            }
+        }
+    });
+}
+
+// Auto-load saat section Vendor dibuka
+// Panggil manual pertama kali, auto-refresh setiap 60 detik
+loadKonfirmasiVM();
+setInterval(loadKonfirmasiVM, 60000);
+// ===== END REKAP KONFIRMASI VM =====
     </script>
 </body>
 </html>
