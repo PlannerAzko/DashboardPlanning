@@ -2069,9 +2069,124 @@
 <div class="kpi-card gray" id="cbmPlanB4-card">
     <div class="kpi-label">CBM PLAN B4</div>
     <div class="kpi-value" id="cbmPlanB4">0</div>
-    </div>
+</div>
 </div>
             
+        <!-- KPI Section: Armada Planning Summary -->
+        <div id="armada-planning-summary" style="margin-top: 30px; margin-bottom: 25px; background: #1e1e1e; border: 1px solid #333; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
+            <div style="font-size: 1.1em; font-weight: bold; color: #ffd700; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-truck-loading" style="color: #ffd700;"></i> SUMMARY PLAN BY ARMADA TYPE
+            </div>
+
+            <!-- Armada Breakdown Grid (Including Total Plan) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px;">
+                <!-- Card Total Plan aligned with individual type cards -->
+                <div style="background: rgba(255, 215, 0, 0.04); border: 1px solid rgba(255, 215, 0, 0.25); border-radius: 6px; padding: 12px; border-left: 4px solid #ffd700; position: relative; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
+                    <div style="font-size: 0.85em; font-weight: bold; color: #ffd700; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-calculator" style="font-size: 0.9em; color: #ffd700;"></i> TOTAL PLAN
+                        </span>
+                        <span id="armada-total-pct" style="font-size: 1.4em; color: #ffd700; background: rgba(255, 215, 0, 0.2); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace;">100%</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.9em;">
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Plans:</span><strong id="armada-total-plans" style="color: #fff; font-size: 1.15em;">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Tot CBM:</span><strong id="armada-total-cbm" style="color: #10b981; font-size: 1.15em;">0.00</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Avg CBM:</span><strong id="armada-average-cbm" style="color: #00a8e8; font-size: 1.15em;">0.00</strong></div>
+                    </div>
+                </div>
+
+                <!-- Card Cont 20 -->
+                <div style="background: #141414; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; border-left: 3px solid #ff9f43; position: relative; overflow: hidden;">
+                    <div style="font-size: 0.85em; font-weight: bold; color: #ffd700; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-box" style="font-size: 0.9em; color: #ff9f43;"></i> Cont 20
+                        </span>
+                        <span id="kpi-cont20-pct" style="font-size: 1.4em; color: #ff9f43; background: rgba(255, 159, 67, 0.2); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace;">0%</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.9em;">
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Plans:</span><strong id="kpi-cont20-plans" style="color: #fff; font-size: 1.15em;">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Tot CBM:</span><strong id="kpi-cont20-totalcbm" style="color: #10b981; font-size: 1.15em;">0.00</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Avg CBM:</span><strong id="kpi-cont20-avgcbm" style="color: #00a8e8; font-size: 1.15em;">0.00</strong></div>
+                    </div>
+                </div>
+
+                <!-- Card Cont 40 -->
+                <div style="background: #141414; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; border-left: 3px solid #10b981; position: relative; overflow: hidden;">
+                    <div style="font-size: 0.85em; font-weight: bold; color: #ffd700; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-boxes" style="font-size: 0.9em; color: #10b981;"></i> Cont 40
+                        </span>
+                        <span id="kpi-cont40-pct" style="font-size: 1.4em; color: #10b981; background: rgba(16, 185, 129, 0.2); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace;">0%</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.9em;">
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Plans:</span><strong id="kpi-cont40-plans" style="color: #fff; font-size: 1.15em;">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Tot CBM:</span><strong id="kpi-cont40-totalcbm" style="color: #10b981; font-size: 1.15em;">0.00</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Avg CBM:</span><strong id="kpi-cont40-avgcbm" style="color: #00a8e8; font-size: 1.15em;">0.00</strong></div>
+                    </div>
+                </div>
+
+                <!-- Card Wingbox -->
+                <div style="background: #141414; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; border-left: 3px solid #00a8e8; position: relative; overflow: hidden;">
+                    <div style="font-size: 0.85em; font-weight: bold; color: #ffd700; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-truck-moving" style="font-size: 0.9em; color: #00a8e8;"></i> Wingbox
+                        </span>
+                        <span id="kpi-wingbox-pct" style="font-size: 1.4em; color: #00a8e8; background: rgba(0, 168, 232, 0.2); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace;">0%</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.9em;">
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Plans:</span><strong id="kpi-wingbox-plans" style="color: #fff; font-size: 1.15em;">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Tot CBM:</span><strong id="kpi-wingbox-totalcbm" style="color: #10b981; font-size: 1.15em;">0.00</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Avg CBM:</span><strong id="kpi-wingbox-avgcbm" style="color: #00a8e8; font-size: 1.15em;">0.00</strong></div>
+                    </div>
+                </div>
+
+                <!-- Card Fuso -->
+                <div style="background: #141414; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; border-left: 3px solid #a855f7; position: relative; overflow: hidden;">
+                    <div style="font-size: 0.85em; font-weight: bold; color: #ffd700; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-truck" style="font-size: 0.9em; color: #a855f7;"></i> Fuso
+                        </span>
+                        <span id="kpi-fuso-pct" style="font-size: 1.4em; color: #a855f7; background: rgba(168, 85, 247, 0.2); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace;">0%</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.9em;">
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Plans:</span><strong id="kpi-fuso-plans" style="color: #fff; font-size: 1.15em;">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Tot CBM:</span><strong id="kpi-fuso-totalcbm" style="color: #10b981; font-size: 1.15em;">0.00</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Avg CBM:</span><strong id="kpi-fuso-avgcbm" style="color: #00a8e8; font-size: 1.15em;">0.00</strong></div>
+                    </div>
+                </div>
+
+                <!-- Card CDD Long -->
+                <div style="background: #141414; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; border-left: 3px solid #3b82f6; position: relative; overflow: hidden;">
+                    <div style="font-size: 0.85em; font-weight: bold; color: #ffd700; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-truck-loading" style="font-size: 0.9em; color: #3b82f6;"></i> CDD Long
+                        </span>
+                        <span id="kpi-cdd-pct" style="font-size: 1.4em; color: #3b82f6; background: rgba(59, 130, 246, 0.2); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace;">0%</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.9em;">
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Plans:</span><strong id="kpi-cdd-plans" style="color: #fff; font-size: 1.15em;">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Tot CBM:</span><strong id="kpi-cdd-totalcbm" style="color: #10b981; font-size: 1.15em;">0.00</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Avg CBM:</span><strong id="kpi-cdd-avgcbm" style="color: #00a8e8; font-size: 1.15em;">0.00</strong></div>
+                    </div>
+                </div>
+
+                <!-- Card CDE Long -->
+                <div style="background: #141414; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; border-left: 3px solid #ec4899; position: relative; overflow: hidden;">
+                    <div style="font-size: 0.85em; font-weight: bold; color: #ffd700; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <span style="display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-shuttle-van" style="font-size: 0.9em; color: #ec4899;"></i> CDE Long
+                        </span>
+                        <span id="kpi-cde-pct" style="font-size: 1.4em; color: #ec4899; background: rgba(236, 72, 153, 0.2); padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace;">0%</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.9em;">
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Plans:</span><strong id="kpi-cde-plans" style="color: #fff; font-size: 1.15em;">0</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Tot CBM:</span><strong id="kpi-cde-totalcbm" style="color: #10b981; font-size: 1.15em;">0.00</strong></div>
+                        <div style="display: flex; justify-content: space-between; color: #aaa; align-items: center;"><span>Avg CBM:</span><strong id="kpi-cde-avgcbm" style="color: #00a8e8; font-size: 1.15em;">0.00</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="bottom-table">
             <div class="table-header">
                 <i class="fas fa-ship"></i> SHIPPING LINE DETAILS
@@ -2427,8 +2542,8 @@
                     <div class="cine-content">
                         <div class="cine-animate"><h1 class="cine-title" style="color: var(--accent);">Warehouse Intelligence Dashboard</h1><p class="cine-subtitle">Real-time operational summary • Auto-refreshed</p></div>
                         <div class="cine-grid cine-g-2x2">
-                            <div class="cine-card cine-animate cine-delay-1"><div class="cine-card-header"><i class="fas fa-calendar-alt"></i> Plan Today</div><div class="cine-value" id="c-data-plan-today">0</div><div class="cine-trend up"><i class="fas fa-arrow-up"></i> +12% vs yesterday</div></div>
-                            <div class="cine-card cine-animate cine-delay-2"><div class="cine-card-header"><i class="fas fa-barcode"></i> Total Case ID Today</div><div class="cine-value" id="c-data-case-today">0</div><div class="cine-trend up"><i class="fas fa-arrow-up"></i> +5% vs yesterday</div></div>
+                            <div class="cine-card cine-animate cine-delay-1"><div class="cine-card-header"><i class="fas fa-calendar-alt"></i> Plan Today</div><div class="cine-value" id="c-data-plan-today">0</div><div class="cine-trend" id="c-trend-plan-today"><i class="fas fa-arrow-up"></i> +0% vs yesterday</div></div>
+                            <div class="cine-card cine-animate cine-delay-2"><div class="cine-card-header"><i class="fas fa-barcode"></i> Total Case ID Today</div><div class="cine-value" id="c-data-case-today">0</div><div class="cine-trend" id="c-trend-case-today"><i class="fas fa-arrow-up"></i> +0% vs yesterday</div></div>
                             <div class="cine-card cine-animate cine-delay-3"><div class="cine-card-header"><i class="fas fa-shield-check"></i> SLA GRW This Month</div><div class="cine-value" id="c-data-sla-grw">0%</div><div class="cine-progress-bg"><div class="cine-progress-bar-fill" id="c-prog-sla-grw"></div></div></div>
                             <div class="cine-card cine-animate cine-delay-4"><div class="cine-card-header"><i class="fas fa-users"></i> SLA Customer This Month</div><div class="cine-value" id="c-data-sla-cust">0%</div><div class="cine-progress-bg"><div class="cine-progress-bar-fill" id="c-prog-sla-cust"></div></div></div>
                         </div>
@@ -2538,15 +2653,15 @@
                         let slaGrwSum = 0, slaGrwCount = 0;
                         let slaCustSum = 0, slaCustCount = 0;
                         
-                        let fleetOnTime = 0, fleetTerlambat = 0, fleetTotal = 0;
-                        let fleetUnsupported = 0;
-                        let unsupportedArmadas = new Set();
-                        const excludedCarriers = ['1D-INTERNAL (SDA)', 'AHI', 'DUMMY-LK-EKSP', 'DUMMY'];
-    
                         let outTotal = 0;
                         let outUnplan = 0;
                         let outPlan = 0;
-    
+                        
+                        let fleetUnsupported = 0;
+                        const unsupportedArmadas = new Set();
+                        const unsupportedList = [];
+                        const excludedCarriers = ['1D-INTERNAL (SDA)', 'AHI', 'DUMMY-LK-EKSP', 'DUMMY'];
+
                         if (typeof filteredData !== 'undefined') {
                             filteredData.forEach(row => {
                                 const z = parseNumberWithComma(row.Z || '0');
@@ -2554,37 +2669,11 @@
                                 caseIdPlan += parseNumberWithComma(row.BB || '0', true);
                                 cbmPlan += z;
                                 cbmShipped += parseNumberWithComma(row.AY || '0');
-        
-                                const sGrw = parseNumberWithComma(row.BD || '0');
-                                if (sGrw > 0) { slaGrwSum += (sGrw < 2 ? sGrw*100 : sGrw); slaGrwCount++; }
-                                
-                                const sCust = parseNumberWithComma(row.BC || '0');
-                                if (sCust > 0) { slaCustSum += (sCust < 2 ? sCust*100 : sCust); slaCustCount++; }
-        
-                                // Vendor Performance logic
+
                                 const carrier = (row.D || '').trim();
                                 const carrierUpper = carrier.toUpperCase();
-                                let bBelumSupport = false;
-                                if (!carrierUpper || carrierUpper.includes('BELUM') || carrierUpper.includes('TBA') || carrierUpper.includes('DUMMY') || carrier === '-' || carrier === '0') {
-                                    bBelumSupport = true;
-                                }
-        
-                                if (z > 0 && !bBelumSupport) {
-                                    if (!excludedCarriers.includes(carrierUpper)) {
-                                        const ketVendor = (row.AV || '').trim().toLowerCase();
-                                        if (ketVendor.includes('terlambat')) {
-                                            fleetTerlambat++;
-                                            unsupportedArmadas.add(carrier);
-                                        } else {
-                                            fleetOnTime++;
-                                        }
-                                        fleetTotal++;
-                                    }
-                                } else if (z > 0 && bBelumSupport) {
-                                    fleetUnsupported++;
-                                    unsupportedArmadas.add("UNSUPPORTED");
-                                }
-        
+                                const bBelumSupport = isBelumSupport(row);
+
                                 // Outstanding logic
                                 if (z > 0 && row.AY !== row.Z) {
                                     outTotal++;
@@ -2595,9 +2684,120 @@
                                         outPlan++;
                                     }
                                 }
+
+                                if (carrier && carrier !== '-' && carrier !== 'CARRIER') {
+                                    if (!excludedCarriers.includes(carrierUpper) && !carrierUpper.includes('DUMMY')) {
+                                        if (bBelumSupport) {
+                                            // Ensure same custom filter logic to match VENDOR SUPPORT NOT AVAILABLE
+                                            const typeArmada = (row.G || '').trim();
+                                            const aging = parseInt(row.AW) || 0;
+
+                                            // --- STUFFING DATE FILTER FOR VENDOR TAB ---
+                                            if (isVendorActive() && selectedFilters.stuffingDate.length > 0) {
+                                                const checkDate = (row.AU || '').trim();
+                                                if (!selectedFilters.stuffingDate.includes(checkDate)) return;
+                                            }
+
+                                            // --- APPLY EXTRA FILTERS ---
+                                            const matchType = selectedFilters.typeArmada.length === 0 || selectedFilters.typeArmada.includes(typeArmada);
+                                            
+                                            let matchKet = false;
+                                            if (selectedFilters.ketVendor.length === 0) {
+                                                matchKet = true;
+                                            } else {
+                                                const rowAVUpper = (row.AV || '').trim().toUpperCase();
+                                                if (selectedFilters.ketVendor.includes('TERLAMBAT') && isTerlambat(row)) {
+                                                    matchKet = true;
+                                                }
+                                                if (selectedFilters.ketVendor.includes(rowAVUpper)) {
+                                                    matchKet = true;
+                                                }
+                                            }
+                                            
+                                            let agingLabel = '';
+                                            if (aging === 1) agingLabel = '1 Hari';
+                                            else if (aging === 2) agingLabel = '2 Hari';
+                                            else if (aging === 3) agingLabel = '3 Hari';
+                                            else if (aging === 4) agingLabel = '4 Hari';
+                                            else if (aging === 5) agingLabel = '5 Hari';
+                                            else if (aging > 5) agingLabel = '> 5 Hari';
+                                            
+                                            const matchAging = selectedFilters.agingLc.length === 0 || (agingLabel && selectedFilters.agingLc.includes(agingLabel));
+                                            
+                                            if (!matchType || !matchKet || !matchAging) return;
+
+                                            unsupportedList.push(row);
+                                            unsupportedArmadas.add(row.D);
+                                        }
+                                    }
+                                }
                             });
                         }
-    
+                        fleetUnsupported = unsupportedList.length;
+
+                        // Calculate Vendor Supporting percentage (ignores Stuffing Date, but honors Month, City, Regional, Area filters)
+                        let kpiTotalLCVal = 0;
+                        let kpiOnTimeLCVal = 0;
+                        const today = new Date();
+                        today.setHours(23, 59, 59, 999);
+
+                        if (typeof allData !== 'undefined') {
+                            const dataForTrend = allData.filter(row => {
+                                const matchBulan = selectedFilters.bulan.length === 0 || selectedFilters.bulan.includes(row.AX);
+                                const matchKota = selectedFilters.kota.length === 0 || selectedFilters.kota.includes(row.AR);
+                                const matchRegional = selectedFilters.regional.length === 0 || selectedFilters.regional.includes(row.AT);
+                                const matchArea = selectedFilters.area.length === 0 || selectedFilters.area.includes(row.AS);
+                                return matchBulan && matchKota && matchRegional && matchArea;
+                            });
+
+                            const isVendor = isVendorActive();
+
+                            dataForTrend.forEach(row => {
+                                const carrier = (row.D || '').trim();
+                                if (!carrier || carrier === '-' || carrier === 'CARRIER') return;
+
+                                // Exclusion Filter
+                                const carrierUpper = carrier.toUpperCase();
+                                if (excludedCarriers.includes(carrierUpper) || carrierUpper.includes('DUMMY')) return;
+
+                                if (isBelumSupport(row)) {
+                                    kpiTotalLCVal++;
+                                } else if (isTerlambat(row)) {
+                                    kpiTotalLCVal++;
+                                } else {
+                                    // Always use raw row dates for future check
+                                    const dateVal = isVendor ? (row.AU || '').trim() : (row.AO || '').trim();
+                                    const dDate = parseDateCustom(dateVal) || parseDate(dateVal);
+                                    if (dDate && !isNaN(dDate.getTime()) && dDate > today) {
+                                        return; // Exclude H+1 on-time record
+                                    }
+                                    kpiOnTimeLCVal++;
+                                    kpiTotalLCVal++;
+                                }
+                            });
+                        }
+
+                        const fleetSupportPct = kpiTotalLCVal > 0 
+                            ? (kpiOnTimeLCVal / kpiTotalLCVal * 100).toFixed(1) 
+                            : '100.0';
+
+                        // Calculate SLA over allData matching month & region filters, bypassing date filter (locked to month-level)
+                        if (typeof allData !== 'undefined') {
+                            allData.forEach(row => {
+                                const matchBulan = selectedFilters.bulan.length === 0 || selectedFilters.bulan.includes(row.AX);
+                                const matchKota = selectedFilters.kota.length === 0 || selectedFilters.kota.includes(row.AR);
+                                const matchRegional = selectedFilters.regional.length === 0 || selectedFilters.regional.includes(row.AT);
+                                const matchArea = selectedFilters.area.length === 0 || selectedFilters.area.includes(row.AS);
+                                if (matchBulan && matchKota && matchRegional && matchArea) {
+                                    const sGrw = parseNumberWithComma(row.BD || '0');
+                                    if (sGrw > 0) { slaGrwSum += (sGrw < 2 ? sGrw*100 : sGrw); slaGrwCount++; }
+                                    
+                                    const sCust = parseNumberWithComma(row.BC || '0');
+                                    if (sCust > 0) { slaCustSum += (sCust < 2 ? sCust*100 : sCust); slaCustCount++; }
+                                }
+                            });
+                        }
+
                         // HUB ASTOR metrics
                         let hubPlan = 0, hubUnplan = 0, hubTotal = 0;
                         let hubSlaSum = 0, hubSlaCount = 0;
@@ -2640,7 +2840,6 @@
     
                         const avgSlaGrw = slaGrwCount > 0 ? (slaGrwSum / slaGrwCount).toFixed(1) : '100.0';
                         const avgSlaCust = slaCustCount > 0 ? (slaCustSum / slaCustCount).toFixed(1) : '100.0';
-                        const fleetSupportPct = fleetTotal > 0 ? ((fleetOnTime / fleetTotal) * 100).toFixed(1) : '100.0';
                         
                         const hubSlaVal = hubSlaCount > 0 ? (hubSlaSum / hubSlaCount).toFixed(1) : '100.0';
                         const azkoSlaVal = azkoSlaCount > 0 ? (azkoSlaSum / azkoSlaCount).toFixed(1) : '100.0';
@@ -2648,6 +2847,62 @@
                         unsupportedArmadas.delete("UNSUPPORTED");
                         let unsupportedArray = Array.from(unsupportedArmadas).slice(0, 5);
                         if (unsupportedArray.length === 0) unsupportedArray.push("ALL CLEAR");
+
+                        // Calculate real-time comparison for Trend: today vs yesterday
+                        let currentTasksVal = totalTasks;
+                        let currentCaseIdVal = caseIdPlan;
+                        let comparisonTasksVal = 0;
+                        let comparisonCaseIdVal = 0;
+
+                        if (typeof allData !== 'undefined' && Array.isArray(allData)) {
+                            const allDatesSorted = Array.from(new Set(allData.map(row => (row.AO || '').trim()).filter(d => d)))
+                                .sort((a, b) => parseDate(a) - parseDate(b));
+
+                            let targetDate = '';
+                            let prevDate = '';
+
+                            if (typeof selectedFilters !== 'undefined' && selectedFilters.stuffingDate && selectedFilters.stuffingDate.length === 1) {
+                                targetDate = selectedFilters.stuffingDate[0];
+                            } else if (allDatesSorted.length > 0) {
+                                targetDate = allDatesSorted[allDatesSorted.length - 1]; // latest date
+                            }
+
+                            if (targetDate && allDatesSorted.length > 0) {
+                                const idx = allDatesSorted.indexOf(targetDate);
+                                if (idx > 0) {
+                                    prevDate = allDatesSorted[idx - 1];
+                                }
+                            }
+
+                            const getMetricsForDate = (dateStr) => {
+                                let tasks = 0;
+                                let caseId = 0;
+                                allData.forEach(row => {
+                                    const matchBulan = selectedFilters.bulan.length === 0 || selectedFilters.bulan.includes(row.AX);
+                                    const matchDate = (row.AO || '').trim() === dateStr;
+                                    const matchKota = selectedFilters.kota.length === 0 || selectedFilters.kota.includes(row.AR);
+                                    const matchRegional = selectedFilters.regional.length === 0 || selectedFilters.regional.includes(row.AT);
+                                    const matchArea = selectedFilters.area.length === 0 || selectedFilters.area.includes(row.AS);
+                                    if (matchBulan && matchDate && matchKota && matchRegional && matchArea) {
+                                        tasks++;
+                                        caseId += parseNumberWithComma(row.BB || '0', true);
+                                    }
+                                });
+                                return { tasks, caseId };
+                            };
+
+                            if (targetDate) {
+                                const currentMetrics = getMetricsForDate(targetDate);
+                                currentTasksVal = currentMetrics.tasks;
+                                currentCaseIdVal = currentMetrics.caseId;
+                                
+                                if (prevDate) {
+                                    const prevMetrics = getMetricsForDate(prevDate);
+                                    comparisonTasksVal = prevMetrics.tasks;
+                                    comparisonCaseIdVal = prevMetrics.caseId;
+                                }
+                            }
+                        }
     
                         // -- INJECT INTO DOM --
                         const setTxt = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
@@ -2657,6 +2912,37 @@
     
                         setTxt('c-data-plan-today', totalTasks + ' Armada');
                         setTxt('c-data-case-today', typeof formatIndo === 'function' ? formatIndo(caseIdPlan) + ' Case ID' : caseIdPlan + ' Case ID');
+
+                        // Dynamic Trend UI updating
+                        const pTrendEl = document.getElementById('c-trend-plan-today');
+                        if (pTrendEl) {
+                            let pctChange = 0;
+                            if (comparisonTasksVal > 0) {
+                                pctChange = ((currentTasksVal - comparisonTasksVal) / comparisonTasksVal) * 100;
+                            } else if (currentTasksVal > 0 && comparisonTasksVal === 0) {
+                                pctChange = 100;
+                            }
+                            const isUp = pctChange >= 0;
+                            const sign = isUp ? '+' : '';
+                            const formattedPct = sign + pctChange.toFixed(0) + '%';
+                            pTrendEl.className = 'cine-trend ' + (isUp ? 'up' : 'down');
+                            pTrendEl.innerHTML = `<i class="fas ${isUp ? 'fa-arrow-up' : 'fa-arrow-down'}"></i> ${formattedPct} vs yesterday`;
+                        }
+
+                        const cTrendEl = document.getElementById('c-trend-case-today');
+                        if (cTrendEl) {
+                            let pctChange = 0;
+                            if (comparisonCaseIdVal > 0) {
+                                pctChange = ((currentCaseIdVal - comparisonCaseIdVal) / comparisonCaseIdVal) * 100;
+                            } else if (currentCaseIdVal > 0 && comparisonCaseIdVal === 0) {
+                                pctChange = 100;
+                            }
+                            const isUp = pctChange >= 0;
+                            const sign = isUp ? '+' : '';
+                            const formattedPct = sign + pctChange.toFixed(0) + '%';
+                            cTrendEl.className = 'cine-trend ' + (isUp ? 'up' : 'down');
+                            cTrendEl.innerHTML = `<i class="fas ${isUp ? 'fa-arrow-up' : 'fa-arrow-down'}"></i> ${formattedPct} vs yesterday`;
+                        }
                         
                         setTxt('c-data-sla-grw', avgSlaGrw + '%');
                         setWidth('c-prog-sla-grw', avgSlaGrw + '%');
@@ -3001,35 +3287,41 @@
                                 </thead>
                                 <tbody>
                                     <tr style="border-bottom: 1px solid #1f1f1f;">
-                                        <td style="padding: 8px 4px; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #ddd;">
-                                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.5);"></span>
-                                            On Time
+                                        <td style="padding: 8px 4px; font-weight: 600; color: #ddd;">
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.5);"></span>
+                                                On Time
+                                            </div>
                                         </td>
-                                        <td id="breakdown-ontime-count" style="padding: 8px 4px; text-align: right; color: #10b981; font-weight: bold; font-family: monospace; font-size: 1.1em;">0</td>
+                                        <td id="breakdown-ontime-count" style="padding: 8px 4px; text-align: right; color: #10b981; font-weight: bold; font-size: 1.1em;">0</td>
                                         <td id="breakdown-ontime-pct" style="padding: 8px 4px; text-align: right; color: #fff; font-weight: bold; font-size: 1.1em;">0%</td>
                                     </tr>
                                     <tr style="border-bottom: 1px solid #1f1f1f;">
-                                        <td style="padding: 8px 4px; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #ddd;">
-                                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.5);"></span>
-                                            Terlambat
+                                        <td style="padding: 8px 4px; font-weight: 600; color: #ddd;">
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.5);"></span>
+                                                Terlambat
+                                            </div>
                                         </td>
-                                        <td id="breakdown-terlambat-count" style="padding: 8px 4px; text-align: right; color: #ef4444; font-weight: bold; font-family: monospace; font-size: 1.1em;">0</td>
+                                        <td id="breakdown-terlambat-count" style="padding: 8px 4px; text-align: right; color: #ef4444; font-weight: bold; font-size: 1.1em;">0</td>
                                         <td id="breakdown-terlambat-pct" style="padding: 8px 4px; text-align: right; color: #fff; font-weight: bold; font-size: 1.1em;">0%</td>
                                     </tr>
                                     <tr style="border-bottom: 1px solid #1f1f1f;">
-                                        <td style="padding: 8px 4px; display: flex; align-items: center; gap: 8px; font-weight: 600; color: #ddd;">
-                                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ff9f43; box-shadow: 0 0 8px rgba(255,159,67,0.5);"></span>
-                                            Delay Support
+                                        <td style="padding: 8px 4px; font-weight: 600; color: #ddd;">
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ff9f43; box-shadow: 0 0 8px rgba(255,159,67,0.5);"></span>
+                                                Delay Support
+                                            </div>
                                         </td>
-                                        <td id="breakdown-support-count" style="padding: 8px 4px; text-align: right; color: #ff9f43; font-weight: bold; font-family: monospace; font-size: 1.1em;">0</td>
+                                        <td id="breakdown-support-count" style="padding: 8px 4px; text-align: right; color: #ff9f43; font-weight: bold; font-size: 1.1em;">0</td>
                                         <td id="breakdown-support-pct" style="padding: 8px 4px; text-align: right; color: #fff; font-weight: bold; font-size: 1.1em;">0%</td>
                                     </tr>
                                     <tr style="font-weight: bold; background: rgba(255,215,0,0.04);">
                                         <td style="padding: 10px 4px; color: #ffd700;">
                                             TOTAL LC
                                         </td>
-                                        <td id="breakdown-total-count" style="padding: 10px 4px; text-align: right; color: #ffd700; font-family: monospace; font-size: 1.15em;">0</td>
-                                        <td style="padding: 10px 4px; text-align: right; color: #ffd700; font-size: 1.15em;">100%</td>
+                                        <td id="breakdown-total-count" style="padding: 10px 4px; text-align: right; color: #ffd700; font-size: 1.1em;">0</td>
+                                        <td style="padding: 10px 4px; text-align: right; color: #ffd700; font-size: 1.1em;">100%</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -3083,11 +3375,11 @@
                                 <th rowspan="2" style="width: 120px; background: #8b0000; color: #fff; font-weight: bold; text-align: center; font-size: 1.15em; padding: 12px 10px;">TOTAL DELAY <i class="fas fa-sort-down"></i></th>
                             </tr>
                             <tr class="sub-header">
-                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">1th</th>
-                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">2nd</th>
-                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">3rd</th>
-                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">4th</th>
-                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">5th</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">1</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">2</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">3</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">4</th>
+                                <th style="background: #111; color: #00a8e8; width: 60px; text-align: center; font-size: 1.05em; padding: 8px 10px;">5</th>
                                 <th style="background: #111; color: #00a8e8; width: 80px; border-right: 1px solid #333; text-align: center; font-size: 1.05em; padding: 8px 10px;">5 UP</th>
                             </tr>
                         </thead>
@@ -7876,13 +8168,8 @@ function renderStoringPivotTable(filteredData) {
             
             const stores = {};
             data.forEach(row => {
-                // Filter by Area BB (Exclude AREA ASTOR unless specifically selected - which is impossible now as it's removed from list)
-                const isAstor = row.areaBB === 'AREA ASTOR';
-                if (selectedBB === 'ALL') {
-                    if (isAstor) return;
-                } else {
-                    if (row.areaBB !== selectedBB) return;
-                }
+                // Filter by Area BB
+                if (selectedBB !== 'ALL' && row.areaBB !== selectedBB) return;
 
                 // Filter by Status Plan
                 if (selectedStatus !== 'ALL' && row.status !== selectedStatus) return;
@@ -7895,11 +8182,11 @@ function renderStoringPivotTable(filteredData) {
                 else if (status === targetKeywords.notStarted) type = 'notStarted';
 
                 if (type) {
-                    const key = row.storeBooking;
+                    const key = row.storeBooking || 'UNKNOWN';
                     if (!stores[key]) {
                         stores[key] = {
-                            storeBooking: row.storeBooking,
-                            storeBookingName: row.storeBookingName,
+                            storeBooking: row.storeBooking || '-',
+                            storeBookingName: row.storeBookingName || 'Unspecified Store',
                             didNot: 0,
                             preAlloc: 0,
                             partPre: 0,
@@ -10380,6 +10667,94 @@ function updateDashboard() {
             document.getElementById('cbmPlanB2').textContent = formatIndo(cbmB2);
             document.getElementById('cbmPlanB3').textContent = formatIndo(cbmB3);
             document.getElementById('cbmPlanB4').textContent = formatIndo(cbmB4);
+
+            // Update Armada summary planning KPI values dynamically
+            updateArmadaPlanningKPIs();
+        }
+
+        // Update Armada Summary Plan KPIs values dynamically
+        function updateArmadaPlanningKPIs() {
+            // Calculate Armada KPIs
+            let plans20 = 0, totalCbm20 = 0;
+            let plans40 = 0, totalCbm40 = 0;
+            let plansWb = 0, totalCbmWb = 0;
+            let plansFuso = 0, totalCbmFuso = 0;
+            let plansCdd = 0, totalCbmCdd = 0;
+            let plansCde = 0, totalCbmCde = 0;
+            let plansOther = 0, totalCbmOther = 0;
+
+            let totalPlans = 0;
+            let totalCbmAll = 0;
+
+            filteredData.forEach(row => {
+                const gVal = (row.G || '').trim().toUpperCase();
+                const cbmVal = parseNumberWithComma(row.Z);
+                
+                totalPlans++;
+                totalCbmAll += cbmVal;
+
+                if (gVal.includes('20') || (gVal.includes('CONT') && gVal.includes('20'))) {
+                    plans20++;
+                    totalCbm20 += cbmVal;
+                } else if (gVal.includes('40') || (gVal.includes('CONT') && gVal.includes('40'))) {
+                    plans40++;
+                    totalCbm40 += cbmVal;
+                } else if (gVal.includes('WINGBOX') || gVal.includes('WBOX') || gVal === 'WING') {
+                    plansWb++;
+                    totalCbmWb += cbmVal;
+                } else if (gVal.includes('FUSO')) {
+                    plansFuso++;
+                    totalCbmFuso += cbmVal;
+                } else if (gVal.includes('CDD')) {
+                    plansCdd++;
+                    totalCbmCdd += cbmVal;
+                } else if (gVal.includes('CDE')) {
+                    plansCde++;
+                    totalCbmCde += cbmVal;
+                } else {
+                    plansOther++;
+                    totalCbmOther += cbmVal;
+                }
+            });
+
+            const avgCbmAll = totalPlans > 0 ? (totalCbmAll / totalPlans) : 0;
+            
+            // Format numbers helper
+            const fCbm = (val) => val.toLocaleString('id-ID', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            // Set main summary text Content
+            const armadaTotalPlansEl = document.getElementById('armada-total-plans');
+            const armadaTotalCbmEl = document.getElementById('armada-total-cbm');
+            const armadaAvgCbmEl = document.getElementById('armada-average-cbm');
+
+            if (armadaTotalPlansEl) armadaTotalPlansEl.textContent = totalPlans.toLocaleString('id-ID');
+            if (armadaTotalCbmEl) armadaTotalCbmEl.textContent = fCbm(totalCbmAll);
+            if (armadaAvgCbmEl) armadaAvgCbmEl.textContent = fCbm(avgCbmAll);
+
+            // Set each card text content
+            const setArmadaCard = (pId, cId, aId, plans, total) => {
+                const pEl = document.getElementById(pId);
+                const cEl = document.getElementById(cId);
+                const aEl = document.getElementById(aId);
+                if (pEl) pEl.textContent = plans.toLocaleString('id-ID');
+                if (cEl) cEl.textContent = fCbm(total);
+                if (aEl) aEl.textContent = fCbm(plans > 0 ? total / plans : 0);
+
+                // Update percentage share of total plans
+                const pctId = pId.replace('-plans', '-pct');
+                const pctEl = document.getElementById(pctId);
+                if (pctEl) {
+                    const computedPct = totalPlans > 0 ? (plans / totalPlans * 100) : 0;
+                    pctEl.textContent = computedPct.toLocaleString('id-ID', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + '%';
+                }
+            };
+
+            setArmadaCard('kpi-cont20-plans', 'kpi-cont20-totalcbm', 'kpi-cont20-avgcbm', plans20, totalCbm20);
+            setArmadaCard('kpi-cont40-plans', 'kpi-cont40-totalcbm', 'kpi-cont40-avgcbm', plans40, totalCbm40);
+            setArmadaCard('kpi-wingbox-plans', 'kpi-wingbox-totalcbm', 'kpi-wingbox-avgcbm', plansWb, totalCbmWb);
+            setArmadaCard('kpi-fuso-plans', 'kpi-fuso-totalcbm', 'kpi-fuso-avgcbm', plansFuso, totalCbmFuso);
+            setArmadaCard('kpi-cdd-plans', 'kpi-cdd-totalcbm', 'kpi-cdd-avgcbm', plansCdd, totalCbmCdd);
+            setArmadaCard('kpi-cde-plans', 'kpi-cde-totalcbm', 'kpi-cde-avgcbm', plansCde, totalCbmCde);
         }
 
         // Update Map - More accurate city locations
