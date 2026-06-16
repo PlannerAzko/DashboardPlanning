@@ -11871,15 +11871,6 @@ function parseVMAddDate(s) {
     return null;
 }
 
-function classifyVMByTime(addDateStr) {
-    const d = parseVMAddDate(addDateStr);
-    if (!d || isNaN(d.getTime())) return null;
-    const totalMinutes = d.getHours() * 60 + d.getMinutes();
-    // HIT  = sebelum jam 13:00 (< 780 menit)
-    // MISS = jam 13:00 ke atas (>= 780 menit)
-    return totalMinutes < 780 ? 'HIT' : 'MISS';
-}
-
 function formatVMTime(addDateStr) {
     const d = parseVMAddDate(addDateStr);
     if (!d || isNaN(d.getTime())) return '-';
@@ -11898,7 +11889,8 @@ async function loadKonfirmasiVM(retries = 2) {
 
     try {
         // Gunakan CSV_URL yang sudah ada di dashboard (sheet AHI)
-        const url      = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=${SHEET_GID_AHI}`;
+        const KONFIRMASI_VM_GID = '1583314709'; // gid tab "DUMMY"
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=${KONFIRMASI_VM_GID}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const csv = await response.text();
@@ -11913,28 +11905,30 @@ async function loadKonfirmasiVM(retries = 2) {
         // Skip header (baris 0), mulai dari baris 1
         for (let i = 1; i < allRows.length; i++) {
             const r = allRows[i];
-            if (r.length < 6) continue;
+            if (r.length < 9) continue;
+// Mapping kolom sesuai sheet DUMMY (gid=1583314709):
+    // A(0)=LC, B(1)=CARRIER, C(2)=SHIP TO, D(3)=SHIPINGLINE,
+    // E(4)=TUJUAN, F(5)=ADD DATE, G(6)=LOAD DATE, H(7)=CBM, I(8)=KONFIRMASI VM (status final, dari sheet)
+            
+            const lc        = (r[0]  || '').trim();
+const carrier   = (r[1]  || '').trim();
+const shipTo    = (r[2]  || '').trim();
+const shipLine  = (r[3]  || '').trim();
+const tujuan    = (r[4]  || '').trim();
+const addDate   = (r[5]  || '').trim();
+const loadDate  = (r[6]  || '').trim();
+const cbm       = parseNumberWithComma(r[7] || '0');
+const statusRaw = (r[8]  || '').trim().toUpperCase(); // kolom I = KONFIRMASI VM, ambil apa adanya
 
-            // Mapping kolom sesuai sheet AHI (gid=1144899065):
-            // A(0)=LC, B(1)=CARRIER, C(2)=SHIP TO, D(3)=SHIPINGLINE
-            // E(4)=TUJUAN, F(5)=ADD DATE, G(6)=LOAD DATE, H(7)=CBM, I(8)=KONFIRMASI VM
-            const lc       = (r[0]  || '').trim();
-            const carrier  = (r[1]  || '').trim();
-            const shipTo   = (r[2]  || '').trim();
-            const shipLine = (r[3]  || '').trim();
-            const tujuan   = (r[4]  || '').trim();
-            const addDate  = (r[5]  || '').trim();
-            const loadDate = (r[6]  || '').trim();
-            const cbm      = parseNumberWithComma(r[7] || '0');
+if (!lc && !carrier && !addDate) continue;
+if (lc.toLowerCase() === 'lc' || lc.toLowerCase() === 'lc/id') continue;
 
-            // Skip baris kosong atau header yang berulang
-            if (!lc && !carrier && !addDate) continue;
-            if (lc.toLowerCase() === 'lc' || lc.toLowerCase() === 'lc/id') continue;
+// status TIDAK dihitung, hanya dibaca persis dari sheet
+let status = null;
+if (statusRaw === 'HIT') status = 'HIT';
+else if (statusRaw === 'MISS') status = 'MISS';
 
-            const status = classifyVMByTime(addDate);
-
-            // Hanya masukkan data yang punya ADD DATE dan bisa diklasifikasi
-            if (!status) continue;
+if (!status) continue; // baris yang kolom I-nya kosong/bukan HIT/MISS dilewati
 
             rawKonfirmasiVM.push({
                 lc, carrier, shipTo, shipLine,
