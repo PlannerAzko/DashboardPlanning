@@ -2599,20 +2599,29 @@
 
                 <!-- E. KESIMPULAN -->
                 <div class="cine-section" id="cine-sec-e" style="--accent: var(--c-purple);">
-                    <div class="cine-content" style="text-align: center;">
-                        <div class="cine-animate"><h1 class="cine-title" style="color: var(--accent);">AI Agent Conclusion</h1><p class="cine-subtitle">Automated warehouse health assessment</p></div>
-                        <div class="cine-card cine-animate cine-delay-1" style="max-width: 800px; margin: 0 auto; padding: 50px;">
-                            <div class="cine-status-pulse" id="c-ai-pulse" style="--accent: var(--c-amber); color: var(--c-amber);"><i class="fas fa-exclamation-triangle"></i></div>
-                            <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 20px; color: var(--c-amber);" id="c-ai-status-text">Warehouse Moderately Healthy</h2>
-                            <p style="font-size: 1.1rem; line-height: 1.6; color: rgba(255,255,255,0.8); margin-bottom: 40px;" id="c-ai-reasoning"></p>
-                            <div style="display: flex; justify-content: center; gap: 15px;">
-                                <button class="cine-btn" onclick="alert('Exporting PDF...')"><i class="fas fa-file-pdf"></i> Export Report PDF</button>
-                                <button class="cine-btn" onclick="alert('Pinging team...')"><i class="fas fa-bell"></i> Notify Team</button>
-                                <button class="cine-btn" style="background: var(--c-purple); color: #fff; border: none;" onclick="cineReinitParams()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+                    <div class="cine-content" style="max-width: 900px; margin: 0 auto;">
+                        <div class="cine-animate"><h1 class="cine-title" style="color: var(--accent);">AI Supply Chain Conclusion</h1><p class="cine-subtitle">Automated planning recommendations & system health</p></div>
+                        <div class="cine-grid cine-g-2cine" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; margin-top: 25px;">
+                            <div class="cine-card cine-animate cine-delay-1" style="border-left: 4px solid var(--c-purple); display: flex; flex-direction: column; gap: 15px;">
+                                <div class="cine-card-header" style="color: var(--c-purple);"><i class="fas fa-brain"></i> System Status Assessment</div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div class="cine-status-pulse" id="c-ai-pulse" style="--accent: var(--c-amber); color: var(--c-amber); width: 45px; height: 45px; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,200,0,0.1);"><i class="fas fa-exclamation-triangle"></i></div>
+                                    <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--c-amber); margin: 0;" id="c-ai-status-text">Analyzing metrics...</h2>
+                                </div>
+                                <p style="font-size: 0.95rem; line-height: 1.6; color: rgba(255,255,255,0.8); margin: 0;" id="c-ai-reasoning"></p>
+                            </div>
+                            <div class="cine-card cine-animate cine-delay-2" style="border-left: 4px solid var(--c-emerald); display: flex; flex-direction: column; gap: 12px;">
+                                <div class="cine-card-header" style="color: var(--c-emerald);"><i class="fas fa-clipboard-list-check"></i> Strategic Recommendations (AI Supply Chain)</div>
+                                <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem; color: rgba(255,255,255,0.85);">
+                                    <li style="display: flex; gap: 10px; align-items: flex-start;"><i class="fas fa-check-circle" style="color: var(--c-emerald); margin-top: 3px; font-size: 0.95rem;"></i> <span><b>Prioritize ASTOR RTs:</b> Target pending AZKO & KWI orders within the 5-line limit to maintain high fulfillment SLAs.</span></li>
+                                    <li style="display: flex; gap: 10px; align-items: flex-start;"><i class="fas fa-check-circle" style="color: var(--c-emerald); margin-top: 3px; font-size: 0.95rem;"></i> <span><b>Vendor Coordination:</b> Promptly engage with unsupported fleet providers today to reduce transit backlog.</span></li>
+                                    <li style="display: flex; gap: 10px; align-items: flex-start;"><i class="fas fa-check-circle" style="color: var(--c-emerald); margin-top: 3px; font-size: 0.95rem;"></i> <span><b>HUB GRW Sync:</b> Keep incoming store routes organized to minimize cross-docking delays.</span></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <script>
@@ -2838,11 +2847,26 @@
                             });
                         }
     
+                        // Check if we need to call renderHubTable and renderAstorSLA to compute latest values
+                        if (typeof renderHubTable === 'function' && typeof window.hubSlaRateLast === 'undefined' && typeof rawHubData !== 'undefined' && rawHubData.length > 0) {
+                            renderHubTable();
+                        }
+                        if (typeof renderAstorSLA === 'function' && typeof window.astorSlaRateLast === 'undefined' && typeof rawAstorData !== 'undefined' && rawAstorData.length > 0) {
+                            renderAstorSLA();
+                        }
+
                         const avgSlaGrw = slaGrwCount > 0 ? (slaGrwSum / slaGrwCount).toFixed(1) : '100.0';
                         const avgSlaCust = slaCustCount > 0 ? (slaCustSum / slaCustCount).toFixed(1) : '100.0';
                         
-                        const hubSlaVal = hubSlaCount > 0 ? (hubSlaSum / hubSlaCount).toFixed(1) : '100.0';
-                        const azkoSlaVal = azkoSlaCount > 0 ? (azkoSlaSum / azkoSlaCount).toFixed(1) : '100.0';
+                        let hubSlaVal = hubSlaCount > 0 ? (hubSlaSum / hubSlaCount).toFixed(1) : '100.0';
+                        if (window.hubSlaRateLast !== undefined) {
+                            hubSlaVal = window.hubSlaRateLast.toFixed(1);
+                        }
+
+                        let azkoSlaVal = azkoSlaCount > 0 ? (azkoSlaSum / azkoSlaCount).toFixed(1) : '100.0';
+                        if (window.astorSlaRateLast !== undefined) {
+                            azkoSlaVal = window.astorSlaRateLast.toFixed(1);
+                        }
     
                         unsupportedArmadas.delete("UNSUPPORTED");
                         let unsupportedArray = Array.from(unsupportedArmadas).slice(0, 5);
@@ -2958,33 +2982,68 @@
                         setTxt('c-data-fleet-unsupported', fleetUnsupported + ' Armada');
                         setHTML('c-data-fleet-list', unsupportedArray.map(a => '<span style="background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">' + a + '</span>').join(''));
                         
-                        setTxt('c-data-out-tot', outTotal + ' Items');
-                        setTxt('c-data-out-unplan', outUnplan + ' Items');
-                        setTxt('c-data-out-plan', outPlan + ' Items');
+                        // Fetch of Outstanding KPIs from rawPivotData filter (exactly matching Outstanding Menu)
+                        let pBacklogOut = 0;
+                        let pBacklogSudah = 0;
+                        let pBacklogBelum = 0;
+
+                        if (typeof rawPivotData !== 'undefined' && Array.isArray(rawPivotData)) {
+                            const areaFilter = document.getElementById('pivot-area-filter') ? document.getElementById('pivot-area-filter').value : 'ALL';
+                            const filteredPivot = areaFilter === 'ALL' 
+                                ? rawPivotData 
+                                : rawPivotData.filter(d => d.area === areaFilter);
+                            
+                            filteredPivot.forEach(row => {
+                                pBacklogOut += row.cbm;
+                                if (row.status === 'Sudah Plan') pBacklogSudah += row.cbm;
+                                if (row.status === 'Belum Plan') pBacklogBelum += row.cbm;
+                            });
+                        }
+
+                        setTxt('c-data-out-tot', (typeof formatIndo === 'function' ? formatIndo(pBacklogOut) : pBacklogOut) + ' CBM');
+                        setTxt('c-data-out-unplan', (typeof formatIndo === 'function' ? formatIndo(pBacklogBelum) : pBacklogBelum) + ' CBM');
+                        setTxt('c-data-out-plan', (typeof formatIndo === 'function' ? formatIndo(pBacklogSudah) : pBacklogSudah) + ' CBM');
                         
-                        const rtPlan = outTotal > 0 ? (outPlan / outTotal) * 100 : 0;
-                        const rtUnplan = outTotal > 0 ? (outUnplan / outTotal) * 100 : 0;
+                        const rtPlan = pBacklogOut > 0 ? (pBacklogSudah / pBacklogOut) * 100 : 0;
+                        const rtUnplan = pBacklogOut > 0 ? (pBacklogBelum / pBacklogOut) * 100 : 0;
                         setWidth('c-prog-ratio-plan', rtPlan + '%');
                         setWidth('c-prog-ratio-unplan', rtUnplan + '%');
     
+                        let finalHubPlan = hubPlan;
+                        let finalHubUnplan = hubUnplan;
+                        if (window.hubStatsLast !== undefined) {
+                            finalHubPlan = window.hubStatsLast.sudahDatang.sudahPlan + window.hubStatsLast.belumDatang.sudahPlan;
+                            finalHubUnplan = window.hubStatsLast.sudahDatang.belumPlan + window.hubStatsLast.belumDatang.belumPlan;
+                        }
+
                         setTxt('c-data-hub-sla', hubSlaVal + '%');
                         setWidth('c-prog-hub-sla', hubSlaVal + '%');
-                        setTxt('c-data-hub-plan', typeof formatIndo === 'function' ? formatIndo(hubPlan) : hubPlan);
-                        setTxt('c-data-hub-unplan', typeof formatIndo === 'function' ? formatIndo(hubUnplan) : hubUnplan);
+                        setTxt('c-data-hub-plan', (typeof formatIndo === 'function' ? formatIndo(finalHubPlan) : finalHubPlan) + ' STORE');
+                        setTxt('c-data-hub-unplan', (typeof formatIndo === 'function' ? formatIndo(finalHubUnplan) : finalHubUnplan) + ' STORE');
     
+                        let finalAzkoPlan = typeof formatIndo === 'function' ? formatIndo(azkoPlan) : azkoPlan;
+                        let finalAzkoUnplan = typeof formatIndo === 'function' ? formatIndo(azkoUnplan) : azkoUnplan;
+                        if (window.astorRtSudahLast !== undefined) {
+                            finalAzkoPlan = window.astorRtSudahLast + ' RT';
+                        }
+                        if (window.astorRtBelumLast !== undefined) {
+                            finalAzkoUnplan = window.astorRtBelumLast + ' RT';
+                        }
+
                         setTxt('c-data-azko-sla', azkoSlaVal + '%');
                         setWidth('c-prog-azko-sla', azkoSlaVal + '%');
-                        setTxt('c-data-azko-plan', typeof formatIndo === 'function' ? formatIndo(azkoPlan) : azkoPlan);
-                        setTxt('c-data-azko-unplan', typeof formatIndo === 'function' ? formatIndo(azkoUnplan) : azkoUnplan);
+                        setTxt('c-data-azko-plan', finalAzkoPlan);
+                        setTxt('c-data-azko-unplan', finalAzkoUnplan);
     
                         // AI Reasoning
                         let state = 'warning';
-                        if (parseFloat(avgSlaGrw) >= 90 && outUnplan < 10) state = 'success';
-                        else if (parseFloat(avgSlaGrw) < 80 || outUnplan > 50) state = 'critical';
+                        const roundedUnplannedCbm = Math.round(pBacklogBelum);
+                        if (parseFloat(avgSlaGrw) >= 90 && roundedUnplannedCbm < 10) state = 'success';
+                        else if (parseFloat(avgSlaGrw) < 80 || roundedUnplannedCbm > 50) state = 'critical';
                         
-                        let aiMsg = `Warehouse operates at SLA GRW ${avgSlaGrw}% (Customer ${avgSlaCust}%). Outstanding: ${outTotal} items (${outUnplan} unassigned). Fleet support stands at ${fleetSupportPct}%. Action recommended: address ${fleetUnsupported} unsupported lanes.`;
-                        if (state === 'success') aiMsg = `All operational metrics look highly optimal. SLA GRW is performing well at ${avgSlaGrw}%. Outstanding items are well-managed with only ${outUnplan} unassigned.`;
-                        if (state === 'critical') aiMsg = `CRITICAL ALERT: Operational metrics have degraded. Ensure all ${outUnplan} unplanned items and ${fleetUnsupported} unsupported fleets are addressed immediately.`;
+                        let aiMsg = `Warehouse operates at SLA GRW ${avgSlaGrw}% (Customer ${avgSlaCust}%). Outstanding: ${formatIndo(pBacklogOut)} CBM (${formatIndo(pBacklogBelum)} CBM unassigned). Fleet support stands at ${fleetSupportPct}%. Action recommended: address ${fleetUnsupported} unsupported lanes.`;
+                        if (state === 'success') aiMsg = `All operational metrics look highly optimal. SLA GRW is performing well at ${avgSlaGrw}%. Outstanding items are well-managed with only ${formatIndo(pBacklogBelum)} CBM unassigned.`;
+                        if (state === 'critical') aiMsg = `CRITICAL ALERT: Operational metrics have degraded. Ensure all ${formatIndo(pBacklogBelum)} CBM unplanned items and ${fleetUnsupported} unsupported fleets are addressed immediately.`;
 
                         const ptColor = state === 'success' ? 'var(--c-emerald)' : (state === 'critical' ? 'var(--c-red)' : 'var(--c-amber)');
                         const stIcon = state === 'success' ? 'fa-shield-check' : (state === 'critical' ? 'fa-times-circle' : 'fa-exclamation-triangle');
@@ -4297,7 +4356,7 @@
 
   /* ── Init + Auto-refresh ── */
   fetchTransitData();
-  setInterval(fetchTransitData, 300000);
+  setInterval(fetchTransitData, 60000);
 
 })();
 </script>
@@ -7228,6 +7287,14 @@ filteredHubData.forEach(row => {
 
     const slaTotal = slaHit + slaMiss;
     const slaRate = slaTotal > 0 ? (slaHit / slaTotal * 100) : 0;
+    
+    // Expose to window for Cinematic Dashboard
+    window.hubSlaRateLast = slaRate;
+    window.hubStatsLast = {
+        sudahDatang: { sudahPlan: stats.sudahDatang.sudahPlan, belumPlan: stats.sudahDatang.belumPlan },
+        belumDatang: { sudahPlan: stats.belumDatang.sudahPlan, belumPlan: stats.belumDatang.belumPlan }
+    };
+
     const circumference = 2 * Math.PI * 30;
     const slaOffset = circumference - (slaRate / 100) * circumference;
 
@@ -10834,13 +10901,13 @@ function updateDashboard() {
 
         // Event Listeners (Removed old listeners, logic handled in checkboxes)
         
-        // Auto-refresh every 30 seconds
-        setInterval(fetchData, 30000);
-        setInterval(fetchPlannerData, 30000);
-        setInterval(fetchOrderDistData, 30000);
+        // Auto-refresh every 1 minute
+        setInterval(fetchData, 60000);
+        setInterval(fetchPlannerData, 60000);
+        setInterval(fetchOrderDistData, 60000);
         setInterval(() => {
             if (document.body.classList.contains('theme-purple')) fetchSlaFbiData();
-        }, 30000);
+        }, 60000);
 
         // Initialize
         initMap();
@@ -11185,6 +11252,16 @@ const data = rawAstorData.filter(r => {
     const lineOsTot = lineOsCbmFiltered / LINE_FACTOR;
     const occupancyPct = Math.min((lineOsTot / MAX_LINES) * 100, 100);
     const freeLines = Math.max(MAX_LINES - lineOsTot, 0);
+
+    // Expose to window for Cinematic Dashboard
+    window.astorSlaRateLast = pct;
+    window.astorOsLast = os;
+    window.astorOsCbmLast = osCbm;
+    window.astorLineOsLast = lineOsTot;
+    window.astorLineSudahLast = lineSudahTot;
+    window.astorLineBelumLast = lineBelumTot;
+    window.astorRtSudahLast = lineSudahCount;
+    window.astorRtBelumLast = lineBelumCount;
 
     document.getElementById('astor-total').textContent           = total + os;
     document.getElementById('astor-hit').textContent             = hit;
