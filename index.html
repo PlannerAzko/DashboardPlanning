@@ -9963,8 +9963,9 @@ function updateDashboard() {
                 const ketVendor = (row.AV || '').trim();
                 const aging = parseInt(row.AW) || 0;
                 
-                // Pengecualian: Jangan tampilkan jika carrier adalah 1D-INTERNAL (SDA) atau AHI
-                if (carrier === '1D-INTERNAL (SDA)' || carrier === 'AHI') return;
+                // Exclusion Filter
+                const excludedCarriers = ['1D-INTERNAL (SDA)', 'AHI', 'DUMMY-LK-EKSP', 'DUMMY'];
+                if (excludedCarriers.includes(carrier) || carrier.includes('DUMMY')) return;
 
                 const isBelumSpt = isBelumSupport(row);
 
@@ -10097,8 +10098,10 @@ function updateDashboard() {
 
         function updateDailyVendorTrendChart() {
             const isVendor = isVendorActive();
+            const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
             
-            // Filter allData honoring other parameters except stuffingDate
+            // Filter allData honoring other parameters, but IGNORE stuffingDate to lock full month view (tgl 1 s/d H-1)
             const dataForTrend = allData.filter(row => {
                 const matchBulan = selectedFilters.bulan.length === 0 || selectedFilters.bulan.includes(row.AX);
                 const matchKota = selectedFilters.kota.length === 0 || selectedFilters.kota.includes(row.AR);
@@ -10118,14 +10121,23 @@ function updateDashboard() {
                 const carrierUpper = carrier.toUpperCase();
                 if (excludedCarriers.includes(carrierUpper) || carrierUpper.includes('DUMMY')) return;
 
-                const dateVal = isVendor ? (row.AU || '').trim() : (row.AO || '').trim();
+                const isBelumSpt = isBelumSupport(row);
+                const dateVal = isVendor 
+                    ? (isBelumSpt ? (row.AU || '').trim() : (row.AO || '').trim())
+                    : (row.AO || '').trim();
+                
                 if (!dateVal || dateVal === '-' || dateVal === '0') return;
+
+                const dDate = parseDateCustom(dateVal) || parseDate(dateVal);
+                if (dDate && !isNaN(dDate.getTime()) && dDate >= todayStart) {
+                    return; // Exclude today (H-0) and future records from daily trend
+                }
 
                 if (!dailyAgg[dateVal]) {
                     dailyAgg[dateVal] = { date: dateVal, onTime: 0, terlambat: 0, belumSupport: 0, total: 0 };
                 }
 
-                if (isBelumSupport(row)) {
+                if (isBelumSpt) {
                     dailyAgg[dateVal].belumSupport++;
                 } else if (isTerlambat(row)) {
                     dailyAgg[dateVal].terlambat++;
@@ -10135,15 +10147,12 @@ function updateDashboard() {
                 dailyAgg[dateVal].total++;
             });
 
-            // Filter out empty states or no dates in agg, and ensure it does not exceed today's date (H-day)
-            const today = new Date();
-            today.setHours(23, 59, 59, 999);
-
+            // Filter out empty states or no dates in agg, and ensure it does not exceed yesterday (H-1)
             const sortedDates = Object.keys(dailyAgg).filter(d => {
                 if (!d) return false;
                 const dDate = parseDateCustom(d) || parseDate(d);
                 if (!dDate || isNaN(dDate.getTime())) return true;
-                if (dDate > today) return false;
+                if (dDate >= todayStart) return false;
 
                 // Ensure the date belongs to the currently active/selected month (if any month is selected)
                 if (selectedFilters.bulan.length > 0) {
@@ -10193,18 +10202,20 @@ function updateDashboard() {
                 const carrierUpper = carrier.toUpperCase();
                 if (excludedCarriers.includes(carrierUpper) || carrierUpper.includes('DUMMY')) return;
 
-                if (isBelumSupport(row)) {
+                const isBelumSpt = isBelumSupport(row);
+                const dateVal = isVendor ? (isBelumSpt ? (row.AU || '').trim() : (row.AO || '').trim()) : (row.AO || '').trim();
+                const dDate = parseDateCustom(dateVal) || parseDate(dateVal);
+                if (dDate && !isNaN(dDate.getTime()) && dDate >= todayStart) {
+                    return; // Exclude today and future records from the Trend tab KPIs
+                }
+
+                if (isBelumSpt) {
                     kpiDelayedLCVal++;
                     kpiTotalLCVal++;
                 } else if (isTerlambat(row)) {
                     kpiTerlambatLCVal++;
                     kpiTotalLCVal++;
                 } else {
-                    const dateVal = isVendor ? (row.AU || '').trim() : (row.AO || '').trim();
-                    const dDate = parseDateCustom(dateVal) || parseDate(dateVal);
-                    if (dDate && !isNaN(dDate.getTime()) && dDate > today) {
-                        return; // Exclude H+1 on-time record
-                    }
                     kpiOnTimeLCVal++;
                     kpiTotalLCVal++;
                 }
