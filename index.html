@@ -3691,7 +3691,7 @@
             <thead id="vm-thead-el"></thead>
             <tbody id="vm-tbody-el">
                 <tr>
-                    <td colspan="7"
+                    <td colspan="6"
                         style="text-align: center;
                                padding: 30px;
                                color: #ffd700;">
@@ -12159,7 +12159,6 @@ function renderVMDetail(data) {
             <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;min-width:110px;">Carrier</th>
             <th style="padding:10px;border:1px solid #333;color:#ffd700;text-align:left;min-width:120px;">Ship To</th>
             <th style="padding:10px;border:1px solid #333;color:#ffd700;width:110px;">Load Date</th>
-            <th style="padding:10px;border:1px solid #333;color:#ffd700;width:110px;">Jam Konfirmasi</th>
             <th style="padding:10px;border:1px solid #333;color:#ffd700;width:80px;">Status</th>
         </tr>`;
     }
@@ -12169,14 +12168,10 @@ function renderVMDetail(data) {
     let hit   = 0, miss = 0;
 
     sorted.forEach((r, i) => {
-        const jam = formatVMTime(r.addDate);
         const isHit = r.status === 'HIT';
         hit  += isHit ? 1 : 0;
         miss += isHit ? 0 : 1;
 
-        const chipStyle = isHit
-            ? 'background:rgba(45,212,175,0.15);color:#2dd4bf;border:1px solid rgba(45,212,175,0.4);'
-            : 'background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.4);';
         const badgeStyle = isHit
             ? 'background:rgba(45,212,175,0.15);color:#2dd4bf;border:1px solid rgba(45,212,175,0.4);'
             : 'background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.4);';
@@ -12190,10 +12185,6 @@ function renderVMDetail(data) {
             <td style="padding:8px;text-align:left;font-size:11px;color:#aaa;border:1px solid #1e1e1e;">${r.shipTo || '-'}</td>
             <td style="padding:8px;text-align:center;color:#ccc;border:1px solid #1e1e1e;">${r.loadDate || '-'}</td>
             <td style="padding:8px;text-align:center;border:1px solid #1e1e1e;">
-                <span style="${chipStyle}border-radius:3px;padding:2px 9px;
-                             font-size:12px;font-weight:700;">${jam}</span>
-            </td>
-            <td style="padding:8px;text-align:center;border:1px solid #1e1e1e;">
                 <span style="${badgeStyle}border-radius:4px;padding:2px 9px;
                              font-size:11px;font-weight:700;">${r.status}</span>
             </td>
@@ -12203,7 +12194,7 @@ function renderVMDetail(data) {
     const tbody = document.getElementById('vm-tbody-el');
     if (tbody) {
         tbody.innerHTML = html ||
-            `<tr><td colspan="7"
+            `<tr><td colspan="6"
                 style="text-align:center;padding:30px;color:#666;">
                 Tidak ada data.
             </td></tr>`;
@@ -12215,7 +12206,7 @@ function renderVMDetail(data) {
     const tfoot = document.getElementById('vm-tfoot-el');
     if (tfoot) {
         tfoot.innerHTML = `<tr style="background:#0f0f0f;">
-            <td colspan="4"
+            <td colspan="3"
                 style="padding:12px 10px;text-align:left;color:#ffd700;
                        font-weight:800;font-size:12px;border-top:2px solid #333;">
                 GRAND TOTAL — ${tot} konfirmasi
