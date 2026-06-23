@@ -16,14 +16,6 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    <script>
-        window.getProxiedUrl = function(url) {
-            if (url && typeof url === 'string' && url.startsWith('https://docs.google.com/')) {
-                return `/api/proxy?url=${encodeURIComponent(url)}`;
-            }
-            return url;
-        };
-    </script>
     <style>
         * {
             margin: 0;
@@ -3324,11 +3316,11 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
                         <div style="background: #141414; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; text-align: center; border-left: 4px solid #ff9f43; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
                             <div style="font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">Rerata Terlambat</div>
-                            <div id="average-delay-hours" style="font-size: 1.6em; font-weight: bold; color: #ff9f43; text-shadow: 0 0 5px rgba(255,159,67,0.3);">0 Jam</div>
+                            <div id="average-delay-hours" style="font-size: 1.6em; font-weight: bold; color: #ff9f43; text-shadow: 0 0 5px rgba(255,159,67,0.3);">0 Jam 00 Menit</div>
                         </div>
                         <div style="background: #141414; border: 1px solid #2d2d2d; border-radius: 6px; padding: 12px; text-align: center; border-left: 4px solid #ef4444; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
                             <div style="font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 4px;">Terlambat Terlama</div>
-                            <div id="max-delay-hours" style="font-size: 1.6em; font-weight: bold; color: #ef4444; text-shadow: 0 0 5px rgba(239,68,68,0.3);">0 Jam</div>
+                            <div id="max-delay-hours" style="font-size: 1.6em; font-weight: bold; color: #ef4444; text-shadow: 0 0 5px rgba(239,68,68,0.3);">0 Jam 00 Menit</div>
                         </div>
                     </div>
 
@@ -4317,7 +4309,7 @@
     }
 
     try {
-      const res = await fetch(window.getProxiedUrl(TRANSIT_CSV_URL));
+      const res = await fetch(TRANSIT_CSV_URL);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const csv = await res.text();
       if (csv.trim().startsWith('<!DOCTYPE')) {
@@ -5233,7 +5225,7 @@
                 loginBtn.textContent = "VERIFYING...";
                 
                 // Fetch user data from spreadsheet
-                const response = await fetch(window.getProxiedUrl(USER_CSV_URL));
+                const response = await fetch(USER_CSV_URL);
                 const csv = await response.text();
                 const lines = csv.split(/\r?\n/);
                 
@@ -6376,7 +6368,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
 
         async function fetchPlannerData(retries = 2) {
             try {
-                const response = await fetch(window.getProxiedUrl(PLANNER_CSV_URL));
+                const response = await fetch(PLANNER_CSV_URL);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csv = await response.text();
                 if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML (Google Login required or link not shared)');
@@ -6545,7 +6537,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
 
         async function fetchOrderDistData(retries = 2) {
             try {
-                const response = await fetch(window.getProxiedUrl(ORDER_DIST_CSV_URL));
+                const response = await fetch(ORDER_DIST_CSV_URL);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csv = await response.text();
                 if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML');
@@ -6558,7 +6550,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
 
         async function fetchSlaFbiData() {
             try {
-                const res = await fetch(window.getProxiedUrl(SLA_FBI_CSV_URL));
+                const res = await fetch(SLA_FBI_CSV_URL);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const csv = await res.text();
                 rawSlaFbiData = robustCSVParser(csv);
@@ -6831,7 +6823,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
 
         async function fetchFBIScheduleData() {
             try {
-                const response = await fetch(window.getProxiedUrl(SHEET_URL_SCHEDULE));
+                const response = await fetch(SHEET_URL_SCHEDULE);
                 const csv = await response.text();
                 parseFBIScheduleCSV(csv);
             } catch (error) {
@@ -6916,7 +6908,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
         async function fetchPivotData(retries = 2) {
             try {
                 const finalUrl = PIVOT_CSV_URL;
-                const response = await fetch(window.getProxiedUrl(finalUrl));
+                const response = await fetch(finalUrl);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const csv = await response.text();
                 
@@ -7104,7 +7096,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 if (container) container.style.display = 'block';
                 
                 const finalUrl = HUB_CSV_URL;
-                const response = await fetch(window.getProxiedUrl(finalUrl));
+                const response = await fetch(finalUrl);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const csv = await response.text();
                 
@@ -8549,7 +8541,7 @@ function renderStoringPivotTable(filteredData) {
             // Remove timestamp suffix to see if it fixes NetworkError
             const finalUrl = CSV_URL;
             try {
-                const response = await fetch(window.getProxiedUrl(finalUrl));
+                const response = await fetch(finalUrl);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -9768,13 +9760,11 @@ function updateDashboard() {
         ]);
 
         function isCityExcluded(row) {
-            if (!row) return false;
             const city = (row.AR || '').trim().toUpperCase();
             return EXCLUDED_CITIES_VENDOR.has(city);
         }
 
         function isBelumSupport(row) {
-            if (!row) return false;
             if (isCityExcluded(row)) return false;
 
             const ketVendor = (row.AV || '').trim().toUpperCase();
@@ -9842,7 +9832,6 @@ function updateDashboard() {
 }
 
         function isTerlambat(row) {
-            if (!row) return false;
             if (isCityExcluded(row)) return false;
             if (isBelumSupport(row)) return false;
             
@@ -9861,7 +9850,6 @@ function updateDashboard() {
         }
 
         function getDelayHours(row) {
-            if (!row) return 0;
             const dateQ = parseDateCustom(row.Q);
             const dateBJ = parseDateCustom(row.BJ);
             if (dateQ && dateBJ) {
@@ -9875,16 +9863,12 @@ function updateDashboard() {
         }
 
         function getDelayHoursText(row) {
-            if (!row) return '-';
             const dateQ = parseDateCustom(row.Q);
             const dateBJ = parseDateCustom(row.BJ);
             if (dateQ && dateBJ) {
                 const diffMs = dateBJ.getTime() - dateQ.getTime();
                 if (diffMs > 0) {
-                    let totalMinutes = Math.floor(diffMs / (1000 * 60));
-                    if (totalMinutes === 0 && diffMs > 0) {
-                        totalMinutes = 1;
-                    }
+                    const totalMinutes = Math.floor(diffMs / (1000 * 60));
                     const hours = Math.floor(totalMinutes / 60);
                     const minutes = totalMinutes % 60;
                     const pad = (num) => String(num).padStart(2, '0');
@@ -10097,36 +10081,20 @@ function updateDashboard() {
             });
 
             // Calculate delay statistics text
-            let avgDelayText = '0 Jam 00 Menit';
-            let maxDelayText = '0 Jam 00 Menit';
+            const avgDelayFloat = delayCountForAvg > 0 ? (totalDelayHoursForAvg / delayCountForAvg) : 0;
             
-            if (delayCountForAvg > 0) {
-                const avgHoursDecimal = totalDelayHoursForAvg / delayCountForAvg;
-                let totalMinutes = Math.floor(avgHoursDecimal * 60);
-                if (totalMinutes === 0 && totalDelayHoursForAvg > 0) {
-                    totalMinutes = 1;
-                }
-                const avgHours = Math.floor(totalMinutes / 60);
-                const avgMins = totalMinutes % 60;
-                const pad = (num) => String(num).padStart(2, '0');
-                avgDelayText = `${avgHours} Jam ${pad(avgMins)} Menit`;
-            }
-            
-            if (maxDelayHoursVal > 0) {
-                let totalMinutesMax = Math.floor(maxDelayHoursVal * 60);
-                if (totalMinutesMax === 0 && maxDelayHoursVal > 0) {
-                    totalMinutesMax = 1;
-                }
-                const maxHoursStr = Math.floor(totalMinutesMax / 60);
-                const maxMinsStr = totalMinutesMax % 60;
-                const pad = (num) => String(num).padStart(2, '0');
-                maxDelayText = `${maxHoursStr} Jam ${pad(maxMinsStr)} Menit`;
-            }
+            const formatDelayText = (hoursFloat) => {
+                if (!hoursFloat) return '0 Jam 00 Menit';
+                const totalMins = Math.round(hoursFloat * 60);
+                const h = Math.floor(totalMins / 60);
+                const m = totalMins % 60;
+                return `${h} Jam ${String(m).padStart(2, '0')} Menit`;
+            };
 
             const avgDelayEl = document.getElementById('average-delay-hours');
             const maxDelayEl = document.getElementById('max-delay-hours');
-            if (avgDelayEl) avgDelayEl.textContent = avgDelayText;
-            if (maxDelayEl) maxDelayEl.textContent = maxDelayText;
+            if (avgDelayEl) avgDelayEl.textContent = formatDelayText(avgDelayFloat);
+            if (maxDelayEl) maxDelayEl.textContent = formatDelayText(maxDelayHoursVal);
 
             // Sort lists based on state
             sortDataList(unsupportedList, unsupportedSort.key, unsupportedSort.dir);
@@ -11204,7 +11172,7 @@ async function fetchAstorData(retries = 2) {
         return;
     }
         try {
-            const res = await fetch(window.getProxiedUrl(ASTOR_CSV_URL_DYNAMIC));
+            const res = await fetch(ASTOR_CSV_URL_DYNAMIC);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const csv = await res.text();
         if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML');
@@ -11945,7 +11913,7 @@ async function loadKonfirmasiVM(retries = 2) {
         // Gunakan CSV_URL yang sudah ada di dashboard (sheet AHI)
         const KONFIRMASI_VM_GID = '1583314709'; // gid tab "DUMMY"
         const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=${KONFIRMASI_VM_GID}`;
-        const response = await fetch(window.getProxiedUrl(url));
+        const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const csv = await response.text();
         if (csv.trim().startsWith('<!DOCTYPE')) {
