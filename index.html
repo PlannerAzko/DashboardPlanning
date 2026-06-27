@@ -5014,6 +5014,7 @@
             D: 3,         // CARRIER
             I: 8,         // SHIPPINGLINE
             M: 12,        // JALUR
+            O: 14,        // ADD DATE
             Q: 16,        // TIMING COL Q
             BJ: 61,       // TIMING COL BJ
             R: 58,        // NOPOL (Column BG)
@@ -8731,6 +8732,7 @@ function renderStoringPivotTable(filteredData) {
                         D: values[COLUMNS.D] || '',
                         I: values[COLUMNS.I] || '',
                         M: values[COLUMNS.M] || '',
+                        O: values[COLUMNS.O] || '',
                         Q: values[COLUMNS.Q] || '',
                         BJ: values[COLUMNS.BJ] || '',
                         R: values[COLUMNS.R] || '',
@@ -9768,7 +9770,22 @@ function updateDashboard() {
             if (isCityExcluded(row)) return false;
 
             const ketVendor = (row.AV || '').trim().toUpperCase();
-            return ketVendor.includes('BELUM SUPPORT');
+            if (!ketVendor.includes('BELUM SUPPORT')) return false;
+
+            // Exclusion for difference < 3 days between ADD DATE (O) and LOAD DATE (Q)
+            const dO = parseDateCustom(row.O);
+            const dQ = parseDateCustom(row.Q);
+            if (dO && dQ) {
+                const dateO = new Date(dO.getFullYear(), dO.getMonth(), dO.getDate());
+                const dateQ = new Date(dQ.getFullYear(), dQ.getMonth(), dQ.getDate());
+                const diffMs = Math.abs(dateQ.getTime() - dateO.getTime());
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                if (diffDays < 3) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         function parseDateCustom(str) {
@@ -9892,9 +9909,9 @@ function updateDashboard() {
                 } else if (key === 'AW') {
                     valA = getDelayHours(a);
                     valB = getDelayHours(b);
-                } else if (key === 'Q') {
-                    const dA = parseDateCustom(a.Q);
-                    const dB = parseDateCustom(b.Q);
+                } else if (key === 'Q' || key === 'O') {
+                    const dA = parseDateCustom(a[key]);
+                    const dB = parseDateCustom(b[key]);
                     valA = dA ? dA.getTime() : 0;
                     valB = dB ? dB.getTime() : 0;
                 } else {
@@ -10502,18 +10519,20 @@ function updateDashboard() {
             const pageData = list.slice(start, end);
 
             let html = `
-                <table>\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th onclick="toggleSort('unsupported', 'A')" style="cursor:pointer">LC ${getSortIcon(unsupportedSort, 'A')}</th>\n                            <th onclick="toggleSort('unsupported', 'D')" style="cursor:pointer">CARRIER ${getSortIcon(unsupportedSort, 'D')}</th>\n                            <th onclick="toggleSort('unsupported', 'M')" style="cursor:pointer">JALUR ${getSortIcon(unsupportedSort, 'M')}</th>\n                            <th onclick="toggleSort('unsupported', 'Q')" style="cursor:pointer">LOAD DATE ${getSortIcon(unsupportedSort, 'Q')}</th>\n                            <th onclick="toggleSort('unsupported', 'Z')" style="cursor:pointer">CBM ${getSortIcon(unsupportedSort, 'Z')}</th>\n                            <th onclick="toggleSort('unsupported', 'AW')" style="cursor:pointer">AGING LC ${getSortIcon(unsupportedSort, 'AW')}</th>\n                        </tr>\n                    </thead>\n                    <tbody>
+                <table>\n                    <thead>\n                        <tr>\n                            <th>#</th>\n                            <th onclick="toggleSort('unsupported', 'A')" style="cursor:pointer">LC ${getSortIcon(unsupportedSort, 'A')}</th>\n                            <th onclick="toggleSort('unsupported', 'D')" style="cursor:pointer">CARRIER ${getSortIcon(unsupportedSort, 'D')}</th>\n                            <th onclick="toggleSort('unsupported', 'M')" style="cursor:pointer">JALUR ${getSortIcon(unsupportedSort, 'M')}</th>\n                            <th onclick="toggleSort('unsupported', 'O')" style="cursor:pointer">ADD DATE ${getSortIcon(unsupportedSort, 'O')}</th>\n                            <th onclick="toggleSort('unsupported', 'Q')" style="cursor:pointer">LOAD DATE ${getSortIcon(unsupportedSort, 'Q')}</th>\n                            <th onclick="toggleSort('unsupported', 'Z')" style="cursor:pointer">CBM ${getSortIcon(unsupportedSort, 'Z')}</th>\n                            <th onclick="toggleSort('unsupported', 'AW')" style="cursor:pointer">AGING LC ${getSortIcon(unsupportedSort, 'AW')}</th>\n                        </tr>\n                    </thead>\n                    <tbody>
             `;
 
             pageData.forEach((row, i) => {
                 const aging = row.AW || '0';
                 const loadDateDisplay = row.Q || '-';
+                const addDateDisplay = row.O || '-';
                 html += `
                     <tr>
                         <td>${start + i + 1}</td>
                         <td>${row.A}</td>
                         <td>${row.D || '-'}</td>
                         <td>${row.M || '-'}</td>
+                        <td>${addDateDisplay}</td>
                         <td>${loadDateDisplay}</td>
                         <td>${parseNumberWithComma(row.Z).toFixed(2)}</td>
                         <td>${aging}</td>
