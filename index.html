@@ -2230,15 +2230,20 @@
                 <!-- Header KPI & Filter Row -->
                 <div style="display: flex; justify-content: space-between; align-items: stretch; gap: 20px; margin-bottom: 24px; flex-wrap: wrap;">
                     <!-- 1. Left: KPI cards -->
-                    <div style="display: flex; gap: 16px; flex: 1.2; min-width: 400px;">
+                    <div style="display: flex; gap: 16px; flex: 1.5; min-width: 450px;">
                         <div style="background: #ffffff; border-left: 5px solid #ffc107; border-radius: 12px; padding: 20px; flex: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center;">
                             <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Total Order Realese</div>
                             <div id="chatime-total-od" style="font-size: 3.5rem; font-weight: 800; color: #1e293b; line-height: 1;">0</div>
                         </div>
                         
                         <div style="background: #ffffff; border-left: 5px solid #6a1b9a; border-radius: 12px; padding: 20px; flex: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center;">
-                            <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Total Case ID</div>
+                            <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">TOTAL CASE ID RELEASED</div>
                             <div id="chatime-total-case-id" style="font-size: 3.5rem; font-weight: 800; color: #1e293b; line-height: 1;">0</div>
+                        </div>
+
+                        <div style="background: #ffffff; border-left: 5px solid #2563eb; border-radius: 12px; padding: 20px; flex: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">TOTAL CASE ID SHIPPED</div>
+                            <div id="chatime-case-id-shipped" style="font-size: 3.5rem; font-weight: 800; color: #1e293b; line-height: 1;">0</div>
                         </div>
                     </div>
 
@@ -6608,10 +6613,42 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             const totalOrderRelease = filtered.reduce((sum, d) => sum + d.orderRelease, 0);
             const totalCaseId = filtered.reduce((sum, d) => sum + d.caseId, 0);
 
+            // CASE ID SHIPPED calculation from rawPivotData
+            let caseIdShippedCount = 0;
+            if (rawPivotData && rawPivotData.length > 0) {
+                const pivotFiltered = rawPivotData.filter(d => {
+                    const dateObj = parseDate(d.stuffingDate);
+                    const isoDate = toISODate(dateObj);
+
+                    // 1. Filter by local Bulan
+                    let matchBulan = true;
+                    if (bulanFilterVal !== 'ALL' && dateObj && dateObj.getTime() > 0) {
+                        const localMonthKey = MonthsID[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
+                        matchBulan = (localMonthKey === bulanFilterVal);
+                    }
+
+                    // 2. Filter by Date
+                    const matchDate = dateFilter === 'ALL' || isoDate === dateFilter;
+
+                    // 3. Filter by Area
+                    const matchArea = areaFilter === 'ALL' || d.area === areaFilter;
+
+                    return matchBulan && matchDate && matchArea;
+                });
+
+                pivotFiltered.forEach(d => {
+                    if (d.caseId && d.caseIdStatus && d.caseIdStatus.toLowerCase() === 'packed') {
+                        caseIdShippedCount++;
+                    }
+                });
+            }
+
             const odEl = document.getElementById('chatime-total-od');
             const ciEl = document.getElementById('chatime-total-case-id');
+            const cisEl = document.getElementById('chatime-case-id-shipped');
             if (odEl) odEl.innerText = formatIndo(totalOrderRelease);
             if (ciEl) ciEl.innerText = formatIndo(totalCaseId);
+            if (cisEl) cisEl.innerText = formatIndo(caseIdShippedCount);
 
             // Chart Data 1: Order Distribution (Unique count of orderNo per region)
             const regionOrderMap = {};
@@ -7055,6 +7092,8 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                     status: (values[idx.status] || '').trim(),
                     allocStatus: (values[idx.allocStatus] || '').trim(),
                     stuffingDate: (values[idx.stuffingDate] || '').trim(),
+                    caseId: (values[16] || '').trim(),
+                    caseIdStatus: (values[17] || '').trim(),
                     rawColumns: {
                         E: values[4] || '',
                         F: values[5] || '',
