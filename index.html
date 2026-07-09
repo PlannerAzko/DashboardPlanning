@@ -2230,64 +2230,64 @@
                 <!-- Header KPI & Filter Row -->
                 <div style="display: flex; justify-content: space-between; align-items: stretch; gap: 20px; margin-bottom: 24px; flex-wrap: wrap;">
                     <!-- 1. Left: KPI cards -->
-                    <div style="display: flex; gap: 16px; flex: 1.5; min-width: 450px;">
-                        <div style="background: #ffffff; border-left: 5px solid #ffc107; border-radius: 12px; padding: 20px; flex: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center;">
-                            <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Total Order Realese</div>
-                            <div id="chatime-total-od" style="font-size: 3.5rem; font-weight: 800; color: #1e293b; line-height: 1;">0</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; flex: 1.5; min-width: 280px;">
+                        <div style="background: #ffffff; border-left: 5px solid #ffc107; border-radius: 12px; padding: 16px 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center; min-width: 0;">
+                            <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; line-height: 1.25;" title="Total Order Realese">Total Order Realese</div>
+                            <div id="chatime-total-od" style="font-size: clamp(1.6rem, 3.5vw, 2.8rem); font-weight: 800; color: #1e293b; line-height: 1; word-break: break-all;">0</div>
                         </div>
                         
-                        <div style="background: #ffffff; border-left: 5px solid #6a1b9a; border-radius: 12px; padding: 20px; flex: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center;">
-                            <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">TOTAL CASE ID RELEASED</div>
-                            <div id="chatime-total-case-id" style="font-size: 3.5rem; font-weight: 800; color: #1e293b; line-height: 1;">0</div>
+                        <div style="background: #ffffff; border-left: 5px solid #6a1b9a; border-radius: 12px; padding: 16px 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center; min-width: 0;">
+                            <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; line-height: 1.25;" title="TOTAL CASE ID RELEASED">TOTAL CASE ID RELEASED</div>
+                            <div id="chatime-total-case-id" style="font-size: clamp(1.6rem, 3.5vw, 2.8rem); font-weight: 800; color: #1e293b; line-height: 1; word-break: break-all;">0</div>
                         </div>
 
-                        <div style="background: #ffffff; border-left: 5px solid #2563eb; border-radius: 12px; padding: 20px; flex: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center;">
-                            <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">TOTAL CASE ID SHIPPED</div>
-                            <div id="chatime-case-id-shipped" style="font-size: 3.5rem; font-weight: 800; color: #1e293b; line-height: 1;">0</div>
+                        <div style="background: #ffffff; border-left: 5px solid #2563eb; border-radius: 12px; padding: 16px 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center; min-width: 0;">
+                            <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; line-height: 1.25;" title="TOTAL CASE ID SHIPPED">TOTAL CASE ID SHIPPED</div>
+                            <div id="chatime-case-id-shipped" style="font-size: clamp(1.6rem, 3.5vw, 2.8rem); font-weight: 800; color: #1e293b; line-height: 1; word-break: break-all;">0</div>
                         </div>
                     </div>
 
                     <!-- 2. Middle: Logo Section (Centered) -->
-                    <div style="background: #ffffff; padding: 10px 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(106, 27, 154, 0.08); border: 2px solid #f0f4f8; display: flex; align-items: center; justify-content: center; min-width: 320px; flex: 1.2;">
+                    <div style="background: #ffffff; padding: 10px 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(106, 27, 154, 0.08); border: 2px solid #f0f4f8; display: flex; align-items: center; justify-content: center; min-width: 240px; flex: 1;">
                          <!-- GANTI DENGAN INI: -->
-<svg width="280" height="90" viewBox="0 0 280 90" style="display: block;">
-    <!-- Outer circle -->
-    <circle cx="45" cy="45" r="40" fill="none" stroke="#3d2b8c" stroke-width="6"/>
-    <!-- Inner circle / smile face -->
-    <circle cx="45" cy="45" r="28" fill="none" stroke="#f5c400" stroke-width="5"/>
-    <!-- Smile arc -->
-    <path d="M30 50 Q45 65 60 50" fill="none" stroke="#3d2b8c" stroke-width="5" stroke-linecap="round"/>
-    <!-- F&B text -->
-    <text x="100" y="48" font-family="'Inter', Arial, sans-serif" font-weight="900" font-size="42" fill="#3d2b8c">F&amp;B</text>
-    <!-- INDONESIA text -->
-    <text x="100" y="72" font-family="'Inter', Arial, sans-serif" font-weight="700" font-size="18" fill="#3d2b8c" letter-spacing="3">INDONESIA</text>
-</svg>
+                        <svg viewBox="0 0 280 90" style="display: block; width: 100%; max-width: 280px; height: auto;">
+                            <!-- Outer circle -->
+                            <circle cx="45" cy="45" r="40" fill="none" stroke="#3d2b8c" stroke-width="6"/>
+                            <!-- Inner circle / smile face -->
+                            <circle cx="45" cy="45" r="28" fill="none" stroke="#f5c400" stroke-width="5"/>
+                            <!-- Smile arc -->
+                            <path d="M30 50 Q45 65 60 50" fill="none" stroke="#3d2b8c" stroke-width="5" stroke-linecap="round"/>
+                            <!-- F&B text -->
+                            <text x="100" y="48" font-family="'Inter', Arial, sans-serif" font-weight="900" font-size="42" fill="#3d2b8c">F&amp;B</text>
+                            <!-- INDONESIA text -->
+                            <text x="100" y="72" font-family="'Inter', Arial, sans-serif" font-weight="700" font-size="18" fill="#3d2b8c" letter-spacing="3">INDONESIA</text>
+                        </svg>
                     </div>
 
                     <!-- 3. Right: Filter Area -->
-                    <div style="background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 12px; min-width: 480px; flex: 1.5; border: 1px solid #edf2f7;">
-                        <div style="display: flex; gap: 12px;">
-                            <div style="flex: 1; position: relative;">
+                    <div style="background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 12px; min-width: 280px; flex: 1.5; border: 1px solid #edf2f7;">
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 120px; position: relative;">
                                 <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">BULAN</label>
                                 <select id="chatime-bulan-filter" onchange="populatePlannerFilters(); renderChatimeDashboard();" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; color: #1e293b;">
                                     <option value="ALL">SEMUA BULAN</option>
                                 </select>
                             </div>
-                            <div style="flex: 1; position: relative;">
+                            <div style="flex: 1; min-width: 120px; position: relative;">
                                 <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">TANGGAL STUFFING</label>
                                 <select id="chatime-date-filter" onchange="this.size=1; this.blur(); renderChatimeDashboard();" onfocus="this.size=6;" onblur="this.size=1;" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; color: #1e293b; position: absolute; z-index: 10;">
                                     <option value="ALL">All Dates</option>
                                 </select>
                                 <div style="height: 40px;"></div> <!-- Spacer to maintain layout when select expands -->
                             </div>
-                            <div style="flex: 1; position: relative;">
+                            <div style="flex: 1; min-width: 120px; position: relative;">
                                 <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">AREA FILTER</label>
                                 <select id="chatime-area-filter" onchange="renderChatimeDashboard()" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; color: #1e293b;">
                                     <option value="ALL">All Areas</option>
                                 </select>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 5px; padding-top: 10px; border-top: 1px solid #f1f5f9;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 5px; padding-top: 10px; border-top: 1px solid #f1f5f9; flex-wrap: wrap; gap: 10px;">
                             <div style="display: flex; align-items: center; gap: 8px; color: #64748b; font-size: 0.85rem;">
                                 <i class="fas fa-info-circle"></i>
                                 <span>Real-time Order Tracking</span>
@@ -4979,6 +4979,10 @@
         const ORDER_DIST_CSV_URL = 'https://docs.google.com/spreadsheets/d/1lRl-Noq63iovsyzOTEM_Dxw4rPOKDF6dsO9o387iHwk/export?format=csv&gid=1075426956';
         let HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
         const USER_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=1368870427`;
+        
+        // FIX KLL sheet for Chatime Case ID Shipped
+        const FIX_KLL_CSV_URL = 'https://docs.google.com/spreadsheets/d/138I1ZNvWKVog5tjdEiDpvEZnjkZFZmBA4Mk8grRwXhQ/export?format=csv&gid=2043444297';
+        let rawFixKllData = [];
 
         const SLA_FBI_GID = '1915084833';
         const SLA_FBI_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_FBI}/export?format=csv&gid=${SLA_FBI_GID}`;
@@ -5380,6 +5384,7 @@
                 fetchAstorData();
                 fetchPlannerData();
                 fetchOrderDistData();
+                fetchFixKllData();
                 fetchData(); // Trigger main data fetch with new URL
             }, 500);
         }
@@ -6582,6 +6587,36 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             renderChatimeDashboard();
         }
 
+        async function fetchFixKllData(retries = 2) {
+            try {
+                const response = await fetch(FIX_KLL_CSV_URL);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const csv = await response.text();
+                if (csv.trim().startsWith('<!DOCTYPE')) {
+                    throw new Error('Received HTML (Google Login required or link not shared)');
+                }
+                parseFixKllCSV(csv);
+            } catch (error) {
+                console.error("Error fetching FIX KLL data:", error);
+                if (retries > 0) setTimeout(() => fetchFixKllData(retries - 1), 2000);
+            }
+        }
+
+        function parseFixKllCSV(csv) {
+            const rows = robustCSVParser(csv);
+            if (rows.length < 2) return;
+            const data = rows.slice(1);
+            rawFixKllData = data.map(row => {
+                const rawCaseId = (row[2] || '').trim();
+                const rawDate = (row[14] || '').trim();
+                return {
+                    caseId: parseNumberWithComma(rawCaseId),
+                    tanggal: rawDate
+                };
+            });
+            renderChatimeDashboard();
+        }
+
         function renderChatimeDashboard() {
             if (!rawPlannerData || rawPlannerData.length === 0) return;
 
@@ -6613,11 +6648,11 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             const totalOrderRelease = filtered.reduce((sum, d) => sum + d.orderRelease, 0);
             const totalCaseId = filtered.reduce((sum, d) => sum + d.caseId, 0);
 
-            // CASE ID SHIPPED calculation from rawPivotData
+            // CASE ID SHIPPED calculation from rawFixKllData
             let caseIdShippedCount = 0;
-            if (rawPivotData && rawPivotData.length > 0) {
-                const pivotFiltered = rawPivotData.filter(d => {
-                    const dateObj = parseDate(d.stuffingDate);
+            if (rawFixKllData && rawFixKllData.length > 0) {
+                rawFixKllData.forEach(d => {
+                    const dateObj = parseDateCustom(d.tanggal) || parseDate(d.tanggal);
                     const isoDate = toISODate(dateObj);
 
                     // 1. Filter by local Bulan
@@ -6630,15 +6665,8 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                     // 2. Filter by Date
                     const matchDate = dateFilter === 'ALL' || isoDate === dateFilter;
 
-                    // 3. Filter by Area
-                    const matchArea = areaFilter === 'ALL' || d.area === areaFilter;
-
-                    return matchBulan && matchDate && matchArea;
-                });
-
-                pivotFiltered.forEach(d => {
-                    if (d.caseId && d.caseIdStatus && d.caseIdStatus.toLowerCase() === 'packed') {
-                        caseIdShippedCount++;
+                    if (matchBulan && matchDate) {
+                        caseIdShippedCount += d.caseId;
                     }
                 });
             }
@@ -11199,6 +11227,7 @@ function updateDashboard() {
         setInterval(fetchData, 60000);
         setInterval(fetchPlannerData, 60000);
         setInterval(fetchOrderDistData, 60000);
+        setInterval(fetchFixKllData, 60000);
         setInterval(() => {
             if (document.body.classList.contains('theme-purple')) fetchSlaFbiData();
         }, 60000);
@@ -11208,6 +11237,7 @@ function updateDashboard() {
         fetchData();
         fetchPlannerData();
         fetchOrderDistData();
+        fetchFixKllData();
         if (document.body.classList.contains('theme-purple')) fetchSlaFbiData();
         // ===== ASTOR SLA & OUTSTANDING ENGINE =====
 const ASTOR_GID     = '1345578811';
