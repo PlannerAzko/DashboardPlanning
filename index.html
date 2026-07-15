@@ -162,56 +162,498 @@
             100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
         }
 
-        .tech-loader {
+        /* Warehouse Process Flow Loader - Bold & Vibrant Cyber-Neon Design */
+        .warehouse-flow-container {
             position: relative;
-            width: 200px;
-            height: 200px;
+            width: 580px;
+            max-width: 95%;
+            height: 230px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            margin-bottom: 35px;
+            background: linear-gradient(135deg, rgba(12, 12, 20, 0.95) 0%, rgba(6, 6, 10, 0.98) 100%);
+            padding: 25px 20px 20px 20px;
+            border-radius: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.85),
+                inset 0 0 30px rgba(255, 255, 255, 0.03),
+                0 0 20px rgba(0, 240, 255, 0.1),
+                0 0 40px rgba(255, 0, 160, 0.05);
+            backdrop-filter: blur(12px);
+            overflow: hidden;
+        }
+
+        /* Top Edge Status LED Indicators */
+        .container-header-leds {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 6px;
+            width: calc(100% - 40px);
+        }
+
+        .led-title {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.65em;
+            font-weight: bold;
+            color: #777d8a;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .led-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .led-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .led-cyan {
+            background-color: #00f3ff;
+            box-shadow: 0 0 8px #00f3ff, 0 0 15px #00f3ff;
+            animation: ledBlink 1s infinite alternate;
+        }
+
+        .led-fuchsia {
+            background-color: #ff00a0;
+            box-shadow: 0 0 8px #ff00a0, 0 0 15px #ff00a0;
+            animation: ledBlink 1.4s infinite alternate-reverse;
+        }
+
+        .led-green {
+            background-color: #39ff14;
+            box-shadow: 0 0 8px #39ff14, 0 0 15px #39ff14;
+            animation: ledBlink 0.8s infinite alternate;
+        }
+
+        @keyframes ledBlink {
+            0% { opacity: 0.3; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* Bold Electric Conveyor Pathway */
+        .flow-pathway {
+            position: absolute;
+            bottom: 78px;
+            left: 8%;
+            right: 8%;
+            height: 14px;
+            background: repeating-linear-gradient(
+                90deg, 
+                #121218 0px, 
+                #121218 12px, 
+                rgba(0, 243, 255, 0.5) 12px, 
+                rgba(0, 243, 255, 0.5) 24px
+            );
+            border-radius: 7px;
+            box-shadow: 
+                inset 0 3px 8px rgba(0,0,0,0.9), 
+                0 0 15px rgba(0, 243, 255, 0.3),
+                0 2px 4px rgba(0,0,0,0.5);
+            animation: conveyorMove 0.6s linear infinite;
+            border: 2px solid #2d2d3a;
+        }
+
+        @keyframes conveyorMove {
+            0% { background-position: 0px 0; }
+            100% { background-position: 48px 0; }
+        }
+
+        /* Flow Stages Wrapper */
+        .flow-stages {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
             z-index: 2;
+            margin-top: 15px;
+            height: 175px;
         }
 
-        .tech-circle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 2px solid transparent;
+        /* Individual Stages with Distinct Neon Identity */
+        .flow-stage {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            width: 30%;
+            position: relative;
+            height: 100%;
+            transform: scale(1.02);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Text Group at the bottom of each stage */
+        .stage-info-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 4px;
+            z-index: 3;
+        }
+
+        .stage-icon-wrapper {
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle at center, #1b1b24 0%, #0a0a0f 100%);
             border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 12px;
+            box-shadow: 
+                0 6px 15px rgba(0,0,0,0.7),
+                inset 0 1px 3px rgba(255,255,255,0.05);
+            transition: all 0.4s ease;
         }
 
-        .tech-circle-1 {
-            width: 180px;
-            height: 180px;
-            border-top-color: #d32f2f;
-            border-bottom-color: #d32f2f;
-            animation: techRotate 4s linear infinite;
+        .stage-icon {
+            font-size: 1.7em;
+            color: #444;
+            transition: all 0.4s ease;
         }
 
-        .tech-circle-2 {
-            width: 140px;
-            height: 140px;
-            border-left-color: #ffd700;
-            border-right-color: #ffd700;
-            animation: techRotate 2s linear infinite reverse;
+        /* STAGE 1: INBOUND - NEON CYAN THEME */
+        .stage-inbound .stage-icon-wrapper {
+            border: 2.5px solid #00f3ff;
+            box-shadow: 
+                0 0 20px rgba(0, 243, 255, 0.4), 
+                inset 0 0 10px rgba(0, 243, 255, 0.2),
+                0 6px 15px rgba(0,0,0,0.7);
         }
 
-        .tech-circle-3 {
-            width: 100px;
-            height: 100px;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            animation: techRotate 8s linear infinite;
+        .stage-inbound .stage-icon {
+            color: #00f3ff;
+            filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.6));
         }
 
-        .tech-core {
+        /* Heavy Laser Sweep */
+        .stage-scanner {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            background: #d32f2f;
+            top: 15%;
+            left: 15%;
+            right: 15%;
+            height: 3px;
+            background: #00f3ff;
+            box-shadow: 
+                0 0 6px #00f3ff, 
+                0 0 15px #00f3ff,
+                0 0 25px rgba(0, 243, 255, 0.8);
+            animation: laserScan 1.6s ease-in-out infinite;
+            opacity: 1;
+            pointer-events: none;
+            border-radius: 2px;
+        }
+
+        @keyframes laserScan {
+            0%, 100% { top: 15%; opacity: 0.2; }
+            50% { top: 82%; opacity: 1; }
+        }
+
+        /* STAGE 2: PROCESSING - NEON FUCHSIA THEME */
+        .stage-processing .stage-icon-wrapper {
+            border: 2.5px solid #ff00a0;
+            box-shadow: 
+                0 0 20px rgba(255, 0, 160, 0.4), 
+                inset 0 0 10px rgba(255, 0, 160, 0.2),
+                0 6px 15px rgba(0,0,0,0.7);
+        }
+
+        .stage-processing .stage-icon {
+            color: #ff00a0;
+            filter: drop-shadow(0 0 8px rgba(255, 0, 160, 0.6));
+        }
+
+        .gear-spin {
+            animation: gearRotate 3s linear infinite;
+        }
+
+        @keyframes gearRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Animated Welding Claw */
+        .stage-robotic-arm {
+            position: absolute;
+            font-size: 1.0em;
+            color: #ffd700;
+            top: 6px;
+            right: 6px;
+            transform-origin: bottom left;
+            animation: armWeld 2.5s ease-in-out infinite;
+            opacity: 0.95;
+            filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+        }
+
+        @keyframes armWeld {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            40% { transform: rotate(18deg) scale(1.05); filter: drop-shadow(0 0 10px #ff00a0); }
+            45% { transform: rotate(15deg) scale(1.05); filter: drop-shadow(0 0 15px #ffffff); }
+            50% { transform: rotate(18deg) scale(1.05); filter: drop-shadow(0 0 10px #ff00a0); }
+            80% { transform: rotate(3deg) scale(1); }
+        }
+
+        /* Sparks effect in Stage 2 */
+        .stage-processing::after {
+            content: '';
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 4px;
+            height: 4px;
+            background-color: #ffd700;
             border-radius: 50%;
-            box-shadow: 0 0 30px #d32f2f;
-            animation: corePulse 1.5s ease-in-out infinite;
+            box-shadow: 0 0 8px #ffd700, 0 0 15px #ff00a0;
+            animation: weldSparks 1.25s infinite ease-out;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes weldSparks {
+            0%, 39% { opacity: 0; transform: translate(0, 0) scale(0); }
+            40% { opacity: 1; transform: translate(6px, 12px) scale(1); }
+            45% { opacity: 1; transform: translate(12px, 18px) scale(1.2); background-color: #ffffff; }
+            50% { opacity: 1; transform: translate(18px, 14px) scale(0.8); }
+            55% { opacity: 0; transform: translate(24px, 20px) scale(0); }
+            100% { opacity: 0; }
+        }
+
+        /* STAGE 3: OUTBOUND - NEON LIME GREEN THEME */
+        .stage-outbound .stage-icon-wrapper {
+            border: 2.5px solid #39ff14;
+            box-shadow: 
+                0 0 20px rgba(57, 255, 20, 0.4), 
+                inset 0 0 10px rgba(57, 255, 20, 0.2),
+                0 6px 15px rgba(0,0,0,0.7);
+        }
+
+        .stage-outbound .stage-icon {
+            color: #39ff14;
+            filter: drop-shadow(0 0 8px rgba(57, 255, 20, 0.6));
+        }
+
+        .truck-vibrate {
+            animation: truckShake 0.12s linear infinite alternate;
+        }
+
+        @keyframes truckShake {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(-1.5px) translateX(0.5px); }
+        }
+
+        /* Active Green Exhaust Trails */
+        .truck-exhaust {
+            position: absolute;
+            bottom: 15px;
+            left: 0px;
+            width: 6px;
+            height: 6px;
+            background: rgba(57, 255, 20, 0.7);
+            border-radius: 50%;
+            animation: exhaustRelease 1s infinite ease-out;
+            opacity: 0;
+            box-shadow: 0 0 6px rgba(57, 255, 20, 0.8);
+        }
+
+        @keyframes exhaustRelease {
+            0% { transform: scale(0.4) translate(0, 0); opacity: 0.8; }
+            50% { transform: scale(1.3) translate(-10px, -3px); opacity: 0.4; }
+            100% { transform: scale(2) translate(-22px, -6px); opacity: 0; }
+        }
+
+        /* Speed trails for Stage 3 */
+        .stage-outbound::before {
+            content: '==';
+            font-family: monospace;
+            font-size: 10px;
+            font-weight: bold;
+            color: #39ff14;
+            position: absolute;
+            top: 36px;
+            left: 10px;
+            opacity: 0.7;
+            letter-spacing: -2px;
+            animation: speedTrails 0.3s linear infinite;
+        }
+
+        @keyframes speedTrails {
+            0% { transform: translateX(4px); opacity: 0.8; }
+            100% { transform: translateX(-4px); opacity: 0.1; }
+        }
+
+        /* Cargo Flow Boxes - Dynamic State-Color-Shift */
+        .cargo-flow {
+            position: absolute;
+            bottom: 86px;
+            left: 8%;
+            right: 8%;
+            height: 30px;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .cargo-box {
+            position: absolute;
+            bottom: 0;
+            font-size: 1.35em;
+            color: #00f3ff;
+            filter: drop-shadow(0 0 5px rgba(0, 243, 255, 0.8));
+            animation: boxTravelPipeline 3.6s linear infinite;
+            opacity: 0;
+        }
+
+        .cargo-box.box-1 { animation-delay: 0s; }
+        .cargo-box.box-2 { animation-delay: 1.2s; }
+        .cargo-box.box-3 { animation-delay: 2.4s; }
+
+        /* The Box Changes Colors dynamically as it travels through stages!
+           0% to 33% is Stage 1 (Cyan), 33% to 66% is Stage 2 (Fuchsia), 66% to 100% is Stage 3 (Green) */
+        @keyframes boxTravelPipeline {
+            0% {
+                left: 0%;
+                transform: scale(0) translateY(12px) rotate(0deg);
+                opacity: 0;
+                color: #00f3ff;
+                filter: drop-shadow(0 0 4px rgba(0, 243, 255, 0.6));
+            }
+            6% {
+                transform: scale(1) translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            /* Stage 1 Inbound Zone (Cyan) */
+            28% {
+                color: #00f3ff;
+                filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.9));
+                transform: scale(1) translateY(0) rotate(0deg);
+            }
+            /* Stage 1 -> Stage 2 Transition (Color Shifts to Fuchsia & Package Rotates/Closes) */
+            33% {
+                color: #e00099;
+                filter: drop-shadow(0 0 10px rgba(224, 0, 153, 0.7));
+                transform: scale(1.1) translateY(-2px) rotate(15deg);
+            }
+            /* Stage 2 Sorting Zone (Fuchsia) */
+            38% {
+                color: #ff00a0;
+                filter: drop-shadow(0 0 8px rgba(255, 0, 160, 0.9));
+                transform: scale(1) translateY(0) rotate(0deg);
+            }
+            60% {
+                color: #ff00a0;
+                filter: drop-shadow(0 0 8px rgba(255, 0, 160, 0.9));
+                transform: scale(1) translateY(0) rotate(0deg);
+            }
+            /* Stage 2 -> Stage 3 Transition (Color Shifts to Lime Green & Trembles/Speeds up) */
+            66% {
+                color: #21e60a;
+                filter: drop-shadow(0 0 10px rgba(33, 230, 10, 0.7));
+                transform: scale(1.05) translateY(-1px) rotate(-10deg);
+            }
+            /* Stage 3 Shipping Zone (Lime Green) */
+            71% {
+                color: #39ff14;
+                filter: drop-shadow(0 0 8px rgba(57, 255, 20, 0.9));
+                transform: scale(1) translateY(0) rotate(0deg);
+            }
+            92% {
+                transform: scale(1) translateY(0) rotate(0deg);
+                opacity: 1;
+                color: #39ff14;
+                filter: drop-shadow(0 0 8px rgba(57, 255, 20, 0.9));
+            }
+            /* Exit Zone (Fades out into the truck) */
+            96% {
+                left: 95%;
+                transform: scale(0.4) translateY(-4px) rotate(15deg);
+                opacity: 0;
+            }
+            100% {
+                left: 95%;
+                transform: scale(0) translateY(-4px);
+                opacity: 0;
+            }
+        }
+
+        /* Bold and Clear Stage Labels */
+        .stage-label {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 800;
+            font-size: 0.75em;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            text-align: center;
+            margin-top: 4px;
+            margin-bottom: 2px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Distinctive Status Glowing Badges */
+        .stage-status {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.65em;
+            letter-spacing: 0.5px;
+            text-align: center;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-transform: uppercase;
+        }
+
+        .stage-inbound .stage-status {
+            color: #00f3ff;
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.6);
+            border-color: rgba(0, 243, 255, 0.2);
+            animation: pulseCyanStatus 1.2s ease-in-out infinite alternate;
+        }
+
+        .stage-processing .stage-status {
+            color: #ff00a0;
+            text-shadow: 0 0 5px rgba(255, 0, 160, 0.6);
+            border-color: rgba(255, 0, 160, 0.2);
+            animation: pulseFuchsiaStatus 1.4s ease-in-out infinite alternate;
+        }
+
+        .stage-outbound .stage-status {
+            color: #39ff14;
+            text-shadow: 0 0 5px rgba(57, 255, 20, 0.6);
+            border-color: rgba(57, 255, 20, 0.2);
+            animation: pulseGreenStatus 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseCyanStatus {
+            0% { opacity: 0.7; box-shadow: 0 0 4px rgba(0, 243, 255, 0.1); }
+            100% { opacity: 1; box-shadow: 0 0 10px rgba(0, 243, 255, 0.3); }
+        }
+
+        @keyframes pulseFuchsiaStatus {
+            0% { opacity: 0.7; box-shadow: 0 0 4px rgba(255, 0, 160, 0.1); }
+            100% { opacity: 1; box-shadow: 0 0 10px rgba(255, 0, 160, 0.3); }
+        }
+
+        @keyframes pulseGreenStatus {
+            0% { opacity: 0.7; box-shadow: 0 0 4px rgba(57, 255, 20, 0.1); }
+            100% { opacity: 1; box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }
         }
 
         /* Purple Theme Overrides */
@@ -514,17 +956,22 @@
             background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
             z-index: 1;
         }
-        .dc-card:hover {
+        .dc-card-wrapper {
+            position: relative;
+            cursor: pointer;
+            width: 100%;
+        }
+        .dc-card-wrapper:hover .dc-card {
             transform: translateY(-8px) scale(1.02);
             border-color: rgba(255, 255, 255, 0.3);
             background: rgba(30, 41, 59, 0.8);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
         }
-        .dc-card.ahi:hover {
+        .dc-card-wrapper:hover .dc-card.ahi {
             box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
             border-color: #ffd700;
         }
-        .dc-card.fbi:hover {
+        .dc-card-wrapper:hover .dc-card.fbi {
             box-shadow: 0 0 25px rgba(168, 85, 247, 0.2);
             border-color: #a855f7;
         }
@@ -533,7 +980,7 @@
             margin-bottom: 5px;
             transition: transform 0.3s ease;
         }
-        .dc-card:hover .dc-card-icon {
+        .dc-card-wrapper:hover .dc-card-icon {
             transform: scale(1.2) rotate(5deg);
         }
         .dc-card-name {
@@ -611,27 +1058,78 @@
             pointer-events: none;
         }
 
-        .loader-text {
+        .azko-title-container {
             position: relative;
-            z-index: 2;
-            color: #fff;
-            font-size: 1.2em;
-            font-weight: 300;
-            letter-spacing: 8px;
-            margin-top: 40px;
+            z-index: 15;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .azko-title {
+            font-family: 'Montserrat', 'Arial Black', Impact, sans-serif;
+            font-weight: 900;
+            font-size: 3rem;
+            color: #ff2a2a;
+            letter-spacing: 4px;
             text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        .loader-text span {
+            position: relative;
             display: inline-block;
-            animation: letterBounce 1.5s infinite;
+            margin: 0;
+            padding: 0 10px;
+            text-shadow: 
+                0 0 15px rgba(255, 42, 42, 0.85),
+                0 0 30px rgba(211, 47, 47, 0.6);
+            animation: cyberGlow 2.5s infinite alternate;
         }
 
-        @keyframes letterBounce {
-            0%, 100% { transform: translateY(0); opacity: 0.5; }
-            50% { transform: translateY(-5px); opacity: 1; color: #ffd700; }
+        .azko-title span {
+            display: inline-block;
+            animation: letterWave 2.2s infinite ease-in-out;
+        }
+
+        /* Staggered red coloring and delay for company theme */
+        .azko-title span:nth-child(1) { animation-delay: 0.0s; color: #ff1a1a; }
+        .azko-title span:nth-child(2) { animation-delay: 0.1s; color: #ff1a1a; }
+        .azko-title span:nth-child(3) { animation-delay: 0.2s; color: #ff1a1a; }
+        .azko-title span:nth-child(4) { animation-delay: 0.3s; color: #ff1a1a; }
+        .azko-title span:nth-child(5) { animation-delay: 0.4s; }
+        .azko-title span:nth-child(6) { animation-delay: 0.5s; color: #e60000; }
+        .azko-title span:nth-child(7) { animation-delay: 0.6s; color: #e60000; }
+        .azko-title span:nth-child(8) { animation-delay: 0.7s; }
+        .azko-title span:nth-child(9) { animation-delay: 0.8s; color: #ff3333; }
+        .azko-title span:nth-child(10) { animation-delay: 0.9s; color: #ff3333; }
+        .azko-title span:nth-child(11) { animation-delay: 1.0s; color: #ff3333; }
+        .azko-title span:nth-child(12) { animation-delay: 1.1s; color: #ff3333; }
+        .azko-title span:nth-child(13) { animation-delay: 1.2s; color: #ff3333; }
+        .azko-title span:nth-child(14) { animation-delay: 1.3s; color: #ff3333; }
+        .azko-title span:nth-child(15) { animation-delay: 1.4s; color: #ff3333; }
+        .azko-title span:nth-child(16) { animation-delay: 1.5s; color: #ff3333; }
+
+        @keyframes letterWave {
+            0%, 100% {
+                transform: translateY(0) scale(1) rotate(0deg);
+                filter: brightness(1);
+            }
+            50% {
+                transform: translateY(-10px) scale(1.15) rotate(3deg);
+                filter: brightness(1.4);
+                text-shadow: 0 0 20px currentColor, 0 0 35px rgba(255, 0, 0, 0.8);
+            }
+        }
+
+        @keyframes cyberGlow {
+            0% {
+                text-shadow: 
+                    0 0 10px rgba(255, 26, 26, 0.8),
+                    0 0 20px rgba(255, 26, 26, 0.4),
+                    0 0 40px rgba(230, 0, 0, 0.6);
+            }
+            100% {
+                text-shadow: 
+                    0 0 15px rgba(230, 0, 0, 0.9),
+                    0 0 30px rgba(255, 26, 26, 0.6),
+                    0 0 50px rgba(255, 51, 51, 0.7);
+            }
         }
 
         .welcome-content {
@@ -1795,17 +2293,80 @@
     <!-- Initializing Dashboard Loader -->
     <div id="init-loader">
         <div class="scanning-bar"></div>
-        <div class="tech-loader">
-            <div class="tech-circle tech-circle-1"></div>
-            <div class="tech-circle tech-circle-2"></div>
-            <div class="tech-circle tech-circle-3"></div>
-            <div class="tech-core"></div>
+        <!-- DC AZKO SIDOARJO Animated Title -->
+        <div class="azko-title-container">
+            <h1 class="azko-title">
+                <span>D</span><span>C</span><span>&nbsp;</span><span>A</span><span>Z</span><span>K</span><span>O</span><span>&nbsp;</span><span>S</span><span>I</span><span>D</span><span>O</span><span>A</span><span>R</span><span>J</span><span>O</span>
+            </h1>
         </div>
-        <div class="loader-text">
-            <span>I</span><span>N</span><span>I</span><span>T</span><span>I</span><span>A</span><span>L</span><span>I</span><span>Z</span><span>I</span><span>N</span><span>G</span>
-            &nbsp;
-            <span>D</span><span>A</span><span>S</span><span>H</span><span>B</span><span>O</span><span>A</span><span>R</span><span>D</span>
+        <!-- Warehouse Flow Container -->
+        <div class="warehouse-flow-container">
+            <!-- Top Edge Status LEDs -->
+            <div class="container-header-leds">
+                <span class="led-title">Warehouse Processing Sync</span>
+                <div class="led-group">
+                    <span class="led-dot led-cyan" title="Inbound Status"></span>
+                    <span class="led-dot led-fuchsia" title="Sorting Status"></span>
+                    <span class="led-dot led-green" title="Shipping Status"></span>
+                </div>
+            </div>
+
+            <!-- Conveyor Belt Background -->
+            <div class="flow-pathway"></div>
+
+            <!-- Flow Stages -->
+            <div class="flow-stages">
+                <!-- Stage 1: Inbound -->
+                <div class="flow-stage stage-inbound active">
+                    <div class="stage-icon-wrapper">
+                        <i class="fas fa-boxes-packing stage-icon"></i>
+                        <div class="stage-scanner"></div>
+                    </div>
+                    <div class="stage-info-group">
+                        <div class="stage-label">Inbound</div>
+                        <div class="stage-status">RECEIVING</div>
+                    </div>
+                </div>
+
+                <!-- Stage 2: Processing -->
+                <div class="flow-stage stage-processing active">
+                    <div class="stage-icon-wrapper">
+                        <i class="fas fa-gears stage-icon gear-spin"></i>
+                        <i class="fas fa-robot stage-robotic-arm"></i>
+                    </div>
+                    <div class="stage-info-group">
+                        <div class="stage-label">Storing</div>
+                        <div class="stage-status">Picking & Packing</div>
+                    </div>
+                </div>
+
+                <!-- Stage 3: Outbound -->
+                <div class="flow-stage stage-outbound active">
+                    <div class="stage-icon-wrapper">
+                        <i class="fas fa-truck-fast stage-icon truck-vibrate"></i>
+                        <div class="truck-exhaust"></div>
+                    </div>
+                    <div class="stage-info-group">
+                        <div class="stage-label">Outbound</div>
+                        <div class="stage-status">DISPATCHING</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Animated Cargo Flow -->
+            <div class="cargo-flow">
+                <div class="cargo-box box-1">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="cargo-box box-2">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="cargo-box box-3">
+                    <i class="fas fa-box"></i>
+                </div>
+            </div>
         </div>
+
         <div class="system-status" id="system-status">ESTABLISHING SECURE CONNECTION...</div>
     </div>
 
@@ -1843,13 +2404,17 @@
                 <p style="color: #94a3b8; font-size: 0.85em; margin-bottom: 20px;">Silakan pilih portal operasional Anda:</p>
                 
                 <div class="dc-card-container">
-                    <div class="dc-card ahi animate-card" style="animation-delay: 0.1s;" onclick="handleDCBranchSelection('AHI')">
-                        <i class="fas fa-warehouse dc-card-icon"></i>
-                        <span class="dc-card-name">DC AHI<br>SIDOARJO</span>
+                    <div class="dc-card-wrapper" onclick="handleDCBranchSelection('AHI')">
+                        <div class="dc-card ahi animate-card" style="animation-delay: 0.1s;">
+                            <i class="fas fa-warehouse dc-card-icon"></i>
+                            <span class="dc-card-name">DC AHI<br>SIDOARJO</span>
+                        </div>
                     </div>
-                    <div class="dc-card fbi animate-card" style="animation-delay: 0.2s;" onclick="handleDCBranchSelection('FBI')">
-                        <i class="fas fa-coffee dc-card-icon"></i>
-                        <span class="dc-card-name">DC FBI<br>SIDOARJO</span>
+                    <div class="dc-card-wrapper" onclick="handleDCBranchSelection('FBI')">
+                        <div class="dc-card fbi animate-card" style="animation-delay: 0.2s;">
+                            <i class="fas fa-coffee dc-card-icon"></i>
+                            <span class="dc-card-name">DC FBI<br>SIDOARJO</span>
+                        </div>
                     </div>
                 </div>
             </div>
