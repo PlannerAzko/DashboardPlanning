@@ -1318,13 +1318,27 @@
         .multi-select-container {
             position: relative;
             background-color: #2a2a2a;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             min-height: 45px;
+            border: 1px solid #444;
+            transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                        box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .multi-select-container:hover {
+            border-color: #666;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+
+        /* Highlight container when dropdown is open */
+        .multi-select-container:has(.multi-select-options.show) {
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
         }
 
         .multi-select-display {
-            padding: 12px;
+            padding: 11px 15px;
             color: #fff;
             font-size: 0.95em;
             white-space: nowrap;
@@ -1333,6 +1347,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            user-select: none;
         }
 
         .multi-select-display::after {
@@ -1341,25 +1356,45 @@
             font-weight: 900;
             margin-left: 10px;
             color: #aaa;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s;
+        }
+
+        /* Rotate arrow when open */
+        .multi-select-container:has(.multi-select-options.show) .multi-select-display::after {
+            transform: rotate(180deg);
+            color: #ffd700;
         }
 
         .multi-select-options {
-            display: none;
+            display: block; /* We keep display block but control visibility/opacity/transform for smooth transitions */
             position: absolute;
-            top: 100%;
+            top: calc(100% + 6px); /* Floating slightly below with an elegant gap */
             left: 0;
             right: 0;
-            background-color: #2a2a2a;
+            background-color: #242424; /* Slightly darker for better nested appearance */
             border: 1px solid #444;
-            z-index: 3000; /* Ditingkatkan agar pasti di atas peta Leaflet */
-            max-height: 300px;
+            z-index: 3000; /* High enough to be on top of Leaflet maps */
+            max-height: 280px;
             overflow-y: auto;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            border-radius: 0 0 4px 4px;
+            scrollbar-gutter: stable; /* Crucial! Prevents "shaking/vibration" layout shift when scrollbar appears */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px) scale(0.97);
+            transform-origin: top center;
+            pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                        visibility 0.25s;
         }
 
         .multi-select-options.show {
-            display: block;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+            border-color: #ffd700;
         }
 
         .option-item {
