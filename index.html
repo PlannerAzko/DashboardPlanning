@@ -1178,6 +1178,7 @@
             font-size: 0.85em;
             background-color: #1a1a1a;
             color: #aaa;
+            text-align: center;
         }
 
         .pivot-filter select:focus {
@@ -4411,17 +4412,47 @@
                         </tr>
                         <tr class="sub-header">
                             <!-- Aging Order -->
-                            <th onclick="sortPivot('aging0')" style="cursor: pointer;">0 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                            <th onclick="sortPivot('aging1_3')" style="cursor: pointer;">1-3 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                            <th onclick="sortPivot('aging4_7')" style="cursor: pointer;">4-7 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                            <th onclick="sortPivot('aging7up')" style="cursor: pointer;">7 UP <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                            <th onclick="sortPivot('agingTotal')" style="background: #34495e; cursor: pointer;">TOTAL <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            <th onclick="sortPivot('aging0')" style="cursor: pointer; vertical-align: bottom; padding: 8px 4px; text-align: center;">
+                                <div id="pct-aging0" style="font-size: 1.15em; font-weight: 800; color: #ffd700; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">0</span> <i class="fas fa-sort" style="font-size: 0.75em; opacity: 0.6; color: #bbb;"></i>
+                            </th>
+                            <th onclick="sortPivot('aging1_3')" style="cursor: pointer; vertical-align: bottom; padding: 8px 4px; text-align: center;">
+                                <div id="pct-aging1_3" style="font-size: 1.15em; font-weight: 800; color: #ffd700; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">1-3</span> <i class="fas fa-sort" style="font-size: 0.75em; opacity: 0.6; color: #bbb;"></i>
+                            </th>
+                            <th onclick="sortPivot('aging4_7')" style="cursor: pointer; vertical-align: bottom; padding: 8px 4px; text-align: center;">
+                                <div id="pct-aging4_7" style="font-size: 1.15em; font-weight: 800; color: #ff6b6b; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">4-7</span> <i class="fas fa-sort" style="font-size: 0.75em; opacity: 0.6; color: #bbb;"></i>
+                            </th>
+                            <th onclick="sortPivot('aging7up')" style="cursor: pointer; vertical-align: bottom; padding: 8px 4px; text-align: center;">
+                                <div id="pct-aging7up" style="font-size: 1.15em; font-weight: 800; color: #ff6b6b; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">7 UP</span> <i class="fas fa-sort" style="font-size: 0.75em; opacity: 0.6; color: #bbb;"></i>
+                            </th>
+                            <th onclick="sortPivot('agingTotal')" style="background: #34495e; cursor: pointer; vertical-align: bottom; padding: 8px 4px; text-align: center;">
+                                <div style="font-size: 1.15em; font-weight: 800; color: #fff; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">100%</div>
+                                <span style="font-size: 0.85em; color: #fff; font-weight: bold;">TOTAL</span> <i class="fas fa-sort" style="font-size: 0.75em; opacity: 0.6; color: #fff;"></i>
+                            </th>
                             <!-- Sebaran Order -->
-                            <th onclick="sortPivot('unplanned0')" style="cursor: pointer;">0 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                            <th onclick="sortPivot('unplanned1_3')" style="cursor: pointer;">1-3 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                            <th onclick="sortPivot('unplanned4_7')" style="cursor: pointer;">4-7 <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                            <th onclick="sortPivot('unplanned7up')" style="cursor: pointer;">7 UP <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
-                            <th onclick="sortPivot('unplannedTotal')" style="background: #219150; cursor: pointer;">TOTAL <i class="fas fa-sort" style="font-size: 0.7em; opacity: 0.5;"></i></th>
+                            <th onclick="sortPivot('unplanned0')" style="cursor: pointer; vertical-align: bottom; padding: 8px 4px; text-align: center;">
+                                <div id="pct-unplanned0" style="font-size: 1.15em; font-weight: 800; color: #ffd700; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">0</span> <i class="fas fa-sort" style="font-size: 0.75em; opacity: 0.6; color: #bbb;"></i>
+                            </th>
+                            <th onclick="sortPivot('unplanned1_3')" style="cursor: pointer; vertical-align: bottom; padding: 8px 4px; text-align: center;">
+                                <div id="pct-unplanned1_3" style="font-size: 1.15em; font-weight: 800; color: #ffd700; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">1-3</span> <i class="fas fa-sort" style="font-size: 0.75em; opacity: 0.6; color: #bbb;"></i>
+                            </th>
+                            <th onclick="sortPivot('unplanned4_7')" style="cursor: pointer; vertical-align: bottom; padding: 8px 4px; text-align: center;">
+                                <div id="pct-unplanned4_7" style="font-size: 1.15em; font-weight: 800; color: #ff6b6b; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">4-7</span> <i class="fas fa-sort" style="font-size: 0.75em; opacity: 0.6; color: #bbb;"></i>
+                            </th>
+                            <th onclick="sortPivot('unplanned7up')" style="cursor: pointer; vertical-align: bottom; padding: 8px 4px; text-align: center;">
+                                <div id="pct-unplanned7up" style="font-size: 1.15em; font-weight: 800; color: #ff6b6b; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">7 UP</span> <i class="fas fa-sort" style="font-size: 0.75em; opacity: 0.6; color: #bbb;"></i>
+                            </th>
+                            <th onclick="sortPivot('unplannedTotal')" style="background: #219150; cursor: pointer; vertical-align: bottom; padding: 8px 4px; text-align: center;">
+                                <div style="font-size: 1.15em; font-weight: 800; color: #fff; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">100%</div>
+                                <span style="font-size: 0.85em; color: #fff; font-weight: bold;">TOTAL</span> <i class="fas fa-sort" style="font-size: 0.75em; opacity: 0.6; color: #fff;"></i>
+                            </th>
                         </tr>
                     </thead>
                     <tbody id="pivot-table-body">
@@ -4450,16 +4481,46 @@
                                 <th colspan="5" style="background: #27ae60; color: #fff; text-align: center;">AGING BELUM PLAN (CBM)</th>
                             </tr>
                             <tr class="sub-header">
-                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('aging0')">0</th>
-                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('aging1_3')">1-3</th>
-                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('aging4_7')">4-7</th>
-                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('aging7up')">7 UP</th>
-                                <th style="cursor: pointer; width: 80px; text-align: center; background: #34495e;" onclick="sortStoringPivot('agingTotal')">TOTAL</th>
-                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('unplanned0')">0</th>
-                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('unplanned1_3')">1-3</th>
-                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('unplanned4_7')">4-7</th>
-                                <th style="cursor: pointer; width: 60px; text-align: center;" onclick="sortStoringPivot('unplanned7up')">7 UP</th>
-                                <th style="cursor: pointer; width: 80px; text-align: center; background: #219150;" onclick="sortStoringPivot('unplannedTotal')">TOTAL</th>
+                                <th style="cursor: pointer; width: 65px; text-align: center; vertical-align: bottom; padding: 8px 4px;" onclick="sortStoringPivot('aging0')">
+                                    <div id="storing-pct-aging0" style="font-size: 1.15em; font-weight: 800; color: #ffd700; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                    <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">0</span>
+                                </th>
+                                <th style="cursor: pointer; width: 65px; text-align: center; vertical-align: bottom; padding: 8px 4px;" onclick="sortStoringPivot('aging1_3')">
+                                    <div id="storing-pct-aging1_3" style="font-size: 1.15em; font-weight: 800; color: #ffd700; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                    <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">1-3</span>
+                                </th>
+                                <th style="cursor: pointer; width: 65px; text-align: center; vertical-align: bottom; padding: 8px 4px;" onclick="sortStoringPivot('aging4_7')">
+                                    <div id="storing-pct-aging4_7" style="font-size: 1.15em; font-weight: 800; color: #ff6b6b; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                    <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">4-7</span>
+                                </th>
+                                <th style="cursor: pointer; width: 65px; text-align: center; vertical-align: bottom; padding: 8px 4px;" onclick="sortStoringPivot('aging7up')">
+                                    <div id="storing-pct-aging7up" style="font-size: 1.15em; font-weight: 800; color: #ff6b6b; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                    <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">7 UP</span>
+                                </th>
+                                <th style="cursor: pointer; width: 85px; text-align: center; background: #34495e; vertical-align: bottom; padding: 8px 4px;" onclick="sortStoringPivot('agingTotal')">
+                                    <div style="font-size: 1.15em; font-weight: 800; color: #fff; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">100%</div>
+                                    <span style="font-size: 0.85em; color: #fff; font-weight: bold;">TOTAL</span>
+                                </th>
+                                <th style="cursor: pointer; width: 65px; text-align: center; vertical-align: bottom; padding: 8px 4px;" onclick="sortStoringPivot('unplanned0')">
+                                    <div id="storing-pct-unplanned0" style="font-size: 1.15em; font-weight: 800; color: #ffd700; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                    <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">0</span>
+                                </th>
+                                <th style="cursor: pointer; width: 65px; text-align: center; vertical-align: bottom; padding: 8px 4px;" onclick="sortStoringPivot('unplanned1_3')">
+                                    <div id="storing-pct-unplanned1_3" style="font-size: 1.15em; font-weight: 800; color: #ffd700; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                    <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">1-3</span>
+                                </th>
+                                <th style="cursor: pointer; width: 65px; text-align: center; vertical-align: bottom; padding: 8px 4px;" onclick="sortStoringPivot('unplanned4_7')">
+                                    <div id="storing-pct-unplanned4_7" style="font-size: 1.15em; font-weight: 800; color: #ff6b6b; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                    <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">4-7</span>
+                                </th>
+                                <th style="cursor: pointer; width: 65px; text-align: center; vertical-align: bottom; padding: 8px 4px;" onclick="sortStoringPivot('unplanned7up')">
+                                    <div id="storing-pct-unplanned7up" style="font-size: 1.15em; font-weight: 800; color: #ff6b6b; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">0%</div>
+                                    <span style="font-size: 0.85em; color: #ddd; font-weight: 500;">7 UP</span>
+                                </th>
+                                <th style="cursor: pointer; width: 85px; text-align: center; background: #219150; vertical-align: bottom; padding: 8px 4px;" onclick="sortStoringPivot('unplannedTotal')">
+                                    <div style="font-size: 1.15em; font-weight: 800; color: #fff; margin-bottom: 3px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">100%</div>
+                                    <span style="font-size: 0.85em; color: #fff; font-weight: bold;">TOTAL</span>
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="storing-aging-body">
@@ -8928,6 +8989,27 @@ Tim Planner DC Sidoarjo`;
             html += `</tr>`;
 
             tbody.innerHTML = html;
+
+            // Calculate and update header percentages
+            const pctAging0 = totals.agingTotal > 0 ? ((totals.aging[0] / totals.agingTotal) * 100).toFixed(1) : '0.0';
+            const pctAging1_3 = totals.agingTotal > 0 ? ((totals.aging[1] / totals.agingTotal) * 100).toFixed(1) : '0.0';
+            const pctAging4_7 = totals.agingTotal > 0 ? ((totals.aging[2] / totals.agingTotal) * 100).toFixed(1) : '0.0';
+            const pctAging7up = totals.agingTotal > 0 ? ((totals.aging[3] / totals.agingTotal) * 100).toFixed(1) : '0.0';
+
+            const pctUnplanned0 = totals.unplannedTotal > 0 ? ((totals.unplanned[0] / totals.unplannedTotal) * 100).toFixed(1) : '0.0';
+            const pctUnplanned1_3 = totals.unplannedTotal > 0 ? ((totals.unplanned[1] / totals.unplannedTotal) * 100).toFixed(1) : '0.0';
+            const pctUnplanned4_7 = totals.unplannedTotal > 0 ? ((totals.unplanned[2] / totals.unplannedTotal) * 100).toFixed(1) : '0.0';
+            const pctUnplanned7up = totals.unplannedTotal > 0 ? ((totals.unplanned[3] / totals.unplannedTotal) * 100).toFixed(1) : '0.0';
+
+            if (document.getElementById('pct-aging0')) document.getElementById('pct-aging0').textContent = `${pctAging0}%`;
+            if (document.getElementById('pct-aging1_3')) document.getElementById('pct-aging1_3').textContent = `${pctAging1_3}%`;
+            if (document.getElementById('pct-aging4_7')) document.getElementById('pct-aging4_7').textContent = `${pctAging4_7}%`;
+            if (document.getElementById('pct-aging7up')) document.getElementById('pct-aging7up').textContent = `${pctAging7up}%`;
+
+            if (document.getElementById('pct-unplanned0')) document.getElementById('pct-unplanned0').textContent = `${pctUnplanned0}%`;
+            if (document.getElementById('pct-unplanned1_3')) document.getElementById('pct-unplanned1_3').textContent = `${pctUnplanned1_3}%`;
+            if (document.getElementById('pct-unplanned4_7')) document.getElementById('pct-unplanned4_7').textContent = `${pctUnplanned4_7}%`;
+            if (document.getElementById('pct-unplanned7up')) document.getElementById('pct-unplanned7up').textContent = `${pctUnplanned7up}%`;
             
             // Populate Priority Summary
             let priorityHtml = '';
@@ -9091,6 +9173,27 @@ function renderStoringPivotTable(filteredData) {
 
     tbody.innerHTML = html;
     if (tfoot) tfoot.innerHTML = footHtml;
+
+    // Calculate and update header percentages for storing area
+    const pctStoreAging0 = totals.agingTotal > 0 ? ((totals.aging[0] / totals.agingTotal) * 100).toFixed(1) : '0.0';
+    const pctStoreAging1_3 = totals.agingTotal > 0 ? ((totals.aging[1] / totals.agingTotal) * 100).toFixed(1) : '0.0';
+    const pctStoreAging4_7 = totals.agingTotal > 0 ? ((totals.aging[2] / totals.agingTotal) * 100).toFixed(1) : '0.0';
+    const pctStoreAging7up = totals.agingTotal > 0 ? ((totals.aging[3] / totals.agingTotal) * 100).toFixed(1) : '0.0';
+
+    const pctStoreUnplanned0 = totals.unplannedTotal > 0 ? ((totals.unplanned[0] / totals.unplannedTotal) * 100).toFixed(1) : '0.0';
+    const pctStoreUnplanned1_3 = totals.unplannedTotal > 0 ? ((totals.unplanned[1] / totals.unplannedTotal) * 100).toFixed(1) : '0.0';
+    const pctStoreUnplanned4_7 = totals.unplannedTotal > 0 ? ((totals.unplanned[2] / totals.unplannedTotal) * 100).toFixed(1) : '0.0';
+    const pctStoreUnplanned7up = totals.unplannedTotal > 0 ? ((totals.unplanned[3] / totals.unplannedTotal) * 100).toFixed(1) : '0.0';
+
+    if (document.getElementById('storing-pct-aging0')) document.getElementById('storing-pct-aging0').textContent = `${pctStoreAging0}%`;
+    if (document.getElementById('storing-pct-aging1_3')) document.getElementById('storing-pct-aging1_3').textContent = `${pctStoreAging1_3}%`;
+    if (document.getElementById('storing-pct-aging4_7')) document.getElementById('storing-pct-aging4_7').textContent = `${pctStoreAging4_7}%`;
+    if (document.getElementById('storing-pct-aging7up')) document.getElementById('storing-pct-aging7up').textContent = `${pctStoreAging7up}%`;
+
+    if (document.getElementById('storing-pct-unplanned0')) document.getElementById('storing-pct-unplanned0').textContent = `${pctStoreUnplanned0}%`;
+    if (document.getElementById('storing-pct-unplanned1_3')) document.getElementById('storing-pct-unplanned1_3').textContent = `${pctStoreUnplanned1_3}%`;
+    if (document.getElementById('storing-pct-unplanned4_7')) document.getElementById('storing-pct-unplanned4_7').textContent = `${pctStoreUnplanned4_7}%`;
+    if (document.getElementById('storing-pct-unplanned7up')) document.getElementById('storing-pct-unplanned7up').textContent = `${pctStoreUnplanned7up}%`;
 }
         
         function renderAllocationSummary(data) {
