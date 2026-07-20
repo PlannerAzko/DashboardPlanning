@@ -803,6 +803,58 @@
             box-shadow: inset 0 2px 0 0 #6a1b9a;
         }
 
+        /* Theme Cyan overrides */
+        body.theme-cyan::before {
+            background: radial-gradient(circle at 50% 50%, rgba(0, 172, 193, 0.1) 0%, transparent 50%);
+        }
+        body.theme-cyan .header {
+            background: linear-gradient(90deg, #00838f 0%, #006064 100%);
+        }
+        body.theme-cyan .footer-marquee {
+            background: linear-gradient(90deg, #00838f 0%, #006064 100%);
+        }
+        body.theme-cyan .welcome-content {
+            border-color: #00acc1;
+            box-shadow: 0 0 50px rgba(0, 172, 193, 0.3);
+        }
+        body.theme-cyan .btn-iya {
+            background: linear-gradient(135deg, #00838f 0%, #006064 100%);
+            box-shadow: 0 4px 15px rgba(0, 172, 193, 0.3);
+        }
+        body.theme-cyan .table-header {
+            border-bottom-color: #00acc1;
+        }
+        body.theme-cyan .bottom-nav-item.active {
+            background: rgba(0, 172, 193, 0.08);
+            color: #00acc1;
+            box-shadow: 0 0 20px rgba(0, 172, 193, 0.15);
+        }
+        body.theme-cyan .bottom-nav-item.active i {
+            filter: drop-shadow(0 0 5px rgba(0, 172, 193, 0.3));
+        }
+        body.theme-cyan .kpi-card.red {
+            background: linear-gradient(135deg, #0097a7 0%, #006064 100%);
+            border-bottom-color: #00363a;
+        }
+        body.theme-cyan .tech-circle-1 {
+            border-top-color: #00acc1;
+            border-bottom-color: #00acc1;
+        }
+        body.theme-cyan .tech-core {
+            background: #00acc1;
+            box-shadow: 0 0 30px #00acc1;
+        }
+        body.theme-cyan .option-item input[type="checkbox"] {
+            accent-color: #00acc1;
+        }
+        body.theme-cyan .filter-group select:focus,
+        body.theme-cyan .filter-group input:focus {
+            border-bottom: 2px solid #00acc1;
+        }
+        body.theme-cyan table tfoot td {
+            box-shadow: inset 0 2px 0 0 #00acc1;
+        }
+
         /* New FBI Layout Styles */
         .fbi-dashboard-header {
             background: #2e2e5c;
@@ -929,9 +981,12 @@
         /* Futuristic DC Cards */
         .dc-card-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-top: 25px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .dc-card {
             background: rgba(15, 23, 42, 0.6);
@@ -975,6 +1030,10 @@
             box-shadow: 0 0 25px rgba(168, 85, 247, 0.2);
             border-color: #a855f7;
         }
+        .dc-card-wrapper:hover .dc-card.kls {
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.25);
+            border-color: #00d2ff;
+        }
         .dc-card-icon {
             font-size: 2.5em;
             margin-bottom: 5px;
@@ -1000,6 +1059,7 @@
         }
         .ahi .dc-card-icon { color: #ffd700; }
         .fbi .dc-card-icon { color: #a855f7; }
+        .kls .dc-card-icon { color: #00d2ff; }
 
         @media (max-width: 640px) {
             .dc-card-container { grid-template-columns: 1fr; }
@@ -2332,7 +2392,7 @@
         <!-- DC AZKO SIDOARJO Animated Title -->
         <div class="azko-title-container">
             <h1 class="azko-title">
-                <span>D</span><span>C</span><span>&nbsp;</span><span>A</span><span>Z</span><span>K</span><span>O</span><span>&nbsp;</span><span>S</span><span>I</span><span>D</span><span>O</span><span>A</span><span>R</span><span>J</span><span>O</span>
+                <span>D</span><span>C</span><span>&nbsp;</span><span>A</span><span>H</span><span>I</span><span>&nbsp;</span><span>S</span><span>I</span><span>D</span><span>O</span><span>A</span><span>R</span><span>J</span><span>O</span>
             </h1>
         </div>
         <!-- Warehouse Flow Container -->
@@ -2450,6 +2510,12 @@
                         <div class="dc-card fbi animate-card" style="animation-delay: 0.2s;">
                             <i class="fas fa-coffee dc-card-icon"></i>
                             <span class="dc-card-name">DC FBI<br>SIDOARJO</span>
+                        </div>
+                    </div>
+                    <div class="dc-card-wrapper" onclick="window.open('https://plannerazko.github.io/logisaleskawanlama/', '_blank')">
+                        <div class="dc-card kls animate-card" style="animation-delay: 0.3s;">
+                            <i class="fas fa-truck-ramp-box dc-card-icon"></i>
+                            <span class="dc-card-name">DC KLS<br>SIDOARJO</span>
                         </div>
                     </div>
                 </div>
@@ -5626,6 +5692,9 @@
         const SHEET_ID_FBI = '1lRl-Noq63iovsyzOTEM_Dxw4rPOKDF6dsO9o387iHwk';
         const SHEET_GID_FBI = '1075426956';
 
+        const SHEET_ID_KLS = '1ylgWBQJQgv0HjRiV9Ay-GYs__ywWUk8ZTSeb0KwaPsM';
+        const SHEET_GID_KLS = '1144899065';
+
         let SHEET_ID = SHEET_ID_AHI;
         let SHEET_GID = SHEET_GID_AHI;
         
@@ -5974,6 +6043,7 @@
             if (bf) bf.innerHTML = '<option value="ALL">SEMUA BULAN</option>';
 
             if (branch === 'FBI') {
+                body.classList.remove('theme-cyan');
                 body.classList.add('theme-purple');
                 SHEET_ID = SHEET_ID_FBI;
                 SHEET_GID = SHEET_GID_FBI;
@@ -5984,7 +6054,11 @@
                 
                 if (headerTitle) headerTitle.textContent = 'LOGISTICS DASHBOARD | ORDER PLANNING DC FBI SIDOARJO';
                 if (welcomeTitle) welcomeTitle.textContent = 'Dashboard DC FBI SIDOARJO';
-                if (marquee) marquee.textContent = marquee.textContent.replace('TIM PLANNER SIDOARJO', 'TIM FBI SIDOARJO');
+                if (marquee) {
+                    marquee.textContent = marquee.textContent
+                        .replace('TIM PLANNER SIDOARJO', 'TIM FBI SIDOARJO')
+                        .replace('TIM KLS SIDOARJO', 'TIM FBI SIDOARJO');
+                }
                 
                 // Hide Storing Aging for FBI
                 const storingContainer = document.getElementById('storing-aging-container');
@@ -6004,8 +6078,43 @@
                 // Fetch FBI Schedule
                 fetchFBIScheduleData();
                 fetchSlaFbiData();
+            } else if (branch === 'KLS') {
+                body.classList.remove('theme-purple');
+                body.classList.add('theme-cyan');
+                SHEET_ID = SHEET_ID_KLS;
+                SHEET_GID = SHEET_GID_KLS;
+                CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+                
+                const navPlanning = document.getElementById('nav-planning');
+                if (navPlanning) navPlanning.style.display = 'none';
+
+                const navAhiSummary = document.getElementById('nav-ahi-summary');
+                if (navAhiSummary) navAhiSummary.style.display = 'flex';
+
+                PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${PIVOT_SHEET_ID}/export?format=csv&gid=${PIVOT_SHEET_GID}`;
+                HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
+                ASTOR_CSV_URL_DYNAMIC = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=1345578811`;
+                
+                if (headerTitle) headerTitle.textContent = 'LOGISTICS DASHBOARD | ORDER PLANNING DC KLS SIDOARJO';
+                if (welcomeTitle) welcomeTitle.textContent = 'Dashboard DC KLS SIDOARJO';
+                if (marquee) {
+                    marquee.textContent = marquee.textContent
+                        .replace('TIM PLANNER SIDOARJO', 'TIM KLS SIDOARJO')
+                        .replace('TIM FBI SIDOARJO', 'TIM KLS SIDOARJO');
+                }
+                
+                // Show Storing Aging for KLS
+                const storingContainer = document.getElementById('storing-aging-container');
+                if (storingContainer) storingContainer.style.display = 'block';
+
+                // KLS: Show all navigation items
+                if (navPartner) navPartner.style.display = 'flex';
+                if (navHub) navHub.style.display = 'flex';
+
+                showDashboardSection('main-dashboard-section');
             } else {
                 body.classList.remove('theme-purple');
+                body.classList.remove('theme-cyan');
                 SHEET_ID = SHEET_ID_AHI;
                 SHEET_GID = SHEET_GID_AHI;
                 CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
@@ -6022,7 +6131,11 @@
                 
                 if (headerTitle) headerTitle.textContent = 'LOGISTICS DASHBOARD | ORDER PLANNING NDC AHI SIDOARJO';
                 if (welcomeTitle) welcomeTitle.textContent = 'Dashboard DC AHI SIDOARJO';
-                if (marquee) marquee.textContent = marquee.textContent.replace('TIM FBI SIDOARJO', 'TIM PLANNER SIDOARJO');
+                if (marquee) {
+                    marquee.textContent = marquee.textContent
+                        .replace('TIM FBI SIDOARJO', 'TIM PLANNER SIDOARJO')
+                        .replace('TIM KLS SIDOARJO', 'TIM PLANNER SIDOARJO');
+                }
                 
                 // Show Storing Aging for AHI
                 const storingContainer = document.getElementById('storing-aging-container');
