@@ -126,40 +126,575 @@
             pointer-events: none;
         }
 
-        /* Initializing Dashboard Overlay */
+        /* Initializing Dashboard Overlay - Enterprise Kawan Lama Logistics Design */
         #init-loader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(30, 41, 59, 0.85) 50%, rgba(15, 23, 42, 0.92) 100%), url('https://www.kawanlamagroup.com/storage/684/Header-DC.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             z-index: 20000;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
+            padding: 24px;
+            box-sizing: border-box;
             transition: opacity 0.8s ease, visibility 0.8s ease;
-            overflow: hidden;
+            overflow-y: auto;
+            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
         }
 
-        #init-loader::before {
-            content: "";
+        .init-header-bar {
             position: absolute;
-            width: 200%;
+            top: 20px;
+            right: 25px;
+            width: auto;
+            z-index: 100;
+            padding: 0;
+        }
+
+        .init-clock-badge {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .init-clock-icon {
+            color: #ef4444;
+            font-size: 16px;
+            animation: initPulseClock 1.5s infinite;
+        }
+
+        @keyframes initPulseClock {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.9); }
+        }
+
+        .init-main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1100px;
+            margin: auto 0;
+            padding: 40px 0 20px 0;
+        }
+
+        /* Swirling Water Vortex & Convergence Stage */
+        .init-logo-stage {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            min-height: 220px;
+            margin-bottom: 25px;
+            overflow: visible;
+        }
+
+        .water-vortex-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 400px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Individual Swirling Water Fragments (Pecahan Air yang Berputar) */
+        .water-frag {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 32px;
+            height: 32px;
+            margin-top: -16px;
+            margin-left: -16px;
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, rgba(186, 230, 253, 0.95) 40%, rgba(14, 165, 233, 0.85) 80%, rgba(2, 132, 199, 0.4) 100%);
+            border-radius: 40% 60% 65% 35% / 55% 45% 60% 40%;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.9), inset 0 0 10px rgba(255, 255, 255, 0.9);
+            filter: drop-shadow(0 0 12px rgba(14, 165, 233, 0.8));
+            animation: vortexSpiral 4.2s cubic-bezier(0.3, 0, 0.7, 1) 1 forwards;
+        }
+
+        @keyframes vortexSpiral {
+            0% { 
+                opacity: 0; 
+                transform: rotate(var(--start-angle)) translateX(190px) scale(0.2); 
+            }
+            10% { 
+                opacity: 1; 
+                transform: rotate(calc(var(--start-angle) + 140deg)) translateX(150px) scale(0.8); 
+            }
+            25% { 
+                opacity: 1; 
+                transform: rotate(calc(var(--start-angle) + 320deg)) translateX(90px) scale(1.4); 
+            }
+            36% { 
+                opacity: 0.95; 
+                transform: rotate(calc(var(--start-angle) + 480deg)) translateX(30px) scale(2.0); 
+            }
+            42% { 
+                opacity: 0; 
+                transform: rotate(calc(var(--start-angle) + 560deg)) translateX(0px) scale(3.5); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: rotate(calc(var(--start-angle) + 560deg)) translateX(0px) scale(3.5); 
+            }
+        }
+
+        /* Central Liquid Splash Core when particles collide */
+        .water-fusion-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 130px;
+            height: 130px;
+            margin-top: -65px;
+            margin-left: -65px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(186, 230, 253, 0.95) 30%, rgba(56, 189, 248, 0.8) 60%, rgba(2, 132, 199, 0) 100%);
+            border-radius: 50%;
+            z-index: 6;
+            pointer-events: none;
+            animation: fusionPulse 4.2s cubic-bezier(0.2, 0.8, 0.2, 1) 1 forwards;
+        }
+
+        @keyframes fusionPulse {
+            0%, 32% { opacity: 0; transform: scale(0.1); }
+            38% { opacity: 0.9; transform: scale(0.8); filter: blur(4px); }
+            44% { opacity: 1; transform: scale(2.4); filter: blur(2px) brightness(160%); }
+            50% { opacity: 0.4; transform: scale(3.2); filter: blur(10px); }
+            58%, 100% { opacity: 0; transform: scale(3.8); }
+        }
+
+        /* Water Ripple Shockwaves when drops merge */
+        .water-ripple {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 180px;
+            height: 120px;
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            border-radius: 40% 60% 65% 35% / 40% 45% 55% 60%;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.6);
+            pointer-events: none;
+            z-index: 8;
+        }
+
+        .ripple-1 { animation: rippleWave 4.2s cubic-bezier(0.1, 0.8, 0.3, 1) 1.65s 1 forwards; }
+        .ripple-2 { animation: rippleWave 4.2s cubic-bezier(0.1, 0.8, 0.3, 1) 1.85s 1 forwards; }
+        .ripple-3 { animation: rippleWave 4.2s cubic-bezier(0.1, 0.8, 0.3, 1) 2.05s 1 forwards; }
+
+        @keyframes rippleWave {
+            0% { transform: translate(-50%, -50%) scale(0.2) rotate(0deg); opacity: 0; border-width: 5px; }
+            15% { opacity: 1; border-color: rgba(186, 230, 253, 0.95); }
+            50%, 100% { transform: translate(-50%, -50%) scale(2.8) rotate(180deg); opacity: 0; border-width: 1px; border-color: rgba(56, 189, 248, 0); }
+        }
+
+        /* Shimmer Wave Sweep */
+        .water-shine-wave {
+            position: absolute;
+            top: -50%;
+            left: -150%;
+            width: 80%;
             height: 200%;
-            background-image: 
-                linear-gradient(rgba(211, 47, 47, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(211, 47, 47, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            transform: perspective(500px) rotateX(60deg) translateY(-100px);
-            animation: gridMove 10s linear infinite;
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0) 0%, 
+                rgba(186, 230, 253, 0.4) 30%, 
+                rgba(255, 255, 255, 0.85) 50%, 
+                rgba(56, 189, 248, 0.4) 70%, 
+                rgba(255,255,255,0) 100%);
+            transform: rotate(30deg);
+            z-index: 5;
+            pointer-events: none;
+            animation: waterShineSweep 4.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes waterShineSweep {
+            0%, 40% { left: -150%; opacity: 0; }
+            55% { opacity: 1; }
+            75%, 100% { left: 150%; opacity: 0; }
+        }
+
+        .init-logo-wrapper {
+            position: relative;
+            margin-bottom: 0;
+            padding: 3px;
+            border-radius: 24px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.5), 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: initLogoWrapperPulse 4.2s cubic-bezier(0.2, 0.8, 0.2, 1) 1 forwards;
+            z-index: 10;
+        }
+
+        .init-logo-wrapper::before {
+            content: '';
+            position: absolute;
+            width: 250%;
+            height: 250%;
+            background: conic-gradient(from 0deg, rgba(239, 68, 68, 0.1) 0deg, rgba(239, 68, 68, 0.1) 180deg, #ff0000 280deg, #ff6600 340deg, #ff0000 360deg);
+            animation: initSpinBorder 2.5s linear infinite;
             z-index: 1;
         }
 
-        @keyframes gridMove {
-            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
-            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        @keyframes initSpinBorder {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes initLogoWrapperPulse {
+            0%, 32% {
+                opacity: 0;
+                transform: scale(0.5);
+                box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+            }
+            43% {
+                opacity: 1;
+                transform: scale(1.05);
+                box-shadow: 0 0 45px rgba(239, 68, 68, 0.9), 0 0 35px rgba(56, 189, 248, 0.9);
+            }
+            50%, 100% {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow: 0 0 25px rgba(239, 68, 68, 0.6), 0 10px 30px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        .init-logo-img {
+            position: relative;
+            z-index: 2;
+            height: 130px;
+            max-width: 90%;
+            object-fit: contain;
+            margin-bottom: 0;
+            background: rgba(255, 255, 255, 0.30);
+            padding: 18px 40px;
+            border-radius: 21px;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            display: block;
+            animation: logoWaterSolidify 4.2s cubic-bezier(0.16, 1, 0.3, 1) 1 forwards;
+        }
+
+        @keyframes logoWaterSolidify {
+            0%, 34% {
+                filter: blur(20px) contrast(250%) drop-shadow(0 0 40px rgba(56, 189, 248, 1));
+                transform: scale(0.8) rotate(-8deg);
+            }
+            43% {
+                filter: blur(4px) contrast(140%) drop-shadow(0 0 30px rgba(56, 189, 248, 0.9));
+                transform: scale(1.04) rotate(2deg);
+            }
+            50%, 100% {
+                filter: blur(0px) contrast(100%) drop-shadow(0 10px 25px rgba(0, 0, 0, 0.4));
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .init-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1e293b;
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .init-pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            animation: initPulseDot 1.5s infinite;
+        }
+
+        @keyframes initPulseDot {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .init-main-title {
+            font-size: 50px;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 2px;
+            margin: 0;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .init-sub-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #f97316;
+            letter-spacing: 3.5px;
+            margin-top: 10px;
+            margin-bottom: 38px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+
+        .init-cards-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            width: 100%;
+            max-width: 1080px;
+            margin-bottom: 20px;
+            perspective: 1200px;
+        }
+
+        .init-menu-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 14px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            cursor: pointer;
+            text-align: left;
+            flex: 1 1 240px;
+            max-width: 250px;
+            min-width: 220px;
+            backdrop-filter: blur(8px);
+            animation: cardBounceInOut 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+        }
+
+        /* Staggered Delay for Each Card (Muncul Satu Persatu Bouncing dari Dalam ke Luar) */
+        .init-menu-card:nth-child(1) { animation-delay: 1.45s; }
+        .init-menu-card:nth-child(2) { animation-delay: 1.60s; }
+        .init-menu-card:nth-child(3) { animation-delay: 1.75s; }
+        .init-menu-card:nth-child(4) { animation-delay: 1.90s; }
+        .init-menu-card:nth-child(5) { animation-delay: 2.05s; }
+        .init-menu-card:nth-child(6) { animation-delay: 2.20s; }
+        .init-menu-card:nth-child(7) { animation-delay: 2.35s; }
+
+        @keyframes cardBounceInOut {
+            0% {
+                opacity: 0;
+                transform: scale(0.1) translateY(50px) translateZ(-250px) rotateX(12deg);
+                box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+            }
+            45% {
+                opacity: 1;
+                transform: scale(1.15) translateY(-12px) translateZ(35px) rotateX(0deg);
+                box-shadow: 0 25px 45px rgba(56, 189, 248, 0.45), 0 10px 30px rgba(0, 0, 0, 0.35);
+                border-color: rgba(56, 189, 248, 0.9);
+            }
+            70% {
+                transform: scale(0.94) translateY(4px) translateZ(-12px);
+                box-shadow: 0 15px 30px rgba(239, 68, 68, 0.25), 0 8px 20px rgba(0, 0, 0, 0.25);
+                border-color: rgba(239, 68, 68, 0.5);
+            }
+            88% {
+                transform: scale(1.03) translateY(-2px) translateZ(4px);
+                border-color: rgba(239, 68, 68, 0.2);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0) translateZ(0) rotateX(0deg);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+                border-color: transparent;
+            }
+        }
+
+        .init-menu-card:hover, .init-menu-card.selected-card {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+            background: #ffffff;
+            border-color: #ef4444;
+        }
+
+        .init-card-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .init-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .init-icon-box.theme-blue { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .init-icon-box.theme-green { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        .init-icon-box.theme-red { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .init-icon-box.theme-orange { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+        .init-icon-box.theme-purple { background: #faf5ff; color: #9333ea; border: 1px solid #e9d5ff; }
+        .init-icon-box.theme-teal { background: #f0fdfa; color: #0d9488; border: 1px solid #99f6e4; }
+        .init-icon-box.theme-navy { background: #f1f5f9; color: #1e3a8a; border: 1px solid #cbd5e1; }
+
+        .init-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .init-card-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #1e293b;
+            letter-spacing: 0.5px;
+        }
+
+        .init-card-desc {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.3;
+            font-weight: 500;
+        }
+
+        .init-card-arrow {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            background: #f8fafc;
+            transition: transform 0.2s ease, background 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .init-menu-card:hover .init-card-arrow {
+            transform: translateX(3px);
+            background: #f1f5f9;
+        }
+
+        .init-card-arrow.theme-blue-text { color: #2563eb; }
+        .init-card-arrow.theme-green-text { color: #16a34a; }
+        .init-card-arrow.theme-red-text { color: #dc2626; }
+        .init-card-arrow.theme-orange-text { color: #ea580c; }
+        .init-card-arrow.theme-purple-text { color: #9333ea; }
+        .init-card-arrow.theme-teal-text { color: #0d9488; }
+        .init-card-arrow.theme-navy-text { color: #1e3a8a; }
+
+        .init-bottom-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1100px;
+            padding-bottom: 10px;
+            gap: 25px;
+        }
+
+        .init-progress-container {
+            width: 100%;
+            max-width: 580px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .init-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .init-status-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e2e8f0;
+            letter-spacing: 0.3px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .init-pct-text {
+            font-size: 14px;
+            font-weight: 800;
+            color: #f97316;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .init-progress-track {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .init-progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #dc2626, #f97316, #fbbf24);
+            border-radius: 999px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 12px rgba(249, 115, 22, 0.8);
+        }
+
+        .init-footer {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 15px;
+            width: 100%;
+        }
+
+        .init-tagline {
+            font-size: 13px;
+            font-style: italic;
+            font-weight: 500;
+            color: #cbd5e1;
+            letter-spacing: 0.5px;
+        }
+
+        .init-copyright {
+            font-size: 11px;
+            color: #94a3b8;
         }
 
         /* Warehouse Process Flow Loader - Bold & Vibrant Cyber-Neon Design */
@@ -2386,84 +2921,163 @@
     </style>
 </head>
 <body>
-    <!-- Initializing Dashboard Loader -->
+    <!-- Initializing Dashboard Loader - Enterprise Kawan Lama Logistics Design -->
     <div id="init-loader">
-        <div class="scanning-bar"></div>
-        <!-- DC AZKO SIDOARJO Animated Title -->
-        <div class="azko-title-container">
-            <h1 class="azko-title">
-                <span>D</span><span>C</span><span>&nbsp;</span><span>A</span><span>H</span><span>I</span><span>&nbsp;</span><span>S</span><span>I</span><span>D</span><span>O</span><span>A</span><span>R</span><span>J</span><span>O</span>
-            </h1>
-        </div>
-        <!-- Warehouse Flow Container -->
-        <div class="warehouse-flow-container">
-            <!-- Top Edge Status LEDs -->
-            <div class="container-header-leds">
-                <span class="led-title">Warehouse Processing Sync</span>
-                <div class="led-group">
-                    <span class="led-dot led-cyan" title="Inbound Status"></span>
-                    <span class="led-dot led-fuchsia" title="Sorting Status"></span>
-                    <span class="led-dot led-green" title="Shipping Status"></span>
-                </div>
-            </div>
-
-            <!-- Conveyor Belt Background -->
-            <div class="flow-pathway"></div>
-
-            <!-- Flow Stages -->
-            <div class="flow-stages">
-                <!-- Stage 1: Inbound -->
-                <div class="flow-stage stage-inbound active">
-                    <div class="stage-icon-wrapper">
-                        <i class="fas fa-boxes-packing stage-icon"></i>
-                        <div class="stage-scanner"></div>
-                    </div>
-                    <div class="stage-info-group">
-                        <div class="stage-label">Inbound</div>
-                        <div class="stage-status">RECEIVING</div>
-                    </div>
-                </div>
-
-                <!-- Stage 2: Processing -->
-                <div class="flow-stage stage-processing active">
-                    <div class="stage-icon-wrapper">
-                        <i class="fas fa-gears stage-icon gear-spin"></i>
-                        <i class="fas fa-robot stage-robotic-arm"></i>
-                    </div>
-                    <div class="stage-info-group">
-                        <div class="stage-label">Storing</div>
-                        <div class="stage-status">Picking & Packing</div>
-                    </div>
-                </div>
-
-                <!-- Stage 3: Outbound -->
-                <div class="flow-stage stage-outbound active">
-                    <div class="stage-icon-wrapper">
-                        <i class="fas fa-truck-fast stage-icon truck-vibrate"></i>
-                        <div class="truck-exhaust"></div>
-                    </div>
-                    <div class="stage-info-group">
-                        <div class="stage-label">Outbound</div>
-                        <div class="stage-status">DISPATCHING</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Animated Cargo Flow -->
-            <div class="cargo-flow">
-                <div class="cargo-box box-1">
-                    <i class="fas fa-box"></i>
-                </div>
-                <div class="cargo-box box-2">
-                    <i class="fas fa-box"></i>
-                </div>
-                <div class="cargo-box box-3">
-                    <i class="fas fa-box"></i>
-                </div>
+        <!-- Top Bar with Live Clock -->
+        <div class="init-header-bar">
+            <div class="init-clock-badge">
+                <i class="fas fa-clock init-clock-icon"></i>
+                <span id="init-clock-text">Memuat waktu...</span>
             </div>
         </div>
 
-        <div class="system-status" id="system-status">ESTABLISHING SECURE CONNECTION...</div>
+        <!-- Main Content Area -->
+        <div class="init-main-content">
+            <!-- Swirling Water Vortex & Convergence Stage -->
+            <div class="init-logo-stage">
+                <!-- Swirling Water Vortex Particles (Pecahan Air yang Berputar) -->
+                <div class="water-vortex-container">
+                    <div class="water-frag" style="--start-angle: 0deg; width: 34px; height: 34px;"></div>
+                    <div class="water-frag" style="--start-angle: 36deg; width: 26px; height: 26px;"></div>
+                    <div class="water-frag" style="--start-angle: 72deg; width: 40px; height: 40px;"></div>
+                    <div class="water-frag" style="--start-angle: 108deg; width: 22px; height: 22px;"></div>
+                    <div class="water-frag" style="--start-angle: 144deg; width: 36px; height: 36px;"></div>
+                    <div class="water-frag" style="--start-angle: 180deg; width: 28px; height: 28px;"></div>
+                    <div class="water-frag" style="--start-angle: 216deg; width: 38px; height: 38px;"></div>
+                    <div class="water-frag" style="--start-angle: 252deg; width: 24px; height: 24px;"></div>
+                    <div class="water-frag" style="--start-angle: 288deg; width: 32px; height: 32px;"></div>
+                    <div class="water-frag" style="--start-angle: 324deg; width: 30px; height: 30px;"></div>
+                    <!-- Central Liquid Splash Core -->
+                    <div class="water-fusion-core"></div>
+                </div>
+                
+                <!-- Liquid Ripple Shockwaves -->
+                <div class="water-ripple ripple-1"></div>
+                <div class="water-ripple ripple-2"></div>
+                <div class="water-ripple ripple-3"></div>
+
+                <!-- Logo Box with Shimmer Wave & Glowing Border -->
+                <div class="init-logo-wrapper">
+                    <div class="water-shine-wave"></div>
+                    <img src="https://rec-data.kalibrr.com/www.kalibrr.id/logos/4S7NLAUUSXTT8J4GHMB76SUP7LAJVC8KHHJP4CNH-5eabd866.png" alt="Kawan Lama Group Logo" class="init-logo-img">
+                </div>
+            </div>
+
+            <h1 class="init-main-title">DASHBOARD LOGISTICS</h1>
+            <div class="init-sub-title">ORDER PLANNING NDC SIDOARJO</div>
+
+            <!-- 7 Module Cards Grid -->
+            <div class="init-cards-grid">
+                <!-- 1: Planning -->
+                <div class="init-menu-card" onclick="handleInitCardSelect('fbi-planning-section')">
+                    <div class="init-card-left">
+                        <div class="init-icon-box theme-blue">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="init-card-info">
+                            <div class="init-card-title">PLANNING</div>
+                            <div class="init-card-desc">Rencana order & planning distribusi</div>
+                        </div>
+                    </div>
+                    <div class="init-card-arrow theme-blue-text"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <!-- 2: Outstanding -->
+                <div class="init-menu-card" onclick="handleInitCardSelect('outstanding-section')">
+                    <div class="init-card-left">
+                        <div class="init-icon-box theme-green">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="init-card-info">
+                            <div class="init-card-title">OUTSTANDING</div>
+                            <div class="init-card-desc">Monitoring order belum selesai</div>
+                        </div>
+                    </div>
+                    <div class="init-card-arrow theme-green-text"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <!-- 3: Vendor -->
+                <div class="init-menu-card" onclick="handleInitCardSelect('supply-partner-section')">
+                    <div class="init-card-left">
+                        <div class="init-icon-box theme-red">
+                            <i class="fas fa-truck-moving"></i>
+                        </div>
+                        <div class="init-card-info">
+                            <div class="init-card-title">VENDOR</div>
+                            <div class="init-card-desc">Performa vendor & keterlambatan</div>
+                        </div>
+                    </div>
+                    <div class="init-card-arrow theme-red-text"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <!-- 4: SLA & CBM -->
+                <div class="init-menu-card" onclick="handleInitCardSelect('summary-report-section')">
+                    <div class="init-card-left">
+                        <div class="init-icon-box theme-orange">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="init-card-info">
+                            <div class="init-card-title">SLA & CBM</div>
+                            <div class="init-card-desc">Monitoring SLA & utilisasi CBM</div>
+                        </div>
+                    </div>
+                    <div class="init-card-arrow theme-orange-text"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <!-- 5: Hub Astor -->
+                <div class="init-menu-card" onclick="handleInitCardSelect('hub-astor-section')">
+                    <div class="init-card-left">
+                        <div class="init-icon-box theme-purple">
+                            <i class="fas fa-warehouse"></i>
+                        </div>
+                        <div class="init-card-info">
+                            <div class="init-card-title">HUB ASTOR</div>
+                            <div class="init-card-desc">Data hub & stok ASTOR</div>
+                        </div>
+                    </div>
+                    <div class="init-card-arrow theme-purple-text"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <!-- 6: Skema Transit -->
+                <div class="init-menu-card" onclick="handleInitCardSelect('transit-schema-section')">
+                    <div class="init-card-left">
+                        <div class="init-icon-box theme-teal">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <div class="init-card-info">
+                            <div class="init-card-title">SKEMA TRANSIT</div>
+                            <div class="init-card-desc">Skema transit & routing distribusi</div>
+                        </div>
+                    </div>
+                    <div class="init-card-arrow theme-teal-text"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <!-- 7: Jadwal DC -->
+                <div class="init-menu-card" onclick="window.open('https://script.google.com/a/macros/kawanlamacorp.com/s/AKfycbz-otD-56iTVsM8KiVcC0orH2f2F9450cVZx1N40Og3fPQAfuMbL3EVFFXpBqSf3U1f/exec', '_blank')">
+                    <div class="init-card-left">
+                        <div class="init-icon-box theme-navy">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="init-card-info">
+                            <div class="init-card-title">JADWAL DC</div>
+                            <div class="init-card-desc">Jadwal operasional & pengiriman DC</div>
+                        </div>
+                    </div>
+                    <div class="init-card-arrow theme-navy-text"><i class="fas fa-arrow-right"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Progress & Footer -->
+        <div class="init-bottom-section">
+            <div class="init-progress-container">
+                <div class="init-progress-header">
+                    <span id="system-status" class="init-status-text">Memuat data dashboard, mohon tunggu sebentar...</span>
+                    <span id="init-progress-pct" class="init-pct-text">0%</span>
+                </div>
+                <div class="init-progress-track">
+                    <div id="init-progress-bar" class="init-progress-fill"></div>
+                </div>
+            </div>
+            <div class="init-footer">
+                <div class="init-tagline">Delivering Excellence, Together</div>
+                <div class="init-copyright">© 2026 Kawan Lama Logistics. All Rights Reserved.</div>
+            </div>
+        </div>
     </div>
 
     <!-- Welcome Overlay -->
@@ -3967,15 +4581,15 @@
         <!-- Extra Section (New Tables & Charts) -->
         <div class="extra-section">
             <div class="extra-left">
-                <!-- Table 3: Vendor Response Delayed -->
+                <!-- Table 2: Vendor Support Not Available -->
                 <div class="bottom-table">
                     <div class="table-header" style="color: #ffd700;">
-                        <i class="fas fa-clock"></i> VENDOR RESPONSE DELAYED
+                        <i class="fas fa-exclamation-circle"></i> VENDOR SUPPORT NOT AVAILABLE
                     </div>
-                    <div class="table-content-extra" id="vendor-delayed-table">
+                    <div class="table-content-extra" id="vendor-unsupported-table">
                         <div class="loading">Processing data...</div>
                     </div>
-                    <div class="pagination" id="delayed-pagination"></div>
+                    <div class="pagination" id="unsupported-pagination"></div>
                 </div>
                 
                 <!-- Percentage Breakdown Charts -->
@@ -4065,15 +4679,15 @@
             </div>
             
             <div class="extra-right">
-                <!-- Table 2: Vendor Support Not Available -->
+                <!-- Table 3: Vendor Response Delayed -->
                 <div class="bottom-table">
                     <div class="table-header" style="color: #ffd700;">
-                        <i class="fas fa-exclamation-circle"></i> VENDOR SUPPORT NOT AVAILABLE
+                        <i class="fas fa-clock"></i> VENDOR RESPONSE DELAYED
                     </div>
-                    <div class="table-content-extra" id="vendor-unsupported-table">
+                    <div class="table-content-extra" id="vendor-delayed-table">
                         <div class="loading">Processing data...</div>
                     </div>
-                    <div class="pagination" id="unsupported-pagination"></div>
+                    <div class="pagination" id="delayed-pagination"></div>
                 </div>
                 
                 <!-- Table 1: CBM & City Summary -->
@@ -5685,6 +6299,59 @@
     </div>
 
     <script>
+        // Initial Loader Progress & Live Clock Control
+        let initProgressVal = 0;
+        let selectedInitialSection = null;
+        let initProgressTimer = setInterval(() => {
+            if (initProgressVal < 88) {
+                initProgressVal += Math.floor(Math.random() * 6) + 2;
+                if (initProgressVal > 88) initProgressVal = 88;
+                const pBar = document.getElementById('init-progress-bar');
+                const pPct = document.getElementById('init-progress-pct');
+                if (pBar) pBar.style.width = initProgressVal + '%';
+                if (pPct) pPct.innerText = initProgressVal + '%';
+            }
+        }, 250);
+
+        function finishInitProgress() {
+            clearInterval(initProgressTimer);
+            const pBar = document.getElementById('init-progress-bar');
+            const pPct = document.getElementById('init-progress-pct');
+            if (pBar) pBar.style.width = '100%';
+            if (pPct) pPct.innerText = '100%';
+            const statusEl = document.getElementById('system-status');
+            if (statusEl) statusEl.innerText = "MEMUAT DATA SELESAI — SIAP DIGUNAKAN";
+        }
+
+        function updateInitClock() {
+            const clockEl = document.getElementById('init-clock-text');
+            if (!clockEl) return;
+            const now = new Date();
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const dayName = days[now.getDay()];
+            const dateNum = String(now.getDate()).padStart(2, '0');
+            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const monthName = monthNames[now.getMonth()];
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const mins = String(now.getMinutes()).padStart(2, '0');
+            const secs = String(now.getSeconds()).padStart(2, '0');
+            clockEl.innerText = `${hours}:${mins}:${secs} ${dayName}, ${dateNum} ${monthName} ${year}`;
+        }
+        setInterval(updateInitClock, 1000);
+        setTimeout(updateInitClock, 100);
+
+        function handleInitCardSelect(sectionId) {
+            selectedInitialSection = sectionId;
+            const cards = document.querySelectorAll('.init-menu-card');
+            cards.forEach(c => c.classList.remove('selected-card'));
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('selected-card');
+            }
+            const statusEl = document.getElementById('system-status');
+            if (statusEl) statusEl.innerText = "MODUL TERPILIH — MENYIAPKAN DASHBOARD...";
+        }
+
         // Google Sheets Configuration
         const SHEET_ID_AHI = '1ylgWBQJQgv0HjRiV9Ay-GYs__ywWUk8ZTSeb0KwaPsM';
         const SHEET_GID_AHI = '1144899065';
@@ -6073,7 +6740,7 @@
                 if (navPlanning) navPlanning.style.display = 'flex';
 
                 // Initial show FBI dashboard
-                showDashboardSection('fbi-dashboard-section');
+                showDashboardSection(selectedInitialSection || 'fbi-dashboard-section');
 
                 // Fetch FBI Schedule
                 fetchFBIScheduleData();
@@ -6111,7 +6778,7 @@
                 if (navPartner) navPartner.style.display = 'flex';
                 if (navHub) navHub.style.display = 'flex';
 
-                showDashboardSection('main-dashboard-section');
+                showDashboardSection(selectedInitialSection || 'main-dashboard-section');
             } else {
                 body.classList.remove('theme-purple');
                 body.classList.remove('theme-cyan');
@@ -6145,7 +6812,7 @@
                 if (navPartner) navPartner.style.display = 'flex';
                 if (navHub) navHub.style.display = 'flex';
 
-                showDashboardSection('main-dashboard-section');
+                showDashboardSection(selectedInitialSection || 'main-dashboard-section');
             }
 
             document.getElementById('welcome-step-dc-branch').classList.add('hidden');
@@ -9462,8 +10129,9 @@ function renderStoringPivotTable(filteredData) {
                 updateLastUpdateTime(lastUpdateDate);
                 
                 // Update system status
+                if (typeof finishInitProgress === 'function') finishInitProgress();
                 const statusEl = document.getElementById('system-status');
-                if (statusEl) statusEl.innerText = "DATA SYNCHRONIZATION COMPLETE. READY.";
+                if (statusEl) statusEl.innerText = "MEMUAT DATA SELESAI — SIAP DIGUNAKAN";
 
                 // Hide Initial Loader
                 setTimeout(() => {
@@ -9472,7 +10140,7 @@ function renderStoringPivotTable(filteredData) {
                         loader.onclick = toggleFullScreen;
                         loader.classList.add('hidden');
                     }
-                }, 3000); // Give it more time to show the animation
+                }, 5000); // Give 5 seconds total to view cards and finish animation
             } catch (error) {
                 console.error('Error fetching data from URL:', finalUrl);
                 console.error('Error details:', error);
