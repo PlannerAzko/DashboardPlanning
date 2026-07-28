@@ -133,7 +133,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(30, 41, 59, 0.85) 50%, rgba(15, 23, 42, 0.92) 100%), url('https://www.kawanlamagroup.com/storage/684/Header-DC.jpg');
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(30, 41, 59, 0.85) 50%, rgba(15, 23, 42, 0.92) 100%), url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBJR3VbMYI18Lzq99f-JHalEgKDDr4lYjLbaNIYSdz9A&s=10');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -4552,23 +4552,23 @@
                 <!-- KPI 4 -->
                 <div class="vendor-kpi-card" style="background: #242424; border: 1px solid #3d3d3d; border-radius: 6px; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                     <div>
-                        <div style="font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px;">Delayed Support LC</div>
-                        <div id="kpi-delayed-lc" style="font-size: 1.8em; font-weight: bold; color: #ff9f43; margin-top: 5px;">0</div>
-                        <div style="font-size: 0.7em; color: #888; margin-top: 2px;">Delayed Admin Support</div>
-                    </div>
-                    <div style="background: rgba(255, 159, 67, 0.1); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 159, 67, 0.2);">
-                        <i class="fas fa-clock" style="color: #ff9f43; font-size: 1.2em;"></i>
-                    </div>
-                </div>
-                <!-- KPI 5 -->
-                <div class="vendor-kpi-card" style="background: #242424; border: 1px solid #3d3d3d; border-radius: 6px; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                    <div>
                         <div style="font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px;">Terlambat LC</div>
                         <div id="kpi-terlambat-lc" style="font-size: 1.8em; font-weight: bold; color: #ef4444; margin-top: 5px;">0</div>
                         <div style="font-size: 0.7em; color: #888; margin-top: 2px;">Requires Dispatch Followup</div>
                     </div>
                     <div style="background: rgba(239, 68, 68, 0.1); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(239, 68, 68, 0.2);">
                         <i class="fas fa-exclamation-triangle" style="color: #ef4444; font-size: 1.2em;"></i>
+                    </div>
+                </div>
+                <!-- KPI 5 -->
+                <div class="vendor-kpi-card" style="background: #242424; border: 1px solid #3d3d3d; border-radius: 6px; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                    <div>
+                        <div style="font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px;">Delayed Support LC</div>
+                        <div id="kpi-delayed-lc" style="font-size: 1.8em; font-weight: bold; color: #ff9f43; margin-top: 5px;">0</div>
+                        <div style="font-size: 0.7em; color: #888; margin-top: 2px;">Delayed Admin Support</div>
+                    </div>
+                    <div style="background: rgba(255, 159, 67, 0.1); border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 159, 67, 0.2);">
+                        <i class="fas fa-clock" style="color: #ff9f43; font-size: 1.2em;"></i>
                     </div>
                 </div>
             </div>
@@ -4581,15 +4581,15 @@
         <!-- Extra Section (New Tables & Charts) -->
         <div class="extra-section">
             <div class="extra-left">
-                <!-- Table 2: Vendor Support Not Available -->
+                <!-- Table 3: Vendor Response Delayed -->
                 <div class="bottom-table">
                     <div class="table-header" style="color: #ffd700;">
-                        <i class="fas fa-exclamation-circle"></i> VENDOR SUPPORT NOT AVAILABLE
+                        <i class="fas fa-clock"></i> VENDOR RESPONSE DELAYED
                     </div>
-                    <div class="table-content-extra" id="vendor-unsupported-table">
+                    <div class="table-content-extra" id="vendor-delayed-table">
                         <div class="loading">Processing data...</div>
                     </div>
-                    <div class="pagination" id="unsupported-pagination"></div>
+                    <div class="pagination" id="delayed-pagination"></div>
                 </div>
                 
                 <!-- Percentage Breakdown Charts -->
@@ -4679,15 +4679,15 @@
             </div>
             
             <div class="extra-right">
-                <!-- Table 3: Vendor Response Delayed -->
+                <!-- Table 2: Vendor Support Not Available -->
                 <div class="bottom-table">
                     <div class="table-header" style="color: #ffd700;">
-                        <i class="fas fa-clock"></i> VENDOR RESPONSE DELAYED
+                        <i class="fas fa-exclamation-circle"></i> VENDOR SUPPORT NOT AVAILABLE
                     </div>
-                    <div class="table-content-extra" id="vendor-delayed-table">
+                    <div class="table-content-extra" id="vendor-unsupported-table">
                         <div class="loading">Processing data...</div>
                     </div>
-                    <div class="pagination" id="delayed-pagination"></div>
+                    <div class="pagination" id="unsupported-pagination"></div>
                 </div>
                 
                 <!-- Table 1: CBM & City Summary -->
