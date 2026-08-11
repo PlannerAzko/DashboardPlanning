@@ -12046,10 +12046,14 @@ function updateDashboard() {
                             color: '#94a3b8',
                             font: { size: 11, weight: '700' },
                             padding: 10,
+                            precision: 0,
+                            maxTicksLimit: 8,
                             callback: value => {
                                 if (value > 100) return '';
-                                if (value === 100) return '100' + suffix;
-                                return value.toFixed(0) + suffix;
+                                if (Math.round(value) === value) {
+                                    return value + suffix;
+                                }
+                                return '';
                             }
                         },
                         grid: {
