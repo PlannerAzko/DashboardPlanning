@@ -3153,7 +3153,7 @@
     }
 
     .bottom-nav {
-        bottom: 12px !important;
+        bottom: 42px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
         width: calc(100vw - 12px) !important;
@@ -3282,42 +3282,194 @@
         white-space: nowrap !important;
     }
 
+    /* Mobile Responsive Styles for Initial Loader */
     #init-loader {
-        padding: 15px !important;
+        padding: 12px 10px !important;
+        justify-content: flex-start !important;
+        gap: 10px !important;
     }
 
-    .init-loader-card {
-        padding: 20px 15px !important;
-        width: 95% !important;
-    }
-
-    .init-main-title {
-        font-size: 24px !important;
-        letter-spacing: 1px !important;
-    }
-
-    .init-sub-title {
-        font-size: 12px !important;
-        margin-bottom: 15px !important;
-    }
-
-    .init-cards-grid {
-        grid-template-columns: 1fr !important;
-        gap: 12px !important;
-    }
-
-    .init-menu-card {
-        max-width: 100% !important;
+    .init-header-bar {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
         width: 100% !important;
-        min-width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+        margin: 5px 0 10px 0 !important;
     }
 
     .init-clock-badge {
         position: relative !important;
         top: auto !important;
         right: auto !important;
-        margin: 10px auto 0 !important;
-        display: inline-block !important;
+        margin: 0 auto !important;
+        padding: 6px 16px !important;
+        font-size: 11px !important;
+        border-radius: 30px !important;
+        display: inline-flex !important;
+    }
+
+    .init-main-content {
+        padding: 5px 0 10px 0 !important;
+        width: 100% !important;
+        align-items: center !important;
+        margin: 0 !important;
+    }
+
+    .init-logo-stage {
+        max-width: 280px !important;
+        min-height: 130px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .water-vortex-container {
+        width: 250px !important;
+        height: 250px !important;
+    }
+
+    .init-logo-wrapper {
+        padding: 2px !important;
+        border-radius: 16px !important;
+    }
+
+    .init-logo-img {
+        height: 70px !important;
+        padding: 10px 20px !important;
+        border-radius: 14px !important;
+    }
+
+    .init-main-title {
+        font-size: 20px !important;
+        letter-spacing: 1px !important;
+        margin: 0 !important;
+        text-align: center !important;
+        line-height: 1.2 !important;
+    }
+
+    .init-sub-title {
+        font-size: 11px !important;
+        letter-spacing: 1.5px !important;
+        margin-top: 4px !important;
+        margin-bottom: 16px !important;
+        text-align: center !important;
+    }
+
+    .init-cards-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        gap: 8px !important;
+        padding: 0 2px !important;
+        box-sizing: border-box !important;
+        margin-bottom: 14px !important;
+    }
+
+    .init-menu-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        padding: 8px 10px !important;
+        gap: 6px !important;
+        border-radius: 12px !important;
+        flex: none !important;
+        justify-content: flex-start !important;
+        align-items: center !important;
+    }
+
+    /* 7th card (JADWAL DC) spans full 2 columns */
+    .init-menu-card:nth-child(7) {
+        grid-column: span 2 !important;
+    }
+
+    .init-card-left {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .init-icon-box {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 14px !important;
+        border-radius: 8px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .init-card-info {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1px !important;
+        min-width: 0 !important;
+        flex: 1 !important;
+        overflow: hidden !important;
+    }
+
+    .init-card-title {
+        font-size: 11px !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.2px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        color: #1e293b !important;
+    }
+
+    .init-card-desc {
+        font-size: 9px !important;
+        line-height: 1.2 !important;
+        color: #64748b !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    .init-card-arrow {
+        display: none !important;
+    }
+
+    .init-bottom-section {
+        width: 100% !important;
+        padding: 10px 4px 15px 4px !important;
+        box-sizing: border-box !important;
+        gap: 12px !important;
+        margin-top: auto !important;
+    }
+
+    .init-progress-container {
+        width: 100% !important;
+        gap: 6px !important;
+    }
+
+    .init-status-text {
+        font-size: 10.5px !important;
+        line-height: 1.3 !important;
+    }
+
+    .init-pct-text {
+        font-size: 12px !important;
+        font-weight: 800 !important;
+    }
+
+    .init-progress-track {
+        height: 8px !important;
+    }
+
+    .init-footer {
+        padding-top: 10px !important;
+        gap: 2px !important;
+    }
+
+    .init-tagline {
+        font-size: 11px !important;
+    }
+
+    .init-copyright {
+        font-size: 9.5px !important;
     }
 
     .cine-g-2x2, .cine-g-3, .cine-g-1-2, .cine-sub-2x2 {
@@ -3426,7 +3578,7 @@
     }
 
     .bottom-nav {
-        bottom: 10px !important;
+        bottom: 38px !important;
         width: calc(100vw - 8px) !important;
         padding: 3px 2px !important;
         gap: 1px !important;
