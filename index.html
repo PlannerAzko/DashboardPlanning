@@ -2444,22 +2444,247 @@
             display: grid;
             grid-template-columns: 1fr 1fr; /* Menjadi 2 kolom agar sejajar */
             gap: 20px;
-            margin-top: 25px;
+            margin-top: 15px;
         }
 
         .chart-container {
-            background-color: #2a2a2a;
-            border-radius: 4px;
-            overflow: hidden; /* Agar header bulat di pojok */
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            background: linear-gradient(145deg, #181d28 0%, #0f131c 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
             display: flex;
             flex-direction: column;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .chart-container:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+        }
+
+        .table-header {
+            background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+            padding: 14px 18px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            letter-spacing: 0.04em;
+            color: #f1f5f9;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-header-title i {
+            color: #fbbf24;
+            font-size: 1.05rem;
+        }
+
+        .table-header-pill {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            letter-spacing: 0.02em;
         }
 
         .chart-body {
             padding: 20px;
             height: 420px; /* Ditingkatkan agar lebih proporsional */
             position: relative;
+        }
+
+        /* Fresh Executive Summary KPI Cards */
+        .summary-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+            margin-top: 15px;
+        }
+
+        .summary-kpi-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .summary-kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .kpi-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            flex-shrink: 0;
+        }
+
+        .kpi-icon-wrapper.cyan {
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .kpi-icon-wrapper.teal {
+            background: rgba(45, 212, 191, 0.15);
+            color: #2dd4bf;
+            border: 1px solid rgba(45, 212, 191, 0.3);
+        }
+
+        .kpi-icon-wrapper.blue {
+            background: rgba(96, 165, 250, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+
+        .kpi-icon-wrapper.gold {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .kpi-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .kpi-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .kpi-val {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #f8fafc;
+            line-height: 1.2;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .kpi-sub {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Executive Summary Table Customization */
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            min-width: 28px;
+        }
+
+        .rank-badge.rank-1 {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
+        }
+
+        .rank-badge.rank-2 {
+            background: rgba(148, 163, 184, 0.2);
+            color: #cbd5e1;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+        }
+
+        .rank-badge.rank-3 {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fdba74;
+            border: 1px solid rgba(249, 115, 22, 0.4);
+        }
+
+        .rank-badge.rank-other {
+            background: rgba(51, 65, 85, 0.4);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .rank-badge.rank-bottom {
+            background: rgba(244, 63, 94, 0.15);
+            color: #f43f5e;
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        .city-name {
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .cbm-num {
+            font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+            font-weight: 700;
+            color: #38bdf8;
+            font-size: 0.86rem;
+        }
+
+        .cbm-progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 2px;
+        }
+
+        .cbm-progress-fill.top-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #38bdf8 0%, #2196f3 100%);
+            border-radius: 3px;
+        }
+
+        .cbm-progress-fill.bottom-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f43f5e 0%, #fb7185 100%);
+            border-radius: 3px;
+        }
+
+        .pct-badge {
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .pct-badge.top-pct {
+            color: #fbbf24;
+        }
+
+        .pct-badge.bottom-pct {
+            color: #f43f5e;
         }
 
         /* Extra Section Styles */
@@ -5079,12 +5304,51 @@
             <div class="section-title-banner">
                 <i class="fas fa-chart-line"></i> SUMMARY REPORT SLA & CBM SHIPPED
             </div>
+
+            <!-- Executive KPI Cards Header -->
+            <div id="summary-kpi-banner" class="summary-kpi-grid">
+                <div class="summary-kpi-card">
+                    <div class="kpi-icon-wrapper cyan"><i class="fas fa-user-check"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-title">AVG SLA CUSTOMER</span>
+                        <span class="kpi-val" id="summary-kpi-sla-customer">100.0%</span>
+                        <span class="kpi-sub"><i class="fas fa-check-circle" style="color:#38bdf8;"></i> Target SLA: 100%</span>
+                    </div>
+                </div>
+                <div class="summary-kpi-card">
+                    <div class="kpi-icon-wrapper teal"><i class="fas fa-shipping-fast"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-title">AVG SLA GRW (ACTUAL)</span>
+                        <span class="kpi-val" id="summary-kpi-sla-grw">-- %</span>
+                        <span class="kpi-sub"><i class="fas fa-chart-line" style="color:#2dd4bf;"></i> Actual GRW Speed</span>
+                    </div>
+                </div>
+                <div class="summary-kpi-card">
+                    <div class="kpi-icon-wrapper blue"><i class="fas fa-balance-scale"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-title">PLAN-TO-ACTUAL CBM</span>
+                        <span class="kpi-val" id="summary-kpi-cbm-ratio">-- %</span>
+                        <span class="kpi-sub"><i class="fas fa-percentage" style="color:#60a5fa;"></i> Achievement Ratio</span>
+                    </div>
+                </div>
+                <div class="summary-kpi-card">
+                    <div class="kpi-icon-wrapper gold"><i class="fas fa-cubes"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-title">TOTAL CBM SHIPPED</span>
+                        <span class="kpi-val" id="summary-kpi-cbm-shipped">-- CBM</span>
+                        <span class="kpi-sub"><i class="fas fa-truck-loading" style="color:#fbbf24;"></i> Total Outbound</span>
+                    </div>
+                </div>
+            </div>
             
             <!-- FBI LAYOUT (DK/LK) -->
             <div id="fbi-charts-layout" class="chart-section" style="display: none;">
                 <div class="chart-container">
                     <div class="table-header">
-                        <i class="fas fa-chart-line"></i> SLA PERFORMANCE DK
+                        <div class="table-header-title">
+                            <i class="fas fa-chart-line"></i> SLA PERFORMANCE DK
+                        </div>
+                        <span class="table-header-pill">DALAM KOTA</span>
                     </div>
                     <div class="chart-body">
                         <canvas id="slaChartDK"></canvas>
@@ -5092,7 +5356,10 @@
                 </div>
                 <div class="chart-container">
                     <div class="table-header">
-                        <i class="fas fa-chart-line"></i> SLA PERFORMANCE LK
+                        <div class="table-header-title">
+                            <i class="fas fa-chart-line"></i> SLA PERFORMANCE LK
+                        </div>
+                        <span class="table-header-pill">LUAR KOTA</span>
                     </div>
                     <div class="chart-body">
                         <canvas id="slaChartLK"></canvas>
@@ -5104,13 +5371,19 @@
             <div id="ahi-charts-layout" class="chart-section" style="display: none;">
                 <div class="chart-container">
                     <div class="table-header">
-                        <i class="fas fa-chart-line"></i> SLA PERFORMANCE (CUSTOMER vs GRW)
+                        <div class="table-header-title">
+                            <i class="fas fa-chart-line"></i> SLA PERFORMANCE (CUSTOMER vs GRW)
+                        </div>
+                        <span class="table-header-pill"><i class="fas fa-bullseye" style="color: #38bdf8;"></i> TARGET 100%</span>
                     </div>
                     <div class="chart-body">
                         <canvas id="slaChart"></canvas>
                     </div>
-                    <div class="table-header" style="margin-top: 15px; background: #1a1a1a; border-top: 1px solid #333;">
-                        <i class="fas fa-trophy"></i> SUMMARY TOP 10 KOTA (BY CBM)
+                    <div class="table-header" style="margin-top: 15px;">
+                        <div class="table-header-title">
+                            <i class="fas fa-trophy" style="color:#fbbf24;"></i> SUMMARY TOP 10 KOTA (BY CBM)
+                        </div>
+                        <span class="table-header-pill" style="color:#fbbf24; border-color: rgba(251, 191, 36, 0.3);">HIGHEST VOLUME</span>
                     </div>
                     <div class="table-content-extra" id="top-cities-table" style="height: 480px;">
                         <div class="loading">Calculating...</div>
@@ -5118,13 +5391,19 @@
                 </div>
                 <div class="chart-container">
                     <div class="table-header">
-                        <i class="fas fa-chart-area"></i> CBM PLAN-TO-ACTUAL RATIO (%)
+                        <div class="table-header-title">
+                            <i class="fas fa-chart-area"></i> CBM PLAN-TO-ACTUAL RATIO (%)
+                        </div>
+                        <span class="table-header-pill"><i class="fas fa-sync" style="color: #60a5fa;"></i> SHIPPED / PLAN</span>
                     </div>
                     <div class="chart-body">
                         <canvas id="cbmRatioChart"></canvas>
                     </div>
-                    <div class="table-header" style="margin-top: 15px; background: #1a1a1a; border-top: 1px solid #333;">
-                        <i class="fas fa-arrow-down"></i> SUMMARY BOTTOM 10 KOTA (BY CBM)
+                    <div class="table-header" style="margin-top: 15px;">
+                        <div class="table-header-title">
+                            <i class="fas fa-exclamation-triangle" style="color:#f43f5e;"></i> SUMMARY BOTTOM 10 KOTA (BY CBM)
+                        </div>
+                        <span class="table-header-pill" style="color:#f43f5e; border-color: rgba(244, 63, 94, 0.3);">LOWEST VOLUME</span>
                     </div>
                     <div class="table-content-extra" id="bottom-cities-table" style="height: 480px;">
                         <div class="loading">Calculating...</div>
@@ -11644,21 +11923,47 @@ function updateDashboard() {
 
             const slaCustomerData = sortedDates.map(date => {
                 const val = dailyData[date].slaCustomerPercent;
-                return (val === 0 || val === null) ? null : val;
+                return (val === 0 || val === null) ? null : Math.min(100, val);
             });
             const slaGrwData = sortedDates.map(date => {
                 const val = dailyData[date].slaGrwPercent;
-                return (val === 0 || val === null) ? null : val;
+                return (val === 0 || val === null) ? null : Math.min(100, val);
             });
             const cbmRatioData = sortedDates.map(date => {
                 const d = dailyData[date];
                 if (d.cbmPlan === 0) return null;
                 const ratio = (d.cbmShipped / d.cbmPlan) * 100;
-                return ratio === 0 ? null : ratio;
+                return ratio === 0 ? null : Math.min(100, ratio);
             });
+
+            // Update Summary KPI Cards Header
+            const validCust = slaCustomerData.filter(v => v !== null);
+            const validGrw = slaGrwData.filter(v => v !== null);
+            const validRatio = cbmRatioData.filter(v => v !== null);
+
+            const avgCust = validCust.length ? (validCust.reduce((a,b)=>a+b,0) / validCust.length) : 100;
+            const avgGrw = validGrw.length ? (validGrw.reduce((a,b)=>a+b,0) / validGrw.length) : 0;
+            const avgRatio = validRatio.length ? (validRatio.reduce((a,b)=>a+b,0) / validRatio.length) : 0;
+
+            let totalCbmShipped = 0;
+            Object.values(dailyData).forEach(d => { if (d.cbmShipped) totalCbmShipped += d.cbmShipped; });
+
+            const elCust = document.getElementById('summary-kpi-sla-customer');
+            const elGrw = document.getElementById('summary-kpi-sla-grw');
+            const elRatio = document.getElementById('summary-kpi-cbm-ratio');
+            const elShipped = document.getElementById('summary-kpi-cbm-shipped');
+
+            if (elCust) elCust.textContent = avgCust.toFixed(1) + '%';
+            if (elGrw) elGrw.textContent = avgGrw.toFixed(1) + '%';
+            if (elRatio) elRatio.textContent = avgRatio.toFixed(1) + '%';
+            if (elShipped) elShipped.textContent = totalCbmShipped.toLocaleString('en-US', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + ' CBM';
 
             // Combined SLA Chart
             const slaCtx = document.getElementById('slaChart').getContext('2d');
+            const grwGrad = slaCtx.createLinearGradient(0, 0, 0, 350);
+            grwGrad.addColorStop(0, 'rgba(45, 212, 191, 0.35)');
+            grwGrad.addColorStop(1, 'rgba(45, 212, 191, 0.0)');
+
             if (slaChart) slaChart.destroy();
             slaChart = new Chart(slaCtx, {
                 type: 'line',
@@ -11668,29 +11973,30 @@ function updateDashboard() {
                         {
                             label: 'SLA CUSTOMER (Target 100%)',
                             data: slaCustomerData,
-                            borderColor: '#3b82f6',
+                            borderColor: '#38bdf8',
                             backgroundColor: 'transparent',
-                            borderWidth: 4,
+                            borderWidth: 3,
                             pointRadius: 5,
                             pointHoverRadius: 8,
-                            pointBackgroundColor: '#fff',
-                            pointBorderColor: '#3b82f6',
-                            pointBorderWidth: 3,
-                            tension: 0.4,
-                            borderDash: [8, 4]
+                            pointBackgroundColor: '#0f172a',
+                            pointBorderColor: '#38bdf8',
+                            pointBorderWidth: 2,
+                            tension: 0.35,
+                            borderDash: [6, 4]
                         },
                         {
                             label: 'SLA GRW (Actual)',
                             data: slaGrwData,
                             borderColor: '#2dd4bf',
-                            backgroundColor: 'transparent',
-                            borderWidth: 5,
-                            pointRadius: 7,
-                            pointHoverRadius: 10,
-                            pointBackgroundColor: '#fff',
+                            backgroundColor: grwGrad,
+                            fill: true,
+                            borderWidth: 4,
+                            pointRadius: 6,
+                            pointHoverRadius: 9,
+                            pointBackgroundColor: '#ffffff',
                             pointBorderColor: '#2dd4bf',
                             pointBorderWidth: 3,
-                            tension: 0.4
+                            tension: 0.35
                         }
                     ]
                 },
@@ -11699,6 +12005,10 @@ function updateDashboard() {
 
             // CBM Ratio Chart
             const cbmCtx = document.getElementById('cbmRatioChart').getContext('2d');
+            const cbmGrad = cbmCtx.createLinearGradient(0, 0, 0, 350);
+            cbmGrad.addColorStop(0, 'rgba(96, 165, 250, 0.35)');
+            cbmGrad.addColorStop(1, 'rgba(96, 165, 250, 0.0)');
+
             if (cbmRatioChart) cbmRatioChart.destroy();
             cbmRatioChart = new Chart(cbmCtx, {
                 type: 'line',
@@ -11708,15 +12018,15 @@ function updateDashboard() {
                         label: 'CBM Ratio (%)',
                         data: cbmRatioData,
                         borderColor: '#60a5fa',
-                        backgroundColor: 'rgba(96, 165, 250, 0.2)',
+                        backgroundColor: cbmGrad,
                         fill: true,
-                        borderWidth: 5,
-                        pointRadius: 7,
-                        pointHoverRadius: 11,
-                        pointBackgroundColor: '#fff',
+                        borderWidth: 4,
+                        pointRadius: 6,
+                        pointHoverRadius: 9,
+                        pointBackgroundColor: '#ffffff',
                         pointBorderColor: '#60a5fa',
-                        pointBorderWidth: 4,
-                        tension: 0.4
+                        pointBorderWidth: 3,
+                        tension: 0.35
                     }]
                 },
                 options: getCommonChartOptions('%')
@@ -11727,22 +12037,34 @@ function updateDashboard() {
             return {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 800 },
-                layout: { padding: { top: 30, bottom: 5, left: 10, right: 15 } },
+                animation: { duration: 800, easing: 'easeOutQuart' },
+                layout: { padding: { top: 32, bottom: 8, left: 12, right: 20 } },
                 scales: {
                     y: {
+                        max: 100,
                         ticks: {
-                            color: '#e5e7eb',
-                            font: { size: 12, weight: 'bold' },
+                            color: '#94a3b8',
+                            font: { size: 11, weight: '700' },
+                            padding: 10,
                             callback: value => {
+                                if (value > 100) return '';
                                 if (value === 100) return '100' + suffix;
-                                return value.toFixed(1) + suffix;
+                                return value.toFixed(0) + suffix;
                             }
                         },
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            drawBorder: false
+                        }
                     },
                     x: {
-                        ticks: { color: '#d1d5db', font: { size: 11 }, maxRotation: 45, minRotation: 45 },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { size: 11, weight: '600' },
+                            maxRotation: 45,
+                            minRotation: 45,
+                            padding: 6
+                        },
                         grid: { display: false }
                     }
                 },
@@ -11750,12 +12072,41 @@ function updateDashboard() {
                     legend: {
                         position: 'top',
                         align: 'end',
-                        labels: { color: '#fff', font: { size: 12, weight: 'bold' }, usePointStyle: true }
+                        labels: {
+                            color: '#f8fafc',
+                            font: { size: 12, weight: '700' },
+                            usePointStyle: true,
+                            pointStyleWidth: 10,
+                            padding: 18
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#cbd5e1',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 12,
+                        displayColors: true,
+                        boxPadding: 4,
+                        titleFont: { size: 13, weight: '700' },
+                        bodyFont: { size: 12, weight: '600' },
+                        callbacks: {
+                            label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y !== null ? ctx.parsed.y.toFixed(2) + suffix : 'N/A'}`
+                        }
                     },
                     datalabels: {
-                        anchor: 'end', align: 'top', offset: 8, color: '#fff',
-                        font: { weight: 'bold', size: 11 },
-                        backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 4, padding: 4,
+                        anchor: 'end',
+                        align: 'top',
+                        offset: 8,
+                        color: '#f8fafc',
+                        font: { weight: '800', size: 11 },
+                        backgroundColor: 'rgba(15, 23, 42, 0.85)',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        padding: { top: 3, bottom: 3, left: 6, right: 6 },
                         formatter: (val) => val === null ? '' : val.toFixed(1) + suffix,
                         display: (ctx) => {
                             const data = ctx.dataset.data;
@@ -11764,11 +12115,8 @@ function updateDashboard() {
                             const max = Math.max(...valid);
                             const min = Math.min(...valid);
                             const cur = data[ctx.dataIndex];
-                            // Selalu tampilkan data terakhir
                             if (ctx.dataIndex === data.length - 1) return true;
-                            // Tampilkan nilai minimum (pertama muncul)
                             if (cur === min && ctx.dataIndex === data.indexOf(min)) return true;
-                            // Tampilkan nilai maximum jika BUKAN 100% (pertama muncul)
                             if (cur === max && cur < 100 && ctx.dataIndex === data.indexOf(max)) return true;
                             return false;
                         }
@@ -11783,10 +12131,13 @@ function updateDashboard() {
             
             const slaGrwData = sortedDates.map(date => {
                 const val = dailyData[date].slaGrwPercent;
-                return (val === 0 || val === null) ? null : val;
+                return (val === 0 || val === null) ? null : Math.min(100, val);
             });
 
             const ctx = document.getElementById(canvasId).getContext('2d');
+            const grwGrad = ctx.createLinearGradient(0, 0, 0, 350);
+            grwGrad.addColorStop(0, 'rgba(45, 212, 191, 0.35)');
+            grwGrad.addColorStop(1, 'rgba(45, 212, 191, 0.0)');
             
             if (chartVarName === 'slaChartDK') {
                 if (slaChartDK) slaChartDK.destroy();
@@ -11803,24 +12154,24 @@ function updateDashboard() {
                             label: 'SLA GRW (Actual)',
                             data: slaGrwData,
                             borderColor: '#2dd4bf',
-                            backgroundColor: 'transparent',
-                            borderWidth: 5,
-                            pointRadius: 7,
-                            pointHoverRadius: 10,
-                            pointBackgroundColor: '#fff',
+                            backgroundColor: grwGrad,
+                            borderWidth: 4,
+                            pointRadius: 6,
+                            pointHoverRadius: 9,
+                            pointBackgroundColor: '#ffffff',
                             pointBorderColor: '#2dd4bf',
                             pointBorderWidth: 3,
-                            tension: 0.4,
-                            fill: false
+                            tension: 0.35,
+                            fill: true
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: { duration: 800 },
+                    animation: { duration: 800, easing: 'easeOutQuart' },
                     layout: {
-                        padding: { top: 15, bottom: 5, left: 10, right: 15 }
+                        padding: { top: 25, bottom: 8, left: 10, right: 15 }
                     },
                     interaction: {
                         mode: 'index',
@@ -11829,23 +12180,23 @@ function updateDashboard() {
                     scales: {
                         y: {
                             suggestedMin: 90,
-                            suggestedMax: 100,
+                            max: 100,
                             ticks: {
                                 stepSize: 5,
-                                color: '#e5e7eb',
-                                font: { size: 13, weight: '700' },
-                                padding: 15,
+                                color: '#94a3b8',
+                                font: { size: 12, weight: '700' },
+                                padding: 12,
                                 callback: value => value <= 100 ? value + '%' : ''
                             },
-                            grid: { color: 'rgba(255, 255, 255, 0.08)', drawBorder: false }
+                            grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false }
                         },
                         x: {
                             ticks: { 
-                                color: '#d1d5db',
-                                font: { size: 12, weight: '600' },
+                                color: '#94a3b8',
+                                font: { size: 11, weight: '600' },
                                 maxRotation: 45,
                                 minRotation: 45,
-                                padding: 5
+                                padding: 6
                             },
                             grid: { display: false }
                         }
@@ -11855,8 +12206,8 @@ function updateDashboard() {
                             position: 'top',
                             align: 'end',
                             labels: { 
-                                color: '#ffffff', 
-                                font: { size: 13, weight: 'bold' },
+                                color: '#f8fafc', 
+                                font: { size: 12, weight: '700' },
                                 usePointStyle: true,
                                 boxWidth: 10,
                                 padding: 15
@@ -11865,14 +12216,14 @@ function updateDashboard() {
                         datalabels: {
                             anchor: 'end',
                             align: 'top',
-                            offset: 10,
-                            color: '#ffffff',
-                            font: { weight: 'bold', size: 13 },
-                            backgroundColor: 'rgba(15, 15, 15, 0.8)',
+                            offset: 8,
+                            color: '#f8fafc',
+                            font: { weight: '800', size: 11 },
+                            backgroundColor: 'rgba(15, 23, 42, 0.85)',
                             borderColor: 'rgba(255,255,255,0.2)',
                             borderWidth: 1,
                             borderRadius: 6,
-                            padding: 6,
+                            padding: { top: 3, bottom: 3, left: 6, right: 6 },
                             formatter: (value) => value === null ? '' : value.toFixed(1) + '%',
                             display: (context) => {
                                 const data = context.dataset.data;
@@ -11881,22 +12232,21 @@ function updateDashboard() {
                                 const max = Math.max(...validData);
                                 const min = Math.min(...validData);
                                 const currentVal = data[context.dataIndex];
-                                // Selalu tampilkan data terakhir
                                 if (context.dataIndex === data.length - 1) return true;
-                                // Tampilkan nilai minimum (pertama muncul)
                                 if (currentVal === min && context.dataIndex === data.indexOf(min)) return true;
-                                // Tampilkan nilai maximum jika BUKAN 100% (pertama muncul)
                                 if (currentVal === max && currentVal < 100 && context.dataIndex === data.indexOf(max)) return true;
                                 return false;
                             }
                         },
                         tooltip: {
-                            backgroundColor: '#111',
-                            titleFont: { size: 15, weight: 'bold' },
-                            bodyFont: { size: 14 },
-                            padding: 15,
-                            cornerRadius: 10,
-                            borderColor: '#333',
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleFont: { size: 13, weight: '700' },
+                            bodyFont: { size: 12, weight: '600' },
+                            titleColor: '#f8fafc',
+                            bodyColor: '#cbd5e1',
+                            padding: 12,
+                            cornerRadius: 8,
+                            borderColor: 'rgba(255, 255, 255, 0.15)',
                             borderWidth: 1,
                             callbacks: {
                                 label: (context) => ` ${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`
@@ -11940,40 +12290,63 @@ function updateDashboard() {
             const container = document.getElementById(elementId);
             if (!container) return;
 
+            const isTop = elementId.includes('top');
+            const maxCbm = Math.max(...data.map(d => d.cbm), 1);
+
             let html = `
                 <table class="summary-table">
                     <thead>
                         <tr>
-                            <th style="width: 40px; text-align: center;">#</th>
-                            <th>KOTA</th>
-                            <th style="text-align: right;">CBM</th>
-                            <th style="text-align: right; width: 60px;">%</th>
+                            <th style="width: 50px; text-align: center;">RANK</th>
+                            <th>NAMA KOTA</th>
+                            <th style="text-align: right;">CBM SHIPPED</th>
+                            <th style="width: 100px; text-align: center;">DISTRIBUSI</th>
+                            <th style="text-align: right; width: 65px;">RASIO</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
 
             data.forEach((item, index) => {
-                const rankColor = elementId.includes('top') ? 
-                    (index < 3 ? '#ffd700' : '#eee') : 
-                    (index < 3 ? '#ff6b6b' : '#eee');
+                const rankClass = isTop ? 
+                    (index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : 'rank-other') : 
+                    'rank-bottom';
                 
+                const rankLabel = isTop ? 
+                    (index === 0 ? '🥇 1' : index === 1 ? '🥈 2' : index === 2 ? '🥉 3' : (index + 1)) : 
+                    (index + 1);
+
+                const barWidth = Math.max(5, Math.min(100, (item.cbm / maxCbm) * 100));
+
                 html += `
                     <tr>
-                        <td style="text-align: center; font-weight: bold; color: ${rankColor};">${index + 1}</td>
-                        <td style="font-weight: 500;">${item.city}</td>
-                        <td style="text-align: right; font-family: 'Courier New', monospace; font-weight: bold;">${item.cbm.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                        <td style="text-align: right; color: #ffd700;">${item.percentage.toFixed(1)}%</td>
+                        <td style="text-align: center;">
+                            <span class="rank-badge ${rankClass}">${rankLabel}</span>
+                        </td>
+                        <td>
+                            <span class="city-name">${item.city}</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <span class="cbm-num">${item.cbm.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                        </td>
+                        <td style="text-align: center; vertical-align: middle; padding: 10px 8px;">
+                            <div class="cbm-progress-track">
+                                <div class="cbm-progress-fill ${isTop ? 'top-fill' : 'bottom-fill'}" style="width: ${barWidth}%"></div>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <span class="pct-badge ${isTop ? 'top-pct' : 'bottom-pct'}">${item.percentage.toFixed(1)}%</span>
+                        </td>
                     </tr>
                 `;
             });
 
             for (let i = data.length; i < 10; i++) {
-                html += `<tr style="height: 40px;"><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>`;
+                html += `<tr style="height: 42px;"><td colspan="5" style="border: none;">&nbsp;</td></tr>`;
             }
 
             if (data.length === 0) {
-                html = `<div style="padding: 40px; text-align: center; color: #666;">No data available</div>`;
+                html = `<div style="padding: 40px; text-align: center; color: #64748b;">Tidak ada data kota tersedia</div>`;
             } else {
                 html += `</tbody></table>`;
             }
