@@ -10236,7 +10236,7 @@ function hubSort(colIdx) {
         async function downloadPivotPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'pt', 'a4');
-            const targetAreas = ['SULAWESI', 'PAPUA', 'MALUKU', 'NUSRA'];
+            const targetAreas = ['SULAWESI', 'PAPUA', 'MALUKU', 'NUSRA', 'KALIMANTAN'];
             
             // Aggregation logic: Process ALL data to find target regions regardless of UI filter
             const filtered = rawPivotData;
@@ -10272,7 +10272,7 @@ function hubSort(colIdx) {
 
             // Filter ONLY requested regions AND volume < 19 CBM
             const rows = Object.values(stores)
-                .filter(s => targetAreas.includes(s.area) && s.unplannedTotal > 0 && s.unplannedTotal < 19)
+                .filter(s => targetAreas.some(area => s.area.includes(area)) && s.unplannedTotal > 0 && s.unplannedTotal < 19)
                 .sort((a, b) => b.unplannedCbm[3] - a.unplannedCbm[3]); // Sort by 7 UP (index 3) descending
 
             if (rows.length === 0) {
@@ -10483,7 +10483,7 @@ Tim Planner DC Sidoarjo`;
             if (btn && rawPivotData && rawPivotData.length > 0) {
                 const introMessage = "Halo Tim Inventory Planner,\n\nKami ingin menginformasikan bahwa saat ini STOREBOOKING kami mengalami kekurangan kuota. Sehubungan dengan hal tersebut, kami mohon bantuannya untuk penambahan kuota agar proses operasional dapat berjalan dengan lancar.\n\nMohon dapat ditindaklanjuti secepatnya. Terima kasih atas perhatian dan kerjasamanya.";
                 const closingMessage = "\n\nBest regards,\n[Tim Planner DC Sidoarjo]";
-                const targetAreas = ["MALUKU", "PAPUA", "SULAWESI"];
+                const targetAreas = ["MALUKU", "PAPUA", "SULAWESI", "NUSRA", "KALIMANTAN"];
                 const stores = {};
                 rawPivotData.forEach(row => {
                     const storeArea = (row.area || "").toUpperCase();
