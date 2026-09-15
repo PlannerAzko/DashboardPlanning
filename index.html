@@ -4683,12 +4683,26 @@
                 .cine-section.visible .cine-animate { opacity: 1; transform: rotateX(0deg) translateY(0) translateZ(0); }
                 .cine-delay-1 { transition-delay: 100ms; } .cine-delay-2 { transition-delay: 200ms; }
                 .cine-delay-3 { transition-delay: 300ms; } .cine-delay-4 { transition-delay: 400ms; }
+                .cine-delay-5 { transition-delay: 500ms; }
                 
                 .cine-title { font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -1px; }
                 .cine-subtitle { font-size: 1.2rem; color: rgba(255,255,255,0.6); margin-bottom: 3rem; font-weight: 400; }
                 
                 .cine-grid { display: grid; gap: 20px; }
                 .cine-g-2x2 { grid-template-columns: 1fr 1fr; } .cine-g-3 { grid-template-columns: 1fr 1fr 1fr; } .cine-g-1-2 { grid-template-columns: 1fr 2fr; }
+                .cine-g-sec-a { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; }
+                .cine-col-top { grid-column: span 2; }
+                .cine-col-bottom { grid-column: span 3; }
+                .cine-col-top .cine-value { font-size: clamp(1.85rem, 2.3vw, 3.2rem); }
+                @media (max-width: 1024px) {
+                    .cine-g-sec-a { grid-template-columns: 1fr 1fr !important; }
+                    .cine-col-top, .cine-col-bottom { grid-column: span 1 !important; }
+                    .cine-col-top:nth-child(3) { grid-column: span 2 !important; }
+                }
+                @media (max-width: 768px) {
+                    .cine-g-sec-a { grid-template-columns: 1fr !important; gap: 12px !important; }
+                    .cine-col-top, .cine-col-bottom { grid-column: span 1 !important; }
+                }
                 
                 .cine-card { background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
                 .cine-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
@@ -4733,11 +4747,32 @@
                 <div class="cine-section" id="cine-sec-a" style="--accent: var(--c-blue);">
                     <div class="cine-content">
                         <div class="cine-animate"><h1 class="cine-title" style="color: var(--accent);">Warehouse Intelligence Dashboard</h1><p class="cine-subtitle">Real-time operational summary • Auto-refreshed</p></div>
-                        <div class="cine-grid cine-g-2x2">
-                            <div class="cine-card cine-animate cine-delay-1"><div class="cine-card-header"><i class="fas fa-calendar-alt"></i> Plan Today</div><div class="cine-value" id="c-data-plan-today">0</div><div class="cine-trend" id="c-trend-plan-today"><i class="fas fa-arrow-up"></i> +0% vs yesterday</div></div>
-                            <div class="cine-card cine-animate cine-delay-2"><div class="cine-card-header"><i class="fas fa-barcode"></i> Total Case ID Today</div><div class="cine-value" id="c-data-case-today">0</div><div class="cine-trend" id="c-trend-case-today"><i class="fas fa-arrow-up"></i> +0% vs yesterday</div></div>
-                            <div class="cine-card cine-animate cine-delay-3"><div class="cine-card-header"><i class="fas fa-shield-check"></i> SLA GRW This Month</div><div class="cine-value" id="c-data-sla-grw">0%</div><div class="cine-progress-bg"><div class="cine-progress-bar-fill" id="c-prog-sla-grw"></div></div></div>
-                            <div class="cine-card cine-animate cine-delay-4"><div class="cine-card-header"><i class="fas fa-users"></i> SLA Customer This Month</div><div class="cine-value" id="c-data-sla-cust">0%</div><div class="cine-progress-bg"><div class="cine-progress-bar-fill" id="c-prog-sla-cust"></div></div></div>
+                        <div class="cine-grid cine-g-sec-a">
+                            <div class="cine-card cine-animate cine-delay-1 cine-col-top" id="cine-card-plan-today">
+                                <div class="cine-card-header"><i class="fas fa-calendar-alt"></i> Plan Today</div>
+                                <div class="cine-value" id="c-data-plan-today">0</div>
+                                <div class="cine-trend" id="c-trend-plan-today"><i class="fas fa-arrow-up"></i> +0% vs yesterday</div>
+                            </div>
+                            <div class="cine-card cine-animate cine-delay-2 cine-col-top" id="cine-card-case-today">
+                                <div class="cine-card-header"><i class="fas fa-barcode"></i> Total Case ID Today</div>
+                                <div class="cine-value" id="c-data-case-today">0</div>
+                                <div class="cine-trend" id="c-trend-case-today"><i class="fas fa-arrow-up"></i> +0% vs yesterday</div>
+                            </div>
+                            <div class="cine-card cine-animate cine-delay-3 cine-col-top" id="cine-card-plan-release">
+                                <div class="cine-card-header"><i class="fas fa-truck-ramp-box"></i> Plan Release Case ID</div>
+                                <div class="cine-value" id="c-data-plan-release">0</div>
+                                <div class="cine-trend" id="c-detail-plan-release" style="color: rgba(255,255,255,0.75); font-size: 0.85rem; font-weight: 500;"><i class="fas fa-layer-group" style="color: var(--accent);"></i> B4 Hari Ini: 0 • B1 Besok: 0</div>
+                            </div>
+                            <div class="cine-card cine-animate cine-delay-4 cine-col-bottom" id="cine-card-sla-grw">
+                                <div class="cine-card-header"><i class="fas fa-shield-check"></i> SLA GRW This Month</div>
+                                <div class="cine-value" id="c-data-sla-grw">0%</div>
+                                <div class="cine-progress-bg"><div class="cine-progress-bar-fill" id="c-prog-sla-grw"></div></div>
+                            </div>
+                            <div class="cine-card cine-animate cine-delay-5 cine-col-bottom" id="cine-card-sla-cust">
+                                <div class="cine-card-header"><i class="fas fa-users"></i> SLA Customer This Month</div>
+                                <div class="cine-value" id="c-data-sla-cust">0%</div>
+                                <div class="cine-progress-bg"><div class="cine-progress-bar-fill" id="c-prog-sla-cust"></div></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -4936,11 +4971,11 @@
                         }
                         fleetUnsupported = unsupportedList.length;
 
-                        // Calculate Vendor Supporting percentage (ignores Stuffing Date, but honors Month, City, Regional, Area filters)
+                        // Calculate Vendor Supporting percentage (identik dengan KPI Vendor Supporting di Menu Vendor: tgl 1 s/d H-1)
                         let kpiTotalLCVal = 0;
                         let kpiOnTimeLCVal = 0;
                         const today = new Date();
-                        today.setHours(23, 59, 59, 999);
+                        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
                         if (typeof allData !== 'undefined') {
                             const dataForTrend = allData.filter(row => {
@@ -4951,8 +4986,6 @@
                                 return matchBulan && matchKota && matchRegional && matchArea;
                             });
 
-                            const isVendor = isVendorActive();
-
                             dataForTrend.forEach(row => {
                                 const carrier = (row.D || '').trim();
                                 if (!carrier || carrier === '-' || carrier === 'CARRIER') return;
@@ -4961,26 +4994,31 @@
                                 const carrierUpper = carrier.toUpperCase();
                                 if (excludedCarriers.includes(carrierUpper) || carrierUpper.includes('DUMMY')) return;
 
-                                if (isBelumSupport(row)) {
+                                const isBelumSpt = isBelumSupport(row);
+                                const dateVal = isBelumSpt ? (row.AU || '').trim() : (row.AO || '').trim();
+                                const dDate = parseDateCustom(dateVal) || parseDate(dateVal);
+                                if (dDate && !isNaN(dDate.getTime()) && dDate >= todayStart) {
+                                    return; // Exclude today and future records from the Trend tab KPIs (tgl 1 s/d H-1)
+                                }
+
+                                if (isBelumSpt) {
                                     kpiTotalLCVal++;
                                 } else if (isTerlambat(row)) {
                                     kpiTotalLCVal++;
                                 } else {
-                                    // Always use raw row dates for future check
-                                    const dateVal = isVendor ? (row.AU || '').trim() : (row.AO || '').trim();
-                                    const dDate = parseDateCustom(dateVal) || parseDate(dateVal);
-                                    if (dDate && !isNaN(dDate.getTime()) && dDate > today) {
-                                        return; // Exclude H+1 on-time record
-                                    }
                                     kpiOnTimeLCVal++;
                                     kpiTotalLCVal++;
                                 }
                             });
                         }
 
-                        const fleetSupportPct = kpiTotalLCVal > 0 
+                        let fleetSupportPct = kpiTotalLCVal > 0 
                             ? (kpiOnTimeLCVal / kpiTotalLCVal * 100).toFixed(1) 
                             : '100.0';
+
+                        if (typeof window.vendorSupportingPercentLast !== 'undefined' && window.vendorSupportingPercentLast !== null) {
+                            fleetSupportPct = window.vendorSupportingPercentLast;
+                        }
 
                         // Calculate SLA over allData matching month & region filters, bypassing date filter (locked to month-level)
                         if (typeof allData !== 'undefined') {
@@ -5070,6 +5108,11 @@
                         let comparisonTasksVal = 0;
                         let comparisonCaseIdVal = 0;
 
+                        let planReleaseVal = 0;
+                        let b4TodayVal = 0;
+                        let b1TomorrowVal = 0;
+                        let nextDateFoundStr = '';
+
                         if (typeof allData !== 'undefined' && Array.isArray(allData)) {
                             const allDatesSorted = Array.from(new Set(allData.map(row => (row.AO || '').trim()).filter(d => d)))
                                 .sort((a, b) => parseDate(a) - parseDate(b));
@@ -5079,6 +5122,9 @@
 
                             if (typeof selectedFilters !== 'undefined' && selectedFilters.stuffingDate && selectedFilters.stuffingDate.length === 1) {
                                 targetDate = selectedFilters.stuffingDate[0];
+                            } else if (typeof selectedFilters !== 'undefined' && selectedFilters.stuffingDate && selectedFilters.stuffingDate.length > 1) {
+                                const sortedSelected = [...selectedFilters.stuffingDate].sort((a, b) => parseDate(a) - parseDate(b));
+                                targetDate = sortedSelected[sortedSelected.length - 1];
                             } else if (allDatesSorted.length > 0) {
                                 targetDate = allDatesSorted[allDatesSorted.length - 1]; // latest date
                             }
@@ -5107,6 +5153,29 @@
                                 return { tasks, caseId };
                             };
 
+                            // Plan B1-B4 calculation for a specific date (respecting city, regional, area filters)
+                            const getPlanBMetricsForDate = (dateStr) => {
+                                let b1 = 0, b2 = 0, b3 = 0, b4 = 0;
+                                allData.forEach(row => {
+                                    const matchDate = (row.AO || '').trim() === dateStr;
+                                    if (!matchDate) return;
+                                    const matchKota = selectedFilters.kota.length === 0 || selectedFilters.kota.includes(row.AR);
+                                    const matchRegional = selectedFilters.regional.length === 0 || selectedFilters.regional.includes(row.AT);
+                                    const matchArea = selectedFilters.area.length === 0 || selectedFilters.area.includes(row.AS);
+                                    if (matchKota && matchRegional && matchArea) {
+                                        const jam = parseFloat(row.AP);
+                                        const val = parseNumberWithComma(row.BB || '0', true);
+                                        if (!isNaN(jam)) {
+                                            if (jam >= 8 && jam <= 10) { b1 += val; }
+                                            else if (Math.floor(jam) === 13) { b2 += val; }
+                                            else if (jam >= 16 && jam <= 18) { b3 += val; }
+                                            else if (jam >= 19 && jam <= 21) { b4 += val; }
+                                        }
+                                    }
+                                });
+                                return { b1, b2, b3, b4 };
+                            };
+
                             if (targetDate) {
                                 const currentMetrics = getMetricsForDate(targetDate);
                                 currentTasksVal = currentMetrics.tasks;
@@ -5117,6 +5186,43 @@
                                     comparisonTasksVal = prevMetrics.tasks;
                                     comparisonCaseIdVal = prevMetrics.caseId;
                                 }
+
+                                // Calculate PLAN RELEASE: Total Case ID Plan B4 Hari Ini + Total Case ID Plan B1 Hari Besok
+                                const todayPlanB = getPlanBMetricsForDate(targetDate);
+                                b4TodayVal = todayPlanB.b4;
+
+                                // Find tomorrow's date
+                                const tObj = parseDate(targetDate);
+                                if (tObj && !isNaN(tObj.getTime()) && tObj.getTime() > 0) {
+                                    const nextCalDate = new Date(tObj.getFullYear(), tObj.getMonth(), tObj.getDate() + 1);
+                                    const foundCalDate = allDatesSorted.find(d => {
+                                        const pd = parseDate(d);
+                                        return pd.getFullYear() === nextCalDate.getFullYear() &&
+                                               pd.getMonth() === nextCalDate.getMonth() &&
+                                               pd.getDate() === nextCalDate.getDate();
+                                    });
+
+                                    if (foundCalDate) {
+                                        nextDateFoundStr = foundCalDate;
+                                    } else {
+                                        const currIdx = allDatesSorted.indexOf(targetDate);
+                                        if (currIdx >= 0 && currIdx < allDatesSorted.length - 1) {
+                                            nextDateFoundStr = allDatesSorted[currIdx + 1];
+                                        }
+                                    }
+                                } else {
+                                    const currIdx = allDatesSorted.indexOf(targetDate);
+                                    if (currIdx >= 0 && currIdx < allDatesSorted.length - 1) {
+                                        nextDateFoundStr = allDatesSorted[currIdx + 1];
+                                    }
+                                }
+
+                                if (nextDateFoundStr) {
+                                    const tomorrowPlanB = getPlanBMetricsForDate(nextDateFoundStr);
+                                    b1TomorrowVal = tomorrowPlanB.b1;
+                                }
+
+                                planReleaseVal = b4TodayVal + b1TomorrowVal;
                             }
                         }
     
@@ -5128,6 +5234,12 @@
     
                         setTxt('c-data-plan-today', totalTasks + ' Armada');
                         setTxt('c-data-case-today', typeof formatIndo === 'function' ? formatIndo(caseIdPlan) + ' Case ID' : caseIdPlan + ' Case ID');
+
+                        // Inject PLAN RELEASE CASE ID
+                        const formatValStr = (num) => typeof formatIndo === 'function' ? formatIndo(Math.round(num)) : Math.round(num).toLocaleString('id-ID');
+                        setTxt('c-data-plan-release', formatValStr(planReleaseVal) + ' Case ID');
+                        const tomorrowText = nextDateFoundStr ? `B1 Besok (${nextDateFoundStr}): <b>${formatValStr(b1TomorrowVal)}</b>` : `B1 Besok: <b>${formatValStr(b1TomorrowVal)}</b>`;
+                        setHTML('c-detail-plan-release', `<i class="fas fa-layer-group" style="color: var(--accent);"></i> B4 Hari Ini: <b>${formatValStr(b4TodayVal)}</b> • ${tomorrowText}`);
 
                         // Dynamic Trend UI updating
                         const pTrendEl = document.getElementById('c-trend-plan-today');
@@ -10234,9 +10346,27 @@ function hubSort(colIdx) {
         }
 
         async function downloadPivotPDF() {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert("Library PDF belum siap. Silakan muat ulang halaman.");
+                return;
+            }
+            if (!rawPivotData || rawPivotData.length === 0) {
+                alert("Data belum dimuat. Silakan tunggu hingga data selesai diambil.");
+                return;
+            }
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'pt', 'a4');
-            const targetAreas = ['SULAWESI', 'PAPUA', 'MALUKU', 'NUSRA', 'KALIMANTAN'];
+            const targetAreas = ['KALIMANTAN', 'SULAWESI', 'PAPUA', 'MALUKU', 'NUSRA'];
+
+            function getStoreAreaGroup(areaStr) {
+                const clean = (areaStr || '').toUpperCase().trim();
+                for (const t of targetAreas) {
+                    if (clean.includes(t)) return t;
+                }
+                if (clean.includes('NUSA TENGGARA')) return 'NUSRA';
+                return clean || 'LAIN-LAIN';
+            }
             
             // Aggregation logic: Process ALL data to find target regions regardless of UI filter
             const filtered = rawPivotData;
@@ -10245,7 +10375,7 @@ function hubSort(colIdx) {
             filtered.forEach(row => {
                 const key = row.storeBooking;
                 const name = row.storeBookingName;
-                const area = row.area ? row.area.toUpperCase() : '';
+                const area = row.area ? row.area.toUpperCase().trim() : '';
                 if (!key || !name || key.trim() === "" || name.trim() === "") return;
 
                 if (!stores[key]) {
@@ -10256,6 +10386,8 @@ function hubSort(colIdx) {
                         unplannedCbm: Array(4).fill(0),
                         unplannedTotal: 0
                     };
+                } else if (!stores[key].area && area) {
+                    stores[key].area = area;
                 }
 
                 if (row.status === 'Belum Plan') {
@@ -10271,66 +10403,199 @@ function hubSort(colIdx) {
             });
 
             // Filter ONLY requested regions AND volume < 19 CBM
-            const rows = Object.values(stores)
-                .filter(s => targetAreas.some(area => s.area.includes(area)) && s.unplannedTotal > 0 && s.unplannedTotal < 19)
-                .sort((a, b) => b.unplannedCbm[3] - a.unplannedCbm[3]); // Sort by 7 UP (index 3) descending
+            const eligibleStores = Object.values(stores).filter(s => 
+                targetAreas.some(area => (s.area || '').toUpperCase().includes(area)) && 
+                s.unplannedTotal > 0 && 
+                s.unplannedTotal < 19
+            );
 
-            if (rows.length === 0) {
+            if (eligibleStores.length === 0) {
                 alert("Tidak ada data 'Kurang Kuota' (< 19 CBM) yang ditemukan di area: " + targetAreas.join(', '));
                 return;
             }
 
+            // Group stores by canonical Area Group
+            const groupedStores = {};
+            eligibleStores.forEach(s => {
+                const groupName = getStoreAreaGroup(s.area);
+                if (!groupedStores[groupName]) {
+                    groupedStores[groupName] = [];
+                }
+                groupedStores[groupName].push(s);
+            });
+
+            // Sort Area groups according to targetAreas sequence, then any other alphabetically
+            const sortedAreaKeys = Object.keys(groupedStores).sort((a, b) => {
+                const idxA = targetAreas.indexOf(a);
+                const idxB = targetAreas.indexOf(b);
+                if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                if (idxA !== -1) return -1;
+                if (idxB !== -1) return 1;
+                return a.localeCompare(b);
+            });
+
+            // Sort stores within each Area group (by 7 UP descending, then total unplanned CBM descending)
+            sortedAreaKeys.forEach(area => {
+                groupedStores[area].sort((a, b) => {
+                    if (b.unplannedCbm[3] !== a.unplannedCbm[3]) {
+                        return b.unplannedCbm[3] - a.unplannedCbm[3];
+                    }
+                    if (b.unplannedTotal !== a.unplannedTotal) {
+                        return b.unplannedTotal - a.unplannedTotal;
+                    }
+                    return a.code.localeCompare(b.code);
+                });
+            });
+
+            // Calculate Grand Totals
+            const grandAging = [0, 0, 0, 0];
+            let grandTotalBacklog = 0;
+            let grandTotalKurang = 0;
+            eligibleStores.forEach(s => {
+                for (let i = 0; i < 4; i++) {
+                    grandAging[i] += s.unplannedCbm[i];
+                }
+                grandTotalBacklog += s.unplannedTotal;
+                grandTotalKurang += Math.max(0, 19 - s.unplannedTotal);
+            });
+
             const now = new Date();
-            const dateStr = now.toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
-            const timeStr = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
             // Header Section
             doc.setFillColor(183, 28, 28); // Dark Red
-            doc.rect(40, 40, 515, 50, 'F');
+            doc.rect(40, 40, 515, 45, 'F');
             doc.setTextColor(255, 255, 255);
-            doc.setFontSize(16);
+            doc.setFontSize(15);
             doc.setFont("helvetica", "bold");
-            doc.text("LAPORAN PERMOHONAN PENAMBAHAN KUOTA", 297.5, 72, { align: 'center' });
+            doc.text("LAPORAN PERMOHONAN PENAMBAHAN KUOTA", 297.5, 68, { align: 'center' });
 
             // Formal Message
             doc.setTextColor(50, 50, 50);
-            doc.setFontSize(10);
+            doc.setFontSize(9.5);
             doc.setFont("helvetica", "bold");
-            doc.text("Kepada Yth. Tim Inventory Planner,", 40, 115);
+            doc.text("Kepada Yth. Tim Inventory Planner,", 40, 105);
             
             doc.setFont("helvetica", "normal");
-            const message = "Kami ingin menginformasikan bahwa saat ini STOREBOOKING kami mengalami kekurangan kuota. Sehubungan dengan hal tersebut, kami mohon bantuannya untuk penambahan kuota agar proses operasional dapat berjalan dengan lancar. Berikut adalah rincian store yang memerlukan penanganan segera:";
+            const message = "Kami ingin menginformasikan bahwa saat ini STOREBOOKING kami mengalami kekurangan kuota (< 19 CBM). Sehubungan dengan hal tersebut, kami mohon bantuannya untuk penambahan kuota agar proses operasional dan pemuatan kontainer dapat berjalan optimal. Berikut rincian data per area:";
             const splitMessage = doc.splitTextToSize(message, 515);
-            doc.text(splitMessage, 40, 130);
+            doc.text(splitMessage, 40, 118);
 
-            // Summary
-            doc.setFillColor(245, 245, 245);
-            doc.rect(40, 160, 515, 30, 'F');
-            doc.setDrawColor(200, 200, 200);
-            doc.rect(40, 160, 515, 30, 'S');
+            // Summary Card
+            doc.setFillColor(248, 250, 252);
+            doc.rect(40, 148, 515, 28, 'F');
+            doc.setDrawColor(226, 232, 240);
+            doc.rect(40, 148, 515, 28, 'S');
             
+            doc.setFontSize(8.5);
             doc.setFont("helvetica", "bold");
-            const currentTotalBacklog = rows.reduce((sum, r) => sum + r.unplannedTotal, 0);
-            doc.text(`TOTAL BACKLOG CBM: ${formatIndo(currentTotalBacklog)}`, 50, 179);
+            doc.setTextColor(30, 41, 59);
+            doc.text(`TOTAL BACKLOG: ${formatIndo(grandTotalBacklog)} CBM  |  KURANG KUOTA: ${formatIndo(grandTotalKurang)} CBM  |  ${eligibleStores.length} STORE`, 48, 166);
             doc.setFont("helvetica", "normal");
-            doc.text(`Tanggal: ${dateStr}`, 515+40, 179, { align: 'right' });
+            doc.setTextColor(100, 116, 139);
+            doc.text(`Tanggal: ${dateStr} ${timeStr}`, 515 + 32, 166, { align: 'right' });
 
-            // Table Data
-            const tableBody = rows.map((s, idx) => [
-                idx + 1,
-                s.code,
-                s.name,
-                s.unplannedCbm[0] > 0 ? formatIndo(s.unplannedCbm[0]) : '-',
-                s.unplannedCbm[1] > 0 ? formatIndo(s.unplannedCbm[1]) : '-',
-                s.unplannedCbm[2] > 0 ? formatIndo(s.unplannedCbm[2]) : '-',
-                s.unplannedCbm[3] > 0 ? formatIndo(s.unplannedCbm[3]) : '-',
-                formatIndo(s.unplannedTotal),
-                formatIndo(19 - s.unplannedTotal)
-            ]);
+            // Build Grouped Table Body
+            const tableBody = [];
 
-            // Table Drawing
+            sortedAreaKeys.forEach(areaName => {
+                const areaStores = groupedStores[areaName];
+                if (!areaStores || areaStores.length === 0) return;
+
+                const areaAging = [0, 0, 0, 0];
+                let areaTotalBacklog = 0;
+                let areaTotalKurang = 0;
+
+                areaStores.forEach(s => {
+                    for (let i = 0; i < 4; i++) {
+                        areaAging[i] += s.unplannedCbm[i];
+                    }
+                    areaTotalBacklog += s.unplannedTotal;
+                    areaTotalKurang += Math.max(0, 19 - s.unplannedTotal);
+                });
+
+                // Area Header Row (Spans all 9 columns)
+                const headerRow = [
+                    {
+                        content: `WILAYAH: ${areaName}   [ ${areaStores.length} Store  |  Total Backlog: ${formatIndo(areaTotalBacklog)} CBM  |  Kurang Kuota: ${formatIndo(areaTotalKurang)} CBM ]`,
+                        colSpan: 9,
+                        styles: {
+                            fillColor: [30, 41, 59],
+                            textColor: [255, 215, 0],
+                            fontStyle: 'bold',
+                            fontSize: 8.5,
+                            halign: 'left'
+                        }
+                    }
+                ];
+                headerRow._isAreaHeader = true;
+                tableBody.push(headerRow);
+
+                // Store Data Rows for this Area
+                areaStores.forEach((s, idx) => {
+                    const storeRow = [
+                        idx + 1,
+                        s.code,
+                        s.name,
+                        s.unplannedCbm[0] > 0 ? formatIndo(s.unplannedCbm[0]) : '-',
+                        s.unplannedCbm[1] > 0 ? formatIndo(s.unplannedCbm[1]) : '-',
+                        s.unplannedCbm[2] > 0 ? formatIndo(s.unplannedCbm[2]) : '-',
+                        s.unplannedCbm[3] > 0 ? formatIndo(s.unplannedCbm[3]) : '-',
+                        formatIndo(s.unplannedTotal),
+                        formatIndo(Math.max(0, 19 - s.unplannedTotal))
+                    ];
+                    tableBody.push(storeRow);
+                });
+
+                // Subtotal Row for this Area
+                const subtotalRow = [
+                    {
+                        content: `SUBTOTAL ${areaName}`,
+                        colSpan: 3,
+                        styles: {
+                            halign: 'right',
+                            fontStyle: 'bold',
+                            fillColor: [241, 245, 249],
+                            textColor: [15, 23, 42]
+                        }
+                    },
+                    areaAging[0] > 0 ? formatIndo(areaAging[0]) : '-',
+                    areaAging[1] > 0 ? formatIndo(areaAging[1]) : '-',
+                    areaAging[2] > 0 ? formatIndo(areaAging[2]) : '-',
+                    areaAging[3] > 0 ? formatIndo(areaAging[3]) : '-',
+                    formatIndo(areaTotalBacklog),
+                    formatIndo(areaTotalKurang)
+                ];
+                subtotalRow._isSubtotal = true;
+                tableBody.push(subtotalRow);
+            });
+
+            // Grand Total Row
+            const grandTotalRow = [
+                {
+                    content: 'GRAND TOTAL (SEMUA AREA)',
+                    colSpan: 3,
+                    styles: {
+                        halign: 'right',
+                        fontStyle: 'bold',
+                        fillColor: [183, 28, 28],
+                        textColor: [255, 255, 255]
+                    }
+                },
+                grandAging[0] > 0 ? formatIndo(grandAging[0]) : '-',
+                grandAging[1] > 0 ? formatIndo(grandAging[1]) : '-',
+                grandAging[2] > 0 ? formatIndo(grandAging[2]) : '-',
+                grandAging[3] > 0 ? formatIndo(grandAging[3]) : '-',
+                formatIndo(grandTotalBacklog),
+                formatIndo(grandTotalKurang)
+            ];
+            grandTotalRow._isGrandTotal = true;
+            tableBody.push(grandTotalRow);
+
+            // Draw AutoTable
             doc.autoTable({
-                startY: 205,
+                startY: 188,
                 head: [['NO', 'CODE', 'SHIP TO', '0', '1-3', '4-7', '7 UP', 'TOTAL CBM', 'KURANG KUOTA']],
                 body: tableBody,
                 theme: 'grid',
@@ -10341,34 +10606,87 @@ function hubSort(colIdx) {
                     halign: 'center' 
                 },
                 columnStyles: {
-                    0: { halign: 'center', cellWidth: 30 },
-                    1: { halign: 'center', cellWidth: 45 },
+                    0: { halign: 'center', cellWidth: 26 },
+                    1: { halign: 'center', cellWidth: 46 },
                     2: { cellWidth: 'auto' },
-                    3: { halign: 'right', cellWidth: 35 },
-                    4: { halign: 'right', cellWidth: 35 },
-                    5: { halign: 'right', cellWidth: 35, textColor: [183, 28, 28], fontStyle: 'bold' }, // 4-7 Red
-                    6: { halign: 'right', cellWidth: 35, textColor: [183, 28, 28], fontStyle: 'bold' }, // 7 UP Red
-                    7: { halign: 'right', cellWidth: 50, fontStyle: 'bold' }, 
-                    8: { halign: 'right', cellWidth: 60, textColor: [183, 28, 28], fontStyle: 'bold', fillColor: [255, 248, 225] }
+                    3: { halign: 'right', cellWidth: 34 },
+                    4: { halign: 'right', cellWidth: 34 },
+                    5: { halign: 'right', cellWidth: 34 },
+                    6: { halign: 'right', cellWidth: 34 },
+                    7: { halign: 'right', cellWidth: 50 }, 
+                    8: { halign: 'right', cellWidth: 62 }
                 },
-                styles: { fontSize: 8, cellPadding: 6, valign: 'middle' },
+                styles: { fontSize: 8, cellPadding: 5, valign: 'middle' },
                 alternateRowStyles: { fillColor: [252, 252, 252] },
                 margin: { left: 40, right: 40 },
                 didParseCell: function(data) {
-                    // Color header cells for 4-7 and 7 UP to Red
-                    if (data.section === 'head' && (data.column.index === 5 || data.column.index === 6)) {
-                        data.cell.styles.textColor = [255, 68, 68]; // Bright Red for visibility on dark background
+                    if (data.section === 'head') {
+                        if (data.column.index === 5 || data.column.index === 6) {
+                            data.cell.styles.textColor = [255, 100, 100];
+                        }
+                    } else if (data.section === 'body') {
+                        const rawRow = data.row.raw;
+                        if (rawRow && rawRow._isAreaHeader) {
+                            data.cell.styles.fillColor = [30, 41, 59];
+                            data.cell.styles.textColor = [255, 215, 0];
+                            data.cell.styles.fontStyle = 'bold';
+                            data.cell.styles.fontSize = 8.5;
+                            data.cell.styles.halign = 'left';
+                        } else if (rawRow && rawRow._isSubtotal) {
+                            data.cell.styles.fontStyle = 'bold';
+                            data.cell.styles.fillColor = [241, 245, 249];
+                            if (data.column.index === 0) {
+                                data.cell.styles.halign = 'right';
+                            }
+                            if (data.column.index === 5 || data.column.index === 6 || data.column.index === 8) {
+                                data.cell.styles.textColor = [183, 28, 28];
+                            } else {
+                                data.cell.styles.textColor = [15, 23, 42];
+                            }
+                        } else if (rawRow && rawRow._isGrandTotal) {
+                            data.cell.styles.fontStyle = 'bold';
+                            data.cell.styles.fontSize = 8.5;
+                            if (data.column.index === 0) {
+                                data.cell.styles.halign = 'right';
+                            }
+                            if (data.column.index <= 2) {
+                                data.cell.styles.fillColor = [183, 28, 28];
+                                data.cell.styles.textColor = [255, 255, 255];
+                            } else if (data.column.index === 8) {
+                                data.cell.styles.fillColor = [255, 237, 213];
+                                data.cell.styles.textColor = [194, 65, 12];
+                            } else {
+                                data.cell.styles.fillColor = [254, 226, 226];
+                                data.cell.styles.textColor = [183, 28, 28];
+                            }
+                        } else {
+                            // Normal data row
+                            if (data.column.index === 5 || data.column.index === 6) {
+                                data.cell.styles.textColor = [183, 28, 28];
+                                data.cell.styles.fontStyle = 'bold';
+                            } else if (data.column.index === 7) {
+                                data.cell.styles.fontStyle = 'bold';
+                            } else if (data.column.index === 8) {
+                                data.cell.styles.textColor = [183, 28, 28];
+                                data.cell.styles.fontStyle = 'bold';
+                                data.cell.styles.fillColor = [255, 248, 225];
+                            }
+                        }
                     }
-                },
-                didDrawPage: (data) => {
-                    doc.setFontSize(8);
-                    doc.setTextColor(150);
-                    doc.text("Best regards, Tim Planner DC Sidoarjo", 40, doc.internal.pageSize.height - 30);
-                    doc.text(`Halaman ${doc.internal.getNumberOfPages()}`, 555, doc.internal.pageSize.height - 30, { align: 'right' });
                 }
             });
 
-            doc.save(`Request_Kuota_Gabungan_${now.getTime()}.pdf`);
+            // Two-pass page numbering & footer
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let p = 1; p <= totalPages; p++) {
+                doc.setPage(p);
+                doc.setFontSize(8);
+                doc.setTextColor(130, 130, 130);
+                doc.text("Best regards, Tim Planner DC Sidoarjo", 40, doc.internal.pageSize.height - 30);
+                doc.text(`Halaman ${p} dari ${totalPages}`, 555, doc.internal.pageSize.height - 30, { align: 'right' });
+            }
+
+            doc.save(`Request_Kuota_Per_Area_${now.getTime()}.pdf`);
         }
 
         async function shareAllocationMobile() {
@@ -12767,9 +13085,7 @@ function updateDashboard() {
                 if (excludedCarriers.includes(carrierUpper) || carrierUpper.includes('DUMMY')) return;
 
                 const isBelumSpt = isBelumSupport(row);
-                const dateVal = isVendor 
-                    ? (isBelumSpt ? (row.AU || '').trim() : (row.AO || '').trim())
-                    : (row.AO || '').trim();
+                const dateVal = isBelumSpt ? (row.AU || '').trim() : (row.AO || '').trim();
                 
                 if (!dateVal || dateVal === '-' || dateVal === '0') return;
 
@@ -12848,7 +13164,7 @@ function updateDashboard() {
                 if (excludedCarriers.includes(carrierUpper) || carrierUpper.includes('DUMMY')) return;
 
                 const isBelumSpt = isBelumSupport(row);
-                const dateVal = isVendor ? (isBelumSpt ? (row.AU || '').trim() : (row.AO || '').trim()) : (row.AO || '').trim();
+                const dateVal = isBelumSpt ? (row.AU || '').trim() : (row.AO || '').trim();
                 const dDate = parseDateCustom(dateVal) || parseDate(dateVal);
                 if (dDate && !isNaN(dDate.getTime()) && dDate >= todayStart) {
                     return; // Exclude today and future records from the Trend tab KPIs
@@ -12877,11 +13193,21 @@ function updateDashboard() {
                 ? (kpiOnTimeLCVal / kpiTotalLCVal * 100).toFixed(1) + '%' 
                 : '0.0%';
 
+            window.vendorSupportingPercentLast = kpiTotalLCVal > 0 
+                ? (kpiOnTimeLCVal / kpiTotalLCVal * 100).toFixed(1) 
+                : '100.0';
+
             if (kpiSupportingPercentEl) kpiSupportingPercentEl.textContent = kpiSupportingPercentVal;
             if (kpiTotalLcEl) kpiTotalLcEl.textContent = kpiTotalLCVal.toLocaleString('id-ID') + ' LC';
             if (kpiOnTimeLcEl) kpiOnTimeLcEl.textContent = kpiOnTimeLCVal.toLocaleString('id-ID') + ' LC';
             if (kpiDelayedLcEl) kpiDelayedLcEl.textContent = kpiDelayedLCVal.toLocaleString('id-ID') + ' LC';
             if (kpiTerlambatLcEl) kpiTerlambatLcEl.textContent = kpiTerlambatLCVal.toLocaleString('id-ID') + ' LC';
+
+            // Sync with Summary Section (B. Vendor & Fleet Performance) if present
+            const cFleetEl = document.getElementById('c-data-fleet-pct');
+            if (cFleetEl) cFleetEl.textContent = window.vendorSupportingPercentLast + '%';
+            const cDonutFleet = document.getElementById('c-donut-fleet');
+            if (cDonutFleet) cDonutFleet.style.setProperty('--val', Math.max(0.1, parseFloat(window.vendorSupportingPercentLast)));
 
             // Update disclaimer message text based on active tab
             const disclaimerEl = document.getElementById('trend-disclaimer');
