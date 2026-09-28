@@ -4066,7 +4066,7 @@
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.25);
     border-radius: 18px;
     width: 95%;
-    max-width: 1100px;
+    max-width: 1180px;
     max-height: 92vh;
     display: flex;
     flex-direction: column;
@@ -4169,7 +4169,7 @@
 /* Quick Stats */
 .so-stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
     padding: 14px 20px 8px 20px;
 }
@@ -4189,6 +4189,10 @@
     border-color: rgba(16, 185, 129, 0.4);
     background: rgba(16, 185, 129, 0.08);
 }
+.so-stat-card.stat-cbm {
+    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.08);
+}
 .so-stat-label {
     font-size: 0.7rem;
     color: #94a3b8;
@@ -4207,6 +4211,10 @@
 }
 .stat-kirim .so-stat-value {
     color: #34d399;
+}
+.stat-cbm .so-stat-value {
+    color: #f87171;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
 }
 .so-stat-sub {
     font-size: 0.72rem;
@@ -4390,6 +4398,35 @@
     width: 125px;
     white-space: nowrap;
 }
+.so-table th.th-cbm,
+.so-table td.td-cbm {
+    width: 95px;
+    text-align: center;
+    white-space: nowrap;
+}
+.so-cbm-badge {
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.14);
+    border: 1px solid rgba(239, 68, 68, 0.42);
+    padding: 3px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    min-width: 62px;
+    text-align: center;
+    letter-spacing: 0.5px;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 1px 4px rgba(239, 68, 68, 0.2);
+}
+.so-cbm-badge.cbm-zero {
+    color: #94a3b8;
+    background: rgba(148, 163, 184, 0.08);
+    border-color: rgba(148, 163, 184, 0.2);
+    font-weight: 600;
+    box-shadow: none;
+}
 .so-code-badge {
     font-family: monospace;
     font-size: 0.85rem;
@@ -4510,7 +4547,7 @@
 @media (min-width: 1024px) {
     .so-modal-container {
         width: 95%;
-        max-width: 1100px;
+        max-width: 1180px;
     }
     .so-table-wrapper {
         overflow-x: auto;
@@ -4538,7 +4575,7 @@
         font-size: 0.7rem !important;
     }
     .so-stats-grid {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: repeat(2, 1fr) !important;
         gap: 8px !important;
         padding: 10px 14px 4px 14px !important;
     }
@@ -4850,6 +4887,11 @@
                     <span class="so-stat-value" id="so-stat-hold-count">6</span>
                     <span class="so-stat-sub">Pengiriman Ditahan Sementara</span>
                 </div>
+                <div class="so-stat-card stat-cbm">
+                    <span class="so-stat-label">TOTAL CBM (HOLD)</span>
+                    <span class="so-stat-value" id="so-stat-cbm-total">0,00</span>
+                    <span class="so-stat-sub">Akumulasi CBM Khusus Status HOLD</span>
+                </div>
             </div>
 
             <!-- Toolbar -->
@@ -4890,7 +4932,7 @@
             <!-- Modal Footer -->
             <div class="so-modal-footer">
                 <div class="so-footer-info">
-                    <i class="fas fa-database"></i> Sumber Data: Google Sheets Cut Off Stock Opname AHI 2026 (Kolom A-J, Filter J = COVERAGE)
+                    <i class="fas fa-database"></i> Sumber Data: Google Sheets Cut Off Stock Opname AHI 2026 (Kolom A-K, Filter J = COVERAGE)
                 </div>
                 <div class="so-footer-buttons">
                     <button class="so-btn-dismiss" onclick="closeStockOpnameModal()">TUTUP</button>
@@ -9073,7 +9115,7 @@
         const STOCK_OPNAME_CSV_URL = 'https://docs.google.com/spreadsheets/d/1GA2p2wNM1Glty7ddcUFgrZRp9yje3zbDWS7GIkgAr3g/export?format=csv&gid=0';
         let rawStockOpnameData = [];
         let stockOpnameFilteredData = [];
-        let stockOpnameHeaders = ['NO', 'KODE', 'STORE', 'AREA', 'JALUR', 'CUTOFF KIRIM', 'KIRIM KEMBALI', 'INFO', 'STATUS', 'COVER/NON COVER'];
+        let stockOpnameHeaders = ['NO', 'KODE', 'STORE', 'AREA', 'JALUR', 'CUTOFF KIRIM', 'KIRIM KEMBALI', 'INFO', 'STATUS', 'COVER/NON COVER', 'CBM'];
         let stockOpnameActiveFilter = 'ALL';
         let stockOpnameSearchQuery = '';
 
@@ -9132,8 +9174,8 @@
                 }
 
                 if (rows.length >= 2) {
-                    // Row 2 is index 1 (Header row per instructions: baris 2 adalah header)
-                    stockOpnameHeaders = rows[1].slice(0, 10);
+                    // Row 2 is index 1 (Header row per instructions: baris 2 adalah header, Columns A to K)
+                    stockOpnameHeaders = rows[1].slice(0, 11);
 
                     // Data starts from index 2
                     // Filter rule per instructions: "filter ambil data hanya COVERAGE pada kolom j" (Column J is index 9)
@@ -9151,7 +9193,8 @@
                             info: r[7] || '',
                             status: (r[8] || '').toUpperCase().trim(),
                             cover: (r[9] || '').toUpperCase().trim(),
-                            raw: r.slice(0, 10)
+                            cbm: r[10] || '',
+                            raw: r.slice(0, 11)
                         }));
 
                     updateStockOpnameCounters();
@@ -9171,6 +9214,14 @@
             const holdCount = stockOpnameFilteredData.filter(d => d.status === 'HOLD').length;
             const kirimCount = stockOpnameFilteredData.filter(d => d.status === 'KIRIM').length;
 
+            let totalCbmHold = 0;
+            stockOpnameFilteredData.forEach(d => {
+                if (d.status === 'HOLD' && d.cbm) {
+                    totalCbmHold += parseNumberWithComma(d.cbm);
+                }
+            });
+            const formattedCbm = totalCbmHold.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
             const elTotal = document.getElementById('so-stat-total');
             if (elTotal) elTotal.textContent = total;
             const elCoverage = document.getElementById('so-stat-coverage-count');
@@ -9179,6 +9230,8 @@
             if (elHold) elHold.textContent = holdCount;
             const elKirim = document.getElementById('so-stat-kirim-count');
             if (elKirim) elKirim.textContent = kirimCount;
+            const elCbm = document.getElementById('so-stat-cbm-total');
+            if (elCbm) elCbm.textContent = formattedCbm;
 
             const pillAll = document.getElementById('so-pill-all-count');
             if (pillAll) pillAll.textContent = total;
@@ -9197,8 +9250,8 @@
             if (!headerRow || !tbody) return;
 
             // Render table header from row 2 data or default
-            const hNames = stockOpnameHeaders && stockOpnameHeaders.length >= 10 ? stockOpnameHeaders : [
-                'NO', 'KODE', 'STORE', 'AREA', 'JALUR', 'CUTOFF KIRIM', 'KIRIM KEMBALI', 'INFO', 'STATUS', 'COVER/NON COVER'
+            const hNames = stockOpnameHeaders && stockOpnameHeaders.length >= 11 ? stockOpnameHeaders : [
+                'NO', 'KODE', 'STORE', 'AREA', 'JALUR', 'CUTOFF KIRIM', 'KIRIM KEMBALI', 'INFO', 'STATUS', 'COVER/NON COVER', 'CBM'
             ];
 
             headerRow.innerHTML = `
@@ -9212,6 +9265,7 @@
                 <th class="th-info" style="width: 130px; max-width: 150px;">${escapeSOHTML(hNames[7])}</th>
                 <th class="th-center" style="width: 90px;">${escapeSOHTML(hNames[8])}</th>
                 <th class="th-center" style="width: 110px;">${escapeSOHTML(hNames[9])}</th>
+                <th class="th-center th-cbm" style="width: 95px;">${escapeSOHTML(hNames[10] || 'CBM')}</th>
             `;
 
             // Filter data by pill filter & search
@@ -9230,14 +9284,16 @@
                     (d.status && d.status.toLowerCase().includes(q)) ||
                     (d.cutoffKirim && d.cutoffKirim.toLowerCase().includes(q)) ||
                     (d.kirimKembali && d.kirimKembali.toLowerCase().includes(q)) ||
-                    (d.info && d.info.toLowerCase().includes(q))
+                    (d.info && d.info.toLowerCase().includes(q)) ||
+                    (d.cbm && String(d.cbm).toLowerCase().includes(q)) ||
+                    (parseNumberWithComma(d.cbm).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).includes(q))
                 );
             }
 
             if (list.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="10" style="text-align: center; padding: 36px 20px; color: #94a3b8; font-size: 0.9rem;">
+                        <td colspan="11" style="text-align: center; padding: 36px 20px; color: #94a3b8; font-size: 0.9rem;">
                             <i class="fas fa-search" style="font-size: 2.2rem; margin-bottom: 10px; display: block; color: #475569;"></i>
                             Tidak ada data Stock Opname Coverage yang sesuai kriteria pencarian/filter.
                         </td>
@@ -9255,6 +9311,10 @@
                         : `<span>${escapeSOHTML(r.status)}</span>`);
 
                 const coverageBadge = `<span class="so-badge-coverage"><i class="fas fa-shield-halved"></i> ${escapeSOHTML(r.cover || 'COVERAGE')}</span>`;
+                const cbmNum = parseNumberWithComma(r.cbm);
+                const cbmFormatted = cbmNum.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const isCbmZero = cbmNum === 0;
+                const cbmBadge = `<span class="so-cbm-badge ${isCbmZero ? 'cbm-zero' : ''}">${cbmFormatted}</span>`;
 
                 return `
                     <tr class="${isHold ? 'row-hold' : ''}">
@@ -9268,6 +9328,7 @@
                         <td class="td-wrap td-info"><span class="so-info-text">${escapeSOHTML(r.info || '-')}</span></td>
                         <td class="td-center">${statusBadge}</td>
                         <td class="td-center">${coverageBadge}</td>
+                        <td class="td-center td-cbm">${cbmBadge}</td>
                     </tr>
                 `;
             }).join('');
@@ -9296,7 +9357,7 @@
                 if (tbody) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="10" style="text-align: center; padding: 36px 20px; color: #94a3b8; font-size: 0.9rem;">
+                            <td colspan="11" style="text-align: center; padding: 36px 20px; color: #94a3b8; font-size: 0.9rem;">
                                 <i class="fas fa-circle-notch fa-spin" style="font-size: 1.8rem; margin-bottom: 10px; display: block; color: #f59e0b;"></i>
                                 Memuat data Stock Opname Coverage...
                             </td>
@@ -9329,9 +9390,9 @@
                 return;
             }
             try {
-                const headerTitles = stockOpnameHeaders && stockOpnameHeaders.length >= 10 
+                const headerTitles = stockOpnameHeaders && stockOpnameHeaders.length >= 11 
                     ? stockOpnameHeaders 
-                    : ['NO', 'KODE', 'STORE', 'AREA', 'JALUR', 'CUTOFF KIRIM', 'KIRIM KEMBALI', 'INFO', 'STATUS', 'COVER/NON COVER'];
+                    : ['NO', 'KODE', 'STORE', 'AREA', 'JALUR', 'CUTOFF KIRIM', 'KIRIM KEMBALI', 'INFO', 'STATUS', 'COVER/NON COVER', 'CBM'];
                 
                 const rows = stockOpnameFilteredData.map(d => [
                     d.no,
@@ -9343,7 +9404,8 @@
                     d.kirimKembali,
                     d.info,
                     d.status,
-                    d.cover
+                    d.cover,
+                    parseFloat(parseNumberWithComma(d.cbm).toFixed(2))
                 ]);
 
                 const aoa = [headerTitles, ...rows];
