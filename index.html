@@ -16870,5 +16870,115 @@ loadKonfirmasiVM();
 setInterval(loadKonfirmasiVM, 600000);
 // ===== END REKAP KONFIRMASI VM =====
     </script>
+    <!-- ═══════════════════════════════════════════════════════════════════
+     AUTO-CAPTURE untuk halaman Tools (PPT Laporan Pagi) — SLIDE 3
+     Tools kirim postMessage {type:'wmsCapReq2'} -> panel MAIN DASHBOARD
+     difoto 2x (tanggal kemarin & hari ini) -> dikirim balik
+     {type:'wmsCapRes',which:'e'|'f'}
+     Letakkan tepat SEBELUM </body> di index.html
+     ═══════════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  function bcast(w,msg,d){
+    if(d>6)return;var n=0;
+    try{n=w.length;}catch(e){return;}
+    for(var i=0;i<n;i++){var f;try{f=w[i];}catch(e){continue;}
+      try{f.postMessage(msg,'*');}catch(e){}
+      bcast(f,msg,d+1);}
+  }
+  function send(msg){try{window.top.postMessage(msg,'*');}catch(e){} bcast(window.top,msg,0);}
+  function loadH2C(cb){
+    if(window.html2canvas)return cb();
+    var s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/html2canvas-pro@1/dist/html2canvas-pro.min.js';
+    s.onload=function(){cb();};s.onerror=function(){cb('html2canvas gagal dimuat');};
+    document.head.appendChild(s);
+  }
+  function waitFor(cond,max,cb){
+    var t0=Date.now();(function p(){var ok=false;try{ok=cond();}catch(e){}
+      if(ok||Date.now()-t0>max)return cb(ok);setTimeout(p,250);})();
+  }
+  /* cari nilai kolom AO (STUFFING DATE) yang cocok dengan tanggal tertentu.
+     Format di sheet bisa YYYY-MM-DD atau DD/MM/YYYY, jadi dua-duanya dicoba. */
+  function cariTanggal(dt){
+    var y=dt.getFullYear(),m=dt.getMonth()+1,d=dt.getDate();
+    var iso=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var dmy=String(d).padStart(2,'0')+'/'+String(m).padStart(2,'0')+'/'+y;
+    var ada={};
+    try{allData.forEach(function(r){var v=(r.AO||'').trim();if(v)ada[v]=1;});}catch(e){}
+    if(ada[iso])return iso;
+    if(ada[dmy])return dmy;
+    return null;
+  }
+  function snap(){
+    var el=document.getElementById('main-dashboard-section');
+    return html2canvas(el,{backgroundColor:'#0d0d0f',scale:1.2,useCORS:true,logging:false})
+      .then(function(c){return c.toDataURL('image/jpeg',0.9);});
+  }
+  /* pasang filter 1 tanggal lalu hitung ulang dashboard */
+  function pakaiTanggal(tgl){
+    try{
+      selectedFilters.bulan=[];
+      selectedFilters.kota=[];
+      selectedFilters.regional=[];
+      selectedFilters.area=[];
+      selectedFilters.stuffingDate=tgl?[tgl]:[];
+      populateFilters();
+      applyFilters();
+    }catch(e){}
+  }
+  var busyId=null;
+  function run(id){
+    function fail(m){busyId=null;send({type:'wmsCapErr',id:id,msg:String(m)});}
+    loadH2C(function(err){
+      if(err)return fail(err);
+      try{
+        /* lewati layar sambutan & modal stok opname tanpa perlu login */
+        try{currentBranch='AHI';}catch(e){}
+        try{handleDCBranchSelection('AHI');}catch(e){}
+        var ov=document.getElementById('welcome-overlay');
+        if(ov){ov.classList.add('hidden');ov.style.display='none';}
+        try{closeStockOpnameModal();}catch(e){}
+        try{showDashboardSection('main-dashboard-section');}catch(e){}
+
+        /* tunggu data CSV selesai dimuat */
+        waitFor(function(){return typeof allData!=='undefined'&&allData.length>0;},40000,function(ok){
+          if(!ok)return fail('data Planner belum termuat');
+          try{closeStockOpnameModal();}catch(e){}
+          var now=new Date();
+          var tglKemarin=cariTanggal(new Date(now.getTime()-86400000));
+          var tglHariIni=cariTanggal(now);
+
+          pakaiTanggal(tglKemarin);
+          setTimeout(function(){
+            try{if(window.map&&map.invalidateSize)map.invalidateSize();}catch(e){}
+            setTimeout(function(){
+              snap().then(function(u){
+                send({type:'wmsCapRes',id:id,which:'e',url:u});
+                pakaiTanggal(tglHariIni);
+                setTimeout(function(){
+                  try{if(window.map&&map.invalidateSize)map.invalidateSize();}catch(e){}
+                  setTimeout(function(){
+                    snap().then(function(u2){
+                      send({type:'wmsCapRes',id:id,which:'f',url:u2});
+                      send({type:'wmsCapDone',id:id});busyId=null;
+                    }).catch(fail);
+                  },2500);
+                },2500);
+              }).catch(fail);
+            },2500);
+          },2500);
+        });
+      }catch(e){fail(e.message);}
+    });
+  }
+  window.addEventListener('message',function(e){
+    var d=e.data;if(!d||d.type!=='wmsCapReq2'||!d.id)return;
+    send({type:'wmsCapAck',id:d.id});
+    if(busyId===d.id)return;
+    busyId=d.id;run(d.id);
+  });
+})();
+</script>
 </body>
 </html>
