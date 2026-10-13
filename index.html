@@ -16923,27 +16923,29 @@ setInterval(loadKonfirmasiVM, 600000);
     return hid;
   }
   function balikin(hid){ (hid||[]).forEach(function(x){ x[0].style.display=x[1]||''; }); }
+  /* potong tinggi foto sampai baris CBM PLAN B1-B4 saja, biar hasilnya melebar
+     (bagian SUMMARY PLAN BY ARMADA TYPE & tabel di bawahnya tidak ikut) */
+  function tinggiPotong(sec){
+    try{
+      var b4=document.getElementById('cbmPlanB4-card');
+      if(!b4)return 0;
+      var a=sec.getBoundingClientRect(),b=b4.getBoundingClientRect();
+      var h=Math.round(b.bottom-a.top+14);
+      return (h>200&&h<sec.scrollHeight)?h:0;
+    }catch(e){return 0;}
+  }
   function snap(){
     var el=document.getElementById('main-dashboard-section');
-    var hid=potong();
-    return html2canvas(el,{backgroundColor:'#0d0d0f',scale:1.2,useCORS:true,logging:false})
-      .then(function(c){balikin(hid);return c.toDataURL('image/jpeg',0.9);})
-      .catch(function(e){balikin(hid);throw e;});
+    var o={backgroundColor:'#0d0d0f',scale:1.2,useCORS:true,allowTaint:false,logging:false};
+    var h=tinggiPotong(el); if(h)o.height=h;
+    return html2canvas(el,o).then(function(c){return c.toDataURL('image/jpeg',0.9);});
+  }
+  function segarkanPeta(){
+    try{ if(typeof map!=='undefined'&&map&&map.invalidateSize)map.invalidateSize(true); }catch(e){}
   }
   function tungguPeta(cb){
-    waitFor(function(){return document.querySelectorAll('#map .leaflet-tile-loaded').length>0;},15000,function(){cb();});
-  }
-  /* pasang filter 1 tanggal lalu hitung ulang dashboard */
-  function pakaiTanggal(tgl){
-    try{
-      selectedFilters.bulan=[];
-      selectedFilters.kota=[];
-      selectedFilters.regional=[];
-      selectedFilters.area=[];
-      selectedFilters.stuffingDate=tgl?[tgl]:[];
-      populateFilters();
-      applyFilters();
-    }catch(e){}
+    segarkanPeta();
+    waitFor(function(){return document.querySelectorAll('#map img.leaflet-tile-loaded').length>2;},20000,function(){cb();});
   }
   var busyId=null;
   function run(id){
@@ -16969,14 +16971,14 @@ setInterval(loadKonfirmasiVM, 600000);
 
           pakaiTanggal(tglKemarin);
           setTimeout(function(){
-            try{if(window.map&&map.invalidateSize)map.invalidateSize();}catch(e){}
+            segarkanPeta();
             tungguPeta(function(){
               setTimeout(function(){
                 snap().then(function(u){
                   send({type:'wmsCapRes',id:id,which:'e',url:u});
                   pakaiTanggal(tglHariIni);
                   setTimeout(function(){
-                    try{if(window.map&&map.invalidateSize)map.invalidateSize();}catch(e){}
+                    segarkanPeta();
                     tungguPeta(function(){
                       setTimeout(function(){
                         snap().then(function(u2){
