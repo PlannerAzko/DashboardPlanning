@@ -16968,7 +16968,7 @@ setInterval(loadKonfirmasiVM, 600000);
   function snap(){
     var el=document.getElementById('main-dashboard-section');
     var hid=sembunyikanBerat();
-    var o={backgroundColor:'#0d0d0f',scale:1,useCORS:true,allowTaint:false,logging:false};
+    var o={backgroundColor:'#0d0d0f',scale:1.2,useCORS:true,allowTaint:false,logging:false};
     var h=tinggiPotong(el); if(h)o.height=h;
     var frozen=bekukanCanvas(el);
     var bersih=function(){tampilkanBerat(hid);cairkanCanvas(frozen);};
@@ -16983,6 +16983,7 @@ setInterval(loadKonfirmasiVM, 600000);
     segarkanPeta();
     waitFor(function(){return document.querySelectorAll('#map img.leaflet-tile-loaded').length>2;},20000,function(){cb();});
   }
+  function lapor(id,t){send({type:'wmsCapInfo',id:id,step:t});}
   var busyId=null;
   function run(id){
     function fail(m){busyId=null;send({type:'wmsCapErr',id:id,msg:String(m)});}
@@ -16990,6 +16991,7 @@ setInterval(loadKonfirmasiVM, 600000);
       if(err)return fail(err);
       try{
         /* lewati layar sambutan & modal stok opname tanpa perlu login */
+        lapor(id,'mulai');
         try{currentBranch='AHI';}catch(e){}
         try{handleDCBranchSelection('AHI');}catch(e){}
         var ov=document.getElementById('welcome-overlay');
@@ -17000,23 +17002,27 @@ setInterval(loadKonfirmasiVM, 600000);
         /* tunggu data CSV selesai dimuat */
         waitFor(function(){return typeof allData!=='undefined'&&allData.length>0;},40000,function(ok){
           if(!ok)return fail('data Planner belum termuat');
+          lapor(id,'data termuat');
           try{closeStockOpnameModal();}catch(e){}
           var now=new Date();
           var tglKemarin=cariTanggal(new Date(now.getTime()-86400000));
           var tglHariIni=cariTanggal(now);
 
+          lapor(id,'filter kemarin='+tglKemarin+' hariini='+tglHariIni);
           pakaiTanggal(tglKemarin);
           setTimeout(function(){
             segarkanPeta();
             tungguPeta(function(){
               setTimeout(function(){
-                snap().then(function(u){
+                lapor(id,'mulai foto 1');
+              snap().then(function(u){
                   send({type:'wmsCapRes',id:id,which:'e',url:u});
                   pakaiTanggal(tglHariIni);
                   setTimeout(function(){
                     segarkanPeta();
                     tungguPeta(function(){
                       setTimeout(function(){
+                        lapor(id,'mulai foto 2');
                         snap().then(function(u2){
                           send({type:'wmsCapRes',id:id,which:'f',url:u2});
                           send({type:'wmsCapDone',id:id});busyId=null;
