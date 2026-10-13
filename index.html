@@ -16910,10 +16910,28 @@ setInterval(loadKonfirmasiVM, 600000);
     if(ada[dmy])return dmy;
     return null;
   }
+  /* sembunyikan bagian bawah panel (SUMMARY PLAN BY ARMADA TYPE dst) supaya
+     hasil foto cuma tabel + peta + baris KPI, bentuknya jadi melebar bukan memanjang */
+  function potong(){
+    var sec=document.getElementById('main-dashboard-section'); if(!sec)return [];
+    var kids=sec.children,hid=[],cut=false;
+    for(var i=0;i<kids.length;i++){
+      var el=kids[i];
+      if(cut){hid.push([el,el.style.display]);el.style.display='none';continue;}
+      if(el.querySelector&&el.querySelector('#cbmPlanB4-card'))cut=true;
+    }
+    return hid;
+  }
+  function balikin(hid){ (hid||[]).forEach(function(x){ x[0].style.display=x[1]||''; }); }
   function snap(){
     var el=document.getElementById('main-dashboard-section');
+    var hid=potong();
     return html2canvas(el,{backgroundColor:'#0d0d0f',scale:1.2,useCORS:true,logging:false})
-      .then(function(c){return c.toDataURL('image/jpeg',0.9);});
+      .then(function(c){balikin(hid);return c.toDataURL('image/jpeg',0.9);})
+      .catch(function(e){balikin(hid);throw e;});
+  }
+  function tungguPeta(cb){
+    waitFor(function(){return document.querySelectorAll('#map .leaflet-tile-loaded').length>0;},15000,function(){cb();});
   }
   /* pasang filter 1 tanggal lalu hitung ulang dashboard */
   function pakaiTanggal(tgl){
@@ -16952,21 +16970,25 @@ setInterval(loadKonfirmasiVM, 600000);
           pakaiTanggal(tglKemarin);
           setTimeout(function(){
             try{if(window.map&&map.invalidateSize)map.invalidateSize();}catch(e){}
-            setTimeout(function(){
-              snap().then(function(u){
-                send({type:'wmsCapRes',id:id,which:'e',url:u});
-                pakaiTanggal(tglHariIni);
-                setTimeout(function(){
-                  try{if(window.map&&map.invalidateSize)map.invalidateSize();}catch(e){}
+            tungguPeta(function(){
+              setTimeout(function(){
+                snap().then(function(u){
+                  send({type:'wmsCapRes',id:id,which:'e',url:u});
+                  pakaiTanggal(tglHariIni);
                   setTimeout(function(){
-                    snap().then(function(u2){
-                      send({type:'wmsCapRes',id:id,which:'f',url:u2});
-                      send({type:'wmsCapDone',id:id});busyId=null;
-                    }).catch(fail);
+                    try{if(window.map&&map.invalidateSize)map.invalidateSize();}catch(e){}
+                    tungguPeta(function(){
+                      setTimeout(function(){
+                        snap().then(function(u2){
+                          send({type:'wmsCapRes',id:id,which:'f',url:u2});
+                          send({type:'wmsCapDone',id:id});busyId=null;
+                        }).catch(fail);
+                      },2000);
+                    });
                   },2500);
-                },2500);
-              }).catch(fail);
-            },2500);
+                }).catch(fail);
+              },2000);
+            });
           },2500);
         });
       }catch(e){fail(e.message);}
@@ -16980,5 +17002,5 @@ setInterval(loadKonfirmasiVM, 600000);
   });
 })();
 </script>
-</body>
+    </body>
 </html>
