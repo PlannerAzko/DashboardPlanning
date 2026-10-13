@@ -16934,11 +16934,33 @@ setInterval(loadKonfirmasiVM, 600000);
       return (h>200&&h<sec.scrollHeight)?h:0;
     }catch(e){return 0;}
   }
+  /* html2canvas kadang gagal menyalin <canvas>. Diubah dulu jadi <img>, lalu dibalikin. */
+  function bekukanCanvas(root){
+    var list=[],cs=root.querySelectorAll('canvas');
+    for(var i=0;i<cs.length;i++){
+      var c=cs[i];
+      if(!c.width||!c.height)continue;
+      var url;try{url=c.toDataURL('image/png');}catch(e){continue;}
+      var r=c.getBoundingClientRect();
+      if(!r.width||!r.height)continue;
+      var img=document.createElement('img');
+      img.src=url;
+      img.style.cssText='width:'+r.width+'px;height:'+r.height+'px;display:block;';
+      c.parentNode.insertBefore(img,c);
+      c.style.display='none';
+      list.push([c,img]);
+    }
+    return list;
+  }
+  function cairkanCanvas(list){(list||[]).forEach(function(p){try{p[1].parentNode.removeChild(p[1]);p[0].style.display='';}catch(e){}});}
   function snap(){
     var el=document.getElementById('main-dashboard-section');
     var o={backgroundColor:'#0d0d0f',scale:1.2,useCORS:true,allowTaint:false,logging:false};
     var h=tinggiPotong(el); if(h)o.height=h;
-    return html2canvas(el,o).then(function(c){return c.toDataURL('image/jpeg',0.9);});
+    var frozen=bekukanCanvas(el);
+    return html2canvas(el,o)
+      .then(function(c){cairkanCanvas(frozen);return c.toDataURL('image/jpeg',0.9);})
+      .catch(function(e){cairkanCanvas(frozen);throw e;});
   }
   function segarkanPeta(){
     try{ if(typeof map!=='undefined'&&map&&map.invalidateSize)map.invalidateSize(true); }catch(e){}
