@@ -4944,6 +4944,315 @@
         </div>
     </div>
 
+    <!-- Modal Detail SLA Hub GRW (HIT / MISS) -->
+    <div id="modal-hub-sla-detail" class="so-modal-overlay hidden" onclick="handleHubSlaBackdropClick(event)">
+        <div class="so-modal-container" id="hub-sla-modal-card" onclick="event.stopPropagation()" style="max-width: 1250px; border-color: rgba(45, 212, 175, 0.6); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(45, 212, 175, 0.25);">
+            <!-- Modal Header -->
+            <div class="so-modal-header" id="hub-sla-modal-header" style="background: linear-gradient(90deg, #092c24 0%, #0f172a 100%); border-bottom: 1px solid rgba(45, 212, 175, 0.4);">
+                <div class="so-modal-title-area">
+                    <div id="hub-sla-modal-icon-wrap" class="so-warning-icon-wrapper" style="background: rgba(45, 212, 175, 0.15); border: 1px solid rgba(45, 212, 175, 0.5); color: #2dd4bf;">
+                        <i id="hub-sla-modal-icon" class="fas fa-circle-check"></i>
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <h2 class="so-modal-title" id="hub-sla-modal-title" style="margin: 0; font-size: 1.25rem;">DETAIL SLA HUB GRW — <span style="color: #2dd4bf;">HIT (ON-TIME)</span></h2>
+                            <span id="hub-sla-modal-badge" style="background: #2dd4bf; color: #042f2e; font-weight: 800; font-size: 0.75rem; padding: 3px 10px; border-radius: 999px;">0 STORE</span>
+                        </div>
+                        <p class="so-modal-subtitle" id="hub-sla-modal-subtitle" style="margin-top: 4px;">
+                            Daftar store dengan proses muat tepat waktu • Target: Area DK ≤ 3 Hari, Area LK ≤ 5 Hari
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <!-- Quick Tab Switcher inside modal -->
+                    <div style="display: inline-flex; background: #0b1120; border: 1px solid #334155; border-radius: 8px; padding: 3px; gap: 3px;">
+                        <button type="button" id="tab-sla-hit" onclick="switchHubSlaModalTab('HIT')" style="background: #2dd4bf; color: #042f2e; border: none; border-radius: 6px; padding: 6px 14px; font-size: 0.8em; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i class="fas fa-check-circle"></i> HIT (<span id="hub-sla-tab-hit-count">0</span>)
+                        </button>
+                        <button type="button" id="tab-sla-miss" onclick="switchHubSlaModalTab('MISS')" style="background: transparent; color: #94a3b8; border: none; border-radius: 6px; padding: 6px 14px; font-size: 0.8em; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i class="fas fa-triangle-exclamation"></i> MISS (<span id="hub-sla-tab-miss-count">0</span>)
+                        </button>
+                    </div>
+                    <button class="so-modal-close-btn" onclick="closeHubSlaDetailModal()" title="Tutup Modal (Esc)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Ribbon -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; padding: 14px 20px; background: #0b1120; border-bottom: 1px solid #1e293b;">
+                <div style="background: #111c33; border: 1px solid #1e293b; border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column;">
+                    <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">TOTAL STORE</span>
+                    <span id="hub-sla-stat-stores" style="font-size: 1.4rem; font-weight: 800; color: #fff;">0</span>
+                    <span style="font-size: 0.72rem; color: #64748b;">Jumlah store terfilter</span>
+                </div>
+                <div style="background: #111c33; border: 1px solid #1e293b; border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column;">
+                    <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">TOTAL CBM</span>
+                    <span id="hub-sla-stat-cbm" style="font-size: 1.4rem; font-weight: 800; color: #ffd700;">0.00 CBM</span>
+                    <span style="font-size: 0.72rem; color: #64748b;">Volume kubikasi total</span>
+                </div>
+                <div style="background: #111c33; border: 1px solid #1e293b; border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column;">
+                    <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">BREAKDOWN AREA</span>
+                    <div style="display: flex; gap: 10px; margin-top: 2px;">
+                        <span id="hub-sla-stat-dk" style="font-size: 0.95rem; font-weight: 700; color: #38bdf8;">DK: 0 store (0 CBM)</span>
+                        <span id="hub-sla-stat-lk" style="font-size: 0.95rem; font-weight: 700; color: #f472b6;">LK: 0 store (0 CBM)</span>
+                    </div>
+                    <span style="font-size: 0.72rem; color: #64748b;">Distribusi Dalam / Luar Kota</span>
+                </div>
+                <div style="background: #111c33; border: 1px solid #1e293b; border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column;">
+                    <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">RATA-RATA AGING</span>
+                    <span id="hub-sla-stat-avg-aging" style="font-size: 1.4rem; font-weight: 800; color: #a78bfa;">0.0 Hari</span>
+                    <span id="hub-sla-stat-max-aging" style="font-size: 0.72rem; color: #64748b;">Aging Maksimal: 0 Hari</span>
+                </div>
+            </div>
+
+            <!-- Toolbar & Filter -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #0f172a; border-bottom: 1px solid #1e293b; flex-wrap: wrap; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex: 1;">
+                    <div style="position: relative; min-width: 260px; max-width: 420px; flex: 1;">
+                        <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 0.85em;"></i>
+                        <input type="text" id="hub-sla-search-input" oninput="handleHubSlaSearchInput()" placeholder="Cari Kode/Nama Store, No LC, LC Pembawa, Region..." style="width: 100%; background: #090e17; border: 1px solid #334155; border-radius: 6px; padding: 7px 12px 7px 34px; color: #f8fafc; font-size: 0.85em; outline: none; transition: border-color 0.2s;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 0.8em; color: #94a3b8; font-weight: 600;">Area:</span>
+                        <div style="display: inline-flex; background: #090e17; border: 1px solid #334155; border-radius: 6px; padding: 2px;">
+                            <button type="button" class="hub-sla-area-btn" data-area="ALL" onclick="setHubSlaAreaFilter('ALL')" style="background: #3b82f6; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">SEMUA</button>
+                            <button type="button" class="hub-sla-area-btn" data-area="DK" onclick="setHubSlaAreaFilter('DK')" style="background: transparent; color: #94a3b8; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">DK (≤3)</button>
+                            <button type="button" class="hub-sla-area-btn" data-area="LK" onclick="setHubSlaAreaFilter('LK')" style="background: transparent; color: #94a3b8; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">LK (≤5)</button>
+                        </div>
+                    </div>
+                    <span id="hub-sla-count-info" style="font-size: 0.8em; color: #94a3b8; font-weight: 600;">Menampilkan 0 data</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button onclick="exportHubSlaDetailToExcel()" style="background: #166534; color: #fff; border: 1px solid #22c55e; padding: 7px 14px; border-radius: 6px; font-size: 0.8em; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                        <i class="fas fa-file-excel" style="color: #4ade80;"></i> EXPORT EXCEL
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Content -->
+            <div style="overflow-x: auto; overflow-y: auto; max-height: 520px; background: #0a0f1d; padding: 0;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.83em; color: #f8fafc; text-align: left;">
+                    <thead style="position: sticky; top: 0; z-index: 10; background: #131d31; border-bottom: 2px solid #334155;">
+                        <tr>
+                            <th style="padding: 10px 8px; border: 1px solid #26334d; text-align: center; color: #ffd700; width: 40px;">#</th>
+                            <th onclick="sortHubSlaDetail('tanggal')" style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; cursor: pointer; user-select: none; white-space: nowrap;">
+                                TGL KEDATANGAN <span id="sort-icon-tanggal" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortHubSlaDetail('hari')" style="padding: 10px 8px; border: 1px solid #26334d; color: #ffd700; text-align: center; cursor: pointer; user-select: none; white-space: nowrap;">
+                                HARI <span id="sort-icon-hari" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortHubSlaDetail('lcPembawa')" style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; cursor: pointer; user-select: none; white-space: nowrap;">
+                                LC PEMBAWA <span id="sort-icon-lcPembawa" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortHubSlaDetail('region')" style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; cursor: pointer; user-select: none; white-space: nowrap;">
+                                REGION / AREA <span id="sort-icon-region" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortHubSlaDetail('kodeStore')" style="padding: 10px 8px; border: 1px solid #26334d; color: #ffd700; text-align: center; cursor: pointer; user-select: none; white-space: nowrap;">
+                                KODE <span id="sort-icon-kodeStore" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortHubSlaDetail('storeName')" style="padding: 10px 12px; border: 1px solid #26334d; color: #ffd700; cursor: pointer; user-select: none; min-width: 200px;">
+                                NAMA STORE (TUJUAN) <span id="sort-icon-storeName" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortHubSlaDetail('cbm')" style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; text-align: right; cursor: pointer; user-select: none; white-space: nowrap;">
+                                CBM <span id="sort-icon-cbm" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortHubSlaDetail('aging')" style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; text-align: center; cursor: pointer; user-select: none; white-space: nowrap;">
+                                AGING <span id="sort-icon-aging" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; text-align: center; white-space: nowrap;">
+                                STATUS SLA
+                            </th>
+                            <th onclick="sortHubSlaDetail('noLc')" style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; cursor: pointer; user-select: none; white-space: nowrap;">
+                                NOMOR LC <span id="sort-icon-noLc" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="hub-sla-detail-tbody">
+                        <!-- Dynamic rows populated here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal Footer -->
+            <div style="background: #0b1120; padding: 12px 20px; border-top: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div style="font-size: 0.75em; color: #94a3b8; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-info-circle" style="color: #38bdf8;"></i>
+                    <span>Ketentuan SLA: <strong>JATIM DK ≤ 3 Hari</strong> (Hit jika aging 0-3 hari), <strong>LUAR KOTA (LK) ≤ 5 Hari</strong> (Hit jika aging 0-5 hari). Khusus store dengan status muat (SUDAH LOADING / SUDAH MUAT).</span>
+                </div>
+                <button onclick="closeHubSlaDetailModal()" style="background: #334155; color: #fff; border: 1px solid #475569; padding: 7px 18px; border-radius: 6px; font-weight: bold; font-size: 0.8em; cursor: pointer;">
+                    TUTUP
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail SLA Astor (HIT / MISS) -->
+    <div id="modal-astor-sla-detail" class="so-modal-overlay hidden" onclick="handleAstorSlaBackdropClick(event)">
+        <div class="so-modal-container" id="astor-sla-modal-card" onclick="event.stopPropagation()" style="max-width: 1280px; border-color: rgba(45, 212, 175, 0.6); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(45, 212, 175, 0.25);">
+            <!-- Modal Header -->
+            <div class="so-modal-header" id="astor-sla-modal-header" style="background: linear-gradient(90deg, #092c24 0%, #0f172a 100%); border-bottom: 1px solid rgba(45, 212, 175, 0.4);">
+                <div class="so-modal-title-area">
+                    <div id="astor-sla-modal-icon-wrap" class="so-warning-icon-wrapper" style="background: rgba(45, 212, 175, 0.15); border: 1px solid rgba(45, 212, 175, 0.5); color: #2dd4bf;">
+                        <i id="astor-sla-modal-icon" class="fas fa-circle-check"></i>
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <h2 class="so-modal-title" id="astor-sla-modal-title" style="margin: 0; font-size: 1.25rem;">DETAIL SLA ASTOR — <span style="color: #2dd4bf;">HIT (ON-TIME)</span></h2>
+                            <span id="astor-sla-modal-badge" style="background: #2dd4bf; color: #042f2e; font-weight: 800; font-size: 0.75rem; padding: 3px 10px; border-radius: 999px;">0 ORDER</span>
+                        </div>
+                        <p class="so-modal-subtitle" id="astor-sla-modal-subtitle" style="margin-top: 4px;">
+                            Daftar order Astor dengan pemenuhan tepat waktu • Target SLA: Area DK ≤ 3 Hari, Area LK ≤ 5 Hari
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <!-- Quick Tab Switcher inside modal -->
+                    <div style="display: inline-flex; background: #0b1120; border: 1px solid #334155; border-radius: 8px; padding: 3px; gap: 3px;">
+                        <button type="button" id="tab-astor-sla-hit" onclick="switchAstorSlaModalTab('HIT')" style="background: #2dd4bf; color: #042f2e; border: none; border-radius: 6px; padding: 6px 14px; font-size: 0.8em; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i class="fas fa-check-circle"></i> HIT (<span id="astor-sla-tab-hit-count">0</span>)
+                        </button>
+                        <button type="button" id="tab-astor-sla-miss" onclick="switchAstorSlaModalTab('MISS')" style="background: transparent; color: #94a3b8; border: none; border-radius: 6px; padding: 6px 14px; font-size: 0.8em; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i class="fas fa-triangle-exclamation"></i> MISS (<span id="astor-sla-tab-miss-count">0</span>)
+                        </button>
+                    </div>
+                    <button class="so-modal-close-btn" onclick="closeAstorSlaDetailModal()" title="Tutup Modal (Esc)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Ribbon -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; padding: 14px 20px; background: #0b1120; border-bottom: 1px solid #1e293b;">
+                <div style="background: #111c33; border: 1px solid #1e293b; border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column;">
+                    <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">TOTAL ORDER</span>
+                    <span id="astor-sla-stat-orders" style="font-size: 1.4rem; font-weight: 800; color: #fff;">0</span>
+                    <span style="font-size: 0.72rem; color: #64748b;">Jumlah order terfilter</span>
+                </div>
+                <div style="background: #111c33; border: 1px solid #1e293b; border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column;">
+                    <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">TOTAL CBM</span>
+                    <span id="astor-sla-stat-cbm" style="font-size: 1.4rem; font-weight: 800; color: #ffd700;">0.00 CBM</span>
+                    <span style="font-size: 0.72rem; color: #64748b;">Volume kubikasi total</span>
+                </div>
+                <div style="background: #111c33; border: 1px solid #1e293b; border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column;">
+                    <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">BREAKDOWN BU</span>
+                    <div id="astor-sla-stat-bu-pills" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; font-size: 0.75rem;">
+                        <!-- BU Pills rendered here -->
+                    </div>
+                    <span style="font-size: 0.72rem; color: #64748b; margin-top: 2px;">Proporsi per Business Unit</span>
+                </div>
+                <div style="background: #111c33; border: 1px solid #1e293b; border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column;">
+                    <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">BREAKDOWN AREA</span>
+                    <div style="display: flex; gap: 8px; margin-top: 2px; flex-wrap: wrap;">
+                        <span id="astor-sla-stat-dk" style="font-size: 0.85rem; font-weight: 700; color: #38bdf8;">DK: 0 (0 CBM)</span>
+                        <span id="astor-sla-stat-lk" style="font-size: 0.85rem; font-weight: 700; color: #f472b6;">LK: 0 (0 CBM)</span>
+                        <span id="astor-sla-stat-lp" style="font-size: 0.85rem; font-weight: 700; color: #a78bfa;">LP: 0 (0 CBM)</span>
+                    </div>
+                    <span style="font-size: 0.72rem; color: #64748b;">Distribusi Area Geografis</span>
+                </div>
+                <div style="background: #111c33; border: 1px solid #1e293b; border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column;">
+                    <span style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">RATA-RATA AGING</span>
+                    <span id="astor-sla-stat-avg-aging" style="font-size: 1.4rem; font-weight: 800; color: #fbbf24;">0.0 Hari</span>
+                    <span id="astor-sla-stat-max-aging" style="font-size: 0.72rem; color: #64748b;">Aging Maksimal: 0 Hari</span>
+                </div>
+            </div>
+
+            <!-- Toolbar & Filter -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: #0f172a; border-bottom: 1px solid #1e293b; flex-wrap: wrap; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex: 1;">
+                    <div style="position: relative; min-width: 250px; max-width: 380px; flex: 1;">
+                        <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 0.85em;"></i>
+                        <input type="text" id="astor-sla-search-input" oninput="handleAstorSlaSearchInput()" placeholder="Cari No LC, RT/OD, BU, Store Tujuan, Region..." style="width: 100%; background: #090e17; border: 1px solid #334155; border-radius: 6px; padding: 7px 12px 7px 34px; color: #f8fafc; font-size: 0.85em; outline: none; transition: border-color 0.2s;">
+                    </div>
+                    <!-- BU Filter buttons -->
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 0.8em; color: #94a3b8; font-weight: 600;">BU:</span>
+                        <div style="display: inline-flex; background: #090e17; border: 1px solid #334155; border-radius: 6px; padding: 2px; flex-wrap: wrap;">
+                            <button type="button" class="astor-sla-bu-btn" data-bu="ALL" onclick="setAstorSlaBuFilter('ALL')" style="background: #3b82f6; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; cursor: pointer;">SEMUA</button>
+                            <button type="button" class="astor-sla-bu-btn" data-bu="AZKO" onclick="setAstorSlaBuFilter('AZKO')" style="background: transparent; color: #94a3b8; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; cursor: pointer;">AZKO</button>
+                            <button type="button" class="astor-sla-bu-btn" data-bu="KWI" onclick="setAstorSlaBuFilter('KWI')" style="background: transparent; color: #94a3b8; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; cursor: pointer;">KWI</button>
+                            <button type="button" class="astor-sla-bu-btn" data-bu="TGI" onclick="setAstorSlaBuFilter('TGI')" style="background: transparent; color: #94a3b8; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; cursor: pointer;">TGI</button>
+                            <button type="button" class="astor-sla-bu-btn" data-bu="FBI" onclick="setAstorSlaBuFilter('FBI')" style="background: transparent; color: #94a3b8; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; cursor: pointer;">FBI</button>
+                            <button type="button" class="astor-sla-bu-btn" data-bu="OTHER" onclick="setAstorSlaBuFilter('OTHER')" style="background: transparent; color: #94a3b8; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; cursor: pointer;">OTHER</button>
+                            <button type="button" class="astor-sla-bu-btn" data-bu="CUSTOMER" onclick="setAstorSlaBuFilter('CUSTOMER')" style="background: transparent; color: #94a3b8; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; cursor: pointer;">CUSTOMER</button>
+                        </div>
+                    </div>
+                    <!-- Area Filter buttons -->
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 0.8em; color: #94a3b8; font-weight: 600;">Area:</span>
+                        <div style="display: inline-flex; background: #090e17; border: 1px solid #334155; border-radius: 6px; padding: 2px;">
+                            <button type="button" class="astor-sla-area-btn" data-area="ALL" onclick="setAstorSlaAreaFilter('ALL')" style="background: #3b82f6; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; cursor: pointer;">SEMUA</button>
+                            <button type="button" class="astor-sla-area-btn" data-area="DK" onclick="setAstorSlaAreaFilter('DK')" style="background: transparent; color: #94a3b8; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; cursor: pointer;">DK (≤3)</button>
+                            <button type="button" class="astor-sla-area-btn" data-area="LK" onclick="setAstorSlaAreaFilter('LK')" style="background: transparent; color: #94a3b8; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; cursor: pointer;">LK (≤5)</button>
+                            <button type="button" class="astor-sla-area-btn" data-area="LP" onclick="setAstorSlaAreaFilter('LP')" style="background: transparent; color: #94a3b8; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; cursor: pointer;">LP</button>
+                        </div>
+                    </div>
+                    <span id="astor-sla-count-info" style="font-size: 0.8em; color: #94a3b8; font-weight: 600;">Menampilkan 0 data</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button onclick="exportAstorSlaDetailToExcel()" style="background: #166534; color: #fff; border: 1px solid #22c55e; padding: 7px 14px; border-radius: 6px; font-size: 0.8em; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                        <i class="fas fa-file-excel" style="color: #4ade80;"></i> EXPORT EXCEL
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Content (Columns up to NOMOR LC only) -->
+            <div style="overflow-x: auto; overflow-y: auto; max-height: 520px; background: #0a0f1d; padding: 0;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.83em; color: #f8fafc; text-align: left;">
+                    <thead style="position: sticky; top: 0; z-index: 10; background: #131d31; border-bottom: 2px solid #334155;">
+                        <tr>
+                            <th style="padding: 10px 8px; border: 1px solid #26334d; text-align: center; color: #ffd700; width: 40px;">#</th>
+                            <th onclick="sortAstorSlaDetail('tgl')" style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; cursor: pointer; user-select: none; white-space: nowrap;">
+                                TGL INPUT <span id="sort-astor-tgl" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortAstorSlaDetail('bu')" style="padding: 10px 8px; border: 1px solid #26334d; color: #ffd700; text-align: center; cursor: pointer; user-select: none; white-space: nowrap;">
+                                BU <span id="sort-astor-bu" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortAstorSlaDetail('rtod')" style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; cursor: pointer; user-select: none; white-space: nowrap;">
+                                RT / OD <span id="sort-astor-rtod" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortAstorSlaDetail('kota')" style="padding: 10px 12px; border: 1px solid #26334d; color: #ffd700; cursor: pointer; user-select: none; min-width: 180px;">
+                                STORE TUJUAN <span id="sort-astor-kota" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortAstorSlaDetail('region')" style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; cursor: pointer; user-select: none; white-space: nowrap;">
+                                REGION <span id="sort-astor-region" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortAstorSlaDetail('area')" style="padding: 10px 8px; border: 1px solid #26334d; color: #ffd700; text-align: center; cursor: pointer; user-select: none; white-space: nowrap;">
+                                AREA <span id="sort-astor-area" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortAstorSlaDetail('cbm')" style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; text-align: right; cursor: pointer; user-select: none; white-space: nowrap;">
+                                CBM <span id="sort-astor-cbm" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th onclick="sortAstorSlaDetail('aging')" style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; text-align: center; cursor: pointer; user-select: none; white-space: nowrap;">
+                                AGING <span id="sort-astor-aging" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                            <th style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; text-align: center; white-space: nowrap;">
+                                STATUS SLA
+                            </th>
+                            <th onclick="sortAstorSlaDetail('lc')" style="padding: 10px 10px; border: 1px solid #26334d; color: #ffd700; cursor: pointer; user-select: none; white-space: nowrap;">
+                                NOMOR LC <span id="sort-astor-lc" style="font-size: 0.75em; color: #64748b;">⇅</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="astor-sla-detail-tbody">
+                        <!-- Dynamic rows populated here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal Footer -->
+            <div style="background: #0b1120; padding: 12px 20px; border-top: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div style="font-size: 0.75em; color: #94a3b8; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-info-circle" style="color: #38bdf8;"></i>
+                    <span>Ketentuan SLA Astor: <strong>DK ≤ 3 Hari</strong>, <strong>LK ≤ 5 Hari</strong>. Meliputi semua Business Unit (AZKO, KWI, TGI, FBI, OTHER, CUSTOMER). Kolom detail ditampilkan hingga <strong>Nomor LC</strong>.</span>
+                </div>
+                <button onclick="closeAstorSlaDetailModal()" style="background: #334155; color: #fff; border: 1px solid #475569; padding: 7px 18px; border-radius: 6px; font-weight: bold; font-size: 0.8em; cursor: pointer;">
+                    TUTUP
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating Bottom Navigation -->
     <div id="bottom-nav" class="bottom-nav hidden">
         <div class="bottom-nav-item" id="nav-ahi-summary" style="display: none;" onclick="showDashboardSection('ahi-summary-section')">
@@ -8015,24 +8324,33 @@
         <div id="hub-sla-badge" style="display: inline-block; font-size: 0.75em; font-weight: bold; padding: 3px 12px; border-radius: 999px; margin-top: 4px; background: rgba(255,68,68,0.15); color: #ff4444;">Menghitung...</div>
         <div style="font-size: 0.7em; color: #666; margin-top: 4px;">Target: 95%</div>
     </div>
-    <div style="display: flex; flex-direction: column; gap: 6px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(45,212,175,0.1); border-radius: 6px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <div style="width: 6px; height: 6px; border-radius: 50%; background: #2dd4bf;"></div>
+    <div style="display: flex; flex-direction: column; gap: 7px;">
+        <div id="hub-sla-hit-row" onclick="openHubSlaDetailModal('HIT')" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(45,212,175,0.12); border: 1px solid rgba(45,212,175,0.35); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(45,212,175,0.24)'; this.style.borderColor='#2dd4bf'; this.style.transform='translateX(2px)';" onmouseout="this.style.background='rgba(45,212,175,0.12)'; this.style.borderColor='rgba(45,212,175,0.35)'; this.style.transform='translateX(0)';" title="Klik untuk melihat detail seluruh store HIT (DK ≤3 / LK ≤5 hari)">
+            <div style="display: flex; align-items: center; gap: 7px;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #2dd4bf; box-shadow: 0 0 6px rgba(45,212,175,0.8);"></div>
                 <span style="font-size: 0.85em; color: #2dd4bf; font-weight: bold;">Hit (DK ≤3 / LK ≤5 hari)</span>
             </div>
-            <span id="hub-sla-hit" style="font-size: 0.9em; font-weight: bold; color: #2dd4bf;">0 store</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; background: rgba(255,68,68,0.1); border-radius: 6px;">
             <div style="display: flex; align-items: center; gap: 6px;">
-                <div style="width: 6px; height: 6px; border-radius: 50%; background: #ff6b6b;"></div>
+                <span id="hub-sla-hit" style="font-size: 0.95em; font-weight: 800; color: #2dd4bf;">0 store</span>
+                <i class="fas fa-chevron-right" style="font-size: 0.72em; color: #2dd4bf; opacity: 0.8;"></i>
+            </div>
+        </div>
+        <div id="hub-sla-miss-row" onclick="openHubSlaDetailModal('MISS')" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,68,68,0.12); border: 1px solid rgba(255,68,68,0.35); border-radius: 6px; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(255,68,68,0.24)'; this.style.borderColor='#ff6b6b'; this.style.transform='translateX(2px)';" onmouseout="this.style.background='rgba(255,68,68,0.12)'; this.style.borderColor='rgba(255,68,68,0.35)'; this.style.transform='translateX(0)';" title="Klik untuk melihat detail seluruh store MISS (DK >3 / LK >5 hari)">
+            <div style="display: flex; align-items: center; gap: 7px;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #ff6b6b; box-shadow: 0 0 6px rgba(255,107,107,0.8);"></div>
                 <span style="font-size: 0.85em; color: #ff6b6b; font-weight: bold;">Miss (DK &gt;3 / LK &gt;5 hari)</span>
             </div>
-            <span id="hub-sla-miss" style="font-size: 0.9em; font-weight: bold; color: #ff6b6b;">0 store</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span id="hub-sla-miss" style="font-size: 0.95em; font-weight: 800; color: #ff6b6b;">0 store</span>
+                <i class="fas fa-chevron-right" style="font-size: 0.72em; color: #ff6b6b; opacity: 0.8;"></i>
+            </div>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 0.8em; padding: 6px 10px; color: #888; border-top: 1px solid #333; margin-top: 2px;">
             <span>Total dihitung</span>
             <span id="hub-sla-total" style="font-weight: bold; color: #aaa;">0 store</span>
+        </div>
+        <div style="text-align: center; font-size: 0.68em; color: #ffd700; opacity: 0.85; margin-top: 2px;">
+            <i class="fas fa-hand-pointer" style="margin-right: 4px;"></i> Klik baris Hit / Miss untuk melihat rincian store
         </div>
     </div>
 </div>
@@ -8130,8 +8448,11 @@
                             <span>DK: <b>-</b></span><span>LK: <b>-</b></span><span>LP: <b>-</b></span>
                         </div>
                     </div>
-                    <div class="astor-kpi-card hit">
-                        <div class="astor-kpi-label">SLA HIT</div>
+                    <div class="astor-kpi-card hit" onclick="openAstorSlaDetailModal('HIT', 'ALL')" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(45,212,175,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='';" title="Klik untuk melihat detail seluruh order SLA HIT Astor">
+                        <div class="astor-kpi-label" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>SLA HIT</span>
+                            <i class="fas fa-arrow-up-right-from-square" style="font-size: 0.72em; opacity: 0.7; color: #2dd4bf;"></i>
+                        </div>
                         <div class="astor-kpi-value" id="astor-hit">—</div>
                         <div style="font-size:0.7em;color:#2dd4bf;opacity:0.8;margin-bottom:6px;font-style:italic;">(DK ≤3 / LK ≤5 hari)</div>
                         <div class="astor-kpi-breakdown" id="astor-hit-breakdown">
@@ -8139,8 +8460,11 @@
                             <span>DK: <b>-</b></span><span>LK: <b>-</b></span><span>LP: <b>-</b></span>
                         </div>
                     </div>
-                    <div class="astor-kpi-card miss">
-                        <div class="astor-kpi-label">SLA MISS</div>
+                    <div class="astor-kpi-card miss" onclick="openAstorSlaDetailModal('MISS', 'ALL')" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(248,113,113,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='';" title="Klik untuk melihat detail seluruh order SLA MISS Astor">
+                        <div class="astor-kpi-label" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>SLA MISS</span>
+                            <i class="fas fa-arrow-up-right-from-square" style="font-size: 0.72em; opacity: 0.7; color: #f87171;"></i>
+                        </div>
                         <div class="astor-kpi-value" id="astor-miss">—</div>
                         <div style="font-size:0.7em;color:#f87171;opacity:0.8;margin-bottom:6px;font-style:italic;">(DK >3 / LK >5 hari)</div>
                         <div class="astor-kpi-breakdown" id="astor-miss-breakdown">
@@ -10640,16 +10964,19 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             if (!mapEl) return;
         
             if (!fbiMap) {
-                // Initialize Leaflet Map (mimicking Google Maps)
+                // Initialize Leaflet Map with OpenStreetMap tiles (No API Key required)
                 fbiMap = L.map('fbi-google-map').setView([-5.0, 115.0], 5);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                    attribution: '© OpenStreetMap, © CARTO'
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 19
                 }).addTo(fbiMap);
                 fbiMarkersLayer = L.layerGroup().addTo(fbiMap);
             } else {
-                fbiMap.invalidateSize();
                 if (fbiMarkersLayer) fbiMarkersLayer.clearLayers();
             }
+            setTimeout(() => {
+                if (fbiMap) fbiMap.invalidateSize();
+            }, 150);
         
             // Wilayah FBI coverage markers
         const wilayahData = [
@@ -11358,20 +11685,65 @@ return matchesLoading && matchesLc && matchesArmadaStatus && matchesAging && mat
     if (sudahLoadingEl) sudahLoadingEl.textContent = `${formatIndo(cbmSudahLoading)} CBM`;
     if (belumLoadingEl) belumLoadingEl.textContent = `${formatIndo(cbmBelumLoading)} CBM`;
 
-    // SLA Calculation
-    // SLA Calculation
-let slaHit = 0, slaMiss = 0;
-filteredHubData.forEach(row => {
-    const statusLoading = (row[13] || '').toUpperCase();
-    const isSudahLoading = statusLoading.includes('SUDAH LOADING') || statusLoading.includes('SUDAH MUAT');
-    if (!isSudahLoading) return;
-    const agingVal = parseInt(row[agingHariIdx]) || 0;
-    const rowRegion = (row[regionIdx] || '').trim().toUpperCase();
-    const isDK = rowRegion === 'JATIM DK';
-    const slaThreshold = isDK ? 3 : 5;
-    if (agingVal >= 0 && agingVal <= slaThreshold) slaHit++;
-    else slaMiss++;
-});
+    // SLA Calculation & Detail Records Collection
+    window.hubSlaHitList = [];
+    window.hubSlaMissList = [];
+
+    const hTglIdx = hubHeaderNames.findIndex(h => h.toUpperCase().includes('TANGGAL') && h.toUpperCase().includes('KEDATANGAN'));
+    const tglCol = hTglIdx !== -1 ? hTglIdx : 0;
+    const hLcPembawaIdx = hubHeaderNames.findIndex(h => h.toUpperCase().includes('LC PEMBAWA'));
+    const lcPembawaCol = hLcPembawaIdx !== -1 ? hLcPembawaIdx : 1;
+    const hKodeStoreIdx = hubHeaderNames.findIndex(h => h.toUpperCase().includes('KODE STORE'));
+    const kodeStoreCol = hKodeStoreIdx !== -1 ? hKodeStoreIdx : 3;
+    const hStoreNameIdx = hubHeaderNames.findIndex(h => h.toUpperCase().includes('STORE NAME') || h.toUpperCase().includes('NAMA STORE'));
+    const storeNameCol = hStoreNameIdx !== -1 ? hStoreNameIdx : 4;
+    const hCbmIdx = hubHeaderNames.findIndex(h => h.toUpperCase().includes('TOTAL CBM') || h.toUpperCase() === 'CBM');
+    const cbmCol = hCbmIdx !== -1 ? hCbmIdx : 8;
+    const hPlanLoadIdx = hubHeaderNames.findIndex(h => h.toUpperCase().includes('PLAN LOADING'));
+    const planLoadCol = hPlanLoadIdx !== -1 ? hPlanLoadIdx : 14;
+
+    filteredHubData.forEach((row, originalIdx) => {
+        const statusLoading = (row[13] || '').toUpperCase();
+        const isSudahLoading = statusLoading.includes('SUDAH LOADING') || statusLoading.includes('SUDAH MUAT');
+        if (!isSudahLoading) return;
+        const agingVal = parseInt(row[agingHariIdx]) || 0;
+        const rowRegion = (row[regionIdx] || '').trim();
+        const isDK = rowRegion.toUpperCase() === 'JATIM DK';
+        const slaThreshold = isDK ? 3 : 5;
+        const tglVal = row[tglCol] || '';
+
+        const record = {
+            id: originalIdx + 1,
+            tanggal: tglVal,
+            hari: getDayName(tglVal),
+            lcPembawa: (row[lcPembawaCol] || '').trim(),
+            region: rowRegion,
+            isDK: isDK,
+            area: isDK ? 'DK' : 'LK',
+            slaThreshold: slaThreshold,
+            kodeStore: (row[kodeStoreCol] || '').trim(),
+            storeName: (row[storeNameCol] || '').trim(),
+            cbm: parseNumberWithComma(row[cbmCol]),
+            aging: agingVal,
+            noLc: noLcIdx !== -1 ? (row[noLcIdx] || '').trim() : '',
+            statusArmada: (row[statusArmadaIdx] || '').trim(),
+            keteranganLoading: (row[13] || '').trim(),
+            planLoading: (row[planLoadCol] || '').trim()
+        };
+
+        if (agingVal >= 0 && agingVal <= slaThreshold) {
+            record.status = 'HIT';
+            record.diffDays = slaThreshold - agingVal;
+            window.hubSlaHitList.push(record);
+        } else {
+            record.status = 'MISS';
+            record.diffDays = agingVal - slaThreshold;
+            window.hubSlaMissList.push(record);
+        }
+    });
+
+    const slaHit = window.hubSlaHitList.length;
+    const slaMiss = window.hubSlaMissList.length;
 
     const slaTotal = slaHit + slaMiss;
     const slaRate = slaTotal > 0 ? (slaHit / slaTotal * 100) : 0;
@@ -11479,6 +11851,13 @@ filteredHubData.forEach(row => {
         bodyHtml += '</tr>';
     });
     tbody.innerHTML = bodyHtml;
+
+    // Auto-update Hub SLA detail modal if currently open
+    const hubSlaModal = document.getElementById('modal-hub-sla-detail');
+    if (hubSlaModal && !hubSlaModal.classList.contains('hidden')) {
+        updateHubSlaModalHeaderUI();
+        renderHubSlaDetailTable();
+    }
 }
         
 function hubSort(colIdx) {
@@ -11518,6 +11897,837 @@ function hubSort(colIdx) {
             XLSX.utils.book_append_sheet(workbook, worksheet, "Hub Data");
             XLSX.writeFile(workbook, "Hub_Summary_Data.xlsx");
         }
+
+        /* ========================================================
+           SLA HUB GRW DETAIL MODAL (HIT & MISS)
+           ======================================================== */
+        window.currentHubSlaModalType = 'HIT';
+        window.currentHubSlaAreaFilter = 'ALL';
+        window.currentHubSlaSearch = '';
+        window.hubSlaSortCol = 'aging';
+        window.hubSlaSortDir = 'desc';
+        window.hubSlaDisplayLimit = 250;
+
+        window.openHubSlaDetailModal = function(type) {
+            window.currentHubSlaModalType = (type || 'HIT').toUpperCase();
+            window.currentHubSlaAreaFilter = 'ALL';
+            window.currentHubSlaSearch = '';
+            window.hubSlaSortCol = 'aging';
+            window.hubSlaSortDir = window.currentHubSlaModalType === 'MISS' ? 'desc' : 'asc';
+            window.hubSlaDisplayLimit = 250;
+
+            const searchInput = document.getElementById('hub-sla-search-input');
+            if (searchInput) searchInput.value = '';
+
+            // Reset area filter buttons
+            document.querySelectorAll('.hub-sla-area-btn').forEach(btn => {
+                if (btn.getAttribute('data-area') === 'ALL') {
+                    btn.style.background = '#3b82f6';
+                    btn.style.color = '#fff';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#94a3b8';
+                }
+            });
+
+            updateHubSlaModalHeaderUI();
+            renderHubSlaDetailTable();
+
+            const modal = document.getElementById('modal-hub-sla-detail');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        };
+
+        window.closeHubSlaDetailModal = function() {
+            const modal = document.getElementById('modal-hub-sla-detail');
+            if (modal) modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        window.handleHubSlaBackdropClick = function(e) {
+            if (e.target && e.target.id === 'modal-hub-sla-detail') {
+                closeHubSlaDetailModal();
+            }
+        };
+
+        window.switchHubSlaModalTab = function(type) {
+            window.currentHubSlaModalType = (type || 'HIT').toUpperCase();
+            window.hubSlaDisplayLimit = 250;
+            window.hubSlaSortCol = 'aging';
+            window.hubSlaSortDir = window.currentHubSlaModalType === 'MISS' ? 'desc' : 'asc';
+            updateHubSlaModalHeaderUI();
+            renderHubSlaDetailTable();
+        };
+
+        window.setHubSlaAreaFilter = function(area) {
+            window.currentHubSlaAreaFilter = area;
+            document.querySelectorAll('.hub-sla-area-btn').forEach(btn => {
+                if (btn.getAttribute('data-area') === area) {
+                    btn.style.background = '#3b82f6';
+                    btn.style.color = '#fff';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#94a3b8';
+                }
+            });
+            renderHubSlaDetailTable();
+        };
+
+        window.handleHubSlaSearchInput = function() {
+            const input = document.getElementById('hub-sla-search-input');
+            window.currentHubSlaSearch = input ? input.value.trim().toLowerCase() : '';
+            renderHubSlaDetailTable();
+        };
+
+        function updateHubSlaModalHeaderUI() {
+            const isHit = window.currentHubSlaModalType === 'HIT';
+            const hitCount = window.hubSlaHitList ? window.hubSlaHitList.length : 0;
+            const missCount = window.hubSlaMissList ? window.hubSlaMissList.length : 0;
+
+            const card = document.getElementById('hub-sla-modal-card');
+            const header = document.getElementById('hub-sla-modal-header');
+            const iconWrap = document.getElementById('hub-sla-modal-icon-wrap');
+            const icon = document.getElementById('hub-sla-modal-icon');
+            const title = document.getElementById('hub-sla-modal-title');
+            const badge = document.getElementById('hub-sla-modal-badge');
+            const subtitle = document.getElementById('hub-sla-modal-subtitle');
+            const tabHit = document.getElementById('tab-sla-hit');
+            const tabMiss = document.getElementById('tab-sla-miss');
+            const hitTabCount = document.getElementById('hub-sla-tab-hit-count');
+            const missTabCount = document.getElementById('hub-sla-tab-miss-count');
+
+            if (hitTabCount) hitTabCount.textContent = formatIndo(hitCount);
+            if (missTabCount) missTabCount.textContent = formatIndo(missCount);
+
+            if (isHit) {
+                if (card) {
+                    card.style.borderColor = 'rgba(45, 212, 175, 0.6)';
+                    card.style.boxShadow = '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(45, 212, 175, 0.25)';
+                }
+                if (header) {
+                    header.style.background = 'linear-gradient(90deg, #092c24 0%, #0f172a 100%)';
+                    header.style.borderBottom = '1px solid rgba(45, 212, 175, 0.4)';
+                }
+                if (iconWrap) {
+                    iconWrap.style.background = 'rgba(45, 212, 175, 0.15)';
+                    iconWrap.style.borderColor = 'rgba(45, 212, 175, 0.5)';
+                    iconWrap.style.color = '#2dd4bf';
+                }
+                if (icon) icon.className = 'fas fa-circle-check';
+                if (title) title.innerHTML = 'DETAIL SLA HUB GRW — <span style="color: #2dd4bf;">HIT (ON-TIME)</span>';
+                if (badge) {
+                    badge.style.background = '#2dd4bf';
+                    badge.style.color = '#042f2e';
+                    badge.textContent = `${formatIndo(hitCount)} STORE`;
+                }
+                if (subtitle) {
+                    subtitle.textContent = 'Daftar store dengan proses muat tepat waktu • Target SLA: Area DK ≤ 3 Hari, Area LK ≤ 5 Hari';
+                }
+                if (tabHit) {
+                    tabHit.style.background = '#2dd4bf';
+                    tabHit.style.color = '#042f2e';
+                }
+                if (tabMiss) {
+                    tabMiss.style.background = 'transparent';
+                    tabMiss.style.color = '#94a3b8';
+                }
+            } else {
+                if (card) {
+                    card.style.borderColor = 'rgba(239, 68, 68, 0.6)';
+                    card.style.boxShadow = '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(239, 68, 68, 0.25)';
+                }
+                if (header) {
+                    header.style.background = 'linear-gradient(90deg, #350c0c 0%, #0f172a 100%)';
+                    header.style.borderBottom = '1px solid rgba(239, 68, 68, 0.4)';
+                }
+                if (iconWrap) {
+                    iconWrap.style.background = 'rgba(239, 68, 68, 0.15)';
+                    iconWrap.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+                    iconWrap.style.color = '#f87171';
+                }
+                if (icon) icon.className = 'fas fa-triangle-exclamation';
+                if (title) title.innerHTML = 'DETAIL SLA HUB GRW — <span style="color: #f87171;">MISS (DELAY)</span>';
+                if (badge) {
+                    badge.style.background = '#ef4444';
+                    badge.style.color = '#fff';
+                    badge.textContent = `${formatIndo(missCount)} STORE`;
+                }
+                if (subtitle) {
+                    subtitle.textContent = 'Daftar store dengan proses muat melebihi batas target SLA (Area DK > 3 Hari, Area LK > 5 Hari)';
+                }
+                if (tabHit) {
+                    tabHit.style.background = 'transparent';
+                    tabHit.style.color = '#94a3b8';
+                }
+                if (tabMiss) {
+                    tabMiss.style.background = '#ef4444';
+                    tabMiss.style.color = '#fff';
+                }
+            }
+        }
+
+        window.sortHubSlaDetail = function(col) {
+            if (window.hubSlaSortCol === col) {
+                window.hubSlaSortDir = window.hubSlaSortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                window.hubSlaSortCol = col;
+                window.hubSlaSortDir = (col === 'cbm' || col === 'aging') ? 'desc' : 'asc';
+            }
+            renderHubSlaDetailTable();
+        };
+
+        window.renderHubSlaDetailTable = function() {
+            const isHit = window.currentHubSlaModalType === 'HIT';
+            const sourceList = isHit ? (window.hubSlaHitList || []) : (window.hubSlaMissList || []);
+            const areaFilter = window.currentHubSlaAreaFilter || 'ALL';
+            const searchQuery = window.currentHubSlaSearch || '';
+
+            // 1. Filter Area & Search
+            let filtered = sourceList.filter(item => {
+                if (areaFilter === 'DK' && !item.isDK) return false;
+                if (areaFilter === 'LK' && item.isDK) return false;
+
+                if (searchQuery) {
+                    const matchText = `${item.kodeStore} ${item.storeName} ${item.lcPembawa} ${item.noLc} ${item.region} ${item.statusArmada} ${item.keteranganLoading}`.toLowerCase();
+                    if (!matchText.includes(searchQuery)) return false;
+                }
+                return true;
+            });
+
+            // 2. Sort
+            const col = window.hubSlaSortCol || 'aging';
+            const dir = window.hubSlaSortDir || 'asc';
+            filtered.sort((a, b) => {
+                let vA = a[col];
+                let vB = b[col];
+                if (col === 'cbm' || col === 'aging' || col === 'diffDays') {
+                    vA = Number(vA) || 0;
+                    vB = Number(vB) || 0;
+                    return dir === 'asc' ? vA - vB : vB - vA;
+                }
+                vA = String(vA || '').toLowerCase();
+                vB = String(vB || '').toLowerCase();
+                return dir === 'asc' ? vA.localeCompare(vB) : vB.localeCompare(a);
+            });
+
+            // Update sort icons in table header
+            ['tanggal', 'hari', 'lcPembawa', 'region', 'kodeStore', 'storeName', 'cbm', 'aging', 'noLc'].forEach(c => {
+                const iconEl = document.getElementById(`sort-icon-${c}`);
+                if (iconEl) {
+                    if (c === col) {
+                        iconEl.textContent = dir === 'asc' ? '▲' : '▼';
+                        iconEl.style.color = '#ffd700';
+                    } else {
+                        iconEl.textContent = '⇅';
+                        iconEl.style.color = '#64748b';
+                    }
+                }
+            });
+
+            // 3. Update Ribbon KPIs
+            const totalStore = filtered.length;
+            const totalCbm = filtered.reduce((acc, it) => acc + (it.cbm || 0), 0);
+            const dkItems = filtered.filter(it => it.isDK);
+            const lkItems = filtered.filter(it => !it.isDK);
+            const dkCbm = dkItems.reduce((acc, it) => acc + (it.cbm || 0), 0);
+            const lkCbm = lkItems.reduce((acc, it) => acc + (it.cbm || 0), 0);
+            const avgAging = totalStore > 0 ? (filtered.reduce((acc, it) => acc + (it.aging || 0), 0) / totalStore).toFixed(1) : '0.0';
+            const maxAging = totalStore > 0 ? Math.max(...filtered.map(it => it.aging || 0)) : 0;
+
+            const statStoresEl = document.getElementById('hub-sla-stat-stores');
+            const statCbmEl = document.getElementById('hub-sla-stat-cbm');
+            const statDkEl = document.getElementById('hub-sla-stat-dk');
+            const statLkEl = document.getElementById('hub-sla-stat-lk');
+            const statAvgAgingEl = document.getElementById('hub-sla-stat-avg-aging');
+            const statMaxAgingEl = document.getElementById('hub-sla-stat-max-aging');
+            const countInfoEl = document.getElementById('hub-sla-count-info');
+
+            if (statStoresEl) statStoresEl.textContent = formatIndo(totalStore);
+            if (statCbmEl) statCbmEl.textContent = `${formatIndo(totalCbm)} CBM`;
+            if (statDkEl) statDkEl.textContent = `DK: ${formatIndo(dkItems.length)} store (${formatIndo(dkCbm)} CBM)`;
+            if (statLkEl) statLkEl.textContent = `LK: ${formatIndo(lkItems.length)} store (${formatIndo(lkCbm)} CBM)`;
+            if (statAvgAgingEl) statAvgAgingEl.textContent = `${avgAging} Hari`;
+            if (statMaxAgingEl) statMaxAgingEl.textContent = `Aging Maksimal: ${maxAging} Hari`;
+
+            const displayLimit = window.hubSlaDisplayLimit || 250;
+            if (countInfoEl) {
+                countInfoEl.textContent = `Menampilkan ${Math.min(totalStore, displayLimit)} dari ${formatIndo(totalStore)} data`;
+            }
+
+            // 4. Render Table Rows
+            const tbody = document.getElementById('hub-sla-detail-tbody');
+            if (!tbody) return;
+
+            if (totalStore === 0) {
+                const emptyMsg = isHit
+                    ? 'Tidak ada store dengan status HIT untuk filter atau pencarian saat ini.'
+                    : 'Tidak ada store dengan status MISS untuk filter atau pencarian saat ini. Performa SLA sempurna!';
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="11" style="text-align: center; padding: 45px 20px; color: #94a3b8; background: #0c1222;">
+                            <i class="${isHit ? 'fas fa-info-circle' : 'fas fa-check-circle'}" style="font-size: 2.2rem; color: ${isHit ? '#38bdf8' : '#4ade80'}; margin-bottom: 12px; display: inline-block;"></i>
+                            <div style="font-size: 0.95rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px;">Data Kosong</div>
+                            <div style="font-size: 0.82rem; color: #94a3b8;">${emptyMsg}</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const visibleItems = filtered.slice(0, displayLimit);
+            let html = '';
+
+            visibleItems.forEach((item, idx) => {
+                const rowBg = idx % 2 === 0 ? '#0d1527' : '#080d19';
+                const hariColor = item.hari === 'MINGGU' ? '#ff6b6b' : item.hari === 'SABTU' ? '#ffd700' : '#4ade80';
+                
+                let slaBadgeHtml = '';
+                if (item.status === 'HIT') {
+                    slaBadgeHtml = `<span style="background: rgba(45, 212, 175, 0.15); color: #2dd4bf; border: 1px solid rgba(45, 212, 175, 0.4); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;"><i class="fas fa-check"></i> HIT (≤ ${item.slaThreshold}h)</span>`;
+                } else {
+                    slaBadgeHtml = `<span style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.5); padding: 3px 8px; border-radius: 4px; font-weight: 700; font-size: 0.75rem; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;"><i class="fas fa-triangle-exclamation"></i> MISS (+${item.diffDays}h)</span>`;
+                }
+
+                html += `
+                    <tr style="background: ${rowBg}; border-bottom: 1px solid #1a253a; transition: background 0.15s ease;" onmouseover="this.style.background='#162238'" onmouseout="this.style.background='${rowBg}'">
+                        <td style="padding: 8px; border: 1px solid #1a253a; text-align: center; color: #64748b; font-weight: 600;">${idx + 1}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a253a; color: #e2e8f0; white-space: nowrap;">${item.tanggal || '—'}</td>
+                        <td style="padding: 8px; border: 1px solid #1a253a; text-align: center; font-weight: bold; color: ${hariColor}; white-space: nowrap;">${item.hari || '—'}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a253a; font-family: monospace; color: #38bdf8; font-weight: 600; white-space: nowrap;">${item.lcPembawa || '—'}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a253a; white-space: nowrap;">
+                            <span style="font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; font-weight: 800; background: ${item.isDK ? 'rgba(56, 189, 248, 0.18)' : 'rgba(244, 114, 182, 0.18)'}; color: ${item.isDK ? '#38bdf8' : '#f472b6'}; margin-right: 5px;">${item.area}</span>
+                            <span style="font-size: 0.8rem; color: #94a3b8;">${item.region}</span>
+                        </td>
+                        <td style="padding: 8px; border: 1px solid #1a253a; text-align: center; font-weight: 800; color: #ffd700; white-space: nowrap;">${item.kodeStore || '—'}</td>
+                        <td style="padding: 8px 12px; border: 1px solid #1a253a; font-weight: 600; color: #fff;">${item.storeName || '—'}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a253a; text-align: right; font-family: monospace; font-weight: 700; color: #ffd700; white-space: nowrap;">${formatIndo(item.cbm)}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a253a; text-align: center; white-space: nowrap;">
+                            <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 0.85em; background: ${item.status === 'HIT' ? 'rgba(45, 212, 175, 0.12)' : 'rgba(239, 68, 68, 0.12)'}; color: ${item.status === 'HIT' ? '#2dd4bf' : '#f87171'}; border: 1px solid ${item.status === 'HIT' ? 'rgba(45, 212, 175, 0.3)' : 'rgba(239, 68, 68, 0.4)'};">${item.aging} Hari</span>
+                        </td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a253a; text-align: center; white-space: nowrap;">${slaBadgeHtml}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a253a; font-family: monospace; color: ${item.noLc ? '#4ade80' : '#64748b'}; white-space: nowrap;">${item.noLc || '—'}</td>
+                    </tr>
+                `;
+            });
+
+            // Pagination load more if needed
+            if (totalStore > displayLimit) {
+                const remaining = totalStore - displayLimit;
+                html += `
+                    <tr>
+                        <td colspan="11" style="text-align: center; padding: 14px; background: #0b1120; border: 1px solid #1a253a;">
+                            <button onclick="window.hubSlaDisplayLimit += 300; renderHubSlaDetailTable();" style="background: #2563eb; color: #fff; border: none; padding: 6px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.82em; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-plus-circle"></i> Muat 300 Data Tambahan (${remaining} data tersisa)
+                            </button>
+                            <button onclick="window.hubSlaDisplayLimit = 999999; renderHubSlaDetailTable();" style="background: #334155; color: #fff; border: 1px solid #475569; padding: 6px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.82em; margin-left: 8px;">
+                                Tampilkan Semua (${formatIndo(totalStore)})
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            tbody.innerHTML = html;
+        };
+
+        window.exportHubSlaDetailToExcel = function() {
+            const isHit = window.currentHubSlaModalType === 'HIT';
+            const sourceList = isHit ? (window.hubSlaHitList || []) : (window.hubSlaMissList || []);
+            const areaFilter = window.currentHubSlaAreaFilter || 'ALL';
+            const searchQuery = window.currentHubSlaSearch || '';
+
+            const filtered = sourceList.filter(item => {
+                if (areaFilter === 'DK' && !item.isDK) return false;
+                if (areaFilter === 'LK' && item.isDK) return false;
+                if (searchQuery) {
+                    const matchText = `${item.kodeStore} ${item.storeName} ${item.lcPembawa} ${item.noLc} ${item.region}`.toLowerCase();
+                    if (!matchText.includes(searchQuery)) return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                alert("Tidak ada data untuk diexport.");
+                return;
+            }
+
+            const exportData = filtered.map((item, idx) => ({
+                "NO": idx + 1,
+                "TANGGAL KEDATANGAN": item.tanggal,
+                "HARI": item.hari,
+                "LC PEMBAWA": item.lcPembawa,
+                "REGION": item.region,
+                "AREA": item.area,
+                "TARGET SLA (HARI)": item.slaThreshold,
+                "KODE STORE": item.kodeStore,
+                "NAMA STORE": item.storeName,
+                "TOTAL CBM": item.cbm,
+                "AGING (HARI)": item.aging,
+                "STATUS SLA": item.status,
+                "KETERANGAN SLA": item.status === 'HIT' ? `Tepat Waktu (Sisa ${item.diffDays} hari)` : `Terlambat (Lewat +${item.diffDays} hari)`,
+                "NOMOR LC": item.noLc
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            const sheetName = isHit ? "SLA_HIT" : "SLA_MISS";
+            XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            const fileName = `Detail_SLA_Hub_GRW_${window.currentHubSlaModalType}_${todayStr}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+        };
+
+        /* ========================================================
+           SLA ASTOR DETAIL MODAL (HIT & MISS)
+           ======================================================== */
+        window.currentAstorSlaModalType = 'HIT';
+        window.currentAstorSlaBuFilter = 'ALL';
+        window.currentAstorSlaAreaFilter = 'ALL';
+        window.currentAstorSlaSearch = '';
+        window.astorSlaSortCol = 'aging';
+        window.astorSlaSortDir = 'desc';
+        window.astorSlaDisplayLimit = 250;
+
+        window.openAstorSlaDetailModal = function(type, bu = 'ALL') {
+            window.currentAstorSlaModalType = (type || 'HIT').toUpperCase();
+            window.currentAstorSlaBuFilter = (bu || 'ALL').toUpperCase();
+            window.currentAstorSlaAreaFilter = 'ALL';
+            window.currentAstorSlaSearch = '';
+            window.astorSlaSortCol = 'aging';
+            window.astorSlaSortDir = window.currentAstorSlaModalType === 'MISS' ? 'desc' : 'asc';
+            window.astorSlaDisplayLimit = 250;
+
+            const searchInput = document.getElementById('astor-sla-search-input');
+            if (searchInput) searchInput.value = '';
+
+            // Update BU filter buttons
+            document.querySelectorAll('.astor-sla-bu-btn').forEach(btn => {
+                if (btn.getAttribute('data-bu') === window.currentAstorSlaBuFilter) {
+                    btn.style.background = '#3b82f6';
+                    btn.style.color = '#fff';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#94a3b8';
+                }
+            });
+
+            // Reset Area filter buttons
+            document.querySelectorAll('.astor-sla-area-btn').forEach(btn => {
+                if (btn.getAttribute('data-area') === 'ALL') {
+                    btn.style.background = '#3b82f6';
+                    btn.style.color = '#fff';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#94a3b8';
+                }
+            });
+
+            updateAstorSlaModalHeaderUI();
+            renderAstorSlaDetailTable();
+
+            const modal = document.getElementById('modal-astor-sla-detail');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        };
+
+        window.closeAstorSlaDetailModal = function() {
+            const modal = document.getElementById('modal-astor-sla-detail');
+            if (modal) modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        window.handleAstorSlaBackdropClick = function(e) {
+            if (e.target && e.target.id === 'modal-astor-sla-detail') {
+                closeAstorSlaDetailModal();
+            }
+        };
+
+        window.switchAstorSlaModalTab = function(type) {
+            window.currentAstorSlaModalType = (type || 'HIT').toUpperCase();
+            window.astorSlaDisplayLimit = 250;
+            window.astorSlaSortCol = 'aging';
+            window.astorSlaSortDir = window.currentAstorSlaModalType === 'MISS' ? 'desc' : 'asc';
+            updateAstorSlaModalHeaderUI();
+            renderAstorSlaDetailTable();
+        };
+
+        window.setAstorSlaBuFilter = function(bu) {
+            window.currentAstorSlaBuFilter = bu;
+            document.querySelectorAll('.astor-sla-bu-btn').forEach(btn => {
+                if (btn.getAttribute('data-bu') === bu) {
+                    btn.style.background = '#3b82f6';
+                    btn.style.color = '#fff';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#94a3b8';
+                }
+            });
+            renderAstorSlaDetailTable();
+        };
+
+        window.setAstorSlaAreaFilter = function(area) {
+            window.currentAstorSlaAreaFilter = area;
+            document.querySelectorAll('.astor-sla-area-btn').forEach(btn => {
+                if (btn.getAttribute('data-area') === area) {
+                    btn.style.background = '#3b82f6';
+                    btn.style.color = '#fff';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#94a3b8';
+                }
+            });
+            renderAstorSlaDetailTable();
+        };
+
+        window.handleAstorSlaSearchInput = function() {
+            const input = document.getElementById('astor-sla-search-input');
+            window.currentAstorSlaSearch = input ? input.value.trim().toLowerCase() : '';
+            renderAstorSlaDetailTable();
+        };
+
+        function updateAstorSlaModalHeaderUI() {
+            const isHit = window.currentAstorSlaModalType === 'HIT';
+            const hitCount = window.astorHitList ? window.astorHitList.length : 0;
+            const missCount = window.astorMissList ? window.astorMissList.length : 0;
+
+            const card = document.getElementById('astor-sla-modal-card');
+            const header = document.getElementById('astor-sla-modal-header');
+            const iconWrap = document.getElementById('astor-sla-modal-icon-wrap');
+            const icon = document.getElementById('astor-sla-modal-icon');
+            const title = document.getElementById('astor-sla-modal-title');
+            const badge = document.getElementById('astor-sla-modal-badge');
+            const subtitle = document.getElementById('astor-sla-modal-subtitle');
+            const tabHit = document.getElementById('tab-astor-sla-hit');
+            const tabMiss = document.getElementById('tab-astor-sla-miss');
+            const hitTabCount = document.getElementById('astor-sla-tab-hit-count');
+            const missTabCount = document.getElementById('astor-sla-tab-miss-count');
+
+            if (hitTabCount) hitTabCount.textContent = formatIndo ? formatIndo(hitCount) : hitCount;
+            if (missTabCount) missTabCount.textContent = formatIndo ? formatIndo(missCount) : missCount;
+
+            if (isHit) {
+                if (card) {
+                    card.style.borderColor = 'rgba(45, 212, 175, 0.6)';
+                    card.style.boxShadow = '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(45, 212, 175, 0.25)';
+                }
+                if (header) {
+                    header.style.background = 'linear-gradient(90deg, #092c24 0%, #0f172a 100%)';
+                    header.style.borderBottom = '1px solid rgba(45, 212, 175, 0.4)';
+                }
+                if (iconWrap) {
+                    iconWrap.style.background = 'rgba(45, 212, 175, 0.15)';
+                    iconWrap.style.borderColor = 'rgba(45, 212, 175, 0.5)';
+                    iconWrap.style.color = '#2dd4bf';
+                }
+                if (icon) icon.className = 'fas fa-circle-check';
+                if (title) title.innerHTML = 'DETAIL SLA ASTOR — <span style="color: #2dd4bf;">HIT (ON-TIME)</span>';
+                if (badge) {
+                    badge.style.background = '#2dd4bf';
+                    badge.style.color = '#042f2e';
+                    badge.textContent = `${formatIndo ? formatIndo(hitCount) : hitCount} ORDER`;
+                }
+                if (subtitle) {
+                    subtitle.textContent = 'Daftar order Astor dengan pemenuhan tepat waktu • Target SLA: Area DK ≤ 3 Hari, Area LK ≤ 5 Hari';
+                }
+                if (tabHit) {
+                    tabHit.style.background = '#2dd4bf';
+                    tabHit.style.color = '#042f2e';
+                }
+                if (tabMiss) {
+                    tabMiss.style.background = 'transparent';
+                    tabMiss.style.color = '#94a3b8';
+                }
+            } else {
+                if (card) {
+                    card.style.borderColor = 'rgba(239, 68, 68, 0.6)';
+                    card.style.boxShadow = '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(239, 68, 68, 0.25)';
+                }
+                if (header) {
+                    header.style.background = 'linear-gradient(90deg, #350c0c 0%, #0f172a 100%)';
+                    header.style.borderBottom = '1px solid rgba(239, 68, 68, 0.4)';
+                }
+                if (iconWrap) {
+                    iconWrap.style.background = 'rgba(239, 68, 68, 0.15)';
+                    iconWrap.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+                    iconWrap.style.color = '#f87171';
+                }
+                if (icon) icon.className = 'fas fa-triangle-exclamation';
+                if (title) title.innerHTML = 'DETAIL SLA ASTOR — <span style="color: #f87171;">MISS (DELAY)</span>';
+                if (badge) {
+                    badge.style.background = '#ef4444';
+                    badge.style.color = '#fff';
+                    badge.textContent = `${formatIndo ? formatIndo(missCount) : missCount} ORDER`;
+                }
+                if (subtitle) {
+                    subtitle.textContent = 'Daftar order Astor yang melebihi batas SLA (Area DK > 3 Hari, Area LK > 5 Hari)';
+                }
+                if (tabHit) {
+                    tabHit.style.background = 'transparent';
+                    tabHit.style.color = '#94a3b8';
+                }
+                if (tabMiss) {
+                    tabMiss.style.background = '#ef4444';
+                    tabMiss.style.color = '#fff';
+                }
+            }
+        }
+
+        window.sortAstorSlaDetail = function(col) {
+            if (window.astorSlaSortCol === col) {
+                window.astorSlaSortDir = window.astorSlaSortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                window.astorSlaSortCol = col;
+                window.astorSlaSortDir = (col === 'cbm' || col === 'aging') ? 'desc' : 'asc';
+            }
+            renderAstorSlaDetailTable();
+        };
+
+        window.renderAstorSlaDetailTable = function() {
+            const isHit = window.currentAstorSlaModalType === 'HIT';
+            const sourceList = isHit ? (window.astorHitList || []) : (window.astorMissList || []);
+            const buFilter = window.currentAstorSlaBuFilter || 'ALL';
+            const areaFilter = window.currentAstorSlaAreaFilter || 'ALL';
+            const searchQuery = window.currentAstorSlaSearch || '';
+
+            // 1. Filter BU, Area, and Search Query
+            let filtered = sourceList.filter(item => {
+                if (buFilter !== 'ALL' && item.bu !== buFilter) return false;
+                if (areaFilter !== 'ALL' && item.area !== areaFilter) return false;
+
+                if (searchQuery) {
+                    const matchText = `${item.tgl} ${item.bu} ${item.rtod} ${item.kota} ${item.region} ${item.area} ${item.lc}`.toLowerCase();
+                    if (!matchText.includes(searchQuery)) return false;
+                }
+                return true;
+            });
+
+            // 2. Sort
+            const col = window.astorSlaSortCol || 'aging';
+            const dir = window.astorSlaSortDir || 'asc';
+            filtered.sort((a, b) => {
+                let vA = a[col];
+                let vB = b[col];
+                if (col === 'cbm' || col === 'aging') {
+                    vA = Number(vA) || 0;
+                    vB = Number(vB) || 0;
+                    return dir === 'asc' ? vA - vB : vB - vA;
+                }
+                vA = String(vA || '').toLowerCase();
+                vB = String(vB || '').toLowerCase();
+                return dir === 'asc' ? vA.localeCompare(vB) : vB.localeCompare(vA);
+            });
+
+            // Update sort icons in table header
+            ['tgl', 'bu', 'rtod', 'kota', 'region', 'area', 'cbm', 'aging', 'lc'].forEach(c => {
+                const iconEl = document.getElementById(`sort-astor-${c}`);
+                if (iconEl) {
+                    if (c === col) {
+                        iconEl.textContent = dir === 'asc' ? '▲' : '▼';
+                        iconEl.style.color = '#ffd700';
+                    } else {
+                        iconEl.textContent = '⇅';
+                        iconEl.style.color = '#64748b';
+                    }
+                }
+            });
+
+            // 3. Stats Ribbon Calculations
+            const totalOrders = filtered.length;
+            const totalCbm = filtered.reduce((acc, it) => acc + (it.cbm || 0), 0);
+            const dkItems = filtered.filter(it => it.area === 'DK');
+            const lkItems = filtered.filter(it => it.area === 'LK');
+            const lpItems = filtered.filter(it => it.area === 'LP');
+            const dkCbm = dkItems.reduce((acc, it) => acc + (it.cbm || 0), 0);
+            const lkCbm = lkItems.reduce((acc, it) => acc + (it.cbm || 0), 0);
+            const lpCbm = lpItems.reduce((acc, it) => acc + (it.cbm || 0), 0);
+            const avgAging = totalOrders > 0 ? (filtered.reduce((acc, it) => acc + (it.aging || 0), 0) / totalOrders).toFixed(1) : '0.0';
+            const maxAging = totalOrders > 0 ? Math.max(...filtered.map(it => it.aging || 0)) : 0;
+
+            const statOrdersEl = document.getElementById('astor-sla-stat-orders');
+            const statCbmEl = document.getElementById('astor-sla-stat-cbm');
+            const statDkEl = document.getElementById('astor-sla-stat-dk');
+            const statLkEl = document.getElementById('astor-sla-stat-lk');
+            const statLpEl = document.getElementById('astor-sla-stat-lp');
+            const statAvgAgingEl = document.getElementById('astor-sla-stat-avg-aging');
+            const statMaxAgingEl = document.getElementById('astor-sla-stat-max-aging');
+            const countInfoEl = document.getElementById('astor-sla-count-info');
+            const buPillsEl = document.getElementById('astor-sla-stat-bu-pills');
+
+            if (statOrdersEl) statOrdersEl.textContent = formatIndo ? formatIndo(totalOrders) : totalOrders;
+            if (statCbmEl) statCbmEl.textContent = `${totalCbm.toFixed(2)} CBM`;
+            if (statDkEl) statDkEl.textContent = `DK: ${dkItems.length} (${dkCbm.toFixed(1)} CBM)`;
+            if (statLkEl) statLkEl.textContent = `LK: ${lkItems.length} (${lkCbm.toFixed(1)} CBM)`;
+            if (statLpEl) statLpEl.textContent = `LP: ${lpItems.length} (${lpCbm.toFixed(1)} CBM)`;
+            if (statAvgAgingEl) statAvgAgingEl.textContent = `${avgAging} Hari`;
+            if (statMaxAgingEl) statMaxAgingEl.textContent = `Aging Maksimal: ${maxAging} Hari`;
+
+            // BU Breakdown pills
+            if (buPillsEl) {
+                const buColors = {
+                    'AZKO': '#60a5fa', 'KWI': '#ffd700', 'TGI': '#a78bfa',
+                    'FBI': '#34d399', 'OTHER': '#f472b6', 'CUSTOMER': '#fb923c'
+                };
+                const buCounts = {};
+                filtered.forEach(it => {
+                    const b = it.bu || 'OTHER';
+                    buCounts[b] = (buCounts[b] || 0) + 1;
+                });
+                buPillsEl.innerHTML = Object.keys(buCounts).map(b => {
+                    const colr = buColors[b] || '#94a3b8';
+                    return `<span style="background: rgba(255,255,255,0.06); border: 1px solid ${colr}40; color: ${colr}; padding: 2px 7px; border-radius: 4px; font-weight: 700;">${b}: ${buCounts[b]}</span>`;
+                }).join('') || '<span style="color:#64748b;">-</span>';
+            }
+
+            // 4. Render Table Rows (Strictly ending at NOMOR LC)
+            const tbody = document.getElementById('astor-sla-detail-tbody');
+            if (!tbody) return;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="11" style="text-align: center; padding: 40px 20px; color: #94a3b8;">
+                            <i class="fas fa-inbox" style="font-size: 2.5em; opacity: 0.4; margin-bottom: 12px; display: block;"></i>
+                            <div style="font-size: 1.05em; font-weight: 600; color: #e2e8f0;">Tidak ada data order SLA ${isHit ? 'HIT' : 'MISS'} yang cocok</div>
+                            <div style="font-size: 0.8em; color: #64748b; margin-top: 4px;">Coba ubah kata kunci pencarian, filter BU, atau filter Area</div>
+                        </td>
+                    </tr>
+                `;
+                if (countInfoEl) countInfoEl.textContent = 'Menampilkan 0 data';
+                return;
+            }
+
+            const limit = window.astorSlaDisplayLimit || 250;
+            const displayed = filtered.slice(0, limit);
+            if (countInfoEl) {
+                countInfoEl.textContent = filtered.length > limit 
+                    ? `Menampilkan ${limit} dari ${formatIndo ? formatIndo(filtered.length) : filtered.length} order` 
+                    : `Menampilkan ${formatIndo ? formatIndo(filtered.length) : filtered.length} order`;
+            }
+
+            const buColors = {
+                'AZKO': '#60a5fa', 'KWI': '#ffd700', 'TGI': '#a78bfa',
+                'FBI': '#34d399', 'OTHER': '#f472b6', 'CUSTOMER': '#fb923c'
+            };
+
+            let html = '';
+            displayed.forEach((item, idx) => {
+                const bgRow = idx % 2 === 0 ? '#0d1527' : '#080d1a';
+                const bCol = buColors[item.bu] || '#ffd700';
+                const slaBadge = isHit 
+                    ? `<span style="background: rgba(45,212,175,0.15); color: #2dd4bf; border: 1px solid rgba(45,212,175,0.4); padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 0.75em;"><i class="fas fa-check" style="margin-right:3px;"></i>HIT</span>`
+                    : `<span style="background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.4); padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 0.75em;"><i class="fas fa-times" style="margin-right:3px;"></i>MISS</span>`;
+
+                const areaBadge = item.area === 'DK' 
+                    ? `<span style="color: #38bdf8; font-weight: 700;">DK</span>`
+                    : (item.area === 'LK' ? `<span style="color: #f472b6; font-weight: 700;">LK</span>` : `<span style="color: #a78bfa; font-weight: 700;">${item.area || '-'}</span>`);
+
+                const lcDisplay = (item.lc && item.lc !== '-' && item.lc.toString().trim() !== '') 
+                    ? `<span style="font-family: monospace; font-weight: 700; color: #93c5fd; background: rgba(59,130,246,0.1); padding: 2px 7px; border-radius: 4px;">${item.lc}</span>` 
+                    : `<span style="color: #64748b; font-style: italic;">-</span>`;
+
+                html += `
+                    <tr style="background: ${bgRow}; border-bottom: 1px solid #1a2640; transition: background 0.15s;" onmouseover="this.style.background='#14223f'" onmouseout="this.style.background='${bgRow}'">
+                        <td style="padding: 8px; border: 1px solid #1a2640; text-align: center; color: #64748b; font-size: 0.8em;">${idx + 1}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a2640; color: #cbd5e1; white-space: nowrap;">${item.tgl || '-'}</td>
+                        <td style="padding: 8px; border: 1px solid #1a2640; text-align: center; font-weight: bold; color: ${bCol}; white-space: nowrap;">
+                            <span style="background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px;">${item.bu || '-'}</span>
+                        </td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a2640; color: #e2e8f0; font-family: monospace; font-weight: 600; white-space: nowrap;">${item.rtod || '-'}</td>
+                        <td style="padding: 8px 12px; border: 1px solid #1a2640; color: #f8fafc; font-weight: 600;">${item.kota || '-'}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a2640; color: #cbd5e1; white-space: nowrap;">${item.region || '-'}</td>
+                        <td style="padding: 8px; border: 1px solid #1a2640; text-align: center; white-space: nowrap;">${areaBadge}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a2640; text-align: right; color: #ffd700; font-weight: 700; white-space: nowrap;">${(item.cbm || 0).toFixed(2)}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a2640; text-align: center; font-weight: 800; color: ${item.aging > 5 ? '#f87171' : (item.aging > 3 ? '#fbbf24' : '#2dd4bf')}; white-space: nowrap;">${item.aging || 0}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a2640; text-align: center; white-space: nowrap;">${slaBadge}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #1a2640; white-space: nowrap;">${lcDisplay}</td>
+                    </tr>
+                `;
+            });
+
+            if (filtered.length > limit) {
+                html += `
+                    <tr>
+                        <td colspan="11" style="text-align: center; padding: 14px; background: #0b1220;">
+                            <button onclick="window.astorSlaDisplayLimit += 250; renderAstorSlaDetailTable();" style="background: #2563eb; color: #fff; border: none; padding: 6px 18px; border-radius: 6px; font-weight: bold; font-size: 0.85em; cursor: pointer;">
+                                Tampilkan Lebih Banyak (+250)
+                            </button>
+                            <button onclick="window.astorSlaDisplayLimit = ${filtered.length}; renderAstorSlaDetailTable();" style="margin-left: 8px; background: #334155; color: #e2e8f0; border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; font-size: 0.85em; cursor: pointer;">
+                                Tampilkan Semua (${filtered.length})
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            tbody.innerHTML = html;
+        };
+
+        window.exportAstorSlaDetailToExcel = function() {
+            const isHit = window.currentAstorSlaModalType === 'HIT';
+            const sourceList = isHit ? (window.astorHitList || []) : (window.astorMissList || []);
+            const buFilter = window.currentAstorSlaBuFilter || 'ALL';
+            const areaFilter = window.currentAstorSlaAreaFilter || 'ALL';
+            const searchQuery = window.currentAstorSlaSearch || '';
+
+            const filtered = sourceList.filter(item => {
+                if (buFilter !== 'ALL' && item.bu !== buFilter) return false;
+                if (areaFilter !== 'ALL' && item.area !== areaFilter) return false;
+                if (searchQuery) {
+                    const matchText = `${item.tgl} ${item.bu} ${item.rtod} ${item.kota} ${item.region} ${item.area} ${item.lc}`.toLowerCase();
+                    if (!matchText.includes(searchQuery)) return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                alert("Tidak ada data untuk diexport.");
+                return;
+            }
+
+            const exportData = filtered.map((item, idx) => ({
+                "NO": idx + 1,
+                "TGL INPUT": item.tgl,
+                "BU": item.bu,
+                "RT / OD": item.rtod,
+                "STORE TUJUAN": item.kota,
+                "REGION": item.region,
+                "AREA": item.area,
+                "TOTAL CBM": item.cbm,
+                "AGING (HARI)": item.aging,
+                "STATUS SLA": isHit ? 'HIT' : 'MISS',
+                "TARGET SLA (HARI)": item.area === 'DK' ? 3 : 5,
+                "NOMOR LC": item.lc || '-'
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            const sheetName = isHit ? "ASTOR_SLA_HIT" : "ASTOR_SLA_MISS";
+            XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            const buSuffix = buFilter !== 'ALL' ? `_${buFilter}` : '';
+            const fileName = `Detail_SLA_Astor_${window.currentAstorSlaModalType}${buSuffix}_${todayStr}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+        };
+
+        // Keyboard Shortcut: Esc to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('modal-hub-sla-detail');
+                if (modal && !modal.classList.contains('hidden')) {
+                    closeHubSlaDetailModal();
+                }
+                const modalAstor = document.getElementById('modal-astor-sla-detail');
+                if (modalAstor && !modalAstor.classList.contains('hidden')) {
+                    closeAstorSlaDetailModal();
+                }
+            }
+        });
 
         function populatePivotAreaFilter() {
             const filter = document.getElementById('pivot-area-filter');
@@ -15731,6 +16941,8 @@ const data = rawAstorData.filter(r => {
     const MAX_LINES = 5;
 
     let osList = [];
+    window.astorHitList = [];
+    window.astorMissList = [];
 
     data.forEach(r => {
         const a = r.area; // DK, LK, LP
@@ -15750,6 +16962,7 @@ const data = rawAstorData.filter(r => {
 
         if (r.sla==='HIT') {
             hit++;
+            window.astorHitList.push(r);
             if(byBu[r.bu])   byBu[r.bu].hit++;
             if(r.area) {
                 if(!byArea[r.area]) byArea[r.area] = { hit:0, miss:0, tot:0 };
@@ -15759,6 +16972,7 @@ const data = rawAstorData.filter(r => {
             if(brk.hit[a] !== undefined) brk.hit[a]++;
         } else if (r.sla==='MISS') {
             miss++;
+            window.astorMissList.push(r);
             if(byBu[r.bu])   byBu[r.bu].miss++;
             if(r.area) {
                 if(!byArea[r.area]) byArea[r.area] = { hit:0, miss:0, tot:0 };
@@ -15957,8 +17171,12 @@ const data = rawAstorData.filter(r => {
 
             return `<tr style="background:${bgRow};border-bottom:1px solid #27272a;">
                 <td style="padding:7px 8px;font-weight:bold;color:${buColor};"><span style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;">${b}</span></td>
-                <td style="padding:7px 8px;text-align:right;color:#2dd4bf;font-weight:bold;">${h}</td>
-                <td style="padding:7px 8px;text-align:right;color:#f87171;font-weight:bold;">${m}</td>
+                <td style="padding:7px 8px;text-align:right;color:#2dd4bf;font-weight:bold;cursor:pointer;transition:all 0.15s;" onclick="openAstorSlaDetailModal('HIT', '${b}')" title="Klik untuk lihat detail HIT BU ${b}" onmouseover="this.style.textDecoration='underline'; this.style.color='#5eead4';" onmouseout="this.style.textDecoration='none'; this.style.color='#2dd4bf';">
+                    <span style="display:inline-flex;align-items:center;gap:4px;">${h} <i class="fas fa-arrow-up-right-from-square" style="font-size:0.7em;opacity:0.6;"></i></span>
+                </td>
+                <td style="padding:7px 8px;text-align:right;color:#f87171;font-weight:bold;cursor:pointer;transition:all 0.15s;" onclick="openAstorSlaDetailModal('MISS', '${b}')" title="Klik untuk lihat detail MISS BU ${b}" onmouseover="this.style.textDecoration='underline'; this.style.color='#fca5a5';" onmouseout="this.style.textDecoration='none'; this.style.color='#f87171';">
+                    <span style="display:inline-flex;align-items:center;gap:4px;">${m} <i class="fas fa-arrow-up-right-from-square" style="font-size:0.7em;opacity:0.6;"></i></span>
+                </td>
                 <td style="padding:7px 8px;text-align:right;color:#fff;font-weight:bold;">${tot}</td>
                 <td style="padding:7px 8px;text-align:center;">${pctDisplay}</td>
                 <td style="padding:7px 8px;text-align:center;">${statusBadge}</td>
@@ -15969,8 +17187,12 @@ const data = rawAstorData.filter(r => {
         const sumPct = sumTot > 0 ? (sumHit / sumTot * 100).toFixed(1) : '-';
         const totalRowHtml = `<tr style="background:#0f172a;border-top:2px solid #334155;font-weight:bold;">
             <td style="padding:8px;color:#ffd700;">TOTAL</td>
-            <td style="padding:8px;text-align:right;color:#2dd4bf;">${sumHit}</td>
-            <td style="padding:8px;text-align:right;color:#f87171;">${sumMiss}</td>
+            <td style="padding:8px;text-align:right;color:#2dd4bf;cursor:pointer;transition:all 0.15s;" onclick="openAstorSlaDetailModal('HIT', 'ALL')" title="Klik untuk lihat seluruh detail order HIT" onmouseover="this.style.textDecoration='underline'; this.style.color='#5eead4';" onmouseout="this.style.textDecoration='none'; this.style.color='#2dd4bf';">
+                <span style="display:inline-flex;align-items:center;gap:4px;">${sumHit} <i class="fas fa-arrow-up-right-from-square" style="font-size:0.7em;opacity:0.6;"></i></span>
+            </td>
+            <td style="padding:8px;text-align:right;color:#f87171;cursor:pointer;transition:all 0.15s;" onclick="openAstorSlaDetailModal('MISS', 'ALL')" title="Klik untuk lihat seluruh detail order MISS" onmouseover="this.style.textDecoration='underline'; this.style.color='#fca5a5';" onmouseout="this.style.textDecoration='none'; this.style.color='#f87171';">
+                <span style="display:inline-flex;align-items:center;gap:4px;">${sumMiss} <i class="fas fa-arrow-up-right-from-square" style="font-size:0.7em;opacity:0.6;"></i></span>
+            </td>
             <td style="padding:8px;text-align:right;color:#fff;">${sumTot}</td>
             <td style="padding:8px;text-align:center;color:#ffd700;">${sumPct !== '-' ? sumPct + '%' : '-'}</td>
             <td style="padding:8px;text-align:center;color:#94a3b8;font-size:0.75em;">OVERALL</td>
@@ -16870,188 +18092,5 @@ loadKonfirmasiVM();
 setInterval(loadKonfirmasiVM, 600000);
 // ===== END REKAP KONFIRMASI VM =====
     </script>
-    <!-- ═══════════════════════════════════════════════════════════════════
-     AUTO-CAPTURE untuk halaman Tools (PPT Laporan Pagi) — SLIDE 3
-     Tools kirim postMessage {type:'wmsCapReq2'} -> panel MAIN DASHBOARD
-     difoto 2x (tanggal kemarin & hari ini) -> dikirim balik
-     {type:'wmsCapRes',which:'e'|'f'}
-     Letakkan tepat SEBELUM </body> di index.html
-     ═══════════════════════════════════════════════════════════════════ -->
-<script>
-(function(){
-  function bcast(w,msg,d){
-    if(d>6)return;var n=0;
-    try{n=w.length;}catch(e){return;}
-    for(var i=0;i<n;i++){var f;try{f=w[i];}catch(e){continue;}
-      try{f.postMessage(msg,'*');}catch(e){}
-      bcast(f,msg,d+1);}
-  }
-  function send(msg){try{window.top.postMessage(msg,'*');}catch(e){} bcast(window.top,msg,0);}
-  function loadH2C(cb){
-    if(window.html2canvas)return cb();
-    var s=document.createElement('script');
-    s.src='https://cdn.jsdelivr.net/npm/html2canvas-pro@1/dist/html2canvas-pro.min.js';
-    s.onload=function(){cb();};s.onerror=function(){cb('html2canvas gagal dimuat');};
-    document.head.appendChild(s);
-  }
-  function waitFor(cond,max,cb){
-    var t0=Date.now();(function p(){var ok=false;try{ok=cond();}catch(e){}
-      if(ok||Date.now()-t0>max)return cb(ok);setTimeout(p,250);})();
-  }
-  /* cari nilai kolom AO (STUFFING DATE) yang cocok dengan tanggal tertentu.
-     Format di sheet bisa YYYY-MM-DD atau DD/MM/YYYY, jadi dua-duanya dicoba. */
-  function cariTanggal(dt){
-    var y=dt.getFullYear(),m=dt.getMonth()+1,d=dt.getDate();
-    var iso=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    var dmy=String(d).padStart(2,'0')+'/'+String(m).padStart(2,'0')+'/'+y;
-    var ada={};
-    try{allData.forEach(function(r){var v=(r.AO||'').trim();if(v)ada[v]=1;});}catch(e){}
-    if(ada[iso])return iso;
-    if(ada[dmy])return dmy;
-    return null;
-  }
-  /* sembunyikan bagian bawah panel (SUMMARY PLAN BY ARMADA TYPE dst) supaya
-     hasil foto cuma tabel + peta + baris KPI, bentuknya jadi melebar bukan memanjang */
-  /* pasang filter 1 tanggal lalu hitung ulang dashboard.
-     populateFilters() sengaja TIDAK dipanggil: itu cuma mengisi ulang daftar
-     pilihan dropdown (berat kalau datanya ribuan baris) dan tidak mempengaruhi
-     angka yang difoto. */
-  function pakaiTanggal(tgl){
-    try{
-      selectedFilters.bulan=[];
-      selectedFilters.kota=[];
-      selectedFilters.regional=[];
-      selectedFilters.area=[];
-      selectedFilters.stuffingDate=tgl?[tgl]:[];
-      applyFilters();
-    }catch(e){}
-  }
-  /* potong tinggi foto sampai baris CBM PLAN B1-B4 saja, biar hasilnya melebar
-     (bagian SUMMARY PLAN BY ARMADA TYPE & tabel di bawahnya tidak ikut) */
-  function tinggiPotong(sec){
-    try{
-      var b4=document.getElementById('cbmPlanB4-card');
-      if(!b4)return 0;
-      var a=sec.getBoundingClientRect(),b=b4.getBoundingClientRect();
-      var h=Math.round(b.bottom-a.top+14);
-      return (h>200&&h<sec.scrollHeight)?h:0;
-    }catch(e){return 0;}
-  }
-  /* html2canvas kadang gagal menyalin <canvas>. Diubah dulu jadi <img>, lalu dibalikin. */
-  function bekukanCanvas(root){
-    var list=[],cs=root.querySelectorAll('canvas');
-    for(var i=0;i<cs.length;i++){
-      var c=cs[i];
-      if(!c.width||!c.height)continue;
-      var url;try{url=c.toDataURL('image/png');}catch(e){continue;}
-      var r=c.getBoundingClientRect();
-      if(!r.width||!r.height)continue;
-      var img=document.createElement('img');
-      img.src=url;
-      img.style.cssText='width:'+r.width+'px;height:'+r.height+'px;display:block;';
-      c.parentNode.insertBefore(img,c);
-      c.style.display='none';
-      list.push([c,img]);
-    }
-    return list;
-  }
-  function cairkanCanvas(list){(list||[]).forEach(function(p){try{p[1].parentNode.removeChild(p[1]);p[0].style.display='';}catch(e){}});}
-  /* bagian berat di bawah panel disembunyikan dulu: tabel SHIPPING LINE DETAILS
-     isinya ratusan baris dan bikin html2canvas sangat lambat / menggantung */
-  var BERAT=['#armada-planning-summary','.bottom-table'];
-  function sembunyikanBerat(){
-    var hid=[];
-    BERAT.forEach(function(sel){
-      var n=document.querySelectorAll('#main-dashboard-section '+sel);
-      for(var i=0;i<n.length;i++){hid.push([n[i],n[i].style.display]);n[i].style.display='none';}
-    });
-    return hid;
-  }
-  function tampilkanBerat(hid){(hid||[]).forEach(function(x){try{x[0].style.display=x[1]||'';}catch(e){}});}
-  function snap(){
-    var el=document.getElementById('main-dashboard-section');
-    var hid=sembunyikanBerat();
-    var o={backgroundColor:'#0d0d0f',scale:1.2,useCORS:true,allowTaint:false,logging:false};
-    var h=tinggiPotong(el); if(h)o.height=h;
-    var frozen=bekukanCanvas(el);
-    var bersih=function(){tampilkanBerat(hid);cairkanCanvas(frozen);};
-    var kerja=html2canvas(el,o).then(function(c){bersih();return c.toDataURL('image/jpeg',0.9);});
-    var batas=new Promise(function(_,rej){setTimeout(function(){bersih();rej(new Error('html2canvas kelamaan (>35 dtk)'));},35000);});
-    return Promise.race([kerja,batas]).catch(function(e){bersih();throw e;});
-  }
-  function segarkanPeta(){
-    try{ if(typeof map!=='undefined'&&map&&map.invalidateSize)map.invalidateSize(true); }catch(e){}
-  }
-  function tungguPeta(cb){
-    segarkanPeta();
-    waitFor(function(){return document.querySelectorAll('#map img.leaflet-tile-loaded').length>2;},20000,function(){cb();});
-  }
-  function lapor(id,t){send({type:'wmsCapInfo',id:id,step:t});}
-  var busyId=null;
-  function run(id){
-    function fail(m){busyId=null;send({type:'wmsCapErr',id:id,msg:String(m)});}
-    loadH2C(function(err){
-      if(err)return fail(err);
-      try{
-        /* lewati layar sambutan & modal stok opname tanpa perlu login */
-        lapor(id,'mulai');
-        try{currentBranch='AHI';}catch(e){}
-        try{handleDCBranchSelection('AHI');}catch(e){}
-        var ov=document.getElementById('welcome-overlay');
-        if(ov){ov.classList.add('hidden');ov.style.display='none';}
-        try{closeStockOpnameModal();}catch(e){}
-        try{showDashboardSection('main-dashboard-section');}catch(e){}
-
-        /* tunggu data CSV selesai dimuat */
-        waitFor(function(){return typeof allData!=='undefined'&&allData.length>0;},40000,function(ok){
-          if(!ok)return fail('data Planner belum termuat');
-          lapor(id,'data termuat');
-          try{closeStockOpnameModal();}catch(e){}
-          var now=new Date();
-          var tglKemarin=cariTanggal(new Date(now.getTime()-86400000));
-          var tglHariIni=cariTanggal(now);
-
-          lapor(id,'filter kemarin='+tglKemarin+' hariini='+tglHariIni);
-          pakaiTanggal(tglKemarin);
-          lapor(id,'filter kemarin dipasang');
-          setTimeout(function(){
-            segarkanPeta();
-            lapor(id,'menunggu peta (foto 1)');
-            tungguPeta(function(){
-              setTimeout(function(){
-                lapor(id,'mulai foto 1');
-              snap().then(function(u){
-                  send({type:'wmsCapRes',id:id,which:'e',url:u});
-                  pakaiTanggal(tglHariIni);
-                  lapor(id,'filter hari ini dipasang');
-                  setTimeout(function(){
-                    segarkanPeta();
-                    lapor(id,'menunggu peta (foto 2)');
-                    tungguPeta(function(){
-                      setTimeout(function(){
-                        lapor(id,'mulai foto 2');
-                        snap().then(function(u2){
-                          send({type:'wmsCapRes',id:id,which:'f',url:u2});
-                          send({type:'wmsCapDone',id:id});busyId=null;
-                        }).catch(fail);
-                      },2000);
-                    });
-                  },2500);
-                }).catch(fail);
-              },2000);
-            });
-          },2500);
-        });
-      }catch(e){fail(e.message);}
-    });
-  }
-  window.addEventListener('message',function(e){
-    var d=e.data;if(!d||d.type!=='wmsCapReq2'||!d.id)return;
-    send({type:'wmsCapAck',id:d.id});
-    if(busyId===d.id)return;
-    busyId=d.id;run(d.id);
-  });
-})();
-</script>
-    </body>
+</body>
 </html>
