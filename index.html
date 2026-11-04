@@ -18103,7 +18103,7 @@ setInterval(loadKonfirmasiVM, 600000);
        ADA pesannya (dulu error di dalam setTimeout hilang diam-diam dan
        halaman Tools cuma bisa lapor "0/2" tanpa sebab)
      - panel dicek dulu ada atau tidak, lengkap dengan nama id-nya
-     - ada penjaga waktu 140 detik yang melapor macet di langkah mana
+     - ada penjaga waktu 190 detik yang melapor macet di langkah mana
      - jeda dipersingkat supaya muat dalam batas 170 detik di sisi Tools
      ═══════════════════════════════════════════════════════════════════ -->
 <script>
@@ -18224,9 +18224,45 @@ setInterval(loadKonfirmasiVM, 600000);
   function segarkanPeta(){
     try{ if(typeof map!=='undefined'&&map&&map.invalidateSize)map.invalidateSize(true); }catch(e){}
   }
+  /* Ubin peta diminta ulang dengan izin CORS. Tanpa ini html2canvas menolak
+     menggambarnya (allowTaint:false) dan kotak peta jadi abu-abu kosong.
+     Kalau penyedia ubinnya ternyata tidak mengizinkan CORS, ubin itu
+     dikembalikan seperti semula supaya tidak malah hilang di layar. */
+  function paksaCors(cb){
+    var t=document.querySelectorAll('#map img.leaflet-tile'), perlu=[];
+    for(var i=0;i<t.length;i++){
+      var im=t[i], src=im.src;
+      if(im.crossOrigin||!src||src.indexOf('data:')===0) continue;
+      (function(img,asli){
+        img.addEventListener('error',function pulih(){
+          img.removeEventListener('error',pulih);
+          img.removeAttribute('crossorigin'); img.src=asli;
+        });
+        img.crossOrigin='anonymous';
+        img.src=asli;
+      })(im,src);
+      perlu.push(im);
+    }
+    if(!perlu.length) return cb();
+    /* tunggu sampai ubin benar-benar TERGAMBAR (naturalWidth>0), bukan cuma
+       'complete' — ubin yang gagal CORS juga 'complete' tapi kosong, dan
+       masih perlu waktu untuk dimuat ulang oleh penangan error di atas */
+    waitFor(function(){
+      for(var i=0;i<perlu.length;i++){ if(!perlu[i].complete||!perlu[i].naturalWidth) return false; }
+      return true;
+    },10000,function(){cb();});
+  }
+  /* peta dianggap siap kalau SEMUA ubinnya selesai dimuat, bukan sekadar
+     "ada lebih dari 2" — dulu fotonya sering diambil waktu ubin masih separuh */
+  function petaSiap(){
+    var t=document.querySelectorAll('#map img.leaflet-tile');
+    if(!t.length) return false;
+    for(var i=0;i<t.length;i++){ if(!t[i].complete||!t[i].naturalWidth) return false; }
+    return true;
+  }
   function tungguPeta(cb){
     segarkanPeta();
-    waitFor(function(){return document.querySelectorAll('#map img.leaflet-tile-loaded').length>2;},12000,function(){cb();});
+    waitFor(petaSiap,20000,function(){ paksaCors(function(){ cb(); }); });
   }
 
   var busyId=null;
@@ -18240,7 +18276,7 @@ setInterval(loadKonfirmasiVM, 600000);
     function beres(){ if(selesai)return; selesai=true; clearTimeout(jaga); busyId=null;
       send({type:'wmsCapDone',id:id}); }
     /* kalau macet di mana pun, setelah 140 dtk tetap lapor — jangan diam */
-    jaga=setTimeout(function(){fail(new Error('macet lebih dari 140 detik'));},140000);
+    jaga=setTimeout(function(){fail(new Error('macet lebih dari 190 detik'));},190000);
     /* bungkus tiap callback: error sekecil apa pun tetap jadi pesan */
     function aman(fn){ return function(){ if(selesai)return;
       try{ return fn.apply(null,arguments); }catch(e){ fail(e); } }; }
@@ -18302,5 +18338,5 @@ setInterval(loadKonfirmasiVM, 600000);
   });
 })();
 </script>
-</body>
+    </body>
 </html>
