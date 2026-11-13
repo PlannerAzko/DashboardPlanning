@@ -1338,6 +1338,117 @@
         body.theme-purple table tfoot td {
             box-shadow: inset 0 2px 0 0 #6a1b9a;
         }
+        #outstanding-od-lp-wrap {
+            display: none;
+        }
+        body.theme-purple #outstanding-od-lp-wrap {
+            display: inline-flex;
+        }
+        #header-ahi-slides-wrap {
+            display: inline-block;
+        }
+        body.theme-purple #header-ahi-slides-wrap,
+        body.theme-cyan #header-ahi-slides-wrap {
+            display: none !important;
+        }
+        .ahi-slides-header-btn {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #ffd700;
+            border: 1.5px solid rgba(255, 215, 0, 0.7);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.78em;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+            letter-spacing: 0.4px;
+        }
+        .ahi-slides-header-btn:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+            box-shadow: 0 6px 18px rgba(255, 215, 0, 0.25);
+        }
+        .ahi-slides-pill {
+            background: #ffd700;
+            color: #111827;
+            padding: 1px 7px;
+            border-radius: 999px;
+            font-size: 0.82em;
+            font-weight: 900;
+        }
+        /* Official Sign in with Google button styles */
+        .gsi-material-button {
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            -webkit-appearance: none;
+            background-color: WHITE;
+            background-image: none;
+            border: 1px solid #747775;
+            border-radius: 4px;
+            box-sizing: border-box;
+            color: #1f1f1f;
+            cursor: pointer;
+            font-family: 'Roboto', arial, sans-serif;
+            font-size: 14px;
+            height: 40px;
+            letter-spacing: 0.25px;
+            outline: none;
+            overflow: hidden;
+            padding: 0 12px;
+            position: relative;
+            text-align: center;
+            transition: background-color .218s, border-color .218s, box-shadow .218s;
+            vertical-align: middle;
+            white-space: nowrap;
+            width: auto;
+            max-width: 400px;
+            min-width: min-content;
+        }
+        .gsi-material-button .gsi-material-button-icon {
+            height: 20px;
+            margin-right: 12px;
+            min-width: 20px;
+            width: 20px;
+        }
+        .gsi-material-button .gsi-material-button-content-wrapper {
+            display: flex;
+            align-items: center;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            height: 100%;
+            justify-content: space-between;
+            position: relative;
+            width: 100%;
+        }
+        .gsi-material-button .gsi-material-button-contents {
+            flex-grow: 1;
+            font-family: 'Roboto', arial, sans-serif;
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: top;
+        }
+        .gsi-material-button .gsi-material-button-state {
+            transition: opacity .218s;
+            bottom: 0;
+            left: 0;
+            opacity: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+        .gsi-material-button:hover {
+            box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+        }
+        .gsi-material-button:hover .gsi-material-button-state {
+            background-color: #303030;
+            opacity: 8%;
+        }
 
         /* Theme Cyan overrides */
         body.theme-cyan::before {
@@ -5253,6 +5364,323 @@
         </div>
     </div>
 
+    <!-- Modal Ambil Kode Store FBI -->
+    <div id="modal-fbi-store-codes" class="so-modal-overlay hidden" onclick="if(event.target===this) closeFbiStoreCodeModal()">
+        <div class="so-modal-container" onclick="event.stopPropagation()" style="max-width: 780px; border-color: rgba(168, 85, 247, 0.65); box-shadow: 0 20px 50px rgba(0,0,0,0.85), 0 0 35px rgba(168, 85, 247, 0.25);">
+            <div class="so-modal-header" style="background: linear-gradient(90deg, #2a1b3d 0%, #0f172a 100%); border-bottom: 1px solid rgba(168, 85, 247, 0.4);">
+                <div class="so-modal-title-area">
+                    <div class="so-warning-icon-wrapper" style="background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.55); color: #d8b4fe;">
+                        <i class="fas fa-copy"></i>
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <h2 class="so-modal-title" style="margin: 0; font-size: 1.15rem;">AMBIL KODE STORE — <span style="color: #ffd700;">SCHEDULE DELIVERY FBI</span></h2>
+                            <span id="fbi-modal-store-badge" style="background: #7c3aed; color: #fff; font-weight: 800; font-size: 0.75rem; padding: 3px 10px; border-radius: 999px;">0 STORE</span>
+                        </div>
+                        <p class="so-modal-subtitle" id="fbi-modal-filter-info" style="margin-top: 4px;">
+                            Filter aktif: Semua Hari • Semua Shipping • Semua Wilayah
+                        </p>
+                    </div>
+                </div>
+                <button class="so-modal-close-btn" onclick="closeFbiStoreCodeModal()" title="Tutup Modal (Esc)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div style="padding: 16px 20px; background: #0b1120; display: flex; flex-direction: column; gap: 14px;">
+                <!-- Scope Filter Pills -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid #1e293b;">
+                    <span style="font-size: 0.8em; color: #94a3b8; font-weight: 700;">CAKUPAN STORE:</span>
+                    <div style="display: inline-flex; background: #090e17; border: 1px solid #334155; border-radius: 6px; padding: 3px; gap: 4px; flex-wrap: wrap;">
+                        <button type="button" class="fbi-code-scope-btn" data-scope="ALL" onclick="setFbiStoreCodeScope('ALL')" style="background: #7c3aed; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Semua di Tabel</button>
+                        <button type="button" class="fbi-code-scope-btn" data-scope="HAS_ORDER" onclick="setFbiStoreCodeScope('HAS_ORDER')" style="background: transparent; color: #94a3b8; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Ada CBM (&gt; 0)</button>
+                        <button type="button" class="fbi-code-scope-btn" data-scope="BELUM_PLAN" onclick="setFbiStoreCodeScope('BELUM_PLAN')" style="background: transparent; color: #94a3b8; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Belum Plan (&gt; 0)</button>
+                        <button type="button" class="fbi-code-scope-btn" data-scope="SUDAH_PLAN" onclick="setFbiStoreCodeScope('SUDAH_PLAN')" style="background: transparent; color: #94a3b8; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Sudah Plan (&gt; 0)</button>
+                    </div>
+                </div>
+
+                <!-- Format 1: Semicolon (;) -->
+                <div style="background: #111827; border: 1px solid #2e1f47; border-radius: 8px; padding: 12px 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(255, 215, 0, 0.14); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.35); padding: 2px 8px; border-radius: 4px; font-family: monospace; font-weight: 800; font-size: 0.8em;">FORMAT ;</span>
+                            <span style="font-size: 0.82em; color: #cbd5e1; font-weight: 600;">Pemisah Titik Koma (Contoh: F35A;F35J;F542)</span>
+                        </div>
+                        <button type="button" id="btn-fbi-modal-copy-semi" onclick="copyFbiStoreCodeFromModal('semicolon')" style="background: #7c3aed; color: #fff; border: none; border-radius: 5px; padding: 5px 12px; font-size: 0.78em; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i class="fas fa-copy"></i> Salin Format (;)
+                        </button>
+                    </div>
+                    <textarea id="fbi-store-codes-semicolon" readonly rows="3" onclick="this.select()" style="width: 100%; background: #070b14; border: 1px solid #334155; border-radius: 6px; padding: 10px; color: #ffd700; font-family: monospace; font-size: 0.9em; font-weight: 600; resize: vertical; outline: none; box-sizing: border-box;"></textarea>
+                </div>
+
+                <!-- Format 2: OR -->
+                <div style="background: #111827; border: 1px solid #1e3a5f; border-radius: 8px; padding: 12px 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(56, 189, 248, 0.14); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); padding: 2px 8px; border-radius: 4px; font-family: monospace; font-weight: 800; font-size: 0.8em;">FORMAT OR</span>
+                            <span style="font-size: 0.82em; color: #cbd5e1; font-weight: 600;">Pemisah "or" (Contoh: F35A or F35J or F542)</span>
+                        </div>
+                        <button type="button" id="btn-fbi-modal-copy-or" onclick="copyFbiStoreCodeFromModal('or')" style="background: #0284c7; color: #fff; border: none; border-radius: 5px; padding: 5px 12px; font-size: 0.78em; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i class="fas fa-copy"></i> Salin Format (or)
+                        </button>
+                    </div>
+                    <textarea id="fbi-store-codes-or" readonly rows="3" onclick="this.select()" style="width: 100%; background: #070b14; border: 1px solid #334155; border-radius: 6px; padding: 10px; color: #38bdf8; font-family: monospace; font-size: 0.9em; font-weight: 600; resize: vertical; outline: none; box-sizing: border-box;"></textarea>
+                </div>
+
+                <!-- Store Chip Preview -->
+                <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 10px 12px;">
+                    <div style="font-size: 0.75em; color: #94a3b8; font-weight: 700; margin-bottom: 8px; display: flex; justify-content: space-between;">
+                        <span>DAFTAR KODE STORE TERPILIH</span>
+                        <span id="fbi-store-chips-count" style="color: #a78bfa;">0 Store</span>
+                    </div>
+                    <div id="fbi-store-chips-preview" style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 150px; overflow-y: auto;"></div>
+                </div>
+            </div>
+
+            <div style="background: #0b1120; padding: 12px 20px; border-top: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <span style="font-size: 0.75em; color: #94a3b8;"><i class="fas fa-info-circle" style="color:#a78bfa;margin-right:5px;"></i>Kode store otomatis mengikuti filter <strong>Hari</strong>, <strong>Shipping Line</strong>, dan <strong>Wilayah</strong> yang sedang aktif.</span>
+                <button onclick="closeFbiStoreCodeModal()" style="background: #334155; color: #fff; border: 1px solid #475569; padding: 7px 18px; border-radius: 6px; font-weight: bold; font-size: 0.8em; cursor: pointer;">
+                    TUTUP
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ambil EXTERNORDERKEY (Outstanding Monitoring Order Aging) -->
+    <div id="modal-outstanding-od-keys" class="so-modal-overlay hidden" onclick="if(event.target===this) closeOutstandingOdModal()">
+        <div class="so-modal-container" onclick="event.stopPropagation()" style="max-width: 920px; border-color: rgba(255, 215, 0, 0.55); box-shadow: 0 20px 50px rgba(0,0,0,0.85), 0 0 35px rgba(255, 215, 0, 0.18);">
+            <div class="so-modal-header" style="background: linear-gradient(90deg, #1f1a09 0%, #0f172a 100%); border-bottom: 1px solid rgba(255, 215, 0, 0.35);">
+                <div class="so-modal-title-area">
+                    <div class="so-warning-icon-wrapper" style="background: rgba(255, 215, 0, 0.14); border: 1px solid rgba(255, 215, 0, 0.45); color: #ffd700;">
+                        <i class="fas fa-file-export"></i>
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <h2 class="so-modal-title" style="margin: 0; font-size: 1.12rem;">AMBIL EXTERNORDERKEY — <span style="color: #ffd700;">LP &amp; CREATED INTERNALLY</span></h2>
+                            <span id="os-od-modal-badge" style="background: #ffd700; color: #111827; font-weight: 800; font-size: 0.75rem; padding: 3px 10px; border-radius: 999px;">0 OD</span>
+                        </div>
+                        <p class="so-modal-subtitle" id="os-od-modal-filter-info" style="margin-top: 4px;">
+                            Sumber: Kolom F (EXTERNORDERKEY) • Filter: Kolom G = Created Internally &amp; Kolom BG = LP
+                        </p>
+                    </div>
+                </div>
+                <button class="so-modal-close-btn" onclick="closeOutstandingOdModal()" title="Tutup Modal (Esc)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div style="padding: 16px 20px; background: #0b1120; display: flex; flex-direction: column; gap: 14px;">
+                <!-- Status Plan Scope Toggle -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid #1e293b;">
+                    <span style="font-size: 0.8em; color: #94a3b8; font-weight: 700;">FILTER STATUS PLAN:</span>
+                    <div style="display: inline-flex; background: #090e17; border: 1px solid #334155; border-radius: 6px; padding: 3px; gap: 4px; flex-wrap: wrap;">
+                        <button type="button" class="os-od-scope-btn" data-scope="ALL" onclick="setOutstandingOdScope('ALL')" style="background: #d97706; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Semua Status</button>
+                        <button type="button" class="os-od-scope-btn" data-scope="BELUM_PLAN" onclick="setOutstandingOdScope('BELUM_PLAN')" style="background: transparent; color: #94a3b8; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Belum Plan Saja</button>
+                        <button type="button" class="os-od-scope-btn" data-scope="SUDAH_PLAN" onclick="setOutstandingOdScope('SUDAH_PLAN')" style="background: transparent; color: #94a3b8; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Sudah Plan Saja</button>
+                    </div>
+                </div>
+
+                <!-- Format OR -->
+                <div style="background: #111827; border: 1px solid #1e3a5f; border-radius: 8px; padding: 12px 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(56, 189, 248, 0.14); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); padding: 2px 8px; border-radius: 4px; font-family: monospace; font-weight: 800; font-size: 0.8em;">FORMAT OR</span>
+                            <span style="font-size: 0.82em; color: #cbd5e1; font-weight: 600;">Contoh: OD.9619039534.7311648956 or OD.9619090484.8105584171</span>
+                        </div>
+                        <button type="button" id="btn-os-od-modal-copy-or" onclick="copyOutstandingOdFromModal('or')" style="background: #0284c7; color: #fff; border: none; border-radius: 5px; padding: 5px 12px; font-size: 0.78em; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i class="fas fa-copy"></i> Salin Format (or)
+                        </button>
+                    </div>
+                    <textarea id="os-od-codes-or" readonly rows="3" onclick="this.select()" style="width: 100%; background: #070b14; border: 1px solid #334155; border-radius: 6px; padding: 10px; color: #38bdf8; font-family: monospace; font-size: 0.86em; font-weight: 600; resize: vertical; outline: none; box-sizing: border-box;"></textarea>
+                </div>
+
+                <!-- Format Semicolon -->
+                <div style="background: #111827; border: 1px solid #423310; border-radius: 8px; padding: 12px 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(255, 215, 0, 0.14); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.35); padding: 2px 8px; border-radius: 4px; font-family: monospace; font-weight: 800; font-size: 0.8em;">FORMAT ;</span>
+                            <span style="font-size: 0.82em; color: #cbd5e1; font-weight: 600;">Pemisah Titik Koma (;)</span>
+                        </div>
+                        <button type="button" id="btn-os-od-modal-copy-semi" onclick="copyOutstandingOdFromModal('semicolon')" style="background: #d97706; color: #fff; border: none; border-radius: 5px; padding: 5px 12px; font-size: 0.78em; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i class="fas fa-copy"></i> Salin Format (;)
+                        </button>
+                    </div>
+                    <textarea id="os-od-codes-semicolon" readonly rows="2" onclick="this.select()" style="width: 100%; background: #070b14; border: 1px solid #334155; border-radius: 6px; padding: 10px; color: #ffd700; font-family: monospace; font-size: 0.86em; font-weight: 600; resize: vertical; outline: none; box-sizing: border-box;"></textarea>
+                </div>
+
+                <!-- Preview Table -->
+                <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; overflow: hidden;">
+                    <div style="padding: 8px 12px; background: #131d31; border-bottom: 1px solid #26334d; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.75em; color: #ffd700; font-weight: 700;">DAFTAR EXTERNORDERKEY TERFILTER</span>
+                        <span id="os-od-table-count" style="font-size: 0.75em; color: #94a3b8;">0 OD</span>
+                    </div>
+                    <div style="max-height: 220px; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.8em; text-align: left; color: #f8fafc;">
+                            <thead style="position: sticky; top: 0; background: #1e293b; z-index: 2;">
+                                <tr>
+                                    <th style="padding: 7px 8px; border: 1px solid #334155; color: #ffd700; text-align: center; width: 36px;">#</th>
+                                    <th style="padding: 7px 10px; border: 1px solid #334155; color: #ffd700;">EXTERNORDERKEY (F)</th>
+                                    <th style="padding: 7px 8px; border: 1px solid #334155; color: #ffd700; text-align: center;">STORE</th>
+                                    <th style="padding: 7px 10px; border: 1px solid #334155; color: #ffd700;">SHIP TO</th>
+                                    <th style="padding: 7px 8px; border: 1px solid #334155; color: #ffd700; text-align: center;">KOLOM G</th>
+                                    <th style="padding: 7px 8px; border: 1px solid #334155; color: #ffd700; text-align: center;">KOLOM BG</th>
+                                    <th style="padding: 7px 8px; border: 1px solid #334155; color: #ffd700; text-align: center;">STATUS</th>
+                                    <th style="padding: 7px 8px; border: 1px solid #334155; color: #ffd700; text-align: right;">CBM</th>
+                                </tr>
+                            </thead>
+                            <tbody id="os-od-preview-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #0b1120; padding: 12px 20px; border-top: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <span style="font-size: 0.75em; color: #94a3b8;"><i class="fas fa-info-circle" style="color:#ffd700;margin-right:5px;"></i>Hanya mengambil <strong>EXTERNORDERKEY (Kolom F)</strong> unik dengan <strong>Kolom G = Created Internally</strong> dan <strong>Kolom BG = LP</strong>.</span>
+                <button onclick="closeOutstandingOdModal()" style="background: #334155; color: #fff; border: 1px solid #475569; padding: 7px 18px; border-radius: 6px; font-weight: bold; font-size: 0.8em; cursor: pointer;">
+                    TUTUP
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Auto PowerPoint & Sync Google Slides (Khusus DC AHI Sidoarjo) -->
+    <div id="modal-ahi-slides-sync" class="so-modal-overlay hidden" onclick="if(event.target===this) closeAhiSlidesModal()">
+        <div class="so-modal-container" onclick="event.stopPropagation()" style="max-width: 880px; border-color: rgba(255, 215, 0, 0.55); box-shadow: 0 24px 60px rgba(0,0,0,0.9), 0 0 40px rgba(255, 215, 0, 0.16);">
+            <div class="so-modal-header" style="background: linear-gradient(90deg, #2a0a0a 0%, #0f172a 100%); border-bottom: 1px solid rgba(255, 215, 0, 0.35);">
+                <div class="so-modal-title-area">
+                    <div class="so-warning-icon-wrapper" style="background: rgba(255, 215, 0, 0.14); border: 1px solid rgba(255, 215, 0, 0.45); color: #ffd700;">
+                        <i class="fas fa-file-powerpoint"></i>
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <h2 class="so-modal-title" style="margin: 0; font-size: 1.15rem;">AUTO POWERPOINT &amp; SYNC GOOGLE SLIDES — <span style="color: #ffd700;">DC AHI SIDOARJO</span></h2>
+                        </div>
+                        <p class="so-modal-subtitle" style="margin-top: 4px;">
+                            Buat &amp; sinkronkan 5 slide laporan langsung dari data spreadsheet dashboard aktif (Planning, Outstanding, HUB/ASTOR &amp; Top Kota).
+                        </p>
+                    </div>
+                </div>
+                <button class="so-modal-close-btn" onclick="closeAhiSlidesModal()" title="Tutup Modal (Esc)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div style="padding: 18px 22px; background: #0b1120; display: flex; flex-direction: column; gap: 14px; max-height: 78vh; overflow-y: auto;">
+                <!-- Google Workspace Auth Box -->
+                <div style="background: #111827; border: 1px solid #1e293b; border-radius: 8px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <div style="font-size: 0.78em; color: #ffd700; font-weight: 800; text-transform: uppercase;">1. Koneksi Google Slides</div>
+                        <div style="font-size: 0.8em; color: #94a3b8; margin-top: 2px;">Masuk dengan akun Google Anda untuk membuat atau memperbarui presentasi Google Slides.</div>
+                    </div>
+
+                    <div id="ahi-slides-auth-signedout" style="display: flex; align-items: center;">
+                        <button type="button" class="gsi-material-button" onclick="signInGoogleSlides()">
+                            <div class="gsi-material-button-state"></div>
+                            <div class="gsi-material-button-content-wrapper">
+                                <div class="gsi-material-button-icon">
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style="display: block;">
+                                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                                        <path fill="none" d="M0 0h48v48H0z"></path>
+                                    </svg>
+                                </div>
+                                <span class="gsi-material-button-contents">Sign in with Google</span>
+                                <span style="display: none;">Sign in with Google</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div id="ahi-slides-auth-signedin" style="display: none; align-items: center; gap: 10px;">
+                        <span style="background: rgba(16, 185, 129, 0.14); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 5px 10px; border-radius: 999px; font-size: 0.78em; font-weight: 700;">
+                            <i class="fas fa-check-circle"></i> <span id="ahi-slides-user-name">Terhubung</span>
+                        </span>
+                        <button type="button" onclick="signOutGoogleSlides()" style="background: #1e293b; color: #cbd5e1; border: 1px solid #475569; padding: 5px 10px; border-radius: 6px; font-size: 0.76em; font-weight: 700; cursor: pointer;">
+                            Keluar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Dashboard Snapshot Preview -->
+                <div style="background: #111827; border: 1px solid #1e293b; border-radius: 8px; padding: 12px 14px;">
+                    <div style="font-size: 0.78em; color: #ffd700; font-weight: 800; text-transform: uppercase; margin-bottom: 8px;">2. Preview Ringkasan 5 Slide (Data Dashboard Aktif)</div>
+                    <div id="ahi-slides-snapshot-preview"></div>
+                </div>
+
+                <!-- Sync & Create Controls -->
+                <div id="ahi-slides-sync-controls" style="background: #111827; border: 1px solid #1e3a5f; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+                    <div>
+                        <div style="font-size: 0.78em; color: #38bdf8; font-weight: 800; text-transform: uppercase; margin-bottom: 6px;">3. Sinkronisasi dengan Presentasi Google Slides</div>
+                        <label style="font-size: 0.76em; color: #94a3b8; display: block; margin-bottom: 5px;">
+                            Tempel Link atau ID Google Slides yang sudah ada untuk diperbarui (opsional jika ingin buat baru):
+                        </label>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <input id="ahi-slides-target-input" type="text" placeholder="https://docs.google.com/presentation/d/xxxxxx/edit" style="flex: 1; min-width: 240px; background: #070b14; border: 1px solid #334155; border-radius: 6px; padding: 8px 10px; color: #f8fafc; font-size: 0.82em; outline: none;" />
+                            <button type="button" onclick="handleSyncExistingGoogleSlides()" style="background: #0284c7; color: #fff; border: none; border-radius: 6px; padding: 8px 14px; font-size: 0.8em; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-sync-alt"></i> Sinkronkan ke Link Ini
+                            </button>
+                            <button type="button" onclick="handleCreateNewGoogleSlides()" style="background: #d97706; color: #fff; border: none; border-radius: 6px; padding: 8px 14px; font-size: 0.8em; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-plus-circle"></i> Buat Google Slides Baru
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Linked Presentation Card -->
+                    <div id="ahi-slides-linked-card" style="display: none; background: #091526; border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 6px; padding: 10px 12px; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <div style="font-size: 0.72em; color: #38bdf8; font-weight: 700;">GOOGLE SLIDES TERHUBUNG</div>
+                            <div id="ahi-slides-linked-title" style="font-size: 0.9em; font-weight: 800; color: #f8fafc;">-</div>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <a id="ahi-slides-open-link" href="#" target="_blank" rel="noopener noreferrer" style="background: #0f766e; color: #fff; text-decoration: none; border-radius: 5px; padding: 6px 12px; font-size: 0.78em; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-external-link-alt"></i> Buka Google Slides
+                            </a>
+                            <a id="ahi-slides-export-pptx-link" href="#" target="_blank" rel="noopener noreferrer" style="background: #1d4ed8; color: #fff; text-decoration: none; border-radius: 5px; padding: 6px 12px; font-size: 0.78em; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-file-download"></i> Unduh .PPTX (Google)
+                            </a>
+                            <button type="button" onclick="clearLinkedGooglePresentation()" style="background: #334155; color: #cbd5e1; border: none; border-radius: 5px; padding: 6px 10px; font-size: 0.76em; font-weight: 700; cursor: pointer;">
+                                Lepas Link
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Watch Spreadsheet Update Toggle -->
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.8em; color: #cbd5e1; cursor: pointer;">
+                        <input type="checkbox" id="ahi-slides-watch-toggle" onchange="toggleAhiSlidesWatchSync(this.checked)" style="accent-color: #ffd700; width: 15px; height: 15px;" />
+                        <span>Ingatkan otomatis untuk sinkronisasi ke Google Slides setiap kali data spreadsheet dashboard diperbarui</span>
+                    </label>
+                </div>
+
+                <!-- Explicit Confirmation Dialog before Creating/Updating Google Slides -->
+                <div id="ahi-slides-confirm-box" style="display: none; background: #261408; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 14px;">
+                    <div id="ahi-slides-confirm-title" style="font-size: 0.92em; font-weight: 800; color: #fbbf24; margin-bottom: 6px;">Konfirmasi Sinkronisasi</div>
+                    <div id="ahi-slides-confirm-desc" style="font-size: 0.82em; color: #fde68a; line-height: 1.45; margin-bottom: 12px;"></div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+                        <button type="button" onclick="cancelAhiSlidesAction()" style="background: #334155; color: #e2e8f0; border: 1px solid #475569; padding: 7px 14px; border-radius: 6px; font-size: 0.8em; font-weight: 700; cursor: pointer;">
+                            Batal
+                        </button>
+                        <button type="button" onclick="confirmAhiSlidesAction()" style="background: #16a34a; color: #fff; border: none; padding: 7px 16px; border-radius: 6px; font-size: 0.8em; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-check"></i> Konfirmasi &amp; Sinkronkan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Status Feedback -->
+                <div id="ahi-slides-status-msg" style="display: none; border: 1px solid; border-radius: 6px; padding: 10px 12px; font-size: 0.82em; line-height: 1.4;"></div>
+            </div>
+
+            <div style="background: #0b1120; padding: 12px 22px; border-top: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <button type="button" onclick="downloadAhiPptxLocal()" style="background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%); color: #fff; border: 1px solid rgba(255, 215, 0, 0.5); padding: 8px 16px; border-radius: 6px; font-weight: 800; font-size: 0.8em; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;">
+                    <i class="fas fa-download"></i> DOWNLOAD POWERPOINT (.PPTX) SEKARANG
+                </button>
+                <button onclick="closeAhiSlidesModal()" style="background: #334155; color: #fff; border: 1px solid #475569; padding: 8px 18px; border-radius: 6px; font-weight: bold; font-size: 0.8em; cursor: pointer;">
+                    TUTUP
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating Bottom Navigation -->
     <div id="bottom-nav" class="bottom-nav hidden">
         <div class="bottom-nav-item" id="nav-ahi-summary" style="display: none;" onclick="showDashboardSection('ahi-summary-section')">
@@ -5310,13 +5738,27 @@
     <div class="main-container-wrapper">
     <div class="header">
         <h1>LOGISTICS DASHBOARD | ORDER PLANNING NDC AHI SIDOARJO</h1>
-        <div id="header-so-alert-wrap" style="display: none; margin-top: 8px;">
-            <button id="btn-header-stok-opname" class="stok-opname-badge-btn" onclick="openStockOpnameModal()" title="Lihat Peringatan Tabel Stok Opname">
-                <i class="fas fa-triangle-exclamation"></i>
-                <span>PERINGATAN STOK OPNAME</span>
-                <span class="so-count-pill" id="header-so-count">12</span>
-            </button>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
+            <div id="header-so-alert-wrap" style="display: none;">
+                <button id="btn-header-stok-opname" class="stok-opname-badge-btn" onclick="openStockOpnameModal()" title="Lihat Peringatan Tabel Stok Opname">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <span>PERINGATAN STOK OPNAME</span>
+                    <span class="so-count-pill" id="header-so-count">12</span>
+                </button>
+            </div>
+            <div id="header-ahi-slides-wrap" style="display: none;">
+                <button id="btn-header-ahi-slides" class="ahi-slides-header-btn" onclick="openAhiSlidesModal()" title="Buat PowerPoint (.PPTX) & Sinkronkan dengan Google Slides">
+                    <i class="fas fa-file-powerpoint"></i>
+                    <span>AUTO PPT &amp; GOOGLE SLIDES</span>
+                    <span class="ahi-slides-pill" id="header-slides-sync-badge">PPT</span>
+                </button>
+            </div>
         </div>
+    </div>
+    <div id="ahi-slides-update-banner" style="display: none; background: #1e293b; border-bottom: 2px solid #ffd700; padding: 8px 16px; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 0.82em; color: #f8fafc;">
+        <span><i class="fas fa-sync-alt" style="color: #ffd700; margin-right: 6px;"></i>Data spreadsheet terbaru sudah termuat di dashboard. Ingin menyinkronkan ke Google Slides?</span>
+        <button type="button" onclick="openAhiSlidesModal()" style="background: #ffd700; color: #111827; border: none; border-radius: 4px; padding: 4px 12px; font-weight: 800; cursor: pointer;">Review &amp; Sinkronkan</button>
+        <button type="button" onclick="document.getElementById('ahi-slides-update-banner').style.display='none'" style="background: transparent; color: #94a3b8; border: 1px solid #475569; border-radius: 4px; padding: 4px 8px; cursor: pointer;">Nanti</button>
     </div>
 
     <div class="container">
@@ -5726,19 +6168,21 @@
                 <!-- NEW KPI ROW: SLA GRW DK & LK -->
                 <div class="fbi-sla-row" style="display: flex; gap: 24px; margin-top: 10px; flex-wrap: wrap;">
                     <div class="fbi-sla-card" style="background: #ffffff; border-left: 6px solid #2dd4bf; border-radius: 16px; padding: 24px; flex: 1; min-width: 220px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: center; border-right: 1px solid #f1f5f9; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9;">
-                        <div style="font-size: 0.9rem; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                            <i class="fas fa-shipping-fast" style="color: #2dd4bf;"></i> SLA GRW DK
+                        <div style="font-size: 0.9rem; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                            <span style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-shipping-fast" style="color: #2dd4bf;"></i> SLA GRW DK</span>
+                            <span style="background: rgba(45, 212, 191, 0.15); color: #0f766e; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; letter-spacing: 0.04em;">H-1</span>
                         </div>
                         <div id="fbi-main-sla-dk" class="fbi-sla-value" style="font-size: 3.8rem; font-weight: 900; color: #1e293b; line-height: 1;">0%</div>
-                        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 8px; font-weight: 600;">Based on selected Delivery Date</div>
+                        <div id="fbi-main-sla-dk-label" style="font-size: 0.78rem; color: #64748b; margin-top: 8px; font-weight: 600;">Base on tanggal —</div>
                     </div>
                     
                     <div class="fbi-sla-card" style="background: #ffffff; border-left: 6px solid #3b82f6; border-radius: 16px; padding: 24px; flex: 1; min-width: 220px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: center; border-right: 1px solid #f1f5f9; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9;">
-                        <div style="font-size: 0.9rem; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                            <i class="fas fa-truck-moving" style="color: #3b82f6;"></i> SLA GRW LK
+                        <div style="font-size: 0.9rem; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                            <span style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-truck-moving" style="color: #3b82f6;"></i> SLA GRW LK</span>
+                            <span style="background: rgba(59, 130, 246, 0.15); color: #1d4ed8; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; letter-spacing: 0.04em;">H-1</span>
                         </div>
                         <div id="fbi-main-sla-lk" class="fbi-sla-value" style="font-size: 3.8rem; font-weight: 900; color: #1e293b; line-height: 1;">0%</div>
-                        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 8px; font-weight: 600;">Based on selected Delivery Date</div>
+                        <div id="fbi-main-sla-lk-label" style="font-size: 0.78rem; color: #64748b; margin-top: 8px; font-weight: 600;">Base on tanggal —</div>
                     </div>
 
                     <div class="fbi-sla-card" style="background: #ffffff; border-left: 6px solid #8b5cf6; border-radius: 16px; padding: 24px; flex: 1; min-width: 220px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: center; border-right: 1px solid #f1f5f9; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9;">
@@ -5797,6 +6241,22 @@
                 <div class="fbi-item-header" style="display: flex; justify-content: space-between; align-items: center; background: #331d52; flex-wrap: wrap; gap: 10px; padding: 12px 16px;">
                     <span style="font-weight: bold; font-size: 0.9em;"><i class="fas fa-calendar-alt" style="margin-right: 6px;"></i> SCHEDULE DELIVERY FBI</span>
                     <div class="fbi-schedule-filters" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <!-- Ambil Kode Store Controls (Sebelah kiri Pilih Hari) -->
+                        <div style="display: inline-flex; align-items: center; gap: 5px; background: #1a102b; border: 1px solid #7c3aed; border-radius: 6px; padding: 3px 6px;" title="Ambil kode store sesuai filter aktif (Hari, Shipping Line, Wilayah)">
+                            <span style="font-size: 0.72em; color: #d8b4fe; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; padding-right: 4px; border-right: 1px solid #4c1d95;">
+                                <i class="fas fa-copy" style="color: #ffd700;"></i>
+                                <span>Kode Store (<span id="fbi-copy-store-count">0</span>)</span>
+                            </span>
+                            <button type="button" id="btn-fbi-copy-semi" onclick="copyFbiStoreCodes('semicolon')" style="background: #5a189a; color: #ffd700; border: 1px solid #7c3aed; padding: 3px 8px; border-radius: 4px; font-size: 0.74em; font-weight: 700; cursor: pointer; font-family: monospace; transition: all 0.15s; white-space: nowrap;" onmouseover="this.style.background='#7c3aed'; this.style.color='#fff';" onmouseout="this.style.background='#5a189a'; this.style.color='#ffd700';" title="Salin kode store dipisah ';' (contoh: F35A;F35J;F542)">
+                                Copy (;)
+                            </button>
+                            <button type="button" id="btn-fbi-copy-or" onclick="copyFbiStoreCodes('or')" style="background: #1e3a5f; color: #38bdf8; border: 1px solid #0284c7; padding: 3px 8px; border-radius: 4px; font-size: 0.74em; font-weight: 700; cursor: pointer; font-family: monospace; transition: all 0.15s; white-space: nowrap;" onmouseover="this.style.background='#0284c7'; this.style.color='#fff';" onmouseout="this.style.background='#1e3a5f'; this.style.color='#38bdf8';" title="Salin kode store dipisah ' or ' (contoh: F35A or F35J or F542)">
+                                Copy (or)
+                            </button>
+                            <button type="button" onclick="openFbiStoreCodeModal()" style="background: #2e1f47; color: #e9d5ff; border: 1px solid #6d28d9; padding: 3px 7px; border-radius: 4px; font-size: 0.74em; font-weight: 700; cursor: pointer; transition: all 0.15s; white-space: nowrap;" onmouseover="this.style.background='#6d28d9'; this.style.color='#fff';" onmouseout="this.style.background='#2e1f47'; this.style.color='#e9d5ff';" title="Lihat & pilih format daftar kode store">
+                                <i class="fas fa-eye"></i> Detail
+                            </button>
+                        </div>
                         <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
                             <label style="font-size: 0.78em; color: #eee; font-weight: 500;">Pilih Hari:</label>
                             <select id="fbi-filter-hari" onchange="renderFBIDashboard()" style="background: #1a1a1a; color: #fff; border: 1px solid #5a189a; padding: 4px 8px; border-radius: 4px; outline: none; font-size: 0.8em; cursor: pointer;">
@@ -7349,11 +7809,27 @@
                     </button>
                     <a id="whatsapp-btn" href="https://wa.me/6285973792145?text=Halo%20Tim%20Inventory%20Planner%2C%0A%0AKami%20ingin%20menginformasikan%20bahwa%20saat%20ini%20STOREBOOKING%20kami%20mengalami%20kekurangan%20kuota.%20Sehubungan%20dengan%20hal%20tersebut%2C%20kami%20mohon%20bantuannya%20untuk%20penambahan%20kuota%20agar%20proses%20operasional%20dapat%20berjalan%20dengan%20lancar.%0A%0AMohon%20dapat%20ditindaklanjuti%20secepatnya.%20Terima%20kasih%20atas%20perhatian%20dan%20kerjasamanya.%0A%0ABest%20regards%2C%0A%5BTim%20Planner%20DC%20Sidoarjo%5D" 
                        target="_blank" 
-                       style="background: #25D366; color: #fff; padding: 6px 10px; border-radius: 4px; text-decoration: none; font-size: 0.78em; display: flex; align-items: center; gap: 6px; font-weight: bold; transition: opacity 0.2s; white-space: nowrap;"
+                       style="background: #25D366; color: white; padding: 6px 10px; border-radius: 4px; text-decoration: none; font-size: 0.78em; display: flex; align-items: center; gap: 6px; font-weight: bold; transition: opacity 0.2s; white-space: nowrap;"
                        onmouseover="this.style.opacity='0.8'" 
                        onmouseout="this.style.opacity='1'">
                         <i class="fab fa-whatsapp" style="font-size: 1.1em;"></i> KIRIM DATA KURANG KUOTA
                     </a>
+                    <!-- Ambil EXTERNORDERKEY (Kolom F) Created Internally & LP (Khusus DC FBI Sidoarjo) -->
+                    <div id="outstanding-od-lp-wrap" style="align-items: center; gap: 5px; background: #141a24; border: 1px solid #ffd700; border-radius: 5px; padding: 3px 6px;" title="Ambil EXTERNORDERKEY (Kolom F) untuk Created Internally (Kolom G) & LP (Kolom BG)">
+                        <span style="font-size: 0.73em; color: #ffd700; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; padding-right: 4px; border-right: 1px solid #444;">
+                            <i class="fas fa-copy"></i>
+                            <span>OD LP (<span id="outstanding-od-count">0</span>)</span>
+                        </span>
+                        <button type="button" id="btn-os-od-copy-or" onclick="copyOutstandingExternOrderKeys('or')" style="background: #1e3a5f; color: #38bdf8; border: 1px solid #0284c7; padding: 3px 8px; border-radius: 4px; font-size: 0.74em; font-weight: 700; cursor: pointer; font-family: monospace; white-space: nowrap; transition: all 0.15s;" onmouseover="this.style.background='#0284c7'; this.style.color='#fff';" onmouseout="this.style.background='#1e3a5f'; this.style.color='#38bdf8';" title="Salin EXTERNORDERKEY dipisah ' or ' (Created Internally & LP)">
+                            Copy (or)
+                        </button>
+                        <button type="button" id="btn-os-od-copy-semi" onclick="copyOutstandingExternOrderKeys('semicolon')" style="background: #422006; color: #ffd700; border: 1px solid #d97706; padding: 3px 8px; border-radius: 4px; font-size: 0.74em; font-weight: 700; cursor: pointer; font-family: monospace; white-space: nowrap; transition: all 0.15s;" onmouseover="this.style.background='#d97706'; this.style.color='#fff';" onmouseout="this.style.background='#422006'; this.style.color='#ffd700';" title="Salin EXTERNORDERKEY dipisah ';' (Created Internally & LP)">
+                            Copy (;)
+                        </button>
+                        <button type="button" onclick="openOutstandingOdModal()" style="background: #262626; color: #e2e8f0; border: 1px solid #525252; padding: 3px 7px; border-radius: 4px; font-size: 0.74em; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.15s;" onmouseover="this.style.background='#404040'; this.style.color='#fff';" onmouseout="this.style.background='#262626'; this.style.color='#e2e8f0';" title="Lihat detail EXTERNORDERKEY & filter">
+                            <i class="fas fa-eye"></i> Detail
+                        </button>
+                    </div>
                     <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
                         <label style="font-size: 0.78em; color: #ccc;">PILIH AREA:</label>
                         <select id="pivot-area-filter" style="background: #222; color: #fff; border: 1px solid #444; padding: 4px 8px; border-radius: 4px; outline: none; font-size: 0.8em;">
@@ -9068,6 +9544,8 @@
             rawFBISchedule = [];
             rawHubData = [];
             rawAstorData = [];
+            if (typeof closeOutstandingOdModal === 'function') closeOutstandingOdModal();
+            if (typeof closeAhiSlidesModal === 'function') closeAhiSlidesModal();
             const bf = document.getElementById('chatime-bulan-filter');
             if (bf) bf.innerHTML = '<option value="ALL">SEMUA BULAN</option>';
 
@@ -9106,6 +9584,8 @@
                 }
                 const soWrap = document.getElementById('header-so-alert-wrap');
                 if (soWrap) soWrap.style.display = 'none';
+                const slidesWrap = document.getElementById('header-ahi-slides-wrap');
+                if (slidesWrap) slidesWrap.style.display = 'none';
             } else if (branch === 'KLS') {
                 body.classList.remove('theme-purple');
                 body.classList.add('theme-cyan');
@@ -9137,6 +9617,8 @@
                 }
                 const soWrap = document.getElementById('header-so-alert-wrap');
                 if (soWrap) soWrap.style.display = 'none';
+                const slidesWrap = document.getElementById('header-ahi-slides-wrap');
+                if (slidesWrap) slidesWrap.style.display = 'none';
             } else {
                 body.classList.remove('theme-purple');
                 body.classList.remove('theme-cyan');
@@ -9168,6 +9650,8 @@
                 }
                 const soWrap = document.getElementById('header-so-alert-wrap');
                 if (soWrap) soWrap.style.display = 'inline-block';
+                const slidesWrap = document.getElementById('header-ahi-slides-wrap');
+                if (slidesWrap) slidesWrap.style.display = 'inline-block';
                 fetchStockOpnameData();
             }
 
@@ -10207,6 +10691,8 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             let html = '';
             let totalSudah = { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 };
             let totalBelum = { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 };
+            const scheduleItemsForCopy = [];
+            const seenCopySites = new Set();
 
             if (filteredSchedule.length === 0) {
                 html = '<tr><td colspan="16" style="text-align:center; padding:20px; color:#bbb;">Tidak ada jadwal pengiriman untuk filter yang dipilih</td></tr>';
@@ -10216,6 +10702,19 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                         sudah: { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 },
                         belum: { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 }
                     };
+
+                    const cleanCode = (s.siteCode || '').toString().trim();
+                    if (cleanCode && !seenCopySites.has(cleanCode)) {
+                        seenCopySites.add(cleanCode);
+                        scheduleItemsForCopy.push({
+                            siteCode: cleanCode,
+                            storeDesc: s.storeDesc || '',
+                            shippingLine: s.shippingLine || '-',
+                            wilayah: s.wilayah || '-',
+                            sudahTotal: stats.sudah.total || 0,
+                            belumTotal: stats.belum.total || 0
+                        });
+                    }
 
                     const stopVal = s.stops[hariFilter] || '-';
 
@@ -10264,6 +10763,15 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                         <td style="text-align:center; color:#ffd700; background:rgba(255,215,0,0.1);">${formatIndo(totalBelum.total)}</td>
                     </tr>
                 `;
+            }
+
+            window.currentFbiScheduleItems = scheduleItemsForCopy;
+            const copyCountEl = document.getElementById('fbi-copy-store-count');
+            if (copyCountEl) copyCountEl.textContent = scheduleItemsForCopy.length;
+
+            const modalFbi = document.getElementById('modal-fbi-store-codes');
+            if (modalFbi && !modalFbi.classList.contains('hidden')) {
+                renderFbiStoreCodeModalContent();
             }
 
             hBody.innerHTML = html;
@@ -10846,7 +11354,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 }
             });
 
-            // SLA GRW DK & LK calculation from rawSlaFbiData
+            // SLA GRW DK & LK calculation from rawSlaFbiData (H-1 logic)
             let slaDkValue = 0;
             let slaLkValue = 0;
             let dkTotalOT = 0; let dkTotalDelay = 0;
@@ -10855,6 +11363,55 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             let slaCurrentMonthValue = 0;
             let currentMonthLabel = '—';
 
+            const IndonesianMonthsShort = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+            // Helper to parse date strings safely in local timezone
+            const parseLocalSlaDate = (str) => {
+                if (!str) return new Date(0);
+                const s = String(str).trim();
+                const isoMatch = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+                if (isoMatch) {
+                    return new Date(parseInt(isoMatch[1]), parseInt(isoMatch[2]) - 1, parseInt(isoMatch[3]));
+                }
+                const slashMatch = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+                if (slashMatch) {
+                    let yr = parseInt(slashMatch[3]);
+                    if (yr < 100) yr += 2000;
+                    return new Date(yr, parseInt(slashMatch[2]) - 1, parseInt(slashMatch[1]));
+                }
+                return parseDate(s);
+            };
+
+            // Determine H-1 target date:
+            // - If a specific Delivery Date is selected (e.g. 2026-11-13), H-1 is selectedDate - 1 day (2026-11-12).
+            // - If 'ALL' is selected, H-1 is today - 1 day (or latest date in selected archive month if viewing a past month).
+            const nowLocal = new Date();
+            const curMonthKey = MonthsID[nowLocal.getMonth()] + ' ' + nowLocal.getFullYear();
+            let h1DateObj = new Date(nowLocal.getFullYear(), nowLocal.getMonth(), nowLocal.getDate() - 1);
+
+            if (dateFilter !== 'ALL' && /^\d{4}-\d{2}-\d{2}$/.test(dateFilter)) {
+                const [y, m, d] = dateFilter.split('-').map(Number);
+                h1DateObj = new Date(y, m - 1, d - 1);
+            } else if (bulanFilterVal !== 'ALL' && bulanFilterVal !== curMonthKey && rawSlaFbiData.length > 2) {
+                // Find the latest date inside the chosen past month
+                let latestPastDate = null;
+                for (let i = 2; i < rawSlaFbiData.length; i++) {
+                    const rDate = (rawSlaFbiData[i][0] || '').trim();
+                    if (!rDate) continue;
+                    const dObj = parseLocalSlaDate(rDate);
+                    if (isNaN(dObj.getTime()) || dObj.getTime() === 0) continue;
+                    const key = MonthsID[dObj.getMonth()] + ' ' + dObj.getFullYear();
+                    if (key === bulanFilterVal && (!latestPastDate || dObj.getTime() > latestPastDate.getTime())) {
+                        latestPastDate = dObj;
+                    }
+                }
+                if (latestPastDate) h1DateObj = latestPastDate;
+            }
+
+            const targetH1Iso = toISODate(h1DateObj);
+            const h1DisplayDate = `${h1DateObj.getDate()} ${IndonesianMonthsShort[h1DateObj.getMonth()]} ${h1DateObj.getFullYear()}`;
+            let hasH1Row = false;
+
             if (rawSlaFbiData.length > 2) {
                 for (let i = 2; i < rawSlaFbiData.length; i++) {
                     const row = rawSlaFbiData[i];
@@ -10862,23 +11419,12 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                     const rowDate = (row[0] || '').trim();
                     if (!rowDate) continue;
 
-                    const dObj = parseDate(rowDate);
+                    const dObj = parseLocalSlaDate(rowDate);
                     const isoDate = toISODate(dObj);
-                    
-                    let m = "";
-                    if (!isNaN(dObj.getTime())) m = MonthsID[dObj.getMonth()];
-                    
-                    let matchBulan = true;
-                    if (bulanFilterVal !== 'ALL') {
-                        const localMonthKey = MonthsID[dObj.getMonth()] + ' ' + dObj.getFullYear();
-                        matchBulan = (localMonthKey === bulanFilterVal);
-                    } else {
-                        matchBulan = selectedFilters.bulan.length === 0 || (m && selectedFilters.bulan.includes(m));
-                    }
-                    const matchDate = dateFilter === 'ALL' || isoDate === dateFilter;
-                    
-                    if (!matchBulan || !matchDate) continue;
 
+                    if (isoDate !== targetH1Iso) continue;
+
+                    hasH1Row = true;
                     dkTotalOT += parseNumberWithComma(row[1] || '0');
                     dkTotalDelay += parseNumberWithComma(row[2] || '0');
                     lkTotalOT += parseNumberWithComma(row[3] || '0');
@@ -10903,7 +11449,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                     if (row.length < 5) continue;
                     const rowDate = (row[0] || '').trim();
                     if (!rowDate) continue;
-                    const dObj = parseDate(rowDate);
+                    const dObj = parseLocalSlaDate(rowDate);
                     if (isNaN(dObj.getTime()) || dObj.getTime() === 0) continue;
 
                     const y = dObj.getFullYear();
@@ -10921,7 +11467,6 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 const targetMonthIdx = hasCurrentCalData ? curMonthIdx : maxMonth;
                 const targetYear = hasCurrentCalData ? curYear : maxYear;
 
-                const IndonesianMonthsShort = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
                 currentMonthLabel = IndonesianMonthsShort[targetMonthIdx] + ' ' + targetYear;
 
                 let monthlyOT = 0;
@@ -10931,7 +11476,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                     if (row.length < 5) continue;
                     const rowDate = (row[0] || '').trim();
                     if (!rowDate) continue;
-                    const dObj = parseDate(rowDate);
+                    const dObj = parseLocalSlaDate(rowDate);
                     if (isNaN(dObj.getTime()) || dObj.getTime() === 0) continue;
 
                     if (dObj.getFullYear() === targetYear && dObj.getMonth() === targetMonthIdx) {
@@ -10948,11 +11493,27 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
 
             const slaDkEl = document.getElementById('fbi-main-sla-dk');
             const slaLkEl = document.getElementById('fbi-main-sla-lk');
+            const slaDkLabelEl = document.getElementById('fbi-main-sla-dk-label');
+            const slaLkLabelEl = document.getElementById('fbi-main-sla-lk-label');
             const slaCurrentMonthEl = document.getElementById('fbi-main-sla-current-month');
             const slaCurrentMonthLabelEl = document.getElementById('fbi-main-sla-current-month-label');
 
             if (slaDkEl) slaDkEl.innerText = slaDkValue > 0 ? slaDkValue.toFixed(1) + '%' : '0%';
             if (slaLkEl) slaLkEl.innerText = slaLkValue > 0 ? slaLkValue.toFixed(1) + '%' : '0%';
+
+            const dkTotalCount = dkTotalOT + dkTotalDelay;
+            const lkTotalCount = lkTotalOT + lkTotalDelay;
+            if (slaDkLabelEl) {
+                slaDkLabelEl.innerHTML = dkTotalCount > 0
+                    ? `Base on tanggal <strong style="color:#0f172a;">${h1DisplayDate}</strong> <span style="color:#0f766e;">(OT: ${formatIndo(dkTotalOT)} / ${formatIndo(dkTotalCount)})</span>`
+                    : `Base on tanggal <strong style="color:#0f172a;">${h1DisplayDate}</strong> <span style="color:#94a3b8;">${hasH1Row ? '(0 Order)' : '(Belum Ada Data)'}</span>`;
+            }
+            if (slaLkLabelEl) {
+                slaLkLabelEl.innerHTML = lkTotalCount > 0
+                    ? `Base on tanggal <strong style="color:#0f172a;">${h1DisplayDate}</strong> <span style="color:#1d4ed8;">(OT: ${formatIndo(lkTotalOT)} / ${formatIndo(lkTotalCount)})</span>`
+                    : `Base on tanggal <strong style="color:#0f172a;">${h1DisplayDate}</strong> <span style="color:#94a3b8;">${hasH1Row ? '(0 Order)' : '(Belum Ada Data)'}</span>`;
+            }
+
             if (slaCurrentMonthEl) slaCurrentMonthEl.innerText = slaCurrentMonthValue > 0 ? slaCurrentMonthValue.toFixed(1) + '%' : '0%';
             if (slaCurrentMonthLabelEl) slaCurrentMonthLabelEl.innerText = 'Based on Month: ' + currentMonthLabel;
 
@@ -11269,7 +11830,8 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                         AK: values[36] || '',
                         AO: values[40] || '',
                         BC: values[54] || '',
-                        BE: values[56] || ''
+                        BE: values[56] || '',
+                        BG: (values[58] || '').trim()
                     }
                 };
 
@@ -12715,6 +13277,350 @@ function hubSort(colIdx) {
             XLSX.writeFile(workbook, fileName);
         };
 
+        /* ========================================================
+           AMBIL KODE STORE FBI (SCHEDULE DELIVERY FBI)
+           ======================================================== */
+        window.currentFbiScheduleItems = [];
+        window.currentFbiStoreCodeScope = 'ALL';
+
+        function copyTextToClipboardSafe(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text).catch(() => fallbackCopyText(text));
+            }
+            return Promise.resolve(fallbackCopyText(text));
+        }
+
+        function fallbackCopyText(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            ta.style.top = '0';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Copy fallback failed:', err);
+            }
+            document.body.removeChild(ta);
+        }
+
+        function showFbiCopyToast(message, isWarning = false) {
+            let toast = document.getElementById('fbi-copy-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'fbi-copy-toast';
+                toast.style.cssText = 'position:fixed; bottom:80px; right:24px; z-index:99999; padding:10px 16px; border-radius:8px; font-size:0.84em; font-weight:700; display:flex; align-items:center; gap:8px; box-shadow:0 10px 25px rgba(0,0,0,0.6); transition:opacity 0.25s, transform 0.25s; opacity:0; transform:translateY(10px); pointer-events:none;';
+                document.body.appendChild(toast);
+            }
+            toast.style.background = isWarning ? '#7f1d1d' : '#1e1b4b';
+            toast.style.border = isWarning ? '1px solid #ef4444' : '1px solid #8b5cf6';
+            toast.style.color = isWarning ? '#fecaca' : '#f5f3ff';
+            toast.innerHTML = `<i class="fas ${isWarning ? 'fa-exclamation-circle' : 'fa-check-circle'}" style="color:${isWarning ? '#f87171' : '#4ade80'};"></i><span>${message}</span>`;
+            requestAnimationFrame(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateY(0)';
+            });
+            clearTimeout(window._fbiToastTimer);
+            window._fbiToastTimer = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+            }, 2500);
+        }
+
+        function getFbiStoreItemsByScope(scope) {
+            const items = window.currentFbiScheduleItems || [];
+            if (scope === 'HAS_ORDER') {
+                return items.filter(it => (it.sudahTotal + it.belumTotal) > 0);
+            }
+            if (scope === 'BELUM_PLAN') {
+                return items.filter(it => it.belumTotal > 0);
+            }
+            if (scope === 'SUDAH_PLAN') {
+                return items.filter(it => it.sudahTotal > 0);
+            }
+            return items;
+        }
+
+        window.copyFbiStoreCodes = function(format) {
+            const items = window.currentFbiScheduleItems || [];
+            if (items.length === 0) {
+                showFbiCopyToast('Tidak ada kode store sesuai filter saat ini', true);
+                return;
+            }
+            const codes = items.map(it => it.siteCode);
+            const sep = format === 'or' ? ' or ' : ';';
+            const result = codes.join(sep);
+
+            copyTextToClipboardSafe(result).then(() => {
+                const shipVal = document.getElementById('fbi-filter-shipping')?.value || 'ALL';
+                const labelShip = shipVal === 'ALL' ? 'Semua Shipping' : shipVal;
+                showFbiCopyToast(`Berhasil salin ${codes.length} kode store (${labelShip}) format ${format === 'or' ? 'OR' : 'titik koma (;)'}`);
+
+                const btnId = format === 'or' ? 'btn-fbi-copy-or' : 'btn-fbi-copy-semi';
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    const origText = format === 'or' ? 'Copy (or)' : 'Copy (;)';
+                    btn.textContent = `✓ Tersalin (${codes.length})`;
+                    clearTimeout(btn._resetTimer);
+                    btn._resetTimer = setTimeout(() => {
+                        btn.textContent = origText;
+                    }, 1800);
+                }
+            });
+        };
+
+        window.openFbiStoreCodeModal = function() {
+            window.currentFbiStoreCodeScope = 'ALL';
+            document.querySelectorAll('.fbi-code-scope-btn').forEach(btn => {
+                if (btn.getAttribute('data-scope') === 'ALL') {
+                    btn.style.background = '#7c3aed';
+                    btn.style.color = '#fff';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#94a3b8';
+                }
+            });
+            renderFbiStoreCodeModalContent();
+            const modal = document.getElementById('modal-fbi-store-codes');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        };
+
+        window.closeFbiStoreCodeModal = function() {
+            const modal = document.getElementById('modal-fbi-store-codes');
+            if (modal) modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        window.setFbiStoreCodeScope = function(scope) {
+            window.currentFbiStoreCodeScope = scope;
+            document.querySelectorAll('.fbi-code-scope-btn').forEach(btn => {
+                if (btn.getAttribute('data-scope') === scope) {
+                    btn.style.background = '#7c3aed';
+                    btn.style.color = '#fff';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#94a3b8';
+                }
+            });
+            renderFbiStoreCodeModalContent();
+        };
+
+        window.renderFbiStoreCodeModalContent = function() {
+            const hariVal = document.getElementById('fbi-filter-hari')?.value || 'ALL';
+            const shipVal = document.getElementById('fbi-filter-shipping')?.value || 'ALL';
+            const wilVal = document.getElementById('fbi-filter-wilayah')?.value || 'ALL';
+
+            const filteredItems = getFbiStoreItemsByScope(window.currentFbiStoreCodeScope || 'ALL');
+            const codes = filteredItems.map(it => it.siteCode);
+
+            const filterInfoEl = document.getElementById('fbi-modal-filter-info');
+            if (filterInfoEl) {
+                filterInfoEl.textContent = `Filter aktif: ${hariVal === 'ALL' ? 'Semua Hari' : hariVal} • Shipping: ${shipVal === 'ALL' ? 'Semua Shipping' : shipVal} • Wilayah: ${wilVal === 'ALL' ? 'Semua Wilayah' : wilVal}`;
+            }
+
+            const badgeEl = document.getElementById('fbi-modal-store-badge');
+            if (badgeEl) badgeEl.textContent = `${codes.length} STORE`;
+
+            const chipsCountEl = document.getElementById('fbi-store-chips-count');
+            if (chipsCountEl) chipsCountEl.textContent = `${codes.length} Store`;
+
+            const semiEl = document.getElementById('fbi-store-codes-semicolon');
+            const orEl = document.getElementById('fbi-store-codes-or');
+            if (semiEl) semiEl.value = codes.join(';');
+            if (orEl) orEl.value = codes.join(' or ');
+
+            const chipsEl = document.getElementById('fbi-store-chips-preview');
+            if (chipsEl) {
+                if (filteredItems.length === 0) {
+                    chipsEl.innerHTML = '<span style="color:#64748b; font-size:0.8em; font-style:italic;">Tidak ada store pada cakupan filter ini.</span>';
+                } else {
+                    chipsEl.innerHTML = filteredItems.map(it => `
+                        <span title="${it.storeDesc} | Shipping: ${it.shippingLine} | Sudah: ${formatIndo(it.sudahTotal)} CBM | Belum: ${formatIndo(it.belumTotal)} CBM" style="background: rgba(124, 58, 237, 0.16); border: 1px solid rgba(168, 85, 247, 0.38); color: #f3e8ff; padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 0.78em; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                            <span style="color:#ffd700;">${it.siteCode}</span>
+                            <span style="font-family:sans-serif; font-size:0.85em; color:#94a3b8; font-weight:500;">${it.shippingLine}</span>
+                        </span>
+                    `).join('');
+                }
+            }
+        };
+
+        window.copyFbiStoreCodeFromModal = function(format) {
+            const targetId = format === 'or' ? 'fbi-store-codes-or' : 'fbi-store-codes-semicolon';
+            const btnId = format === 'or' ? 'btn-fbi-modal-copy-or' : 'btn-fbi-modal-copy-semi';
+            const el = document.getElementById(targetId);
+            const val = el ? el.value : '';
+            if (!val) {
+                showFbiCopyToast('Tidak ada kode store untuk disalin', true);
+                return;
+            }
+            copyTextToClipboardSafe(val).then(() => {
+                showFbiCopyToast(`Kode store format ${format === 'or' ? 'OR' : 'titik koma (;)'} berhasil disalin!`);
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    const origHtml = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
+                    setTimeout(() => {
+                        btn.innerHTML = origHtml;
+                    }, 1800);
+                }
+            });
+        };
+
+        /* ========================================================
+           AMBIL EXTERNORDERKEY (OUTSTANDING MONITORING ORDER AGING)
+           Filter: Kolom G = Created Internally, Kolom BG = LP
+           ======================================================== */
+        window.currentOutstandingOdItems = [];
+        window.currentOutstandingOdScope = 'ALL';
+
+        function getOutstandingOdItemsByScope(scope) {
+            const items = window.currentOutstandingOdItems || [];
+            if (scope === 'BELUM_PLAN') {
+                return items.filter(it => (it.status || '').toUpperCase().includes('BELUM PLAN'));
+            }
+            if (scope === 'SUDAH_PLAN') {
+                return items.filter(it => (it.status || '').toUpperCase().includes('SUDAH PLAN'));
+            }
+            return items;
+        }
+
+        window.copyOutstandingExternOrderKeys = function(format = 'or') {
+            const items = window.currentOutstandingOdItems || [];
+            if (items.length === 0) {
+                showFbiCopyToast('Tidak ada EXTERNORDERKEY (Created Internally & LP) sesuai filter', true);
+                return;
+            }
+            const codes = items.map(it => it.extOrderKey);
+            const sep = format === 'semicolon' ? ';' : ' or ';
+            const result = codes.join(sep);
+
+            copyTextToClipboardSafe(result).then(() => {
+                showFbiCopyToast(`Berhasil salin ${codes.length} EXTERNORDERKEY (Created Internally & LP) format ${format === 'semicolon' ? 'titik koma (;)' : 'OR'}`);
+                const btnId = format === 'semicolon' ? 'btn-os-od-copy-semi' : 'btn-os-od-copy-or';
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    const origText = format === 'semicolon' ? 'Copy (;)' : 'Copy (or)';
+                    btn.textContent = `✓ Tersalin (${codes.length})`;
+                    clearTimeout(btn._resetTimer);
+                    btn._resetTimer = setTimeout(() => {
+                        btn.textContent = origText;
+                    }, 1800);
+                }
+            });
+        };
+
+        window.openOutstandingOdModal = function() {
+            window.currentOutstandingOdScope = 'ALL';
+            document.querySelectorAll('.os-od-scope-btn').forEach(btn => {
+                if (btn.getAttribute('data-scope') === 'ALL') {
+                    btn.style.background = '#d97706';
+                    btn.style.color = '#fff';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#94a3b8';
+                }
+            });
+            renderOutstandingOdModalContent();
+            const modal = document.getElementById('modal-outstanding-od-keys');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        };
+
+        window.closeOutstandingOdModal = function() {
+            const modal = document.getElementById('modal-outstanding-od-keys');
+            if (modal) modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        window.setOutstandingOdScope = function(scope) {
+            window.currentOutstandingOdScope = scope;
+            document.querySelectorAll('.os-od-scope-btn').forEach(btn => {
+                if (btn.getAttribute('data-scope') === scope) {
+                    btn.style.background = '#d97706';
+                    btn.style.color = '#fff';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#94a3b8';
+                }
+            });
+            renderOutstandingOdModalContent();
+        };
+
+        window.renderOutstandingOdModalContent = function() {
+            const areaVal = (document.getElementById('pivot-area-filter') || {}).value || 'ALL';
+            const filteredItems = getOutstandingOdItemsByScope(window.currentOutstandingOdScope || 'ALL');
+            const codes = filteredItems.map(it => it.extOrderKey);
+
+            const filterInfoEl = document.getElementById('os-od-modal-filter-info');
+            if (filterInfoEl) {
+                filterInfoEl.textContent = `Sumber: Kolom F (EXTERNORDERKEY) • Kolom G = Created Internally • Kolom BG = LP • Area: ${areaVal === 'ALL' ? 'Semua Area' : areaVal}`;
+            }
+
+            const badgeEl = document.getElementById('os-od-modal-badge');
+            if (badgeEl) badgeEl.textContent = `${codes.length} OD`;
+
+            const tableCountEl = document.getElementById('os-od-table-count');
+            if (tableCountEl) tableCountEl.textContent = `${codes.length} OD Unik`;
+
+            const orEl = document.getElementById('os-od-codes-or');
+            const semiEl = document.getElementById('os-od-codes-semicolon');
+            if (orEl) orEl.value = codes.join(' or ');
+            if (semiEl) semiEl.value = codes.join(';');
+
+            const tbody = document.getElementById('os-od-preview-tbody');
+            if (tbody) {
+                if (filteredItems.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 24px; color:#64748b;">Tidak ada EXTERNORDERKEY dengan Kolom G = Created Internally dan Kolom BG = LP.</td></tr>';
+                } else {
+                    tbody.innerHTML = filteredItems.map((it, idx) => {
+                        const bgRow = idx % 2 === 0 ? '#0d1527' : '#080d1a';
+                        const isBelum = (it.status || '').toUpperCase().includes('BELUM PLAN');
+                        const statusColor = isBelum ? '#f87171' : '#4ade80';
+                        return `<tr style="background:${bgRow}; border-bottom:1px solid #1e293b;">
+                            <td style="padding:6px 8px; border:1px solid #1e293b; text-align:center; color:#64748b;">${idx + 1}</td>
+                            <td style="padding:6px 10px; border:1px solid #1e293b; font-family:monospace; font-weight:700; color:#38bdf8; white-space:nowrap;">${it.extOrderKey}</td>
+                            <td style="padding:6px 8px; border:1px solid #1e293b; text-align:center; font-weight:700; color:#ffd700;">${it.storeBooking || '-'}</td>
+                            <td style="padding:6px 10px; border:1px solid #1e293b; color:#e2e8f0;">${it.storeBookingName || '-'}</td>
+                            <td style="padding:6px 8px; border:1px solid #1e293b; text-align:center; color:#cbd5e1;">${it.colG || '-'}</td>
+                            <td style="padding:6px 8px; border:1px solid #1e293b; text-align:center; font-weight:700; color:#a78bfa;">${it.colBG || '-'}</td>
+                            <td style="padding:6px 8px; border:1px solid #1e293b; text-align:center; font-weight:700; color:${statusColor}; white-space:nowrap;">${it.status || '-'}</td>
+                            <td style="padding:6px 8px; border:1px solid #1e293b; text-align:right; color:#ffd700; font-weight:700;">${formatIndo(it.cbm || 0)}</td>
+                        </tr>`;
+                    }).join('');
+                }
+            }
+        };
+
+        window.copyOutstandingOdFromModal = function(format) {
+            const targetId = format === 'semicolon' ? 'os-od-codes-semicolon' : 'os-od-codes-or';
+            const btnId = format === 'semicolon' ? 'btn-os-od-modal-copy-semi' : 'btn-os-od-modal-copy-or';
+            const el = document.getElementById(targetId);
+            const val = el ? el.value : '';
+            if (!val) {
+                showFbiCopyToast('Tidak ada EXTERNORDERKEY untuk disalin', true);
+                return;
+            }
+            copyTextToClipboardSafe(val).then(() => {
+                showFbiCopyToast(`EXTERNORDERKEY format ${format === 'semicolon' ? 'titik koma (;)' : 'OR'} berhasil disalin!`);
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    const origHtml = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
+                    setTimeout(() => {
+                        btn.innerHTML = origHtml;
+                    }, 1800);
+                }
+            });
+        };
+
         // Keyboard Shortcut: Esc to close modal
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -12725,6 +13631,18 @@ function hubSort(colIdx) {
                 const modalAstor = document.getElementById('modal-astor-sla-detail');
                 if (modalAstor && !modalAstor.classList.contains('hidden')) {
                     closeAstorSlaDetailModal();
+                }
+                const modalFbiCodes = document.getElementById('modal-fbi-store-codes');
+                if (modalFbiCodes && !modalFbiCodes.classList.contains('hidden')) {
+                    closeFbiStoreCodeModal();
+                }
+                const modalOsOd = document.getElementById('modal-outstanding-od-keys');
+                if (modalOsOd && !modalOsOd.classList.contains('hidden')) {
+                    closeOutstandingOdModal();
+                }
+                const modalAhiSlides = document.getElementById('modal-ahi-slides-sync');
+                if (modalAhiSlides && !modalAhiSlides.classList.contains('hidden') && typeof closeAhiSlidesModal === 'function') {
+                    closeAhiSlidesModal();
                 }
             }
         });
@@ -13395,7 +14313,27 @@ Tim Planner DC Sidoarjo`;
 
             // Aggregate data by StoreBooking
             const stores = {};
+            const odKeyMap = {};
             filtered.forEach(row => {
+                // Collect unique EXTERNORDERKEY (Kolom F) where Kolom G = Created Internally & Kolom BG = LP
+                const extKey = (row.rawColumns && row.rawColumns.F ? row.rawColumns.F : '').trim();
+                const colGVal = (row.rawColumns && row.rawColumns.G ? row.rawColumns.G : (row.allocStatus || '')).trim();
+                const colBGVal = (row.rawColumns && row.rawColumns.BG ? row.rawColumns.BG : '').trim();
+                if (extKey && extKey !== '-' && colGVal.toUpperCase() === 'CREATED INTERNALLY' && colBGVal.toUpperCase() === 'LP') {
+                    if (!odKeyMap[extKey]) {
+                        odKeyMap[extKey] = {
+                            extOrderKey: extKey,
+                            storeBooking: row.storeBooking || '',
+                            storeBookingName: row.storeBookingName || '',
+                            colG: colGVal,
+                            colBG: colBGVal,
+                            status: row.status || '',
+                            cbm: 0
+                        };
+                    }
+                    odKeyMap[extKey].cbm += (row.cbm || 0);
+                }
+
                 // Update KPI Counters
                 kpiTotalBacklog += row.cbm;
                 if (row.status === 'Sudah Plan') kpiSudahPlan += row.cbm;
@@ -13443,6 +14381,15 @@ Tim Planner DC Sidoarjo`;
                     stores[key].unplannedTotal += row.cbm;
                 }
             });
+
+            // Save & sync EXTERNORDERKEY (LP & Created Internally) count
+            window.currentOutstandingOdItems = Object.values(odKeyMap);
+            const odCountEl = document.getElementById('outstanding-od-count');
+            if (odCountEl) odCountEl.textContent = window.currentOutstandingOdItems.length;
+            const modalOsOdEl = document.getElementById('modal-outstanding-od-keys');
+            if (modalOsOdEl && !modalOsOdEl.classList.contains('hidden')) {
+                renderOutstandingOdModalContent();
+            }
 
             // Update KPI UI
             document.getElementById('kpi-backlog-outstanding').textContent = formatIndo(kpiTotalBacklog);
@@ -13907,6 +14854,7 @@ function renderStoringPivotTable(filteredData) {
                 }
                 
                 updateLastUpdateTime(lastUpdateDate);
+                if (typeof window.notifyAhiSpreadsheetSynced === 'function') window.notifyAhiSpreadsheetSynced();
                 
                 // Update system status
                 if (typeof finishInitProgress === 'function') finishInitProgress();
@@ -14355,6 +15303,9 @@ function renderStoringPivotTable(filteredData) {
 
                 return matchBulan && matchDate && matchKota && matchRegional && matchArea;
             });
+
+            window.allData = allData;
+            window.filteredData = filteredData;
 
             currentPage = 1;
             updateDashboard();
@@ -18092,251 +19043,6 @@ loadKonfirmasiVM();
 setInterval(loadKonfirmasiVM, 600000);
 // ===== END REKAP KONFIRMASI VM =====
     </script>
-    <!-- ═══════════════════════════════════════════════════════════════════
-     AUTO-CAPTURE untuk halaman Tools (PPT Laporan Pagi) — SLIDE 3
-     Tools kirim postMessage {type:'wmsCapReq2'} -> panel MAIN DASHBOARD
-     difoto 2x (tanggal kemarin & hari ini) -> dikirim balik
-     {type:'wmsCapRes',which:'e'|'f'}
-
-     Versi 2 — yang berubah:
-     - tiap langkah dibungkus penangkap error, jadi kalau gagal pasti
-       ADA pesannya (dulu error di dalam setTimeout hilang diam-diam dan
-       halaman Tools cuma bisa lapor "0/2" tanpa sebab)
-     - panel dicek dulu ada atau tidak, lengkap dengan nama id-nya
-     - ada penjaga waktu 190 detik yang melapor macet di langkah mana
-     - jeda dipersingkat supaya muat dalam batas 170 detik di sisi Tools
-     ═══════════════════════════════════════════════════════════════════ -->
-<script>
-(function(){
-  var PANEL_ID='main-dashboard-section';
-
-  function bcast(w,msg,d){
-    if(d>6)return;var n=0;
-    try{n=w.length;}catch(e){return;}
-    for(var i=0;i<n;i++){var f;try{f=w[i];}catch(e){continue;}
-      try{f.postMessage(msg,'*');}catch(e){}
-      bcast(f,msg,d+1);}
-  }
-  function send(msg){try{window.top.postMessage(msg,'*');}catch(e){} bcast(window.top,msg,0);}
-  function loadH2C(cb){
-    if(window.html2canvas)return cb();
-    var s=document.createElement('script');
-    s.src='https://cdn.jsdelivr.net/npm/html2canvas-pro@1/dist/html2canvas-pro.min.js';
-    s.onload=function(){cb();};s.onerror=function(){cb('html2canvas gagal dimuat (koneksi ke cdn.jsdelivr.net diblokir?)');};
-    document.head.appendChild(s);
-  }
-  function waitFor(cond,max,cb){
-    var t0=Date.now();(function p(){var ok=false;try{ok=cond();}catch(e){}
-      if(ok||Date.now()-t0>max)return cb(ok);setTimeout(p,250);})();
-  }
-  /* cari nilai kolom AO (STUFFING DATE) yang cocok dengan tanggal tertentu.
-     Format di sheet bisa YYYY-MM-DD atau DD/MM/YYYY, jadi dua-duanya dicoba. */
-  function cariTanggal(dt){
-    var y=dt.getFullYear(),m=dt.getMonth()+1,d=dt.getDate();
-    var iso=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    var dmy=String(d).padStart(2,'0')+'/'+String(m).padStart(2,'0')+'/'+y;
-    var ada={};
-    try{allData.forEach(function(r){var v=(r.AO||'').trim();if(v)ada[v]=1;});}catch(e){}
-    if(ada[iso])return iso;
-    if(ada[dmy])return dmy;
-    return null;
-  }
-  /* pasang filter 1 tanggal lalu hitung ulang dashboard.
-     populateFilters() sengaja TIDAK dipanggil: itu cuma mengisi ulang daftar
-     pilihan dropdown (berat kalau datanya ribuan baris) dan tidak mempengaruhi
-     angka yang difoto. */
-  function pakaiTanggal(tgl){
-    try{
-      ['bulan','kota','regional','area','typeArmada','ketVendor','agingLc']
-        .forEach(function(k){ if(selectedFilters[k]) selectedFilters[k]=[]; });
-      selectedFilters.stuffingDate=tgl?[tgl]:[];
-      applyFilters();
-    }catch(e){}
-  }
-  /* potong tinggi foto sampai baris CBM PLAN B1-B4 saja, biar hasilnya melebar
-     (bagian SUMMARY PLAN BY ARMADA TYPE & tabel di bawahnya tidak ikut) */
-  function tinggiPotong(sec){
-    try{
-      var b4=document.getElementById('cbmPlanB4-card');
-      if(!b4)return 0;
-      var a=sec.getBoundingClientRect(),b=b4.getBoundingClientRect();
-      var h=Math.round(b.bottom-a.top+14);
-      return (h>200&&h<sec.scrollHeight)?h:0;
-    }catch(e){return 0;}
-  }
-  /* html2canvas kadang gagal menyalin <canvas>. Diubah dulu jadi <img>, lalu dibalikin. */
-  function bekukanCanvas(root){
-    var list=[];
-    if(!root)return list;
-    var cs=root.querySelectorAll('canvas');
-    for(var i=0;i<cs.length;i++){
-      var c=cs[i];
-      if(!c.width||!c.height)continue;
-      var url;try{url=c.toDataURL('image/png');}catch(e){continue;}
-      var r=c.getBoundingClientRect();
-      if(!r.width||!r.height)continue;
-      var img=document.createElement('img');
-      img.src=url;
-      img.style.cssText='width:'+r.width+'px;height:'+r.height+'px;display:block;';
-      c.parentNode.insertBefore(img,c);
-      c.style.display='none';
-      list.push([c,img]);
-    }
-    return list;
-  }
-  function cairkanCanvas(list){(list||[]).forEach(function(p){try{p[1].parentNode.removeChild(p[1]);p[0].style.display='';}catch(e){}});}
-  /* bagian berat di bawah panel disembunyikan dulu: tabel SHIPPING LINE DETAILS
-     isinya ratusan baris dan bikin html2canvas sangat lambat / menggantung */
-  var BERAT=['#armada-planning-summary','.bottom-table'];
-  function sembunyikanBerat(){
-    var hid=[];
-    BERAT.forEach(function(sel){
-      var n=document.querySelectorAll('#'+PANEL_ID+' '+sel);
-      for(var i=0;i<n.length;i++){hid.push([n[i],n[i].style.display]);n[i].style.display='none';}
-    });
-    return hid;
-  }
-  function tampilkanBerat(hid){(hid||[]).forEach(function(x){try{x[0].style.display=x[1]||'';}catch(e){}});}
-
-  /* snap() SELALU mengembalikan Promise — kalau ada yang meledak di dalamnya,
-     yang keluar Promise.reject, bukan lemparan mendadak yang hilang di
-     dalam setTimeout. */
-  function snap(){
-    try{
-      if(typeof html2canvas!=='function') throw new Error('html2canvas tidak tersedia');
-      var el=document.getElementById(PANEL_ID);
-      if(!el) throw new Error('panel #'+PANEL_ID+' tidak ditemukan di halaman Planner (id-nya berubah?)');
-      var r=el.getBoundingClientRect();
-      if(!r.width||!r.height) throw new Error('panel #'+PANEL_ID+' ada tapi ukurannya 0 (masih tersembunyi?)');
-      var hid=sembunyikanBerat();
-      var o={backgroundColor:'#0d0d0f',scale:1.2,useCORS:true,allowTaint:false,logging:false};
-      var h=tinggiPotong(el); if(h)o.height=h;
-      var frozen=bekukanCanvas(el);
-      var bersih=function(){tampilkanBerat(hid);cairkanCanvas(frozen);};
-      var kerja=Promise.resolve().then(function(){return html2canvas(el,o);})
-        .then(function(c){bersih();return c.toDataURL('image/jpeg',0.9);});
-      var batas=new Promise(function(_,rej){setTimeout(function(){bersih();rej(new Error('html2canvas kelamaan (>25 dtk)'));},25000);});
-      return Promise.race([kerja,batas]).catch(function(e){bersih();throw e;});
-    }catch(e){
-      return Promise.reject(e);
-    }
-  }
-  function segarkanPeta(){
-    try{ if(typeof map!=='undefined'&&map&&map.invalidateSize)map.invalidateSize(true); }catch(e){}
-  }
-  /* Ubin peta diminta ulang dengan izin CORS. Tanpa ini html2canvas menolak
-     menggambarnya (allowTaint:false) dan kotak peta jadi abu-abu kosong.
-     Kalau penyedia ubinnya ternyata tidak mengizinkan CORS, ubin itu
-     dikembalikan seperti semula supaya tidak malah hilang di layar. */
-  function paksaCors(cb){
-    var t=document.querySelectorAll('#map img.leaflet-tile'), perlu=[];
-    for(var i=0;i<t.length;i++){
-      var im=t[i], src=im.src;
-      if(im.crossOrigin||!src||src.indexOf('data:')===0) continue;
-      (function(img,asli){
-        img.addEventListener('error',function pulih(){
-          img.removeEventListener('error',pulih);
-          img.removeAttribute('crossorigin'); img.src=asli;
-        });
-        img.crossOrigin='anonymous';
-        img.src=asli;
-      })(im,src);
-      perlu.push(im);
-    }
-    if(!perlu.length) return cb();
-    /* tunggu sampai ubin benar-benar TERGAMBAR (naturalWidth>0), bukan cuma
-       'complete' — ubin yang gagal CORS juga 'complete' tapi kosong, dan
-       masih perlu waktu untuk dimuat ulang oleh penangan error di atas */
-    waitFor(function(){
-      for(var i=0;i<perlu.length;i++){ if(!perlu[i].complete||!perlu[i].naturalWidth) return false; }
-      return true;
-    },10000,function(){cb();});
-  }
-  /* peta dianggap siap kalau SEMUA ubinnya selesai dimuat, bukan sekadar
-     "ada lebih dari 2" — dulu fotonya sering diambil waktu ubin masih separuh */
-  function petaSiap(){
-    var t=document.querySelectorAll('#map img.leaflet-tile');
-    if(!t.length) return false;
-    for(var i=0;i<t.length;i++){ if(!t[i].complete||!t[i].naturalWidth) return false; }
-    return true;
-  }
-  function tungguPeta(cb){
-    segarkanPeta();
-    waitFor(petaSiap,20000,function(){ paksaCors(function(){ cb(); }); });
-  }
-
-  var busyId=null;
-  function run(id){
-    var langkah='mulai', selesai=false, jaga=null;
-    function lapor(t){langkah=t;send({type:'wmsCapInfo',id:id,step:t});}
-    function fail(m){
-      if(selesai)return; selesai=true; clearTimeout(jaga); busyId=null;
-      send({type:'wmsCapErr',id:id,msg:String((m&&m.message)||m)+' [langkah: '+langkah+']'});
-    }
-    function beres(){ if(selesai)return; selesai=true; clearTimeout(jaga); busyId=null;
-      send({type:'wmsCapDone',id:id}); }
-    /* kalau macet di mana pun, setelah 140 dtk tetap lapor — jangan diam */
-    jaga=setTimeout(function(){fail(new Error('macet lebih dari 190 detik'));},190000);
-    /* bungkus tiap callback: error sekecil apa pun tetap jadi pesan */
-    function aman(fn){ return function(){ if(selesai)return;
-      try{ return fn.apply(null,arguments); }catch(e){ fail(e); } }; }
-    function nanti(ms,fn){ setTimeout(aman(fn),ms); }
-
-    loadH2C(aman(function(err){
-      if(err)return fail(err);
-      lapor('melewati layar sambutan');
-      try{currentBranch='AHI';}catch(e){}
-      try{handleDCBranchSelection('AHI');}catch(e){}
-      var ov=document.getElementById('welcome-overlay');
-      if(ov){ov.classList.add('hidden');ov.style.display='none';}
-      try{closeStockOpnameModal();}catch(e){}
-      try{showDashboardSection(PANEL_ID);}catch(e){}
-
-      lapor('menunggu data CSV');
-      waitFor(function(){return typeof allData!=='undefined'&&allData.length>0;},40000,aman(function(ok){
-        if(!ok)return fail(new Error('data Planner belum termuat setelah 40 detik'));
-        lapor('data termuat ('+allData.length+' baris)');
-        try{closeStockOpnameModal();}catch(e){}
-        var now=new Date();
-        var tglKemarin=cariTanggal(new Date(now.getTime()-86400000));
-        var tglHariIni=cariTanggal(now);
-        lapor('tanggal kemarin='+tglKemarin+' hariini='+tglHariIni);
-
-        /* satu putaran foto: pasang filter -> tunggu peta -> potret */
-        function potret(tgl,which,sesudah){
-          pakaiTanggal(tgl);
-          lapor('filter '+which+' dipasang ('+tgl+')');
-          nanti(1500,function(){
-            segarkanPeta();
-            lapor('menunggu peta ('+which+')');
-            tungguPeta(aman(function(){
-              nanti(1500,function(){
-                lapor('memotret ('+which+')');
-                snap().then(aman(function(u){
-                  send({type:'wmsCapRes',id:id,which:which,url:u});
-                  lapor('foto '+which+' terkirim');
-                  sesudah();
-                })).catch(fail);
-              });
-            }));
-          });
-        }
-        potret(tglKemarin,'e',function(){
-          potret(tglHariIni,'f',beres);
-        });
-      }));
-    }));
-  }
-
-  window.addEventListener('message',function(e){
-    var d=e.data;if(!d||d.type!=='wmsCapReq2'||!d.id)return;
-    send({type:'wmsCapAck',id:d.id});
-    if(busyId===d.id)return;
-    busyId=d.id;
-    try{ run(d.id); }
-    catch(err){ busyId=null; send({type:'wmsCapErr',id:d.id,msg:'gagal memulai: '+err.message}); }
-  });
-})();
-</script>
-    </body>
+    <script type="module" src="/src/google-slides-sync.ts"></script>
+</body>
 </html>
