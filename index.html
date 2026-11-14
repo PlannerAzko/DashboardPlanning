@@ -25,30 +25,22 @@
 
         body {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0a0a0a 100%);
-            background-attachment: fixed;
+            background: #0a0a0a;
             color: #fff;
             padding-bottom: 60px; /* Space for marquee footer */
             overflow-x: hidden;
         }
 
-        /* Background Animation */
+        /* Static GPU-composited radial background (no fixed attachment or 200% repaint loop) */
         body::before {
             content: "";
             position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 50% 50%, rgba(211, 47, 47, 0.05) 0%, transparent 50%);
-            animation: bgMove 20s infinite alternate ease-in-out;
+            inset: 0;
+            background: radial-gradient(circle at 50% 40%, rgba(211, 47, 47, 0.08) 0%, #161616 45%, #0a0a0a 100%);
+            transform: translateZ(0);
+            will-change: transform;
             z-index: -1;
             pointer-events: none;
-        }
-
-        @keyframes bgMove {
-            0% { transform: translate(-10%, -10%); }
-            100% { transform: translate(10%, 10%); }
         }
 
         .header {
@@ -60,23 +52,24 @@
             overflow: hidden;
         }
 
-        /* Shine effect for header */
+        /* Shine effect for header (GPU transform only) */
         .header::after {
             content: "";
             position: absolute;
             top: -50%;
-            left: -100%;
-            width: 50%;
+            left: 0;
+            width: 35%;
             height: 200%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
-            transform: rotate(30deg);
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.18), transparent);
+            transform: translateX(-180%) rotate(30deg);
             animation: shine 6s infinite;
+            pointer-events: none;
         }
 
         @keyframes shine {
-            0% { left: -100%; }
-            20% { left: 200%; }
-            100% { left: 200%; }
+            0% { transform: translateX(-180%) rotate(30deg); }
+            22% { transform: translateX(420%) rotate(30deg); }
+            100% { transform: translateX(420%) rotate(30deg); }
         }
 
         .header h1 {
@@ -122,9 +115,13 @@
         }
 
         #welcome-overlay.hidden {
+            display: none !important;
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
+        }
+        #welcome-overlay.hidden * {
+            animation: none !important;
         }
 
         /* Initializing Dashboard Overlay - Enterprise Kawan Lama Logistics Design */
@@ -1230,18 +1227,20 @@
             position: fixed;
             bottom: 50px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate3d(-50%, 0, 0);
+            will-change: transform;
+            contain: layout style;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             z-index: 10005;
-            max-width: 96vw;
+            max-width: 98vw;
             transition: transform 0.25s ease, opacity 0.25s ease;
         }
 
         .floating-nav-dock.hidden {
-            transform: translate(-50%, 110px);
+            transform: translate3d(-50%, 110px, 0);
             opacity: 0;
             pointer-events: none;
         }
@@ -1261,8 +1260,6 @@
             width: auto;
             max-width: 100%;
             min-width: 0;
-            overflow-x: auto;
-            scrollbar-width: none;
         }
 
         .bottom-nav.hidden {
@@ -1854,9 +1851,15 @@
         }
 
         #init-loader.hidden {
+            display: none !important;
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
+        }
+        #init-loader.hidden * {
+            animation: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
         }
 
         .azko-title-container {
@@ -2373,7 +2376,7 @@
             padding: 20px;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.28s ease;
             position: relative;
             overflow: hidden;
         }
@@ -3001,12 +3004,16 @@
             font-weight: bold;
             box-shadow: 0 -2px 15px rgba(0,0,0,0.5);
             border-top: 2px solid #ffd700;
+            transform: translateZ(0);
+            will-change: transform;
+            contain: layout paint;
         }
 
         .marquee-content {
             display: inline-block;
             padding-left: 100%;
             animation: marquee 30s linear infinite; /* Kecepatan animasi disesuaikan */
+            will-change: transform;
             font-size: 1.1em;
             letter-spacing: 1px;
             text-transform: uppercase;
@@ -4294,9 +4301,12 @@
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 .so-modal-overlay.hidden {
+    display: none !important;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 /* Modal Container */
@@ -9204,6 +9214,8 @@
         }
 
         function updateInitClock() {
+            const loader = document.getElementById('init-loader');
+            if (loader && loader.classList.contains('hidden')) return;
             const clockEl = document.getElementById('init-clock-text');
             if (!clockEl) return;
             const now = new Date();
@@ -9218,7 +9230,7 @@
             const secs = String(now.getSeconds()).padStart(2, '0');
             clockEl.innerText = `${hours}:${mins}:${secs} ${dayName}, ${dateNum} ${monthName} ${year}`;
         }
-        setInterval(updateInitClock, 1000);
+        const initClockTimer = setInterval(updateInitClock, 1000);
         setTimeout(updateInitClock, 100);
 
         function handleInitCardSelect(sectionId) {
@@ -15044,6 +15056,7 @@ function renderStoringPivotTable(filteredData) {
                     if (loader) {
                         loader.onclick = toggleFullScreen;
                         loader.classList.add('hidden');
+                        if (typeof initClockTimer !== 'undefined') clearInterval(initClockTimer);
                     }
                 }, 5000); // Give 5 seconds total to view cards and finish animation
             } catch (error) {
