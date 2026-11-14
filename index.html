@@ -17695,23 +17695,30 @@ function updateKPIs() {
         const CASE_ID_CAPACITY = { B1: 4560, B2: 3192, B3: 2394, B4: 1824 };
 
         function updateCaseIdCapacity(vals) {
-        Object.keys(CASE_ID_CAPACITY).forEach(function (k) {
-            var el = document.getElementById('caseIdUsage' + k);
-            if (!el) return;
-            var cap = CASE_ID_CAPACITY[k];
-            var val = Math.round(vals[k] || 0);
-            var pct = cap > 0 ? (val / cap) * 100 : 0;
-            var diff = val - cap;
-            var isOver = diff > 0;
+    Object.keys(CASE_ID_CAPACITY).forEach(function (k) {
+        var cap = CASE_ID_CAPACITY[k];
+        var val = Math.round(vals[k] || 0);
 
-            el.className = 'kpi-capacity-usage ' + (isOver ? 'over' : 'ok');
-            if (isOver) {
-                el.textContent = 'Terpakai ' + pct.toFixed(1) + '% (Over ' + Math.abs(diff).toLocaleString('id-ID') + ')';
-            } else {
-                el.textContent = 'Terpakai ' + pct.toFixed(1) + '% (Sisa ' + Math.abs(diff).toLocaleString('id-ID') + ')';
-            }
-        });
-    }
+        // Hapus teks "Terpakai ..."
+        var usageEl = document.getElementById('caseIdUsage' + k);
+        if (usageEl) usageEl.textContent = '';
+
+        // Ubah warna kotak: hijau jika <= kapasitas, merah jika > kapasitas
+        var valueEl = document.getElementById('caseIdPlan' + k);
+        var card = valueEl ? valueEl.closest('.kpi-card') : null;
+        if (!card) return;
+
+        if (val <= cap) {
+            card.style.background   = 'linear-gradient(135deg, #1a5c2a 0%, #2d9144 100%)';
+            card.style.borderBottom = '4px solid #15803d';
+            card.style.boxShadow    = '0 0 12px rgba(45,145,68,0.4)';
+        } else {
+            card.style.background   = 'linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%)';
+            card.style.borderBottom = '4px solid #991b1b';
+            card.style.boxShadow    = '0 0 12px rgba(220,38,38,0.4)';
+        }
+    });
+}
         // Update Armada Summary Plan KPIs values dynamically
         function updateArmadaPlanningKPIs() {
             // Calculate Armada KPIs
