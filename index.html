@@ -1237,12 +1237,11 @@
             gap: 10px;
             z-index: 10005;
             max-width: 96vw;
-            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.35s ease;
+            transition: transform 0.25s ease, opacity 0.25s ease;
         }
 
-        .floating-nav-dock.hidden,
-        .floating-nav-dock:has(.bottom-nav.hidden) {
-            bottom: -110px;
+        .floating-nav-dock.hidden {
+            transform: translate(-50%, 110px);
             opacity: 0;
             pointer-events: none;
         }
@@ -1256,8 +1255,8 @@
             display: flex;
             align-items: center;
             gap: 2px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2), 0 0 1px rgba(0,0,0,0.1);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.18), 0 0 1px rgba(0,0,0,0.1);
+            transition: opacity 0.25s ease;
             border: 1px solid rgba(0,0,0,0.05);
             width: auto;
             max-width: 100%;
@@ -1372,10 +1371,9 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2), 0 0 1px rgba(0,0,0,0.1);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.18), 0 0 1px rgba(0,0,0,0.1);
             border: 1px solid rgba(0,0,0,0.06);
             flex-shrink: 0;
-            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .ahi-left-tools-dock.is-collapsed {
             padding: 6px;
@@ -1389,15 +1387,10 @@
             display: flex;
             align-items: center;
             gap: 2px;
-            overflow: hidden;
-            max-width: 240px;
-            opacity: 1;
-            transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.22s ease;
         }
-        .ahi-left-tools-dock.is-collapsed .ahi-tools-items {
-            max-width: 0;
-            opacity: 0;
-            pointer-events: none;
+        .ahi-left-tools-dock.is-collapsed .ahi-tools-items,
+        .ahi-left-tools-dock.is-collapsed .ahi-tools-divider {
+            display: none;
         }
         .nav-tool-item {
             display: flex;
@@ -1410,7 +1403,7 @@
             background: transparent;
             border-radius: 40px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background-color 0.18s ease, color 0.18s ease;
             position: relative;
             font-family: inherit;
         }
@@ -1423,7 +1416,7 @@
         }
         .nav-tool-icon-wrap i {
             font-size: 1.35rem;
-            transition: transform 0.2s ease;
+            transition: transform 0.18s ease;
         }
         .nav-tool-label {
             font-size: 0.58rem;
@@ -1463,13 +1456,7 @@
             height: 28px;
             background: rgba(15, 23, 42, 0.1);
             margin: 0 2px;
-            transition: opacity 0.2s ease, width 0.2s ease, margin 0.2s ease;
             flex-shrink: 0;
-        }
-        .ahi-left-tools-dock.is-collapsed .ahi-tools-divider {
-            width: 0;
-            margin: 0;
-            opacity: 0;
         }
         .ahi-tools-toggle-btn {
             display: inline-flex;
@@ -1484,7 +1471,7 @@
             color: #475569;
             cursor: pointer;
             position: relative;
-            transition: all 0.22s ease;
+            transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
             flex-shrink: 0;
             padding: 0;
             font-family: inherit;
@@ -1530,8 +1517,7 @@
             align-items: center;
             justify-content: center;
             border: 2px solid #ffffff;
-            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4);
-            animation: pulseWarningBadge 2.5s infinite ease-in-out;
+            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.35);
         }
         .ahi-left-tools-dock:not(.is-collapsed) .ahi-tools-mini-badge {
             display: none !important;
@@ -3643,11 +3629,9 @@
         padding: 4px 5px !important;
         border-radius: 26px !important;
         gap: 2px !important;
-        background: rgba(255, 255, 255, 0.96) !important;
-        backdrop-filter: blur(14px) !important;
-        -webkit-backdrop-filter: blur(14px) !important;
+        background: #ffffff !important;
         border: 1px solid rgba(0,0,0,0.08) !important;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.16) !important;
     }
 
     .ahi-left-tools-dock.is-collapsed {
@@ -3696,11 +3680,9 @@
         align-items: center !important;
         justify-content: space-between !important;
         border-radius: 30px !important;
-        background: rgba(255, 255, 255, 0.96) !important;
-        backdrop-filter: blur(14px) !important;
-        -webkit-backdrop-filter: blur(14px) !important;
+        background: #ffffff !important;
         border: 1px solid rgba(0,0,0,0.08) !important;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.16) !important;
         overflow-x: auto !important;
         white-space: nowrap !important;
         scrollbar-width: none !important;
@@ -5765,8 +5747,8 @@
 
     <!-- Floating Bottom Dock (Left Quick Tools + Navigation) -->
     <div id="floating-nav-dock" class="floating-nav-dock hidden">
-        <!-- Left Quick Tools Dock (AHI Only, Collapsible with Hide Icon) -->
-        <div id="ahi-left-tools-dock" class="ahi-left-tools-dock" style="display: none;">
+        <!-- Left Quick Tools Dock (AHI Only, Collapsible with Hide Icon - Default Hidden) -->
+        <div id="ahi-left-tools-dock" class="ahi-left-tools-dock is-collapsed" style="display: none;">
             <div id="ahi-tools-items" class="ahi-tools-items">
                 <div id="header-so-alert-wrap" style="display: none;">
                     <button id="btn-header-stok-opname" class="nav-tool-item nav-tool-so" onclick="openStockOpnameModal()" title="Lihat Peringatan Tabel Stok Opname">
@@ -5788,9 +5770,9 @@
                 </div>
             </div>
             <div class="ahi-tools-divider"></div>
-            <button type="button" id="btn-toggle-ahi-tools" class="ahi-tools-toggle-btn" onclick="toggleAhiToolsDock()" title="Sembunyikan Stok Opname &amp; Auto PPT" aria-expanded="true">
-                <i id="ahi-tools-toggle-icon" class="fas fa-eye-slash"></i>
-                <span id="ahi-tools-toggle-sub" class="ahi-tools-toggle-sub">HIDE</span>
+            <button type="button" id="btn-toggle-ahi-tools" class="ahi-tools-toggle-btn" onclick="toggleAhiToolsDock()" title="Tampilkan Stok Opname &amp; Auto PPT" aria-expanded="false">
+                <i id="ahi-tools-toggle-icon" class="fas fa-toolbox"></i>
+                <span id="ahi-tools-toggle-sub" class="ahi-tools-toggle-sub">TOOLS</span>
                 <span id="ahi-tools-mini-badge" class="ahi-tools-mini-badge" style="display: none;">12</span>
             </button>
         </div>
@@ -9616,11 +9598,8 @@
         }
 
         function initAhiToolsDockState() {
-            let savedHidden = false;
-            try {
-                savedHidden = localStorage.getItem('ahiToolsDockHidden') === '1';
-            } catch (e) {}
-            toggleAhiToolsDock(savedHidden);
+            // Default hide (collapsed) setiap kali membuka web app agar tetap ringan dan rapi
+            toggleAhiToolsDock(true);
         }
 
         function syncFloatingNavDock() {
