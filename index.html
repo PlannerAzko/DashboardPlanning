@@ -17698,12 +17698,19 @@ function updateKPIs() {
     Object.keys(CASE_ID_CAPACITY).forEach(function (k) {
         var cap = CASE_ID_CAPACITY[k];
         var val = Math.round(vals[k] || 0);
+        var pct = cap > 0 ? (val / cap) * 100 : 0;
+        var diff = cap - val; // positif = sisa, negatif = over
 
-        // Hapus teks "Terpakai ..."
+        // Teks persentase dan selisih, contoh: 84.9% / -687 Case ID
         var usageEl = document.getElementById('caseIdUsage' + k);
-        if (usageEl) usageEl.textContent = '';
+        if (usageEl) {
+            var sign = diff > 0 ? '-' : (diff < 0 ? '+' : '');
+            usageEl.className = 'kpi-capacity-usage';
+            usageEl.style.color = '#fff';
+            usageEl.textContent = pct.toFixed(1) + '% / ' + sign + Math.abs(diff).toLocaleString('id-ID') + ' Case ID';
+        }
 
-        // Ubah warna kotak: hijau jika <= kapasitas, merah jika > kapasitas
+        // Warna kotak: hijau jika <= kapasitas, merah jika > kapasitas
         var valueEl = document.getElementById('caseIdPlan' + k);
         var card = valueEl ? valueEl.closest('.kpi-card') : null;
         if (!card) return;
