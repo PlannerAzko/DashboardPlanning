@@ -17608,15 +17608,8 @@ function updateDashboard() {
         function updateAhiSummaryPage() {
             // Deprecated, handled by cinematic dashboard locally
         }
-const CASE_ID_CAPACITY = { B1: 4560, B2: 3192, B3: 2394, B4: 1824 };
-
-function updateCaseIdCapacity(vals) {
-}
-
 // Update KPIs
 function updateKPIs() {
-        // Update KPIs
-        function updateKPIs() {
             const caseIdShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BF, true), 0);
             const caseIdPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BB, true), 0);
             const cbmPlan = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.Z), 0);
