@@ -1225,12 +1225,31 @@
         body.theme-purple .section-title-banner i {
             color: #0f172a !important;
         }
-        /* New Floating Bottom Navigation Concept */
-        .bottom-nav {
+        /* Floating Bottom Dock Container (Left Quick Tools + Navigation) */
+        .floating-nav-dock {
             position: fixed;
             bottom: 50px;
             left: 50%;
             transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            z-index: 10005;
+            max-width: 96vw;
+            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.35s ease;
+        }
+
+        .floating-nav-dock.hidden,
+        .floating-nav-dock:has(.bottom-nav.hidden) {
+            bottom: -110px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* New Floating Bottom Navigation Concept */
+        .bottom-nav {
+            position: relative;
             background: #ffffff;
             padding: 6px 10px;
             border-radius: 60px;
@@ -1238,15 +1257,16 @@
             align-items: center;
             gap: 2px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.2), 0 0 1px rgba(0,0,0,0.1);
-            z-index: 10005;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 1px solid rgba(0,0,0,0.05);
             width: auto;
-            max-width: 95vw;
+            max-width: 100%;
+            min-width: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
         }
 
         .bottom-nav.hidden {
-            bottom: -100px;
             opacity: 0;
             pointer-events: none;
         }
@@ -1344,41 +1364,198 @@
         body.theme-purple #outstanding-od-lp-wrap {
             display: inline-flex;
         }
+        /* Left Quick Tools Dock (Stok Opname + Auto PPT beside Nav) */
+        .ahi-left-tools-dock {
+            background: #ffffff;
+            padding: 6px 8px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2), 0 0 1px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.06);
+            flex-shrink: 0;
+            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .ahi-left-tools-dock.is-collapsed {
+            padding: 6px;
+            gap: 0;
+        }
+        body.theme-purple .ahi-left-tools-dock,
+        body.theme-cyan .ahi-left-tools-dock {
+            display: none !important;
+        }
+        .ahi-tools-items {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            overflow: hidden;
+            max-width: 240px;
+            opacity: 1;
+            transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.22s ease;
+        }
+        .ahi-left-tools-dock.is-collapsed .ahi-tools-items {
+            max-width: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .nav-tool-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 10px;
+            min-width: 72px;
+            border: none;
+            background: transparent;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            font-family: inherit;
+        }
+        .nav-tool-icon-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2px;
+        }
+        .nav-tool-icon-wrap i {
+            font-size: 1.35rem;
+            transition: transform 0.2s ease;
+        }
+        .nav-tool-label {
+            font-size: 0.58rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            white-space: nowrap;
+        }
+        .nav-tool-so {
+            color: #b45309;
+        }
+        .nav-tool-so .nav-tool-icon-wrap i {
+            color: #d97706;
+        }
+        .nav-tool-so:hover {
+            background: rgba(245, 158, 11, 0.12);
+            color: #92400e;
+        }
+        .nav-tool-so:hover .nav-tool-icon-wrap i {
+            transform: scale(1.08);
+        }
+        .nav-tool-ppt {
+            color: #1e293b;
+        }
+        .nav-tool-ppt .nav-tool-icon-wrap i {
+            color: #c2410c;
+        }
+        .nav-tool-ppt:hover {
+            background: rgba(15, 23, 42, 0.08);
+            color: #0f172a;
+        }
+        .nav-tool-ppt:hover .nav-tool-icon-wrap i {
+            transform: scale(1.08);
+        }
+        .ahi-tools-divider {
+            width: 1px;
+            height: 28px;
+            background: rgba(15, 23, 42, 0.1);
+            margin: 0 2px;
+            transition: opacity 0.2s ease, width 0.2s ease, margin 0.2s ease;
+            flex-shrink: 0;
+        }
+        .ahi-left-tools-dock.is-collapsed .ahi-tools-divider {
+            width: 0;
+            margin: 0;
+            opacity: 0;
+        }
+        .ahi-tools-toggle-btn {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            background: #f8fafc;
+            color: #475569;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.22s ease;
+            flex-shrink: 0;
+            padding: 0;
+            font-family: inherit;
+        }
+        .ahi-tools-toggle-btn:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+            transform: scale(1.05);
+        }
+        .ahi-left-tools-dock.is-collapsed .ahi-tools-toggle-btn {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-color: rgba(217, 119, 6, 0.35);
+            color: #b45309;
+        }
+        .ahi-left-tools-dock.is-collapsed .ahi-tools-toggle-btn:hover {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+        .ahi-tools-toggle-btn i {
+            font-size: 1rem;
+        }
+        .ahi-tools-toggle-sub {
+            font-size: 0.45rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-top: 2px;
+            line-height: 1;
+        }
+        .ahi-tools-mini-badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+            border-radius: 999px;
+            background: #dc2626;
+            color: #ffffff;
+            font-size: 0.62rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4);
+            animation: pulseWarningBadge 2.5s infinite ease-in-out;
+        }
+        .ahi-left-tools-dock:not(.is-collapsed) .ahi-tools-mini-badge {
+            display: none !important;
+        }
         #header-ahi-slides-wrap {
-            display: inline-block;
+            display: inline-flex;
         }
         body.theme-purple #header-ahi-slides-wrap,
         body.theme-cyan #header-ahi-slides-wrap {
             display: none !important;
         }
-        .ahi-slides-header-btn {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        .nav-tool-icon-wrap .ahi-slides-pill {
+            position: absolute;
+            top: -6px;
+            right: -13px;
+            background: #1e293b;
             color: #ffd700;
-            border: 1.5px solid rgba(255, 215, 0, 0.7);
-            padding: 6px 14px;
+            padding: 1px 4px;
             border-radius: 999px;
-            font-size: 0.78em;
-            font-weight: 800;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            transition: all 0.2s ease;
-            letter-spacing: 0.4px;
-        }
-        .ahi-slides-header-btn:hover {
-            transform: translateY(-1px);
-            background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-            box-shadow: 0 6px 18px rgba(255, 215, 0, 0.25);
-        }
-        .ahi-slides-pill {
-            background: #ffd700;
-            color: #111827;
-            padding: 1px 7px;
-            border-radius: 999px;
-            font-size: 0.82em;
+            font-size: 0.52rem;
             font-weight: 900;
+            border: 1.5px solid #ffffff;
+            letter-spacing: 0.2px;
+            line-height: 1.2;
         }
 
         /* Theme Cyan overrides */
@@ -3453,12 +3630,67 @@
         font-size: 0.78rem !important;
     }
 
-    .bottom-nav {
+    .floating-nav-dock {
         bottom: 42px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
         width: calc(100vw - 12px) !important;
-        max-width: 520px !important;
+        max-width: 580px !important;
+        gap: 6px !important;
+    }
+
+    .ahi-left-tools-dock {
+        padding: 4px 5px !important;
+        border-radius: 26px !important;
+        gap: 2px !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        backdrop-filter: blur(14px) !important;
+        -webkit-backdrop-filter: blur(14px) !important;
+        border: 1px solid rgba(0,0,0,0.08) !important;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
+    }
+
+    .ahi-left-tools-dock.is-collapsed {
+        padding: 4px !important;
+    }
+
+    .nav-tool-item {
+        min-width: 46px !important;
+        padding: 4px 5px !important;
+        border-radius: 14px !important;
+    }
+
+    .nav-tool-icon-wrap i {
+        font-size: 0.9rem !important;
+    }
+
+    .nav-tool-label {
+        font-size: 0.46rem !important;
+        letter-spacing: 0px !important;
+    }
+
+    .ahi-tools-toggle-btn {
+        width: 34px !important;
+        height: 34px !important;
+    }
+
+    .ahi-tools-toggle-btn i {
+        font-size: 0.82rem !important;
+    }
+
+    .ahi-tools-toggle-sub {
+        font-size: 0.38rem !important;
+    }
+
+    .bottom-nav {
+        position: relative !important;
+        bottom: auto !important;
+        left: auto !important;
+        transform: none !important;
+        flex: 1 1 auto !important;
+        width: auto !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
         padding: 4px 3px !important;
         display: flex !important;
         align-items: center !important;
@@ -3980,9 +4212,13 @@
         box-sizing: border-box !important;
     }
 
-    .bottom-nav {
+    .floating-nav-dock {
         bottom: 38px !important;
         width: calc(100vw - 8px) !important;
+        gap: 4px !important;
+    }
+
+    .bottom-nav {
         padding: 3px 2px !important;
         gap: 1px !important;
     }
@@ -4040,41 +4276,21 @@
     50% { opacity: 0.35; }
 }
 
-.stok-opname-badge-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #dc2626 100%);
-    color: #ffffff !important;
-    border: 1px solid rgba(253, 230, 138, 0.6);
-    border-radius: 9999px;
-    padding: 6px 16px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35);
-    animation: pulseWarningBadge 2.5s infinite ease-in-out;
-    transition: all 0.2s ease;
-}
-.stok-opname-badge-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
-    border-color: #fef08a;
-}
-.stok-opname-badge-btn i {
-    color: #fef08a;
-    font-size: 1rem;
-    animation: warningBlink 1.5s infinite;
-}
-.so-count-pill {
-    background: #7f1d1d;
-    color: #fef2f2;
-    font-size: 0.75rem;
+.nav-tool-icon-wrap .so-count-pill {
+    position: absolute;
+    top: -6px;
+    right: -11px;
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 0.62rem;
     font-weight: 800;
-    padding: 2px 7px;
+    padding: 1px 5px;
+    min-width: 16px;
+    text-align: center;
     border-radius: 9999px;
-    border: 1px solid rgba(254, 202, 202, 0.4);
+    border: 1.5px solid #ffffff;
+    box-shadow: 0 2px 5px rgba(220, 38, 38, 0.35);
+    line-height: 1.2;
 }
 
 /* Modal Overlay */
@@ -5387,11 +5603,11 @@
                     </div>
                     <div>
                         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <h2 class="so-modal-title" style="margin: 0; font-size: 1.12rem;">AMBIL EXTERNORDERKEY — <span style="color: #ffd700;">LP &amp; CREATED INTERNALLY</span></h2>
+                            <h2 class="so-modal-title" style="margin: 0; font-size: 1.12rem;">AMBIL EXTERNORDERKEY — <span style="color: #ffd700;">LP &amp; CREATED INTERNALLY / NOT STARTED</span></h2>
                             <span id="os-od-modal-badge" style="background: #ffd700; color: #111827; font-weight: 800; font-size: 0.75rem; padding: 3px 10px; border-radius: 999px;">0 OD</span>
                         </div>
                         <p class="so-modal-subtitle" id="os-od-modal-filter-info" style="margin-top: 4px;">
-                            Sumber: Kolom F (EXTERNORDERKEY) • Filter: Kolom G = Created Internally &amp; Kolom BG = LP
+                            Sumber: Kolom F (EXTERNORDERKEY) • Filter: Kolom G = Created Internally / Not Started &amp; Kolom BG = LP
                         </p>
                     </div>
                 </div>
@@ -5401,13 +5617,23 @@
             </div>
 
             <div style="padding: 16px 20px; background: #0b1120; display: flex; flex-direction: column; gap: 14px;">
-                <!-- Status Plan Scope Toggle -->
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid #1e293b;">
-                    <span style="font-size: 0.8em; color: #94a3b8; font-weight: 700;">FILTER STATUS PLAN:</span>
-                    <div style="display: inline-flex; background: #090e17; border: 1px solid #334155; border-radius: 6px; padding: 3px; gap: 4px; flex-wrap: wrap;">
-                        <button type="button" class="os-od-scope-btn" data-scope="ALL" onclick="setOutstandingOdScope('ALL')" style="background: #d97706; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Semua Status</button>
-                        <button type="button" class="os-od-scope-btn" data-scope="BELUM_PLAN" onclick="setOutstandingOdScope('BELUM_PLAN')" style="background: transparent; color: #94a3b8; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Belum Plan Saja</button>
-                        <button type="button" class="os-od-scope-btn" data-scope="SUDAH_PLAN" onclick="setOutstandingOdScope('SUDAH_PLAN')" style="background: transparent; color: #94a3b8; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Sudah Plan Saja</button>
+                <!-- Status Plan & Kolom G Scope Toggles -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid #1e293b;">
+                    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 0.8em; color: #94a3b8; font-weight: 700;">STATUS PLAN:</span>
+                        <div style="display: inline-flex; background: #090e17; border: 1px solid #334155; border-radius: 6px; padding: 3px; gap: 4px; flex-wrap: wrap;">
+                            <button type="button" class="os-od-scope-btn" data-scope="ALL" onclick="setOutstandingOdScope('ALL')" style="background: #d97706; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Semua</button>
+                            <button type="button" class="os-od-scope-btn" data-scope="BELUM_PLAN" onclick="setOutstandingOdScope('BELUM_PLAN')" style="background: transparent; color: #94a3b8; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Belum Plan</button>
+                            <button type="button" class="os-od-scope-btn" data-scope="SUDAH_PLAN" onclick="setOutstandingOdScope('SUDAH_PLAN')" style="background: transparent; color: #94a3b8; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Sudah Plan</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 0.8em; color: #94a3b8; font-weight: 700;">STATUS (G):</span>
+                        <div style="display: inline-flex; background: #090e17; border: 1px solid #334155; border-radius: 6px; padding: 3px; gap: 4px; flex-wrap: wrap;">
+                            <button type="button" class="os-od-colg-btn" data-colg="ALL" onclick="setOutstandingOdColGScope('ALL')" style="background: #7c3aed; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Semua</button>
+                            <button type="button" class="os-od-colg-btn" data-colg="CREATED_INTERNALLY" onclick="setOutstandingOdColGScope('CREATED_INTERNALLY')" style="background: transparent; color: #94a3b8; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Created Internally</button>
+                            <button type="button" class="os-od-colg-btn" data-colg="NOT_STARTED" onclick="setOutstandingOdColGScope('NOT_STARTED')" style="background: transparent; color: #94a3b8; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.78em; font-weight: 700; cursor: pointer;">Not Started</button>
+                        </div>
                     </div>
                 </div>
 
@@ -5466,7 +5692,7 @@
             </div>
 
             <div style="background: #0b1120; padding: 12px 20px; border-top: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <span style="font-size: 0.75em; color: #94a3b8;"><i class="fas fa-info-circle" style="color:#ffd700;margin-right:5px;"></i>Hanya mengambil <strong>EXTERNORDERKEY (Kolom F)</strong> unik dengan <strong>Kolom G = Created Internally</strong> dan <strong>Kolom BG = LP</strong>.</span>
+                <span style="font-size: 0.75em; color: #94a3b8;"><i class="fas fa-info-circle" style="color:#ffd700;margin-right:5px;"></i>Hanya mengambil <strong>EXTERNORDERKEY (Kolom F)</strong> unik dengan <strong>Kolom G = Created Internally / Not Started</strong> dan <strong>Kolom BG = LP</strong>.</span>
                 <button onclick="closeOutstandingOdModal()" style="background: #334155; color: #fff; border: 1px solid #475569; padding: 7px 18px; border-radius: 6px; font-weight: bold; font-size: 0.8em; cursor: pointer;">
                     TUTUP
                 </button>
@@ -5537,79 +5763,96 @@
         </div>
     </div>
 
-    <!-- Floating Bottom Navigation -->
-    <div id="bottom-nav" class="bottom-nav hidden">
-        <div class="bottom-nav-item" id="nav-ahi-summary" style="display: none;" onclick="showDashboardSection('ahi-summary-section')">
-            <i class="fas fa-chart-line"></i>
-            <span>Summary</span>
-        </div>
-        
-        <div class="bottom-nav-item active" id="nav-main" onclick="showDashboardSection('main-dashboard-section')">
-            <i class="fas fa-calendar-alt"></i>
-            <span>Main</span>
-        </div>
-        
-        <!-- PLANNING MENU (FBI ONLY) -->
-        <div class="bottom-nav-item" id="nav-planning" style="display: none;" onclick="showDashboardSection('fbi-planning-section')">
-            <i class="fas fa-tasks"></i>
-            <span>Planning</span>
-        </div>
-        
-        <div class="bottom-nav-item" id="nav-outstanding" onclick="showDashboardSection('outstanding-section')">
-            <i class="fas fa-truck-loading"></i>
-            <span>Outstanding</span>
-        </div>
-
-        <div class="bottom-nav-item" id="nav-partner" onclick="showDashboardSection('supply-partner-section')">
-            <i class="fas fa-users-viewfinder"></i>
-            <span>Vendor</span>
-        </div>
-
-        <div class="bottom-nav-item" id="nav-summary" onclick="showDashboardSection('summary-report-section')">
-            <i class="fas fa-file-invoice"></i>
-            <span>SLA & CBM</span>
-        </div>
-
-        <div class="bottom-nav-item" id="nav-hub" onclick="showDashboardSection('hub-astor-section')">
-            <i class="fas fa-warehouse"></i>
-            <span>Hub Astor</span>
+    <!-- Floating Bottom Dock (Left Quick Tools + Navigation) -->
+    <div id="floating-nav-dock" class="floating-nav-dock hidden">
+        <!-- Left Quick Tools Dock (AHI Only, Collapsible with Hide Icon) -->
+        <div id="ahi-left-tools-dock" class="ahi-left-tools-dock" style="display: none;">
+            <div id="ahi-tools-items" class="ahi-tools-items">
+                <div id="header-so-alert-wrap" style="display: none;">
+                    <button id="btn-header-stok-opname" class="nav-tool-item nav-tool-so" onclick="openStockOpnameModal()" title="Lihat Peringatan Tabel Stok Opname">
+                        <span class="nav-tool-icon-wrap">
+                            <i class="fas fa-triangle-exclamation"></i>
+                            <span class="so-count-pill" id="header-so-count">12</span>
+                        </span>
+                        <span class="nav-tool-label">Stok Opname</span>
+                    </button>
+                </div>
+                <div id="header-ahi-slides-wrap" style="display: none;">
+                    <button id="btn-header-ahi-slides" class="nav-tool-item nav-tool-ppt" onclick="openAhiSlidesModal()" title="Buat PowerPoint (.PPTX) &amp; Sinkronkan dengan Google Slides">
+                        <span class="nav-tool-icon-wrap">
+                            <i class="fas fa-file-powerpoint"></i>
+                            <span class="ahi-slides-pill" id="header-slides-sync-badge">PPT</span>
+                        </span>
+                        <span class="nav-tool-label">Auto PPT</span>
+                    </button>
+                </div>
+            </div>
+            <div class="ahi-tools-divider"></div>
+            <button type="button" id="btn-toggle-ahi-tools" class="ahi-tools-toggle-btn" onclick="toggleAhiToolsDock()" title="Sembunyikan Stok Opname &amp; Auto PPT" aria-expanded="true">
+                <i id="ahi-tools-toggle-icon" class="fas fa-eye-slash"></i>
+                <span id="ahi-tools-toggle-sub" class="ahi-tools-toggle-sub">HIDE</span>
+                <span id="ahi-tools-mini-badge" class="ahi-tools-mini-badge" style="display: none;">12</span>
+            </button>
         </div>
 
-        <div class="bottom-nav-item" id="nav-transit" onclick="showDashboardSection('transit-schema-section')">
-    <i class="fas fa-route"></i>
-    <span>Skema Transit</span>
-</div>
-        
-        <div class="bottom-nav-item" id="nav-jadwal-dc" onclick="window.open('https://script.google.com/a/macros/kawanlamacorp.com/s/AKfycbz-otD-56iTVsM8KiVcC0orH2f2F9450cVZx1N40Og3fPQAfuMbL3EVFFXpBqSf3U1f/exec', '_blank')">
-            <i class="fas fa-clock"></i>
-            <span>JADWAL DC</span>
-        </div>
+        <!-- Main Floating Bottom Navigation -->
+        <div id="bottom-nav" class="bottom-nav hidden">
+            <div class="bottom-nav-item" id="nav-ahi-summary" style="display: none;" onclick="showDashboardSection('ahi-summary-section')">
+                <i class="fas fa-chart-line"></i>
+                <span>Summary</span>
+            </div>
+            
+            <div class="bottom-nav-item active" id="nav-main" onclick="showDashboardSection('main-dashboard-section')">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Main</span>
+            </div>
+            
+            <!-- PLANNING MENU (FBI ONLY) -->
+            <div class="bottom-nav-item" id="nav-planning" style="display: none;" onclick="showDashboardSection('fbi-planning-section')">
+                <i class="fas fa-tasks"></i>
+                <span>Planning</span>
+            </div>
+            
+            <div class="bottom-nav-item" id="nav-outstanding" onclick="showDashboardSection('outstanding-section')">
+                <i class="fas fa-truck-loading"></i>
+                <span>Outstanding</span>
+            </div>
 
-        <div class="bottom-nav-item" id="nav-reset" onclick="resetBranchSelection()">
-            <i class="fas fa-sync-alt"></i>
-            <span>Switch DC</span>
+            <div class="bottom-nav-item" id="nav-partner" onclick="showDashboardSection('supply-partner-section')">
+                <i class="fas fa-users-viewfinder"></i>
+                <span>Vendor</span>
+            </div>
+
+            <div class="bottom-nav-item" id="nav-summary" onclick="showDashboardSection('summary-report-section')">
+                <i class="fas fa-file-invoice"></i>
+                <span>SLA & CBM</span>
+            </div>
+
+            <div class="bottom-nav-item" id="nav-hub" onclick="showDashboardSection('hub-astor-section')">
+                <i class="fas fa-warehouse"></i>
+                <span>Hub Astor</span>
+            </div>
+
+            <div class="bottom-nav-item" id="nav-transit" onclick="showDashboardSection('transit-schema-section')">
+        <i class="fas fa-route"></i>
+        <span>Skema Transit</span>
+    </div>
+            
+            <div class="bottom-nav-item" id="nav-jadwal-dc" onclick="window.open('https://script.google.com/a/macros/kawanlamacorp.com/s/AKfycbz-otD-56iTVsM8KiVcC0orH2f2F9450cVZx1N40Og3fPQAfuMbL3EVFFXpBqSf3U1f/exec', '_blank')">
+                <i class="fas fa-clock"></i>
+                <span>JADWAL DC</span>
+            </div>
+
+            <div class="bottom-nav-item" id="nav-reset" onclick="resetBranchSelection()">
+                <i class="fas fa-sync-alt"></i>
+                <span>Switch DC</span>
+            </div>
         </div>
     </div>
 
     <div class="main-container-wrapper">
     <div class="header">
         <h1>LOGISTICS DASHBOARD | ORDER PLANNING NDC AHI SIDOARJO</h1>
-        <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
-            <div id="header-so-alert-wrap" style="display: none;">
-                <button id="btn-header-stok-opname" class="stok-opname-badge-btn" onclick="openStockOpnameModal()" title="Lihat Peringatan Tabel Stok Opname">
-                    <i class="fas fa-triangle-exclamation"></i>
-                    <span>PERINGATAN STOK OPNAME</span>
-                    <span class="so-count-pill" id="header-so-count">12</span>
-                </button>
-            </div>
-            <div id="header-ahi-slides-wrap" style="display: none;">
-                <button id="btn-header-ahi-slides" class="ahi-slides-header-btn" onclick="openAhiSlidesModal()" title="Buat PowerPoint (.PPTX) & Sinkronkan dengan Google Slides">
-                    <i class="fas fa-file-powerpoint"></i>
-                    <span>AUTO PPT &amp; GOOGLE SLIDES</span>
-                    <span class="ahi-slides-pill" id="header-slides-sync-badge">PPT</span>
-                </button>
-            </div>
-        </div>
     </div>
 
     <div class="container">
@@ -7665,16 +7908,16 @@
                        onmouseout="this.style.opacity='1'">
                         <i class="fab fa-whatsapp" style="font-size: 1.1em;"></i> KIRIM DATA KURANG KUOTA
                     </a>
-                    <!-- Ambil EXTERNORDERKEY (Kolom F) Created Internally & LP (Khusus DC FBI Sidoarjo) -->
-                    <div id="outstanding-od-lp-wrap" style="align-items: center; gap: 5px; background: #141a24; border: 1px solid #ffd700; border-radius: 5px; padding: 3px 6px;" title="Ambil EXTERNORDERKEY (Kolom F) untuk Created Internally (Kolom G) & LP (Kolom BG)">
+                    <!-- Ambil EXTERNORDERKEY (Kolom F) Created Internally / Not Started & LP (Khusus DC FBI Sidoarjo) -->
+                    <div id="outstanding-od-lp-wrap" style="align-items: center; gap: 5px; background: #141a24; border: 1px solid #ffd700; border-radius: 5px; padding: 3px 6px;" title="Ambil EXTERNORDERKEY (Kolom F) untuk Created Internally / Not Started (Kolom G) & LP (Kolom BG)">
                         <span style="font-size: 0.73em; color: #ffd700; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; padding-right: 4px; border-right: 1px solid #444;">
                             <i class="fas fa-copy"></i>
                             <span>OD LP (<span id="outstanding-od-count">0</span>)</span>
                         </span>
-                        <button type="button" id="btn-os-od-copy-or" onclick="copyOutstandingExternOrderKeys('or')" style="background: #1e3a5f; color: #38bdf8; border: 1px solid #0284c7; padding: 3px 8px; border-radius: 4px; font-size: 0.74em; font-weight: 700; cursor: pointer; font-family: monospace; white-space: nowrap; transition: all 0.15s;" onmouseover="this.style.background='#0284c7'; this.style.color='#fff';" onmouseout="this.style.background='#1e3a5f'; this.style.color='#38bdf8';" title="Salin EXTERNORDERKEY dipisah ' or ' (Created Internally & LP)">
+                        <button type="button" id="btn-os-od-copy-or" onclick="copyOutstandingExternOrderKeys('or')" style="background: #1e3a5f; color: #38bdf8; border: 1px solid #0284c7; padding: 3px 8px; border-radius: 4px; font-size: 0.74em; font-weight: 700; cursor: pointer; font-family: monospace; white-space: nowrap; transition: all 0.15s;" onmouseover="this.style.background='#0284c7'; this.style.color='#fff';" onmouseout="this.style.background='#1e3a5f'; this.style.color='#38bdf8';" title="Salin EXTERNORDERKEY dipisah ' or ' (Created Internally / Not Started & LP)">
                             Copy (or)
                         </button>
-                        <button type="button" id="btn-os-od-copy-semi" onclick="copyOutstandingExternOrderKeys('semicolon')" style="background: #422006; color: #ffd700; border: 1px solid #d97706; padding: 3px 8px; border-radius: 4px; font-size: 0.74em; font-weight: 700; cursor: pointer; font-family: monospace; white-space: nowrap; transition: all 0.15s;" onmouseover="this.style.background='#d97706'; this.style.color='#fff';" onmouseout="this.style.background='#422006'; this.style.color='#ffd700';" title="Salin EXTERNORDERKEY dipisah ';' (Created Internally & LP)">
+                        <button type="button" id="btn-os-od-copy-semi" onclick="copyOutstandingExternOrderKeys('semicolon')" style="background: #422006; color: #ffd700; border: 1px solid #d97706; padding: 3px 8px; border-radius: 4px; font-size: 0.74em; font-weight: 700; cursor: pointer; font-family: monospace; white-space: nowrap; transition: all 0.15s;" onmouseover="this.style.background='#d97706'; this.style.color='#fff';" onmouseout="this.style.background='#422006'; this.style.color='#ffd700';" title="Salin EXTERNORDERKEY dipisah ';' (Created Internally / Not Started & LP)">
                             Copy (;)
                         </button>
                         <button type="button" onclick="openOutstandingOdModal()" style="background: #262626; color: #e2e8f0; border: 1px solid #525252; padding: 3px 7px; border-radius: 4px; font-size: 0.74em; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.15s;" onmouseover="this.style.background='#404040'; this.style.color='#fff';" onmouseout="this.style.background='#262626'; this.style.color='#e2e8f0';" title="Lihat detail EXTERNORDERKEY & filter">
@@ -9343,6 +9586,63 @@
             }
         }
 
+        function toggleAhiToolsDock(forceCollapsed) {
+            const dock = document.getElementById('ahi-left-tools-dock');
+            const icon = document.getElementById('ahi-tools-toggle-icon');
+            const sub = document.getElementById('ahi-tools-toggle-sub');
+            const btn = document.getElementById('btn-toggle-ahi-tools');
+            if (!dock) return;
+
+            const shouldCollapse = typeof forceCollapsed === 'boolean'
+                ? forceCollapsed
+                : !dock.classList.contains('is-collapsed');
+
+            dock.classList.toggle('is-collapsed', shouldCollapse);
+            if (icon) {
+                icon.className = shouldCollapse ? 'fas fa-toolbox' : 'fas fa-eye-slash';
+            }
+            if (sub) {
+                sub.textContent = shouldCollapse ? 'TOOLS' : 'HIDE';
+            }
+            if (btn) {
+                btn.title = shouldCollapse
+                    ? 'Tampilkan Stok Opname & Auto PPT'
+                    : 'Sembunyikan Stok Opname & Auto PPT';
+                btn.setAttribute('aria-expanded', String(!shouldCollapse));
+            }
+            try {
+                localStorage.setItem('ahiToolsDockHidden', shouldCollapse ? '1' : '0');
+            } catch (e) {}
+        }
+
+        function initAhiToolsDockState() {
+            let savedHidden = false;
+            try {
+                savedHidden = localStorage.getItem('ahiToolsDockHidden') === '1';
+            } catch (e) {}
+            toggleAhiToolsDock(savedHidden);
+        }
+
+        function syncFloatingNavDock() {
+            const bottomNav = document.getElementById('bottom-nav');
+            const floatingDock = document.getElementById('floating-nav-dock');
+            const toolsDock = document.getElementById('ahi-left-tools-dock');
+            const soWrap = document.getElementById('header-so-alert-wrap');
+            const slidesWrap = document.getElementById('header-ahi-slides-wrap');
+
+            if (floatingDock && bottomNav) {
+                floatingDock.classList.toggle('hidden', bottomNav.classList.contains('hidden'));
+            }
+            if (toolsDock) {
+                const hasSo = soWrap && soWrap.style.display !== 'none';
+                const hasSlides = slidesWrap && slidesWrap.style.display !== 'none';
+                const isAhi = typeof currentBranch === 'undefined'
+                    || currentBranch === 'AHI'
+                    || (!document.body.classList.contains('theme-purple') && !document.body.classList.contains('theme-cyan'));
+                toolsDock.style.display = (isAhi && (hasSo || hasSlides)) ? 'flex' : 'none';
+            }
+        }
+
         function configureBottomNavForBranch(branch) {
             const isFBI = branch === 'FBI';
             const isStore = typeof selectedCategory !== 'undefined' && selectedCategory === 'store';
@@ -9388,6 +9688,7 @@
 
             // Configure menu items according to selected DC branch
             configureBottomNavForBranch(branch);
+            syncFloatingNavDock();
 
             // Reset data to avoid showing stale data from previous branch
             allData = [];
@@ -9437,6 +9738,7 @@
                 if (soWrap) soWrap.style.display = 'none';
                 const slidesWrap = document.getElementById('header-ahi-slides-wrap');
                 if (slidesWrap) slidesWrap.style.display = 'none';
+                syncFloatingNavDock();
             } else if (branch === 'KLS') {
                 body.classList.remove('theme-purple');
                 body.classList.add('theme-cyan');
@@ -9470,6 +9772,7 @@
                 if (soWrap) soWrap.style.display = 'none';
                 const slidesWrap = document.getElementById('header-ahi-slides-wrap');
                 if (slidesWrap) slidesWrap.style.display = 'none';
+                syncFloatingNavDock();
             } else {
                 body.classList.remove('theme-purple');
                 body.classList.remove('theme-cyan');
@@ -9500,9 +9803,11 @@
                     step2Question.innerHTML = 'Apakah Anda ingin melihat planning hari ini?';
                 }
                 const soWrap = document.getElementById('header-so-alert-wrap');
-                if (soWrap) soWrap.style.display = 'inline-block';
+                if (soWrap) soWrap.style.display = 'inline-flex';
                 const slidesWrap = document.getElementById('header-ahi-slides-wrap');
-                if (slidesWrap) slidesWrap.style.display = 'inline-block';
+                if (slidesWrap) slidesWrap.style.display = 'inline-flex';
+                initAhiToolsDockState();
+                syncFloatingNavDock();
                 fetchStockOpnameData();
             }
 
@@ -9579,6 +9884,7 @@
             const bottomNav = document.getElementById('bottom-nav');
             if (bottomNav) bottomNav.classList.remove('hidden');
             configureBottomNavForBranch(currentBranch);
+            syncFloatingNavDock();
         }
 
         function applyWelcomeChoice() {
@@ -9901,6 +10207,11 @@
 
             const headerBadgeCount = document.getElementById('header-so-count');
             if (headerBadgeCount) headerBadgeCount.textContent = total;
+            const miniToolsBadge = document.getElementById('ahi-tools-mini-badge');
+            if (miniToolsBadge) {
+                miniToolsBadge.textContent = total;
+                miniToolsBadge.style.display = total > 0 ? 'inline-flex' : 'none';
+            }
         }
 
         function renderStockOpnameTable() {
@@ -10099,6 +10410,9 @@
 
             const soWrap = document.getElementById('header-so-alert-wrap');
             if (soWrap) soWrap.style.display = 'none';
+            const slidesWrap = document.getElementById('header-ahi-slides-wrap');
+            if (slidesWrap) slidesWrap.style.display = 'none';
+            syncFloatingNavDock();
             closeStockOpnameModal();
 
             if (welcomeOverlay && branchStep) {
@@ -13325,18 +13639,24 @@ function hubSort(colIdx) {
 
         /* ========================================================
            AMBIL EXTERNORDERKEY (OUTSTANDING MONITORING ORDER AGING)
-           Filter: Kolom G = Created Internally, Kolom BG = LP
+           Filter: Kolom G = Created Internally / Not Started, Kolom BG = LP
            ======================================================== */
         window.currentOutstandingOdItems = [];
         window.currentOutstandingOdScope = 'ALL';
+        window.currentOutstandingOdColGScope = 'ALL';
 
-        function getOutstandingOdItemsByScope(scope) {
-            const items = window.currentOutstandingOdItems || [];
+        function getOutstandingOdItemsByScope(scope, colGScope) {
+            let items = window.currentOutstandingOdItems || [];
             if (scope === 'BELUM_PLAN') {
-                return items.filter(it => (it.status || '').toUpperCase().includes('BELUM PLAN'));
+                items = items.filter(it => (it.status || '').toUpperCase().includes('BELUM PLAN'));
+            } else if (scope === 'SUDAH_PLAN') {
+                items = items.filter(it => (it.status || '').toUpperCase().includes('SUDAH PLAN'));
             }
-            if (scope === 'SUDAH_PLAN') {
-                return items.filter(it => (it.status || '').toUpperCase().includes('SUDAH PLAN'));
+            const gScope = colGScope || window.currentOutstandingOdColGScope || 'ALL';
+            if (gScope === 'CREATED_INTERNALLY') {
+                items = items.filter(it => (it.colG || '').trim().toUpperCase() === 'CREATED INTERNALLY');
+            } else if (gScope === 'NOT_STARTED') {
+                items = items.filter(it => (it.colG || '').trim().toUpperCase() === 'NOT STARTED');
             }
             return items;
         }
@@ -13344,7 +13664,7 @@ function hubSort(colIdx) {
         window.copyOutstandingExternOrderKeys = function(format = 'or') {
             const items = window.currentOutstandingOdItems || [];
             if (items.length === 0) {
-                showFbiCopyToast('Tidak ada EXTERNORDERKEY (Created Internally & LP) sesuai filter', true);
+                showFbiCopyToast('Tidak ada EXTERNORDERKEY (Created Internally / Not Started & LP) sesuai filter', true);
                 return;
             }
             const codes = items.map(it => it.extOrderKey);
@@ -13352,7 +13672,7 @@ function hubSort(colIdx) {
             const result = codes.join(sep);
 
             copyTextToClipboardSafe(result).then(() => {
-                showFbiCopyToast(`Berhasil salin ${codes.length} EXTERNORDERKEY (Created Internally & LP) format ${format === 'semicolon' ? 'titik koma (;)' : 'OR'}`);
+                showFbiCopyToast(`Berhasil salin ${codes.length} EXTERNORDERKEY (Created Internally / Not Started & LP) format ${format === 'semicolon' ? 'titik koma (;)' : 'OR'}`);
                 const btnId = format === 'semicolon' ? 'btn-os-od-copy-semi' : 'btn-os-od-copy-or';
                 const btn = document.getElementById(btnId);
                 if (btn) {
@@ -13368,9 +13688,19 @@ function hubSort(colIdx) {
 
         window.openOutstandingOdModal = function() {
             window.currentOutstandingOdScope = 'ALL';
+            window.currentOutstandingOdColGScope = 'ALL';
             document.querySelectorAll('.os-od-scope-btn').forEach(btn => {
                 if (btn.getAttribute('data-scope') === 'ALL') {
                     btn.style.background = '#d97706';
+                    btn.style.color = '#fff';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#94a3b8';
+                }
+            });
+            document.querySelectorAll('.os-od-colg-btn').forEach(btn => {
+                if (btn.getAttribute('data-colg') === 'ALL') {
+                    btn.style.background = '#7c3aed';
                     btn.style.color = '#fff';
                 } else {
                     btn.style.background = 'transparent';
@@ -13405,14 +13735,28 @@ function hubSort(colIdx) {
             renderOutstandingOdModalContent();
         };
 
+        window.setOutstandingOdColGScope = function(colGScope) {
+            window.currentOutstandingOdColGScope = colGScope;
+            document.querySelectorAll('.os-od-colg-btn').forEach(btn => {
+                if (btn.getAttribute('data-colg') === colGScope) {
+                    btn.style.background = '#7c3aed';
+                    btn.style.color = '#fff';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#94a3b8';
+                }
+            });
+            renderOutstandingOdModalContent();
+        };
+
         window.renderOutstandingOdModalContent = function() {
             const areaVal = (document.getElementById('pivot-area-filter') || {}).value || 'ALL';
-            const filteredItems = getOutstandingOdItemsByScope(window.currentOutstandingOdScope || 'ALL');
+            const filteredItems = getOutstandingOdItemsByScope(window.currentOutstandingOdScope || 'ALL', window.currentOutstandingOdColGScope || 'ALL');
             const codes = filteredItems.map(it => it.extOrderKey);
 
             const filterInfoEl = document.getElementById('os-od-modal-filter-info');
             if (filterInfoEl) {
-                filterInfoEl.textContent = `Sumber: Kolom F (EXTERNORDERKEY) • Kolom G = Created Internally • Kolom BG = LP • Area: ${areaVal === 'ALL' ? 'Semua Area' : areaVal}`;
+                filterInfoEl.textContent = `Sumber: Kolom F (EXTERNORDERKEY) • Kolom G = Created Internally / Not Started • Kolom BG = LP • Area: ${areaVal === 'ALL' ? 'Semua Area' : areaVal}`;
             }
 
             const badgeEl = document.getElementById('os-od-modal-badge');
@@ -13429,18 +13773,20 @@ function hubSort(colIdx) {
             const tbody = document.getElementById('os-od-preview-tbody');
             if (tbody) {
                 if (filteredItems.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 24px; color:#64748b;">Tidak ada EXTERNORDERKEY dengan Kolom G = Created Internally dan Kolom BG = LP.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 24px; color:#64748b;">Tidak ada EXTERNORDERKEY dengan Kolom G = Created Internally / Not Started dan Kolom BG = LP.</td></tr>';
                 } else {
                     tbody.innerHTML = filteredItems.map((it, idx) => {
                         const bgRow = idx % 2 === 0 ? '#0d1527' : '#080d1a';
                         const isBelum = (it.status || '').toUpperCase().includes('BELUM PLAN');
                         const statusColor = isBelum ? '#f87171' : '#4ade80';
+                        const isNotStarted = (it.colG || '').trim().toUpperCase() === 'NOT STARTED';
+                        const colGColor = isNotStarted ? '#60a5fa' : '#fbbf24';
                         return `<tr style="background:${bgRow}; border-bottom:1px solid #1e293b;">
                             <td style="padding:6px 8px; border:1px solid #1e293b; text-align:center; color:#64748b;">${idx + 1}</td>
                             <td style="padding:6px 10px; border:1px solid #1e293b; font-family:monospace; font-weight:700; color:#38bdf8; white-space:nowrap;">${it.extOrderKey}</td>
                             <td style="padding:6px 8px; border:1px solid #1e293b; text-align:center; font-weight:700; color:#ffd700;">${it.storeBooking || '-'}</td>
                             <td style="padding:6px 10px; border:1px solid #1e293b; color:#e2e8f0;">${it.storeBookingName || '-'}</td>
-                            <td style="padding:6px 8px; border:1px solid #1e293b; text-align:center; color:#cbd5e1;">${it.colG || '-'}</td>
+                            <td style="padding:6px 8px; border:1px solid #1e293b; text-align:center; font-weight:700; color:${colGColor}; white-space:nowrap;">${it.colG || '-'}</td>
                             <td style="padding:6px 8px; border:1px solid #1e293b; text-align:center; font-weight:700; color:#a78bfa;">${it.colBG || '-'}</td>
                             <td style="padding:6px 8px; border:1px solid #1e293b; text-align:center; font-weight:700; color:${statusColor}; white-space:nowrap;">${it.status || '-'}</td>
                             <td style="padding:6px 8px; border:1px solid #1e293b; text-align:right; color:#ffd700; font-weight:700;">${formatIndo(it.cbm || 0)}</td>
@@ -14166,11 +14512,12 @@ Tim Planner DC Sidoarjo`;
             const stores = {};
             const odKeyMap = {};
             filtered.forEach(row => {
-                // Collect unique EXTERNORDERKEY (Kolom F) where Kolom G = Created Internally & Kolom BG = LP
+                // Collect unique EXTERNORDERKEY (Kolom F) where Kolom G = Created Internally / Not Started & Kolom BG = LP
                 const extKey = (row.rawColumns && row.rawColumns.F ? row.rawColumns.F : '').trim();
                 const colGVal = (row.rawColumns && row.rawColumns.G ? row.rawColumns.G : (row.allocStatus || '')).trim();
+                const colGUpper = colGVal.toUpperCase();
                 const colBGVal = (row.rawColumns && row.rawColumns.BG ? row.rawColumns.BG : '').trim();
-                if (extKey && extKey !== '-' && colGVal.toUpperCase() === 'CREATED INTERNALLY' && colBGVal.toUpperCase() === 'LP') {
+                if (extKey && extKey !== '-' && (colGUpper === 'CREATED INTERNALLY' || colGUpper === 'NOT STARTED') && colBGVal.toUpperCase() === 'LP') {
                     if (!odKeyMap[extKey]) {
                         odKeyMap[extKey] = {
                             extOrderKey: extKey,
