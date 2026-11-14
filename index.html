@@ -2529,7 +2529,27 @@
             margin-bottom: 8px;
             opacity: 0.9;
         }
-
+.kpi-capacity {
+    margin-top: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    background: rgba(0,0,0,0.25);
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    color: #fff;
+}
+.kpi-capacity-usage {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: #fff;
+}
+.kpi-capacity-usage.ok   { color: #86efac; }
+.kpi-capacity-usage.over { color: #fca5a5; }
+        
         /* FBI Schedule Table Styling */
         .schedule-fbi-table {
             border-collapse: separate;
@@ -5959,22 +5979,31 @@
         </div>
 
         <div class="kpi-container-four">
-            <div class="kpi-card blue">
-                <div class="kpi-label">CASE ID PLAN B1</div>
-                <div class="kpi-value" id="caseIdPlanB1">0</div>
-            </div>
-            <div class="kpi-card blue">
-                <div class="kpi-label">CASE ID PLAN B2</div>
-                <div class="kpi-value" id="caseIdPlanB2">0</div>
-            </div>
-            <div class="kpi-card blue">
-                <div class="kpi-label">CASE ID PLAN B3</div>
-                <div class="kpi-value" id="caseIdPlanB3">0</div>
-            </div>
-            <div class="kpi-card blue">
-                <div class="kpi-label">CASE ID PLAN B4</div>
-                <div class="kpi-value" id="caseIdPlanB4">0</div>
-            </div>
+    <div class="kpi-card blue">
+        <div class="kpi-label">CASE ID PLAN B1</div>
+        <div class="kpi-value" id="caseIdPlanB1">0</div>
+        <div class="kpi-capacity">Kapasitas Storing: 4.560 case id</div>
+        <span class="kpi-capacity-usage" id="caseIdUsageB1"></span>
+    </div>
+    <div class="kpi-card blue">
+        <div class="kpi-label">CASE ID PLAN B2</div>
+        <div class="kpi-value" id="caseIdPlanB2">0</div>
+        <div class="kpi-capacity">Kapasitas Storing: 3.192 case id</div>
+        <span class="kpi-capacity-usage" id="caseIdUsageB2"></span>
+    </div>
+    <div class="kpi-card blue">
+        <div class="kpi-label">CASE ID PLAN B3</div>
+        <div class="kpi-value" id="caseIdPlanB3">0</div>
+        <div class="kpi-capacity">Kapasitas Storing: 2.394 case id</div>
+        <span class="kpi-capacity-usage" id="caseIdUsageB3"></span>
+    </div>
+    <div class="kpi-card blue">
+        <div class="kpi-label">CASE ID PLAN B4</div>
+        <div class="kpi-value" id="caseIdPlanB4">0</div>
+        <div class="kpi-capacity">Kapasitas Storing: 1.824 case id</div>
+        <span class="kpi-capacity-usage" id="caseIdUsageB4"></span>
+    </div>
+</div>
         </div>
 <div class="kpi-container-four">
     <div class="kpi-card gray" id="cbmPlanB1-card">
@@ -17579,7 +17608,14 @@ function updateDashboard() {
         function updateAhiSummaryPage() {
             // Deprecated, handled by cinematic dashboard locally
         }
+const CASE_ID_CAPACITY = { B1: 4560, B2: 3192, B3: 2394, B4: 1824 };
 
+function updateCaseIdCapacity(vals) {
+    ...
+}
+
+// Update KPIs
+function updateKPIs() {
         // Update KPIs
         function updateKPIs() {
             const caseIdShipped = filteredData.reduce((sum, r) => sum + parseNumberWithComma(r.BF, true), 0);
@@ -17655,6 +17691,8 @@ function updateDashboard() {
             document.getElementById('caseIdPlanB2').textContent = Math.round(b2).toLocaleString('id-ID');
             document.getElementById('caseIdPlanB3').textContent = Math.round(b3).toLocaleString('id-ID');
             document.getElementById('caseIdPlanB4').textContent = Math.round(b4).toLocaleString('id-ID');
+            document.getElementById('caseIdPlanB4').textContent = Math.round(b4).toLocaleString('id-ID');
+            updateCaseIdCapacity({ B1: b1, B2: b2, B3: b3, B4: b4 });   // <-- tambahan
             document.getElementById('cbmPlanB1').textContent = formatIndo(cbmB1);
             document.getElementById('cbmPlanB2').textContent = formatIndo(cbmB2);
             document.getElementById('cbmPlanB3').textContent = formatIndo(cbmB3);
