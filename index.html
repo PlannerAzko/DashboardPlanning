@@ -17690,7 +17690,6 @@ function updateKPIs() {
             document.getElementById('caseIdPlanB2').textContent = Math.round(b2).toLocaleString('id-ID');
             document.getElementById('caseIdPlanB3').textContent = Math.round(b3).toLocaleString('id-ID');
             document.getElementById('caseIdPlanB4').textContent = Math.round(b4).toLocaleString('id-ID');
-            document.getElementById('caseIdPlanB4').textContent = Math.round(b4).toLocaleString('id-ID');
             updateCaseIdCapacity({ B1: b1, B2: b2, B3: b3, B4: b4 });   // <-- tambahan
             document.getElementById('cbmPlanB1').textContent = formatIndo(cbmB1);
             document.getElementById('cbmPlanB2').textContent = formatIndo(cbmB2);
@@ -17700,7 +17699,26 @@ function updateKPIs() {
             // Update Armada summary planning KPI values dynamically
             updateArmadaPlanningKPIs();
         }
+        const CASE_ID_CAPACITY = { B1: 4560, B2: 3192, B3: 2394, B4: 1824 };
 
+        function updateCaseIdCapacity(vals) {
+        Object.keys(CASE_ID_CAPACITY).forEach(function (k) {
+            var el = document.getElementById('caseIdUsage' + k);
+            if (!el) return;
+            var cap = CASE_ID_CAPACITY[k];
+            var val = Math.round(vals[k] || 0);
+            var pct = cap > 0 ? (val / cap) * 100 : 0;
+            var diff = val - cap;
+            var isOver = diff > 0;
+
+            el.className = 'kpi-capacity-usage ' + (isOver ? 'over' : 'ok');
+            if (isOver) {
+                el.textContent = 'Terpakai ' + pct.toFixed(1) + '% (Over ' + Math.abs(diff).toLocaleString('id-ID') + ')';
+            } else {
+                el.textContent = 'Terpakai ' + pct.toFixed(1) + '% (Sisa ' + Math.abs(diff).toLocaleString('id-ID') + ')';
+            }
+        });
+    }
         // Update Armada Summary Plan KPIs values dynamically
         function updateArmadaPlanningKPIs() {
             // Calculate Armada KPIs
