@@ -5723,7 +5723,7 @@
                     <div>
                         <h2 class="so-modal-title" style="margin: 0; font-size: 1.05rem;">AUTO PPT REPORT — <span style="color: #ffd700;">DC AHI SIDOARJO</span></h2>
                         <p class="so-modal-subtitle" style="margin-top: 3px;">
-                            Buat 11 slide laporan ke Google Drive (Google Slides) atau unduh langsung (.PPTX).
+                            Buat slide laporan ke Google Drive (Google Slides) atau unduh langsung (.PPTX).
                         </p>
                     </div>
                 </div>
@@ -19404,6 +19404,7 @@ setInterval(loadKonfirmasiVM, 600000);
 
         let pptxLoadPromise = null;
         let fbiLiveCache = { ts: 0, pivotRows: null, slaRows: null };
+        let logisalesLiveCache = { ts: 0, items: null };
 
         function ensurePptxGenJsLoaded() {
             if (typeof window.PptxGenJS === 'function') return Promise.resolve(window.PptxGenJS);
@@ -20168,6 +20169,22 @@ setInterval(loadKonfirmasiVM, 600000);
             return c.toDataURL('image/png');
         }
 
+        // ---------- Hub & Astor On-Demand Safety Fetch ----------
+        async function ensureHubAstorLiveDataForPpt() {
+            const tasks = [];
+            try {
+                const needHub = (typeof rawHubData === 'undefined' || !Array.isArray(rawHubData) || rawHubData.length === 0);
+                if (needHub && typeof fetchHubData === 'function') {
+                    tasks.push(fetchHubData(0).catch(() => {}));
+                }
+                const needAstor = (typeof rawAstorData === 'undefined' || !Array.isArray(rawAstorData) || rawAstorData.length === 0);
+                if (needAstor && typeof fetchAstorData === 'function') {
+                    tasks.push(fetchAstorData(0).catch(() => {}));
+                }
+                if (tasks.length > 0) await Promise.all(tasks);
+            } catch (e) {}
+        }
+
         // ---------- FBI Live Data On-Demand Fetch (Used When User is in AHI Mode) ----------
         async function ensureFbiLiveDataForPpt() {
             const now = Date.now();
@@ -20212,6 +20229,95 @@ setInterval(loadKonfirmasiVM, 600000);
             await Promise.all(tasks);
             fbiLiveCache.ts = Date.now();
             return fbiLiveCache;
+        }
+
+        // ---------- Logisales Live Data On-Demand Fetch (plannerazko.github.io/logisaleskawanlama) ----------
+        async function ensureLogisalesLiveDataForPpt() {
+            const now = Date.now();
+            if (logisalesLiveCache.items && logisalesLiveCache.items.length > 0 && now - logisalesLiveCache.ts < 60000) {
+                return logisalesLiveCache;
+            }
+            const LOGISALES_CONFIG_URL = 'https://plannerazko.github.io/logisaleskawanlama/firebase-applet-config.json';
+            let gasUrl = 'https://script.google.com/macros/s/AKfycbycTeZ3Jwo7L49zCO-SzZCgEcrRnu7Jl700lHz4NwmLCoLQfcW1Ubq5r1-1ExNvVqw/exec';
+            let sheetId = '18KgMuMpfGf3mC_D50XKLdy6EfHxNYdPJCiWqCZiKEVs';
+
+            try {
+                const cfgRes = await fetch(LOGISALES_CONFIG_URL, { cache: 'no-store' });
+                if (cfgRes && cfgRes.ok) {
+                    const cfg = await cfgRes.json().catch(() => null);
+                    if (cfg && cfg.appsScriptUrl) gasUrl = cfg.appsScriptUrl;
+                    if (cfg && cfg.spreadsheetId) sheetId = cfg.spreadsheetId;
+                }
+            } catch (e) {}
+
+            let items = null;
+            if (gasUrl) {
+                try {
+                    const res = await fetch(gasUrl, { method: 'GET' });
+                    if (res && res.ok) {
+                        const json = await res.json().catch(() => null);
+                        if (json && Array.isArray(json.items)) {
+                            items = json.items;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            if ((!items || items.length === 0) && sheetId) {
+                const csvUrls = [
+                    `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=0`,
+                    `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=DATABASE`,
+                ];
+                for (let u = 0; u < csvUrls.length; u++) {
+                    try {
+                        const r = await fetch(csvUrls[u]);
+                        if (!r || !r.ok) continue;
+                        const csv = await r.text();
+                        if (!csv || csv.trim().startsWith('<!DOCTYPE') || typeof robustCSVParser !== 'function') continue;
+                        const rows = robustCSVParser(csv);
+                        if (rows && rows.length > 1) {
+                            const parsed = [];
+                            for (let i = 1; i < rows.length; i++) {
+                                const row = rows[i];
+                                if (!row || !row[2] || String(row[2]).trim() === '') continue;
+                                parsed.push({
+                                    tanggalRequest: String(row[0] || '').split('T')[0],
+                                    omo: row[1] || '',
+                                    noOrder: String(row[2]).trim(),
+                                    namaCustomer: row[3] || '',
+                                    noRt: row[4] || '',
+                                    rtAction: row[5] || '',
+                                    namaBarang: row[6] || '',
+                                    alamatLengkap: row[7] || '',
+                                    kecamatan: row[8] || '',
+                                    kota: row[9] || '',
+                                    tanggalKirim: String(row[10] || '').split('T')[0],
+                                    remark: row[11] || '',
+                                    kesiapanBarang: row[12] || '',
+                                    attachment: row[13] || '#',
+                                    noLc: row[14] || '',
+                                    nopol: row[15] || '',
+                                    driver: row[16] || '',
+                                    typeArmada: row[17] || '',
+                                    lineZyllem: row[18] || '',
+                                    status: row[19] || '',
+                                    alasanPending: row[20] || '',
+                                });
+                            }
+                            if (parsed.length > 0) {
+                                items = parsed;
+                                break;
+                            }
+                        }
+                    } catch (e) {}
+                }
+            }
+
+            if (items && items.length > 0) {
+                logisalesLiveCache.items = items;
+                logisalesLiveCache.ts = Date.now();
+            }
+            return logisalesLiveCache;
         }
 
         // ---------- Snapshot Collectors for All 10 Slides ----------
@@ -20750,6 +20856,220 @@ setInterval(loadKonfirmasiVM, 600000);
             };
         }
 
+        function computeHubAstor3MonthSnapshot(reportIso) {
+            const headers = typeof hubHeaderNames !== 'undefined' ? hubHeaderNames : [];
+            const hubRaw = typeof rawHubData !== 'undefined' ? rawHubData : [];
+            const astorRaw = typeof rawAstorData !== 'undefined' ? rawAstorData : [];
+
+            const repDate = parseIsoLocal(reportIso) || new Date();
+            const repDay = Math.max(1, repDate.getDate());
+
+            const parseFlexDate = (str) => {
+                if (!str) return null;
+                const cleaned = String(str).trim().replace(/^'/, '');
+                if (!cleaned) return null;
+                let d = parseIsoLocal(cleaned);
+                if (d && !isNaN(d.getTime())) return d;
+                if (typeof parseTgl === 'function') {
+                    d = parseTgl(cleaned.replace(/-/g, ' '));
+                    if (d && !isNaN(d.getTime())) return d;
+                }
+                return null;
+            };
+
+            const months3 = [];
+            const monthMap = {};
+            for (let offset = -2; offset <= 0; offset++) {
+                const md = new Date(repDate.getFullYear(), repDate.getMonth() + offset, 1);
+                const yr = md.getFullYear();
+                const mo = md.getMonth();
+                const daysInMonth = new Date(yr, mo + 1, 0).getDate();
+                const isCur = offset === 0;
+                const dayDivisor = isCur ? repDay : daysInMonth;
+                const key = `${yr}-${String(mo + 1).padStart(2, '0')}`;
+                const obj = {
+                    key,
+                    shortLabel: `${BULAN_ID_UPPER[mo].slice(0, 3)} ${yr}`,
+                    fullLabel: `${BULAN_ID_UPPER[mo]} ${yr}`,
+                    isCurrent: isCur,
+                    daysInMonth,
+                    dayDivisor,
+                    grw: {
+                        orderCount: 0,
+                        loadedCount: 0,
+                        totalCbm: 0,
+                        loadedCbm: 0,
+                        avgCbmPerDay: 0,
+                        slaHit: 0,
+                        slaMiss: 0,
+                        slaPct: 0,
+                        missCbm: 0,
+                        activeDays: 0,
+                    },
+                    astor: {
+                        orderCount: 0,
+                        totalCbm: 0,
+                        avgCbmPerDay: 0,
+                        slaHit: 0,
+                        slaMiss: 0,
+                        slaPct: 0,
+                        missCbm: 0,
+                        activeDays: 0,
+                    },
+                };
+                months3.push(obj);
+                monthMap[key] = obj;
+            }
+            const currentMonthKey = months3[2].key;
+
+            // --- HUB GRW Columns ---
+            let tglIdx = headers.findIndex((h) => h.toUpperCase().includes('TANGGAL') && h.toUpperCase().includes('KEDATANGAN'));
+            if (tglIdx === -1) tglIdx = 0;
+            let lcPembawaIdx = headers.findIndex((h) => h.toUpperCase().includes('LC PEMBAWA'));
+            if (lcPembawaIdx === -1) lcPembawaIdx = 1;
+            let regionIdx = headers.findIndex((h) => h.toUpperCase().includes('REGION'));
+            if (regionIdx === -1) regionIdx = 2;
+            let kodeIdx = headers.findIndex((h) => h.toUpperCase().includes('KODE STORE'));
+            if (kodeIdx === -1) kodeIdx = 3;
+            let storeIdx = headers.findIndex((h) => h.toUpperCase().includes('STORE NAME') || h.toUpperCase().includes('NAMA STORE'));
+            if (storeIdx === -1) storeIdx = 4;
+            const cbmIdx = headers.findIndex((h) => h.toUpperCase().includes('TOTAL CBM') || h.toUpperCase() === 'CBM');
+            const cbmCol = cbmIdx !== -1 ? cbmIdx : 8;
+            let agingIdx = headers.findIndex((h) => h.toUpperCase() === 'AGING');
+            if (agingIdx === -1) agingIdx = 9;
+            const noLcIdx = headers.findIndex((h) => h.toUpperCase().includes('NO LC'));
+
+            const grwDaySets = {};
+            const astorDaySets = {};
+            months3.forEach((m) => {
+                grwDaySets[m.key] = new Set();
+                astorDaySets[m.key] = new Set();
+            });
+
+            const grwMissList = [];
+            const astorMissList = [];
+
+            hubRaw.forEach((row) => {
+                const d = parseFlexDate(row[tglIdx]);
+                if (!d) return;
+                const mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                const mObj = monthMap[mKey];
+                if (!mObj) return;
+
+                const dIso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                grwDaySets[mKey].add(dIso);
+
+                const cbm = numVal(row[cbmCol]);
+                mObj.grw.orderCount++;
+                mObj.grw.totalCbm += cbm;
+
+                const stK = String(row[10] || '').toUpperCase();
+                const stN = String(row[13] || '').toUpperCase();
+                const isLoaded = stK.includes('SUDAH LOADING') || stK.includes('SUDAH MUAT') || stN.includes('SUDAH LOADING') || stN.includes('SUDAH MUAT');
+
+                if (isLoaded) {
+                    mObj.grw.loadedCount++;
+                    mObj.grw.loadedCbm += cbm;
+                    const reg = String(row[regionIdx] || '').trim().toUpperCase();
+                    const isDK = reg === 'JATIM DK';
+                    const thr = isDK ? 3 : 5;
+                    const ag = parseInt(row[agingIdx], 10) || 0;
+                    if (ag >= 0 && ag <= thr) {
+                        mObj.grw.slaHit++;
+                    } else {
+                        mObj.grw.slaMiss++;
+                        mObj.grw.missCbm += cbm;
+                        if (mKey === currentMonthKey) {
+                            grwMissList.push({
+                                tgl: safeStr(row[tglIdx], '-'),
+                                lcPembawa: safeStr(row[lcPembawaIdx], '-'),
+                                noLc: noLcIdx !== -1 ? safeStr(row[noLcIdx], '-') : '-',
+                                region: safeStr(row[regionIdx], '-'),
+                                area: isDK ? 'DK' : 'LK',
+                                kode: safeStr(row[kodeIdx], '-'),
+                                store: safeStr(row[storeIdx], '-'),
+                                cbm,
+                                aging: ag,
+                                thr,
+                                diff: ag - thr,
+                                ketLoading: safeStr(row[13], '-'),
+                            });
+                        }
+                    }
+                }
+            });
+
+            astorRaw.forEach((r) => {
+                const d = parseFlexDate(r.tgl);
+                if (!d) return;
+                const mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                const mObj = monthMap[mKey];
+                if (!mObj) return;
+
+                const dIso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                astorDaySets[mKey].add(dIso);
+
+                const cbm = Number(r.cbm || 0) || 0;
+                mObj.astor.orderCount++;
+                mObj.astor.totalCbm += cbm;
+
+                if (r.sla === 'HIT') {
+                    mObj.astor.slaHit++;
+                } else if (r.sla === 'MISS') {
+                    mObj.astor.slaMiss++;
+                    mObj.astor.missCbm += cbm;
+                    if (mKey === currentMonthKey) {
+                        astorMissList.push({
+                            tgl: safeStr(r.tgl, '-'),
+                            rtod: safeStr(r.rtod, '-'),
+                            lc: safeStr(r.lc, '-'),
+                            bu: safeStr(r.bu, '-'),
+                            kota: safeStr(r.kota, '-'),
+                            region: safeStr(r.region, '-'),
+                            area: safeStr(r.area, '-'),
+                            cbm,
+                            aging: Number(r.aging || 0) || 0,
+                            stuffing: safeStr(r.stuffing, 'MISS'),
+                        });
+                    }
+                }
+            });
+
+            months3.forEach((m) => {
+                m.grw.activeDays = grwDaySets[m.key].size;
+                m.astor.activeDays = astorDaySets[m.key].size;
+                m.grw.avgCbmPerDay = m.dayDivisor > 0 ? m.grw.totalCbm / m.dayDivisor : 0;
+                m.astor.avgCbmPerDay = m.dayDivisor > 0 ? m.astor.totalCbm / m.dayDivisor : 0;
+                const gTotSla = m.grw.slaHit + m.grw.slaMiss;
+                const aTotSla = m.astor.slaHit + m.astor.slaMiss;
+                m.grw.slaPct = gTotSla > 0 ? (m.grw.slaHit / gTotSla) * 100 : 0;
+                m.astor.slaPct = aTotSla > 0 ? (m.astor.slaHit / aTotSla) * 100 : 0;
+            });
+
+            grwMissList.sort((a, b) => (b.aging - a.aging) || (b.cbm - a.cbm));
+            astorMissList.sort((a, b) => (b.aging - a.aging) || (b.cbm - a.cbm));
+
+            const cur = months3[2];
+            const prev = months3[1];
+
+            const pctDelta = (curV, prevV) => (prevV > 0 ? ((curV - prevV) / prevV) * 100 : 0);
+
+            return {
+                currentMonthLabel: cur.fullLabel,
+                currentShortLabel: cur.shortLabel,
+                prevShortLabel: prev.shortLabel,
+                months3,
+                current: cur,
+                prev,
+                grwCbmMomPct: pctDelta(cur.grw.avgCbmPerDay, prev.grw.avgCbmPerDay),
+                astorCbmMomPct: pctDelta(cur.astor.avgCbmPerDay, prev.astor.avgCbmPerDay),
+                grwSlaDiffPts: cur.grw.slaPct - prev.grw.slaPct,
+                astorSlaDiffPts: cur.astor.slaPct - prev.astor.slaPct,
+                grwMissList,
+                astorMissList,
+            };
+        }
+
         function computeFbiSnapshot(reportIso, fbiCache) {
             const planner = typeof rawPlannerData !== 'undefined' ? rawPlannerData : [];
             const fixKll = typeof rawFixKllData !== 'undefined' ? rawFixKllData : [];
@@ -20929,7 +21249,334 @@ setInterval(loadKonfirmasiVM, 600000);
             };
         }
 
-        function collectFullReportSnapshot(fbiCache) {
+        function computeVendorSnapshot(reportIso) {
+            const rowsAll = typeof allData !== 'undefined' ? allData : [];
+            const repDate = parseIsoLocal(reportIso) || new Date();
+            const todayStart = new Date(repDate.getFullYear(), repDate.getMonth(), repDate.getDate());
+
+            const months3 = [];
+            const monthMap = {};
+            for (let offset = -2; offset <= 0; offset++) {
+                const md = new Date(repDate.getFullYear(), repDate.getMonth() + offset, 1);
+                const key = `${md.getFullYear()}-${String(md.getMonth() + 1).padStart(2, '0')}`;
+                const obj = {
+                    key,
+                    shortLabel: `${BULAN_ID_UPPER[md.getMonth()].slice(0, 3)} ${md.getFullYear()}`,
+                    fullLabel: `${BULAN_ID_UPPER[md.getMonth()]} ${md.getFullYear()}`,
+                    isCurrent: offset === 0,
+                    onTime: 0,
+                    terlambat: 0,
+                    belumSupport: 0,
+                    total: 0,
+                    supportingPct: 0,
+                };
+                months3.push(obj);
+                monthMap[key] = obj;
+            }
+            const currentMonthKey = months3[2].key;
+
+            const excludedCarriers = ['1D-INTERNAL (SDA)', 'AHI', 'DUMMY-LK-EKSP', 'DUMMY'];
+            const parseVendorDate = (str) => {
+                if (typeof parseDateCustom === 'function') {
+                    const d = parseDateCustom(str);
+                    if (d && !isNaN(d.getTime())) return d;
+                }
+                const d2 = parseIsoLocal(str);
+                if (d2 && !isNaN(d2.getTime())) return d2;
+                if (typeof parseDate === 'function') {
+                    const d3 = parseDate(str);
+                    if (d3 && !isNaN(d3.getTime())) return d3;
+                }
+                return null;
+            };
+            const checkBelumSupport = (row) => {
+                if (typeof isBelumSupport === 'function') return isBelumSupport(row);
+                return String(row.AV || '').trim().toUpperCase().includes('BELUM SUPPORT');
+            };
+            const checkTerlambat = (row) => {
+                if (typeof isTerlambat === 'function') return isTerlambat(row);
+                if (checkBelumSupport(row)) return false;
+                return (parseInt(row.AW, 10) || 0) > 0;
+            };
+            const calcDelayHours = (row) => {
+                if (typeof getDelayHours === 'function') return getDelayHours(row);
+                const ag = parseInt(row.AW, 10) || 0;
+                return ag > 0 ? ag * 24 : 0;
+            };
+
+            const carrierMap = {};
+            let delayHoursSum = 0;
+            let delayHoursCnt = 0;
+            let maxDelayHours = 0;
+
+            rowsAll.forEach((row) => {
+                const carrier = String(row.D || '').trim();
+                if (!carrier || carrier === '-' || carrier === 'CARRIER') return;
+                const carrierUpper = carrier.toUpperCase();
+                if (excludedCarriers.includes(carrierUpper) || carrierUpper.includes('DUMMY')) return;
+
+                const isBelumSpt = checkBelumSupport(row);
+                const dateVal = isBelumSpt ? String(row.AU || '').trim() : String(row.AO || '').trim();
+                if (!dateVal || dateVal === '-' || dateVal === '0') return;
+
+                const dDate = parseVendorDate(dateVal);
+                if (!dDate || isNaN(dDate.getTime())) return;
+                if (dDate >= todayStart) return; // Sync with Menu Vendor (tgl 1 s/d H-1)
+
+                const mKey = `${dDate.getFullYear()}-${String(dDate.getMonth() + 1).padStart(2, '0')}`;
+                const mBucket = monthMap[mKey];
+                if (!mBucket) return;
+
+                const isLate = !isBelumSpt && checkTerlambat(row);
+
+                if (isBelumSpt) mBucket.belumSupport++;
+                else if (isLate) mBucket.terlambat++;
+                else mBucket.onTime++;
+                mBucket.total++;
+
+                if (mKey === currentMonthKey) {
+                    if (!carrierMap[carrier]) {
+                        carrierMap[carrier] = { carrier, onTime: 0, terlambat: 0, belumSupport: 0, total: 0, achievement: 0 };
+                    }
+                    if (isBelumSpt) {
+                        carrierMap[carrier].belumSupport++;
+                    } else if (isLate) {
+                        carrierMap[carrier].terlambat++;
+                        const hrs = calcDelayHours(row);
+                        if (hrs > 0) {
+                            delayHoursSum += hrs;
+                            delayHoursCnt++;
+                            if (hrs > maxDelayHours) maxDelayHours = hrs;
+                        }
+                    } else {
+                        carrierMap[carrier].onTime++;
+                    }
+                    carrierMap[carrier].total++;
+                }
+            });
+
+            months3.forEach((m) => {
+                m.supportingPct = m.total > 0 ? (m.onTime / m.total) * 100 : 0;
+            });
+
+            const fmtHoursText = (hrs) => {
+                if (!hrs || hrs <= 0) return '0 Jam 00 Menit';
+                const totM = Math.round(hrs * 60);
+                const hh = Math.floor(totM / 60);
+                const mm = totM % 60;
+                return `${hh} Jam ${String(mm).padStart(2, '0')} Menit`;
+            };
+
+            const carrierList = Object.values(carrierMap)
+                .map((c) => ({
+                    ...c,
+                    achievement: c.total > 0 ? (c.onTime / c.total) * 100 : 0,
+                }))
+                .sort((a, b) => b.total - a.total || a.carrier.localeCompare(b.carrier));
+
+            const current = months3[2];
+            const prev = months3[1];
+
+            return {
+                currentMonthLabel: current.fullLabel,
+                months3,
+                current,
+                prev,
+                avgDelayText: fmtHoursText(delayHoursCnt > 0 ? delayHoursSum / delayHoursCnt : 0),
+                maxDelayText: fmtHoursText(maxDelayHours),
+                carrierList,
+            };
+        }
+
+        function computeLogisalesSnapshot(reportIso, logisalesCache) {
+            const rawItems = (logisalesCache && Array.isArray(logisalesCache.items)) ? logisalesCache.items : [];
+            const repDate = parseIsoLocal(reportIso) || new Date();
+            const year = repDate.getFullYear();
+            const month = repDate.getMonth();
+            const startIso = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+            let hMinus1Iso = addDaysIso(reportIso, -1);
+            if (hMinus1Iso < startIso) hMinus1Iso = startIso;
+
+            const prevMonthDate = new Date(year, month - 1, 1);
+            const prevYear = prevMonthDate.getFullYear();
+            const prevMonth = prevMonthDate.getMonth();
+            const prevStartIso = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-01`;
+            const endDayNum = parseInt(hMinus1Iso.slice(8, 10), 10) || 1;
+            const prevMonthDays = new Date(prevYear, prevMonth + 1, 0).getDate();
+            const prevMtdEndIso = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(Math.min(endDayNum, prevMonthDays)).padStart(2, '0')}`;
+            const prevMonthLabel = `${BULAN_ID_UPPER[prevMonth].slice(0, 3)} ${prevYear}`;
+            const bulanLabel = `${BULAN_ID_UPPER[month]} ${year}`;
+
+            const normDate = (dateStr) => {
+                if (!dateStr) return '';
+                const str = String(dateStr).trim();
+                if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+                if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(str)) {
+                    const p = str.split(/[\/\-]/);
+                    return `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
+                }
+                if (/^\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2}$/.test(str)) {
+                    const p = str.split(/[\/\-]/);
+                    return `${p[0]}-${p[1].padStart(2, '0')}-${p[2].padStart(2, '0')}`;
+                }
+                if (str.includes('T') && /^\d{4}-\d{2}-\d{2}/.test(str)) return str.split('T')[0];
+                const d = new Date(str);
+                if (!isNaN(d.getTime())) {
+                    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                }
+                return str.split(/[\sT]/)[0];
+            };
+
+            const normStatus = (val) => {
+                if (!val) return 'process';
+                const s = String(val).toLowerCase().trim();
+                if (
+                    s.includes('terkirim') || s.includes('dikirim') || s.includes('sudah kirim') ||
+                    s.includes('telah kirim') || s.includes('complete') || s.includes('selesai') ||
+                    s.includes('delivered') || s === 'done' || s === 'ok' ||
+                    s.includes('sukses') || s.includes('success')
+                ) return 'completed';
+                if (s.includes('pending') || s.includes('tunda') || s.includes('delay') || s.includes('hold')) return 'pending';
+                if (s.includes('reschedule') || s.includes('jadwal ulang') || s.includes('re-schedule')) return 'reschedule';
+                if (s.includes('proses') || s.includes('process') || s.includes('jalan') || s.includes('progress') || s.includes('pengiriman')) return 'process';
+                return s;
+            };
+
+            const getCity = (item) => {
+                if (item.kota && String(item.kota).trim() !== '' && String(item.kota).trim() !== '-') {
+                    return String(item.kota).toUpperCase().trim();
+                }
+                const destRaw = item.alamatLengkap || item.destination || '';
+                if (destRaw) {
+                    const dest = String(destRaw).toUpperCase().trim();
+                    if (dest.includes(',')) {
+                        const parts = dest.split(',');
+                        const last = parts[parts.length - 1].trim();
+                        if (last) return last;
+                    }
+                    return dest;
+                }
+                return 'LAINNYA';
+            };
+
+            // Match Logisales Web App syncFromGoogleSheets: deduplicate by noOrder (latest row in Sheet updates/wins)
+            const dedupMap = new Map();
+            rawItems.forEach((item, idx) => {
+                const ordKey = String(item && (item.noOrder || item.order) || '').trim();
+                const mapKey = ordKey || `__ROW_${idx}`;
+                dedupMap.set(mapKey, item);
+            });
+            const uniqueItems = Array.from(dedupMap.values());
+
+            const activeData = [];
+            let prevTotal = 0, prevSuccess = 0, prevPending = 0;
+
+            uniqueItems.forEach((item) => {
+                const dIso = normDate(item.tanggalKirim);
+                if (!dIso) return;
+                const st = normStatus(item.status);
+                if (dIso >= startIso && dIso <= hMinus1Iso) {
+                    activeData.push({ ...item, _dateIso: dIso, _status: st, _city: getCity(item) });
+                } else if (dIso >= prevStartIso && dIso <= prevMtdEndIso) {
+                    prevTotal++;
+                    if (st === 'completed') prevSuccess++;
+                    else if (st === 'pending' || st === 'reschedule') prevPending++;
+                }
+            });
+
+            const totalOrder = activeData.length;
+            const terkirim = activeData.filter((d) => d._status === 'completed').length;
+            const proses = activeData.filter((d) => d._status === 'process').length;
+            const pending = activeData.filter((d) => d._status === 'pending' || d._status === 'reschedule').length;
+            const closedTotal = terkirim + pending;
+            const slaRate = closedTotal > 0 ? (terkirim / closedTotal) * 100 : 0;
+
+            const prevClosed = prevSuccess + prevPending;
+            const prevSlaRate = prevClosed > 0 ? (prevSuccess / prevClosed) * 100 : 0;
+            const diffOrderPct = prevTotal > 0 ? ((totalOrder - prevTotal) / prevTotal) * 100 : 0;
+            const diffSlaPts = slaRate - prevSlaRate;
+
+            const monthShort = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            const fmtShort = (iso) => {
+                const p = iso.split('-');
+                if (p.length !== 3) return iso;
+                const mi = parseInt(p[1], 10) - 1;
+                return `${p[2]} ${monthShort[mi] || p[1]}`;
+            };
+
+            const dailyMap = {};
+            const hubMap = {};
+            const pendingList = [];
+
+            activeData.forEach((item) => {
+                const dIso = item._dateIso;
+                if (!dailyMap[dIso]) {
+                    dailyMap[dIso] = { dateIso: dIso, label: fmtShort(dIso), terkirim: 0, proses: 0, pending: 0, total: 0 };
+                }
+                dailyMap[dIso].total++;
+                if (item._status === 'completed') dailyMap[dIso].terkirim++;
+                else if (item._status === 'process') dailyMap[dIso].proses++;
+                else if (item._status === 'pending' || item._status === 'reschedule') dailyMap[dIso].pending++;
+
+                const h = item._city;
+                if (!hubMap[h]) hubMap[h] = { hub: h, total: 0, terkirim: 0, gagal: 0, proses: 0 };
+                hubMap[h].total++;
+                if (item._status === 'completed') hubMap[h].terkirim++;
+                else if (item._status === 'process') hubMap[h].proses++;
+                else hubMap[h].gagal++;
+
+                if (item._status === 'pending' || item._status === 'reschedule') {
+                    pendingList.push({
+                        tanggalKirim: dIso,
+                        noOrder: safeStr(item.noOrder || item.order),
+                        customer: safeStr(item.namaCustomer || item.customer),
+                        hub: h,
+                        alasan: safeStr(item.alasanPending, 'Dalam Konfirmasi Admin'),
+                        statusLabel: item._status === 'reschedule' ? 'RESCHEDULE' : 'PENDING',
+                    });
+                }
+            });
+
+            const dailySeries = Object.keys(dailyMap)
+                .sort()
+                .map((k) => {
+                    const g = dailyMap[k];
+                    const cl = g.terkirim + g.pending;
+                    return { ...g, slaPct: cl > 0 ? (g.terkirim / cl) * 100 : 0 };
+                });
+
+            const hubList = Object.values(hubMap)
+                .map((h) => {
+                    const cl = h.terkirim + h.gagal;
+                    const sla = cl > 0 ? (h.terkirim / cl) * 100 : 0;
+                    return { ...h, sla, status: sla >= 95 ? 'OPTIMAL' : 'WARNING' };
+                })
+                .sort((a, b) => b.total - a.total || a.hub.localeCompare(b.hub));
+
+            pendingList.sort((a, b) => b.tanggalKirim.localeCompare(a.tanggalKirim));
+
+            return {
+                bulanLabel,
+                prevMonthLabel,
+                startIso,
+                endIso: hMinus1Iso,
+                totalOrder,
+                terkirim,
+                proses,
+                pending,
+                slaRate,
+                prevTotal,
+                prevSlaRate,
+                diffOrderPct,
+                diffSlaPts,
+                dailySeries,
+                hubList,
+                pendingList,
+                rawTotalAll: rawItems.length,
+            };
+        }
+
+        function collectFullReportSnapshot(fbiCache, logisalesCache) {
             const rowsAll = typeof allData !== 'undefined' ? allData : [];
             const todayIso = getReportDateIso();
             const yesterdayIso = addDaysIso(todayIso, -1);
@@ -20941,7 +21588,10 @@ setInterval(loadKonfirmasiVM, 600000);
             const outstanding = computeOutstandingSnapshot(today, tomorrow);
             const hub = computeHubSnapshot();
             const astor = computeAstorSnapshot();
+            const hubAstor3Month = computeHubAstor3MonthSnapshot(todayIso);
+            const vendor = computeVendorSnapshot(todayIso);
             const fbi = computeFbiSnapshot(todayIso, fbiCache);
+            const logisales = computeLogisalesSnapshot(todayIso, logisalesCache);
 
             return {
                 reportIso: todayIso,
@@ -20952,7 +21602,10 @@ setInterval(loadKonfirmasiVM, 600000);
                 outstanding,
                 hub,
                 astor,
+                hubAstor3Month,
+                vendor,
                 fbi,
+                logisales,
             };
         }
 
@@ -21009,7 +21662,7 @@ setInterval(loadKonfirmasiVM, 600000);
 
             // Top Section: City Table + Map
             const topY = barH + 14;
-            const topH = showArmadaRow ? 302 : 326;
+            const topH = showArmadaRow ? 290 : 316;
             const tblW = Math.round(innerW * 0.42);
             const mapX = pad + tblW + 14;
             const mapW = innerW - tblW - 14;
@@ -21162,7 +21815,7 @@ setInterval(loadKonfirmasiVM, 600000);
             ctx.restore();
 
             // Helper to draw crisp gradient KPI card inside canvas
-            const drawCard = (cx, cy, cw, ch, title, val, topHex, botHex, subTxt, subPillBg) => {
+            const drawCard = (cx, cy, cw, ch, title, val, topHex, botHex, subTxt, subPillBg, subLine2) => {
                 const gr = ctx.createLinearGradient(cx, cy, cx, cy + ch);
                 gr.addColorStop(0, topHex);
                 gr.addColorStop(1, botHex);
@@ -21174,36 +21827,60 @@ setInterval(loadKonfirmasiVM, 600000);
                 ctx.stroke();
 
                 const isLight = topHex === '#FACC15' || topHex === '#FDE047';
+                const hasTwoLines = Boolean(subTxt && subLine2);
                 ctx.fillStyle = isLight ? '#1E293B' : '#E2E8F0';
                 ctx.font = '800 15px "Inter", Arial, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(title, cx + cw / 2, cy + 25);
+                ctx.fillText(title, cx + cw / 2, cy + (hasTwoLines ? 20 : 25));
 
                 ctx.fillStyle = isLight ? '#0F172A' : '#FFFFFF';
-                ctx.font = subTxt ? '900 35px "Inter", Arial, sans-serif' : '900 37px "Inter", Arial, sans-serif';
-                ctx.fillText(val, cx + cw / 2, cy + (subTxt ? ch * 0.51 : ch * 0.61));
+                if (hasTwoLines) {
+                    const isCompact = ch < 145;
+                    ctx.font = isCompact ? '900 33px "Inter", Arial, sans-serif' : '900 36px "Inter", Arial, sans-serif';
+                    ctx.fillText(val, cx + cw / 2, cy + (isCompact ? 51 : 61));
 
-                if (subTxt) {
-                    const pw = cw - 24;
-                    const ph = 28;
-                    const px = cx + 12;
-                    const py = cy + ch - 36;
-                    drawRoundedRectPath(ctx, px, py, pw, ph, 14);
-                    ctx.fillStyle = subPillBg || 'rgba(0,0,0,0.25)';
+                    ctx.font = isCompact ? '700 13px "Inter", Arial, sans-serif' : '700 13.5px "Inter", Arial, sans-serif';
+                    const fittedSub = fitCanvasText(ctx, subTxt, cw - 36);
+                    const pw = Math.min(cw - 24, Math.max(190, ctx.measureText(fittedSub).width + 28));
+                    const ph = isCompact ? 25 : 27;
+                    const px = cx + (cw - pw) / 2;
+                    const py = cy + ch - (isCompact ? 58 : 63);
+                    drawRoundedRectPath(ctx, px, py, pw, ph, ph / 2);
+                    ctx.fillStyle = subPillBg || 'rgba(0,0,0,0.28)';
                     ctx.fill();
                     ctx.fillStyle = isLight ? '#0F172A' : '#FFFFFF';
-                    ctx.font = '800 13.5px "Inter", Arial, sans-serif';
-                    ctx.fillText(subTxt, cx + cw / 2, py + ph / 2);
+                    ctx.fillText(fittedSub, cx + cw / 2, py + ph / 2);
+
+                    ctx.fillStyle = isLight ? '#0F172A' : '#FFFFFF';
+                    ctx.font = isCompact ? '800 14px "Inter", Arial, sans-serif' : '800 14.5px "Inter", Arial, sans-serif';
+                    ctx.fillText(fitCanvasText(ctx, subLine2, cw - 20), cx + cw / 2, cy + ch - (isCompact ? 18 : 20));
+                } else {
+                    ctx.font = subTxt ? '900 35px "Inter", Arial, sans-serif' : '900 37px "Inter", Arial, sans-serif';
+                    ctx.fillText(val, cx + cw / 2, cy + (subTxt ? ch * 0.51 : ch * 0.61));
+
+                    if (subTxt) {
+                        const pw = cw - 24;
+                        const ph = 28;
+                        const px = cx + 12;
+                        const py = cy + ch - 36;
+                        drawRoundedRectPath(ctx, px, py, pw, ph, 14);
+                        ctx.fillStyle = subPillBg || 'rgba(0,0,0,0.25)';
+                        ctx.fill();
+                        ctx.fillStyle = isLight ? '#0F172A' : '#FFFFFF';
+                        ctx.font = '800 13.5px "Inter", Arial, sans-serif';
+                        ctx.fillText(fitCanvasText(ctx, subTxt, pw - 12), cx + cw / 2, py + ph / 2);
+                    }
                 }
             };
 
-            const kpiTop = topY + topH + 14;
+            const kpiTop = topY + topH + (showArmadaRow ? 12 : 14);
             const c3W = (innerW - 28) / 3;
             const c4W = (innerW - 42) / 4;
-            const rH = showArmadaRow ? 98 : 132;
+            const rH = showArmadaRow ? 94 : 128;
+            const r4H = showArmadaRow ? 132 : 154;
             const r5H = showArmadaRow ? 124 : 154;
-            const rGap = showArmadaRow ? 11 : 14;
+            const rGap = showArmadaRow ? 10 : 14;
 
             // Row 1: Case ID Shipped / Fulfillment / Plan (Yellow)
             drawCard(pad, kpiTop, c3W, rH, 'CASE ID SHIPPED', fmtInt(snapSlice.caseShipped), '#FDE047', '#EAB308');
@@ -21223,14 +21900,30 @@ setInterval(loadKonfirmasiVM, 600000);
             drawCard(pad + (c4W + 14) * 2, yR3, c4W, rH, 'SLA CUSTOMER', snapSlice.slaCust > 0 ? snapSlice.slaCust.toFixed(1) + '%' : '0%', '#14B8A6', '#0F766E');
             drawCard(pad + (c4W + 14) * 3, yR3, c4W, rH, 'SLA GRW', snapSlice.slaGrw > 0 ? snapSlice.slaGrw.toFixed(1) + '%' : '0%', '#14B8A6', '#0F766E');
 
-            // Row 4: Case ID Plan B1-B4
+            // Row 4: Case ID Plan B1-B4 with Storing Capacity Description & Usage Delta
             const yR4 = yR3 + rH + rGap;
+            const caseCaps = [
+                typeof CASE_ID_CAPACITY !== 'undefined' && CASE_ID_CAPACITY.B1 ? CASE_ID_CAPACITY.B1 : 4560,
+                typeof CASE_ID_CAPACITY !== 'undefined' && CASE_ID_CAPACITY.B2 ? CASE_ID_CAPACITY.B2 : 3192,
+                typeof CASE_ID_CAPACITY !== 'undefined' && CASE_ID_CAPACITY.B3 ? CASE_ID_CAPACITY.B3 : 2394,
+                typeof CASE_ID_CAPACITY !== 'undefined' && CASE_ID_CAPACITY.B4 ? CASE_ID_CAPACITY.B4 : 1824,
+            ];
             for (let i = 0; i < 4; i++) {
-                drawCard(pad + (c4W + 14) * i, yR4, c4W, rH, `CASE ID PLAN B${i + 1}`, fmtInt(snapSlice.caseBatches[i]), '#0EA5E9', '#0369A1');
+                const cVal = Math.round(Number((snapSlice.caseBatches && snapSlice.caseBatches[i]) || 0));
+                const cap = caseCaps[i];
+                const pct = cap > 0 ? (cVal / cap) * 100 : 0;
+                const diff = cap - cVal;
+                const sign = diff > 0 ? '-' : (diff < 0 ? '+' : '');
+                const isOk = cVal <= cap;
+                const topC = isOk ? '#2D9144' : '#DC2626';
+                const botC = isOk ? '#166534' : '#7F1D1D';
+                const capTxt = `Kapasitas Storing: ${fmtInt(cap)} case id`;
+                const usageTxt = `${pct.toFixed(1)}% / ${sign}${fmtInt(Math.abs(diff))} Case ID`;
+                drawCard(pad + (c4W + 14) * i, yR4, c4W, r4H, `CASE ID PLAN B${i + 1}`, fmtInt(cVal), topC, botC, capTxt, 'rgba(0,0,0,0.28)', usageTxt);
             }
 
             // Row 5: CBM Plan B1-B4 with single-line Target Delta Pill
-            const yR5 = yR4 + rH + rGap;
+            const yR5 = yR4 + r4H + rGap;
             snapSlice.cbmBatches.forEach((b, i) => {
                 const topC = b.status === 'ABOVE' ? '#2D9144' : b.status === 'EXACT' ? '#FACC15' : '#DC2626';
                 const botC = b.status === 'ABOVE' ? '#166534' : b.status === 'EXACT' ? '#CA8A04' : '#7F1D1D';
@@ -21242,7 +21935,7 @@ setInterval(loadKonfirmasiVM, 600000);
 
             // Optional Row 6 (Slide 4 Tomorrow): SUMMARY PLAN BY ARMADA TYPE
             if (showArmadaRow) {
-                const armY = yR5 + r5H + 14;
+                const armY = yR5 + r5H + 12;
                 const armH = H - armY - 14;
                 drawRoundedRectPath(ctx, pad, armY, innerW, armH, 12);
                 ctx.fillStyle = '#111827';
@@ -22367,6 +23060,1699 @@ setInterval(loadKonfirmasiVM, 600000);
             return c.toDataURL('image/png');
         }
 
+        function genHubAstor3MonthPanelImage(comp) {
+            const W = 1800, H = 1234;
+            const c = createCanvas(W, H);
+            const ctx = c.getContext('2d');
+            if (!ctx) return c.toDataURL('image/png');
+
+            const pad = 20;
+            const innerW = W - pad * 2;
+            const mList = comp && Array.isArray(comp.months3) ? comp.months3 : [];
+            const cur = comp.current || {
+                fullLabel: '-', shortLabel: '-', dayDivisor: 1,
+                grw: { totalCbm: 0, avgCbmPerDay: 0, slaHit: 0, slaMiss: 0, slaPct: 0, missCbm: 0, orderCount: 0 },
+                astor: { totalCbm: 0, avgCbmPerDay: 0, slaHit: 0, slaMiss: 0, slaPct: 0, missCbm: 0, orderCount: 0 },
+            };
+
+            // Outer Dark Container
+            ctx.fillStyle = '#0D0D11';
+            ctx.fillRect(0, 0, W, H);
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(1.5, 1.5, W - 3, H - 3);
+
+            // Top Header
+            const hdrGrad = ctx.createLinearGradient(0, 0, W, 0);
+            hdrGrad.addColorStop(0, '#991B1B');
+            hdrGrad.addColorStop(1, '#B91C1C');
+            ctx.fillStyle = hdrGrad;
+            ctx.fillRect(0, 0, W, 52);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '800 21px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('PERBANDINGAN 3 BULAN & TREND: HUB GRW VS HUB ASTOR', 22, 27);
+
+            // Subheader Bar
+            const subY = 60;
+            ctx.fillStyle = '#18181B';
+            ctx.fillRect(pad, subY, innerW, 34);
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(pad, subY, innerW, 34);
+            ctx.fillStyle = '#FACC15';
+            ctx.font = '700 15px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            const rangeLbl = mList.length === 3 ? `${mList[0].shortLabel} – ${mList[2].shortLabel}` : cur.shortLabel;
+            const totalMissCount = (comp.grwMissList || []).length + (comp.astorMissList || []).length;
+            ctx.fillText(
+                `PERIODE 3 BULAN: ${rangeLbl}   |   BULAN INI: ${comp.currentMonthLabel} (${cur.dayDivisor} Hari Berjalan)   |   MISS BULAN INI: ${(comp.grwMissList || []).length} GRW & ${(comp.astorMissList || []).length} ASTOR (Total ${totalMissCount})`,
+                pad + 14, subY + 17
+            );
+
+            // Row 1: 4 Summary KPI Cards (y = 104..204, h = 100)
+            const gap = 14;
+            const c4W = (innerW - gap * 3) / 4;
+            const kY = 104;
+            const kH = 100;
+            const grwMomTxt = comp.prev && comp.prev.grw.avgCbmPerDay > 0
+                ? `${comp.grwCbmMomPct >= 0 ? '+' : ''}${comp.grwCbmMomPct.toFixed(1)}% Avg/Hari vs ${comp.prevShortLabel}`
+                : `${fmtInt(cur.grw.orderCount)} Store Masuk`;
+            const astMomTxt = comp.prev && comp.prev.astor.avgCbmPerDay > 0
+                ? `${comp.astorCbmMomPct >= 0 ? '+' : ''}${comp.astorCbmMomPct.toFixed(1)}% Avg/Hari vs ${comp.prevShortLabel}`
+                : `${fmtInt(cur.astor.orderCount)} Order RT`;
+
+            const kpiCards = [
+                {
+                    title: `HUB GRW (${cur.shortLabel})`,
+                    val: `${fmtId(cur.grw.totalCbm, 1)} CBM`,
+                    sub: `Avg ${fmtId(cur.grw.avgCbmPerDay, 2)} CBM/Hari  |  ${grwMomTxt}`,
+                    col: '#38BDF8',
+                    acc: '#0284C7',
+                },
+                {
+                    title: `HUB ASTOR (${cur.shortLabel})`,
+                    val: `${fmtId(cur.astor.totalCbm, 1)} CBM`,
+                    sub: `Avg ${fmtId(cur.astor.avgCbmPerDay, 2)} CBM/Hari  |  ${astMomTxt}`,
+                    col: '#F59E0B',
+                    acc: '#D97706',
+                },
+                {
+                    title: `SLA BULAN INI (GRW VS ASTOR)`,
+                    val: `${cur.grw.slaPct.toFixed(1)}% vs ${cur.astor.slaPct.toFixed(1)}%`,
+                    sub: `GRW ${cur.grw.slaHit}H/${cur.grw.slaMiss}M  ASTOR ${cur.astor.slaHit}H/${cur.astor.slaMiss}M`,
+                    col: '#4ADE80',
+                    acc: '#16A34A',
+                },
+                {
+                    title: `TOTAL MISS (${cur.shortLabel})`,
+                    val: `${(comp.grwMissList || []).length} GRW | ${(comp.astorMissList || []).length} ASTOR`,
+                    sub: `CBM Miss: ${fmtId(cur.grw.missCbm, 1)} GRW + ${fmtId(cur.astor.missCbm, 1)} ASTOR`,
+                    col: totalMissCount > 0 ? '#F87171' : '#4ADE80',
+                    acc: totalMissCount > 0 ? '#DC2626' : '#16A34A',
+                },
+            ];
+
+            kpiCards.forEach((kc, idx) => {
+                const kx = pad + idx * (c4W + gap);
+                drawRoundedRectPath(ctx, kx, kY, c4W, kH, 10);
+                ctx.fillStyle = '#16181F';
+                ctx.fill();
+                ctx.strokeStyle = '#27272A';
+                ctx.lineWidth = 1.6;
+                ctx.stroke();
+
+                ctx.fillStyle = kc.acc;
+                ctx.fillRect(kx + 12, kY + 1, c4W - 24, 4);
+
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '800 13px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(kc.title, kx + c4W / 2, kY + 22);
+
+                ctx.fillStyle = kc.col;
+                ctx.font = '900 28px "Inter", Arial, sans-serif';
+                ctx.fillText(fitCanvasText(ctx, kc.val, c4W - 20), kx + c4W / 2, kY + 54);
+
+                ctx.fillStyle = '#CBD5E1';
+                ctx.font = '600 12.5px "Inter", Arial, sans-serif';
+                ctx.fillText(fitCanvasText(ctx, kc.sub, c4W - 18), kx + c4W / 2, kY + 83);
+            });
+
+            // Row 2: Two Side-by-Side 3-Month Trend Charts (y = 216..568, h = 352)
+            const chY = 216;
+            const chH = 352;
+            const c2W = (innerW - gap) / 2;
+
+            // Chart 1 (Left): CBM per Bulan & Rata-Rata CBM per Hari (Grouped Bars)
+            const c1X = pad;
+            drawRoundedRectPath(ctx, c1X, chY, c2W, chH, 10);
+            ctx.fillStyle = '#111827';
+            ctx.fill();
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 1.6;
+            ctx.stroke();
+
+            ctx.fillStyle = '#FACC15';
+            ctx.font = '800 15.5px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('TREN 3 BULAN CBM / BULAN & RATA-RATA / HARI (GRW VS ASTOR)', c1X + 16, chY + 24);
+
+            const p1L = c1X + 76;
+            const p1T = chY + 62;
+            const p1W = c2W - 102;
+            const p1H = chH - 134;
+            const maxCbmVal = Math.max(
+                10,
+                ...mList.flatMap((m) => [m.grw.totalCbm, m.astor.totalCbm])
+            ) * 1.16;
+
+            for (let g = 0; g <= 4; g++) {
+                const gy = p1T + (g / 4) * p1H;
+                ctx.strokeStyle = '#1E293B';
+                ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(p1L, gy); ctx.lineTo(p1L + p1W, gy); ctx.stroke();
+
+                const gv = ((4 - g) / 4) * maxCbmVal;
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '600 12px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(fmtInt(gv), p1L - 10, gy);
+            }
+
+            const slot1W = p1W / Math.max(1, mList.length);
+            const gBarW = Math.min(72, slot1W * 0.28);
+            const gBarGap = 14;
+            mList.forEach((m, i) => {
+                const cx = p1L + slot1W * (i + 0.5);
+                const baseY = p1T + p1H;
+                const gx = cx - gBarW - gBarGap / 2;
+                const ax = cx + gBarGap / 2;
+
+                const gh = (m.grw.totalCbm / maxCbmVal) * p1H;
+                const ah = (m.astor.totalCbm / maxCbmVal) * p1H;
+
+                // GRW Bar
+                ctx.fillStyle = '#38BDF8';
+                drawRoundedRectPath(ctx, gx, baseY - gh, gBarW, Math.max(gh, m.grw.totalCbm > 0 ? 4 : 0), 4);
+                ctx.fill();
+
+                // ASTOR Bar
+                ctx.fillStyle = '#F59E0B';
+                drawRoundedRectPath(ctx, ax, baseY - ah, gBarW, Math.max(ah, m.astor.totalCbm > 0 ? 4 : 0), 4);
+                ctx.fill();
+
+                // Labels above bars (Total CBM + Avg/Hari)
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#7DD3FC';
+                ctx.font = '800 12.5px "Inter", Arial, sans-serif';
+                ctx.fillText(fmtId(m.grw.totalCbm, 1), gx + gBarW / 2, baseY - gh - 24);
+                ctx.fillStyle = '#BAE6FD';
+                ctx.font = '700 11px "Inter", Arial, sans-serif';
+                ctx.fillText(`(${fmtId(m.grw.avgCbmPerDay, 1)}/hari)`, gx + gBarW / 2, baseY - gh - 10);
+
+                ctx.fillStyle = '#FCD34D';
+                ctx.font = '800 12.5px "Inter", Arial, sans-serif';
+                ctx.fillText(fmtId(m.astor.totalCbm, 1), ax + gBarW / 2, baseY - ah - 24);
+                ctx.fillStyle = '#FDE68A';
+                ctx.font = '700 11px "Inter", Arial, sans-serif';
+                ctx.fillText(`(${fmtId(m.astor.avgCbmPerDay, 1)}/hari)`, ax + gBarW / 2, baseY - ah - 10);
+
+                // Month X Label
+                ctx.fillStyle = m.isCurrent ? '#FACC15' : '#E2E8F0';
+                ctx.font = '800 13.5px "Inter", Arial, sans-serif';
+                ctx.fillText(`${m.shortLabel} (${m.dayDivisor} hari)`, cx, baseY + 22);
+            });
+
+            // Legend Chart 1
+            const leg1 = [
+                { col: '#38BDF8', txt: 'HUB GRW — Total CBM (Avg/Hari)' },
+                { col: '#F59E0B', txt: 'HUB ASTOR — Total CBM (Avg/Hari)' },
+            ];
+            let l1x = c1X + 24;
+            const l1y = chY + chH - 22;
+            leg1.forEach((lg) => {
+                ctx.fillStyle = lg.col;
+                ctx.fillRect(l1x, l1y - 6, 13, 13);
+                ctx.fillStyle = '#CBD5E1';
+                ctx.font = '700 12.5px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(lg.txt, l1x + 19, l1y);
+                l1x += 275;
+            });
+
+            // Chart 2 (Right): SLA Trend (%) HUB GRW VS HUB ASTOR
+            const c2X = pad + c2W + gap;
+            drawRoundedRectPath(ctx, c2X, chY, c2W, chH, 10);
+            ctx.fillStyle = '#111827';
+            ctx.fill();
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 1.6;
+            ctx.stroke();
+
+            ctx.fillStyle = '#FACC15';
+            ctx.font = '800 15.5px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('TREN 3 BULAN SLA (%) — HUB GRW VS HUB ASTOR', c2X + 16, chY + 24);
+
+            const p2L = c2X + 68;
+            const p2T = chY + 62;
+            const p2W = c2W - 104;
+            const p2H = chH - 134;
+
+            const nonZeroSlas = mList
+                .flatMap((m) => [
+                    (m.grw.slaHit + m.grw.slaMiss) > 0 ? m.grw.slaPct : null,
+                    (m.astor.slaHit + m.astor.slaMiss) > 0 ? m.astor.slaPct : null,
+                ])
+                .filter((v) => v !== null);
+            const rawMinSla = nonZeroSlas.length > 0 ? Math.min(...nonZeroSlas) : 80;
+            const minSlaAxis = Math.max(0, Math.min(80, Math.floor((rawMinSla - 5) / 10) * 10));
+            const maxSlaAxis = 100;
+            const slaSpan = Math.max(10, maxSlaAxis - minSlaAxis);
+
+            for (let g = 0; g <= 4; g++) {
+                const gy = p2T + (g / 4) * p2H;
+                ctx.strokeStyle = '#1E293B';
+                ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(p2L, gy); ctx.lineTo(p2L + p2W, gy); ctx.stroke();
+
+                const gv = maxSlaAxis - (g / 4) * slaSpan;
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '600 12px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(`${Math.round(gv)}%`, p2L - 10, gy);
+            }
+
+            // 95% Target dashed line
+            if (95 >= minSlaAxis && 95 <= maxSlaAxis) {
+                const t95Y = p2T + ((maxSlaAxis - 95) / slaSpan) * p2H;
+                ctx.save();
+                ctx.setLineDash([7, 5]);
+                ctx.strokeStyle = 'rgba(248, 113, 113, 0.75)';
+                ctx.lineWidth = 1.8;
+                ctx.beginPath(); ctx.moveTo(p2L, t95Y); ctx.lineTo(p2L + p2W, t95Y); ctx.stroke();
+                ctx.restore();
+                ctx.fillStyle = '#FCA5A5';
+                ctx.font = '700 11px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText('Target 95%', p2L + 6, t95Y - 10);
+            }
+
+            const slot2W = p2W / Math.max(1, mList.length);
+            const grwPts = [];
+            const astPts = [];
+            mList.forEach((m, i) => {
+                const cx = p2L + slot2W * (i + 0.5);
+                const gHas = (m.grw.slaHit + m.grw.slaMiss) > 0;
+                const aHas = (m.astor.slaHit + m.astor.slaMiss) > 0;
+                const gy = p2T + ((maxSlaAxis - Math.max(minSlaAxis, Math.min(maxSlaAxis, gHas ? m.grw.slaPct : minSlaAxis))) / slaSpan) * p2H;
+                const ay = p2T + ((maxSlaAxis - Math.max(minSlaAxis, Math.min(maxSlaAxis, aHas ? m.astor.slaPct : minSlaAxis))) / slaSpan) * p2H;
+                grwPts.push({ x: cx, y: gy, val: m.grw.slaPct, has: gHas, lbl: m.shortLabel, isCurrent: m.isCurrent });
+                astPts.push({ x: cx, y: ay, val: m.astor.slaPct, has: aHas, lbl: m.shortLabel, isCurrent: m.isCurrent });
+
+                ctx.fillStyle = m.isCurrent ? '#FACC15' : '#E2E8F0';
+                ctx.font = '800 13.5px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(m.shortLabel, cx, p2T + p2H + 22);
+            });
+
+            const drawSlaLine = (pts, strokeCol) => {
+                const validPts = pts.filter((p) => p.has);
+                if (validPts.length === 0) return;
+                ctx.strokeStyle = strokeCol;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                validPts.forEach((p, idx) => (idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+                ctx.stroke();
+
+                validPts.forEach((p) => {
+                    ctx.fillStyle = strokeCol;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 7, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = '#0F172A'; ctx.lineWidth = 2.5; ctx.stroke();
+                });
+            };
+
+            drawSlaLine(grwPts, '#2DD4BF');
+            drawSlaLine(astPts, '#FACC15');
+
+            // Badges (avoid vertical overlap if GRW and ASTOR are close)
+            mList.forEach((_, i) => {
+                const gp = grwPts[i];
+                const ap = astPts[i];
+                const drawBadge = (px, py, txt, col, xOff) => {
+                    const bw = 64, bh = 22;
+                    const bx = Math.min(Math.max(p2L, px + xOff - bw / 2), p2L + p2W - bw);
+                    const by = Math.max(p2T - 12, Math.min(p2T + p2H - bh - 4, py));
+                    drawRoundedRectPath(ctx, bx, by, bw, bh, 6);
+                    ctx.fillStyle = '#0F172A';
+                    ctx.fill();
+                    ctx.strokeStyle = col;
+                    ctx.lineWidth = 1.4;
+                    ctx.stroke();
+                    ctx.fillStyle = col;
+                    ctx.font = '800 12px "Inter", Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(txt, bx + bw / 2, by + bh / 2);
+                };
+
+                const close = gp.has && ap.has && Math.abs(gp.y - ap.y) < 30;
+                if (gp.has) {
+                    const yPos = close ? (gp.y <= ap.y ? gp.y - 26 : gp.y + 8) : gp.y - 26;
+                    drawBadge(gp.x, yPos, gp.val.toFixed(1) + '%', '#2DD4BF', close ? -36 : 0);
+                }
+                if (ap.has) {
+                    const yPos = close ? (ap.y < gp.y ? ap.y - 26 : ap.y + 8) : ap.y - 26;
+                    drawBadge(ap.x, yPos, ap.val.toFixed(1) + '%', '#FACC15', close ? 36 : 0);
+                }
+            });
+
+            // Legend Chart 2
+            const leg2 = [
+                { col: '#2DD4BF', txt: 'SLA HUB GRW (%)' },
+                { col: '#FACC15', txt: 'SLA HUB ASTOR (%)' },
+                { col: '#F87171', txt: 'Target 95%' },
+            ];
+            let l2x = c2X + 24;
+            const l2y = chY + chH - 22;
+            leg2.forEach((lg) => {
+                ctx.fillStyle = lg.col;
+                ctx.fillRect(l2x, l2y - 6, 13, 13);
+                ctx.fillStyle = '#CBD5E1';
+                ctx.font = '700 12.5px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(lg.txt, l2x + 19, l2y);
+                l2x += 185;
+            });
+
+            // Row 3: 3-Month Comparison Table (y = 580..768, h = 188)
+            const tblCardY = 580;
+            const tblCardH = 188;
+            drawRoundedRectPath(ctx, pad, tblCardY, innerW, tblCardH, 10);
+            ctx.fillStyle = '#111827';
+            ctx.fill();
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 1.6;
+            ctx.stroke();
+
+            ctx.fillStyle = '#FACC15';
+            ctx.font = '800 14.5px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('RINGKASAN PERBANDINGAN 3 BULAN (CBM PER BULAN, RATA-RATA PER HARI & SLA PER BULAN)', pad + 14, tblCardY + 18);
+
+            const cmpCols = [
+                { h: 'BULAN', w: 230, al: 'left' },
+                { h: 'HARI', w: 86, al: 'center' },
+                { h: 'GRW ORDER', w: 120, al: 'right' },
+                { h: 'GRW CBM/BLN', w: 170, al: 'right' },
+                { h: 'GRW AVG/HARI', w: 170, al: 'right' },
+                { h: 'GRW SLA', w: 220, al: 'center' },
+                { h: 'ASTOR ORDER', w: 126, al: 'right' },
+                { h: 'ASTOR CBM/BLN', w: 170, al: 'right' },
+                { h: 'ASTOR AVG/HARI', w: 174, al: 'right' },
+                { h: 'ASTOR SLA', w: 270, al: 'center' },
+            ];
+            const cmpTblX = pad + 12;
+            const cmpTblY = tblCardY + 34;
+            const cmpHdrH = 32;
+            const cmpRowH = 38;
+
+            ctx.fillStyle = '#0F172A';
+            ctx.fillRect(cmpTblX, cmpTblY, innerW - 24, cmpHdrH);
+            let cxp = cmpTblX;
+            ctx.font = '800 12px "Inter", Arial, sans-serif';
+            cmpCols.forEach((col) => {
+                ctx.fillStyle = '#FACC15';
+                ctx.textAlign = 'center';
+                ctx.fillText(col.h, cxp + col.w / 2, cmpTblY + cmpHdrH / 2);
+                ctx.strokeStyle = '#1E293B';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(cxp, cmpTblY, col.w, cmpHdrH);
+                cxp += col.w;
+            });
+
+            mList.forEach((m, rIdx) => {
+                const ry = cmpTblY + cmpHdrH + rIdx * cmpRowH;
+                const rowBg = m.isCurrent ? '#17253B' : (rIdx % 2 === 0 ? '#16181F' : '#12141A');
+                const gTot = m.grw.slaHit + m.grw.slaMiss;
+                const aTot = m.astor.slaHit + m.astor.slaMiss;
+                const gSlaCol = gTot === 0 ? '#64748B' : m.grw.slaPct >= 95 ? '#2DD4BF' : m.grw.slaPct >= 90 ? '#FACC15' : '#F87171';
+                const aSlaCol = aTot === 0 ? '#64748B' : m.astor.slaPct >= 95 ? '#4ADE80' : m.astor.slaPct >= 90 ? '#FACC15' : '#F87171';
+
+                const cells = [
+                    { v: m.isCurrent ? `${m.shortLabel} (BULAN INI)` : m.shortLabel, col: m.isCurrent ? '#FACC15' : '#F8FAFC', bold: true },
+                    { v: `${m.dayDivisor} hari`, col: '#94A3B8', bold: true },
+                    { v: fmtInt(m.grw.orderCount), col: '#E2E8F0' },
+                    { v: fmtId(m.grw.totalCbm, 1), col: '#38BDF8', bold: true },
+                    { v: `${fmtId(m.grw.avgCbmPerDay, 2)}/hari`, col: '#7DD3FC', bold: true },
+                    { v: gTot > 0 ? `${m.grw.slaPct.toFixed(1)}%` : '-', col: gSlaCol, bold: true },
+                    { v: fmtInt(m.astor.orderCount), col: '#E2E8F0' },
+                    { v: fmtId(m.astor.totalCbm, 1), col: '#F59E0B', bold: true },
+                    { v: `${fmtId(m.astor.avgCbmPerDay, 2)}/hari`, col: '#FCD34D', bold: true },
+                    { v: aTot > 0 ? `${m.astor.slaPct.toFixed(1)}%` : '-', col: aSlaCol, bold: true },
+                ];
+
+                let rx = cmpTblX;
+                cells.forEach((cell, cIdx) => {
+                    const col = cmpCols[cIdx];
+                    ctx.fillStyle = rowBg;
+                    ctx.fillRect(rx, ry, col.w, cmpRowH);
+                    ctx.strokeStyle = m.isCurrent ? '#334155' : '#1E293B';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(rx, ry, col.w, cmpRowH);
+                    ctx.fillStyle = cell.col;
+                    ctx.font = `${cell.bold ? '800' : '600'} 13px "Inter", Arial, sans-serif`;
+                    const txt = fitCanvasText(ctx, cell.v, col.w - 14);
+                    if (col.al === 'center') {
+                        ctx.textAlign = 'center';
+                        ctx.fillText(txt, rx + col.w / 2, ry + cmpRowH / 2);
+                    } else if (col.al === 'right') {
+                        ctx.textAlign = 'right';
+                        ctx.fillText(txt, rx + col.w - 10, ry + cmpRowH / 2);
+                    } else {
+                        ctx.textAlign = 'left';
+                        ctx.fillText(txt, rx + 10, ry + cmpRowH / 2);
+                    }
+                    rx += col.w;
+                });
+            });
+
+            // Row 4: Detail Miss Bulan Ini (y = 780..1214, h = 434) — Left GRW, Right ASTOR
+            const missY = 780;
+            const missH = 434;
+            const maxMissRows = 8;
+
+            const drawMissCard = (mx, title, rows, cols, mapRowCells, emptyMsg, overflowLabel, accentHex) => {
+                drawRoundedRectPath(ctx, mx, missY, c2W, missH, 10);
+                ctx.fillStyle = '#111827';
+                ctx.fill();
+                ctx.strokeStyle = '#27272A';
+                ctx.lineWidth = 1.6;
+                ctx.stroke();
+
+                // Header bar
+                ctx.fillStyle = '#1E293B';
+                ctx.fillRect(mx + 1, missY + 1, c2W - 2, 36);
+                ctx.fillStyle = accentHex;
+                ctx.fillRect(mx + 1, missY + 1, 6, 36);
+
+                ctx.fillStyle = '#FACC15';
+                ctx.font = '800 14.5px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(fitCanvasText(ctx, title, c2W - 240), mx + 16, missY + 19);
+
+                const totMissCbm = rows.reduce((s, r) => s + (r.cbm || 0), 0);
+                ctx.fillStyle = rows.length > 0 ? '#FCA5A5' : '#4ADE80';
+                ctx.font = '800 13.5px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(`${fmtInt(rows.length)} MISS (${fmtId(totMissCbm, 1)} CBM)`, mx + c2W - 14, missY + 19);
+
+                const tx = mx + 12;
+                const ty = missY + 42;
+                const thdrH = 30;
+                const trowH = 41;
+                const tw = c2W - 24;
+
+                ctx.fillStyle = '#0F172A';
+                ctx.fillRect(tx, ty, tw, thdrH);
+                let cxm = tx;
+                ctx.font = '800 11.5px "Inter", Arial, sans-serif';
+                cols.forEach((col) => {
+                    ctx.fillStyle = '#94A3B8';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(col.h, cxm + col.w / 2, ty + thdrH / 2);
+                    ctx.strokeStyle = '#1E293B';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(cxm, ty, col.w, thdrH);
+                    cxm += col.w;
+                });
+
+                const vis = rows.slice(0, maxMissRows);
+                if (vis.length === 0) {
+                    ctx.fillStyle = '#0F1C18';
+                    ctx.fillRect(tx, ty + thdrH, tw, 120);
+                    ctx.fillStyle = '#4ADE80';
+                    ctx.font = '800 16px "Inter", Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(emptyMsg, tx + tw / 2, ty + thdrH + 60);
+                } else {
+                    vis.forEach((r, idx) => {
+                        const ry = ty + thdrH + idx * trowH;
+                        const rowBg = idx % 2 === 0 ? '#14151B' : '#0F1117';
+                        const cells = mapRowCells(r, idx);
+                        let rx = tx;
+                        cells.forEach((cell, cIdx) => {
+                            const col = cols[cIdx];
+                            ctx.fillStyle = rowBg;
+                            ctx.fillRect(rx, ry, col.w, trowH);
+                            ctx.strokeStyle = '#1E293B';
+                            ctx.lineWidth = 1;
+                            ctx.strokeRect(rx, ry, col.w, trowH);
+                            ctx.fillStyle = cell.col;
+                            ctx.font = `${cell.bold ? '700' : '500'} 12px "Inter", Arial, sans-serif`;
+                            const txt = fitCanvasText(ctx, cell.v, col.w - 10);
+                            if (col.al === 'center') {
+                                ctx.textAlign = 'center';
+                                ctx.fillText(txt, rx + col.w / 2, ry + trowH / 2);
+                            } else if (col.al === 'right') {
+                                ctx.textAlign = 'right';
+                                ctx.fillText(txt, rx + col.w - 6, ry + trowH / 2);
+                            } else {
+                                ctx.textAlign = 'left';
+                                ctx.fillText(txt, rx + 6, ry + trowH / 2);
+                            }
+                            rx += col.w;
+                        });
+                    });
+
+                    if (rows.length > maxMissRows) {
+                        ctx.fillStyle = '#FCA5A5';
+                        ctx.font = '700 11.5px "Inter", Arial, sans-serif';
+                        ctx.textAlign = 'left';
+                        ctx.fillText(`+ ${fmtInt(rows.length - maxMissRows)} ${overflowLabel}`, tx + 4, missY + missH - 14);
+                    }
+                }
+            };
+
+            const grwMissCols = [
+                { h: '#', w: 36, al: 'center' },
+                { h: 'TGL', w: 94, al: 'left' },
+                { h: 'STORE', w: 295, al: 'left' },
+                { h: 'LC PEMBAWA', w: 140, al: 'left' },
+                { h: 'AREA', w: 62, al: 'center' },
+                { h: 'CBM', w: 82, al: 'right' },
+                { h: 'AGING', w: 140, al: 'center' },
+            ];
+            drawMissCard(
+                pad,
+                `DETAIL MISS HUB GRW — ${cur.shortLabel}`,
+                comp.grwMissList || [],
+                grwMissCols,
+                (r, idx) => [
+                    { v: String(idx + 1), col: '#94A3B8' },
+                    { v: r.tgl, col: '#E2E8F0' },
+                    { v: `${r.kode && r.kode !== '-' ? r.kode + ' ' : ''}${r.store}`, col: '#F8FAFC', bold: true },
+                    { v: r.lcPembawa, col: '#38BDF8' },
+                    { v: r.area, col: r.area === 'DK' ? '#38BDF8' : '#FBBF24', bold: true },
+                    { v: fmtId(r.cbm, 2), col: '#FACC15', bold: true },
+                    { v: String(r.aging), col: '#F87171', bold: true },
+                ],
+                'Zero Miss HUB GRW pada bulan ini (SLA 100%)',
+                'detail Miss HUB GRW lainnya (urut aging tertinggi)',
+                '#38BDF8'
+            );
+
+            const astMissCols = [
+                { h: '#', w: 36, al: 'center' },
+                { h: 'TGL', w: 92, al: 'left' },
+                { h: 'RT/OD', w: 136, al: 'left' },
+                { h: 'KOTA / STORE', w: 255, al: 'left' },
+                { h: 'BU', w: 82, al: 'center' },
+                { h: 'AREA', w: 62, al: 'center' },
+                { h: 'CBM', w: 84, al: 'right' },
+                { h: 'AGING', w: 102, al: 'center' },
+            ];
+            drawMissCard(
+                pad + c2W + gap,
+                `DETAIL MISS HUB ASTOR — ${cur.shortLabel}`,
+                comp.astorMissList || [],
+                astMissCols,
+                (r, idx) => [
+                    { v: String(idx + 1), col: '#94A3B8' },
+                    { v: r.tgl, col: '#E2E8F0' },
+                    { v: r.rtod, col: '#FFFFFF', bold: true },
+                    { v: r.kota, col: '#F8FAFC', bold: true },
+                    { v: r.bu, col: '#FACC15', bold: true },
+                    { v: r.area, col: r.area === 'DK' ? '#38BDF8' : r.area === 'LP' ? '#FBBF24' : '#34D399', bold: true },
+                    { v: r.cbm > 0 ? fmtId(r.cbm, 2) : '-', col: '#FACC15', bold: true },
+                    { v: String(r.aging), col: '#F87171', bold: true },
+                ],
+                'Zero Miss HUB ASTOR pada bulan ini (SLA 100%)',
+                'detail Miss HUB ASTOR lainnya (urut aging tertinggi)',
+                '#F59E0B'
+            );
+
+            return c.toDataURL('image/png');
+        }
+
+        function genVendorDashboardPanelImage(vnd) {
+            const W = 1800, H = 1234;
+            const c = createCanvas(W, H);
+            const ctx = c.getContext('2d');
+            if (!ctx) return c.toDataURL('image/png');
+
+            const pad = 20;
+            const innerW = W - pad * 2;
+
+            // Outer Dark Container
+            ctx.fillStyle = '#0D0D11';
+            ctx.fillRect(0, 0, W, H);
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(1.5, 1.5, W - 3, H - 3);
+
+            // Top Dark Red Header
+            const hdrGrad = ctx.createLinearGradient(0, 0, W, 0);
+            hdrGrad.addColorStop(0, '#991B1B');
+            hdrGrad.addColorStop(1, '#B91C1C');
+            ctx.fillStyle = hdrGrad;
+            ctx.fillRect(0, 0, W, 52);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '800 21px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('MONITORING VENDOR SUPPORTING & PERFORMANCE — DC AHI SIDOARJO', 22, 27);
+
+            // Subheader Bar
+            const subY = 62;
+            ctx.fillStyle = '#18181B';
+            ctx.fillRect(pad, subY, innerW, 38);
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(pad, subY, innerW, 38);
+            ctx.fillStyle = '#FACC15';
+            ctx.font = '700 16px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            const rangeLbl = vnd.months3 && vnd.months3.length === 3
+                ? `${vnd.months3[0].shortLabel} – ${vnd.months3[2].shortLabel}`
+                : vnd.currentMonthLabel;
+            ctx.fillText(`PERIODE AKTIF: ${vnd.currentMonthLabel} (TGL 1 S/D H-1)   |   HISTORICAL KPI 3 BULAN: ${rangeLbl}`, pad + 14, subY + 19);
+
+            // Row 1: 5 Current-Month Vendor KPI Cards (Vendor Supporting -> Delayed Support LC)
+            const kGap = 14;
+            const k5W = (innerW - kGap * 4) / 5;
+            const kY = 112;
+            const kH = 112;
+            const cur = vnd.current || { supportingPct: 0, total: 0, onTime: 0, terlambat: 0, belumSupport: 0 };
+
+            const kpiItems = [
+                {
+                    title: 'VENDOR SUPPORTING',
+                    val: cur.supportingPct.toFixed(1) + '%',
+                    sub: 'Monthly On-Time Avg',
+                    col: '#FACC15',
+                    acc: '#CA8A04',
+                },
+                {
+                    title: 'TOTAL COMPLETED LC',
+                    val: `${fmtInt(cur.total)} LC`,
+                    sub: 'Total Load Containers',
+                    col: '#38BDF8',
+                    acc: '#0284C7',
+                },
+                {
+                    title: 'TOTAL ON-TIME LC',
+                    val: `${fmtInt(cur.onTime)} LC`,
+                    sub: 'Delivered Within Schedule',
+                    col: '#4ADE80',
+                    acc: '#16A34A',
+                },
+                {
+                    title: 'TERLAMBAT LC',
+                    val: `${fmtInt(cur.terlambat)} LC`,
+                    sub: `Rerata: ${vnd.avgDelayText}`,
+                    col: '#F87171',
+                    acc: '#DC2626',
+                },
+                {
+                    title: 'DELAYED SUPPORT LC',
+                    val: `${fmtInt(cur.belumSupport)} LC`,
+                    sub: `Max: ${vnd.maxDelayText}`,
+                    col: '#FB923C',
+                    acc: '#EA580C',
+                },
+            ];
+
+            kpiItems.forEach((item, idx) => {
+                const kx = pad + idx * (k5W + kGap);
+                drawRoundedRectPath(ctx, kx, kY, k5W, kH, 10);
+                ctx.fillStyle = '#16181F';
+                ctx.fill();
+                ctx.strokeStyle = '#27272A';
+                ctx.lineWidth = 1.6;
+                ctx.stroke();
+
+                // Top accent bar
+                ctx.fillStyle = item.acc;
+                ctx.fillRect(kx + 12, kY + 1, k5W - 24, 4);
+
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '800 13.5px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(item.title, kx + k5W / 2, kY + 24);
+
+                ctx.fillStyle = item.col;
+                ctx.font = '900 32px "Inter", Arial, sans-serif';
+                ctx.fillText(fitCanvasText(ctx, item.val, k5W - 20), kx + k5W / 2, kY + 60);
+
+                ctx.fillStyle = '#CBD5E1';
+                ctx.font = '600 12.5px "Inter", Arial, sans-serif';
+                ctx.fillText(fitCanvasText(ctx, item.sub, k5W - 20), kx + k5W / 2, kY + 93);
+            });
+
+            // Row 2: Left Historical KPI 3 Months Table + Right 3-Month Chart
+            const midY = kY + kH + 14;
+            const midH = 382;
+            const histW = 1046;
+            const chartX = pad + histW + 14;
+            const chartW = innerW - histW - 14;
+
+            // Left Card: HISTORICAL KPI VENDOR (3 BULAN TERAKHIR TERMASUK BULAN INI)
+            drawRoundedRectPath(ctx, pad, midY, histW, midH, 10);
+            ctx.fillStyle = '#111827';
+            ctx.fill();
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 1.6;
+            ctx.stroke();
+
+            ctx.fillStyle = '#FACC15';
+            ctx.font = '800 16px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('HISTORICAL KPI VENDOR (3 BULAN TERAKHIR TERMASUK BULAN INI)', pad + 16, midY + 24);
+
+            const hCols = [
+                { h: 'BULAN', w: 204, al: 'left' },
+                { h: 'VENDOR SUPPORTING', w: 214, al: 'center' },
+                { h: 'TOTAL LC', w: 148, al: 'right' },
+                { h: 'ON-TIME LC', w: 150, al: 'right' },
+                { h: 'TERLAMBAT LC', w: 150, al: 'right' },
+                { h: 'DELAY SUPPORT', w: 152, al: 'right' },
+            ];
+            const hTblX = pad + 14;
+            const hTblY = midY + 44;
+            const hHdrH = 38;
+            const hRowH = 62;
+
+            ctx.fillStyle = '#0F172A';
+            ctx.fillRect(hTblX, hTblY, histW - 28, hHdrH);
+            let hx = hTblX;
+            ctx.font = '800 12.5px "Inter", Arial, sans-serif';
+            hCols.forEach((col) => {
+                ctx.fillStyle = '#FACC15';
+                ctx.textAlign = 'center';
+                ctx.fillText(col.h, hx + col.w / 2, hTblY + hHdrH / 2);
+                ctx.strokeStyle = '#1E293B';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(hx, hTblY, col.w, hHdrH);
+                hx += col.w;
+            });
+
+            const mList = vnd.months3 || [];
+            mList.forEach((m, rIdx) => {
+                const ry = hTblY + hHdrH + rIdx * hRowH;
+                const rowBg = m.isCurrent ? '#17253B' : (rIdx % 2 === 0 ? '#16181F' : '#12141A');
+                const pctCol = m.total === 0 ? '#64748B' : m.supportingPct >= 90 ? '#4ADE80' : m.supportingPct >= 80 ? '#FACC15' : '#F87171';
+                const monthName = m.isCurrent ? `${m.shortLabel} (BULAN INI)` : m.shortLabel;
+
+                let rx = hTblX;
+                const cells = [
+                    { v: monthName, col: m.isCurrent ? '#FACC15' : '#F1F5F9', bold: true },
+                    { v: m.total > 0 ? m.supportingPct.toFixed(1) + '%' : '0.0%', col: pctCol, bold: true, barPct: m.supportingPct },
+                    { v: fmtInt(m.total), col: '#38BDF8', bold: true },
+                    { v: fmtInt(m.onTime), col: '#4ADE80', bold: true },
+                    { v: fmtInt(m.terlambat), col: '#F87171', bold: true },
+                    { v: fmtInt(m.belumSupport), col: '#FB923C', bold: true },
+                ];
+
+                cells.forEach((cell, cIdx) => {
+                    const col = hCols[cIdx];
+                    ctx.fillStyle = rowBg;
+                    ctx.fillRect(rx, ry, col.w, hRowH);
+                    ctx.strokeStyle = m.isCurrent ? '#334155' : '#1E293B';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(rx, ry, col.w, hRowH);
+
+                    if (cIdx === 1) {
+                        // Draw subtle mini progress bar below percentage
+                        ctx.fillStyle = cell.col;
+                        ctx.font = '900 18px "Inter", Arial, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(cell.v, rx + col.w / 2, ry + 23);
+
+                        const bw = col.w - 36;
+                        const bx = rx + 18;
+                        const by = ry + 41;
+                        ctx.fillStyle = '#0F172A';
+                        ctx.fillRect(bx, by, bw, 8);
+                        ctx.fillStyle = cell.col;
+                        ctx.fillRect(bx, by, Math.max(0, Math.min(1, (cell.barPct || 0) / 100)) * bw, 8);
+                    } else {
+                        ctx.fillStyle = cell.col;
+                        ctx.font = `${cell.bold ? '800' : '600'} 15.5px "Inter", Arial, sans-serif`;
+                        const txt = fitCanvasText(ctx, cell.v, col.w - 16);
+                        if (col.al === 'right') {
+                            ctx.textAlign = 'right';
+                            ctx.fillText(txt, rx + col.w - 14, ry + hRowH / 2);
+                        } else {
+                            ctx.textAlign = 'left';
+                            ctx.fillText(txt, rx + 12, ry + hRowH / 2);
+                        }
+                    }
+                    rx += col.w;
+                });
+            });
+
+            // Bottom MoM Comparison Summary Strip inside Historical KPI Card
+            const momY = hTblY + hHdrH + mList.length * hRowH + 14;
+            const momH = midY + midH - momY - 14;
+            const prevM = vnd.prev || { shortLabel: '-', supportingPct: 0, terlambat: 0, belumSupport: 0 };
+            const dPct = cur.supportingPct - prevM.supportingPct;
+            const dLate = cur.terlambat - prevM.terlambat;
+            const dDelay = cur.belumSupport - prevM.belumSupport;
+            const momCards = [
+                {
+                    lbl: `Δ SUPPORTING VS ${prevM.shortLabel}`,
+                    val: `${dPct >= 0 ? '+' : ''}${dPct.toFixed(1)}% Poin`,
+                    col: dPct >= 0 ? '#4ADE80' : '#F87171',
+                },
+                {
+                    lbl: `Δ TERLAMBAT LC VS ${prevM.shortLabel}`,
+                    val: `${dLate > 0 ? '+' : ''}${dLate} LC`,
+                    col: dLate <= 0 ? '#4ADE80' : '#F87171',
+                },
+                {
+                    lbl: `Δ DELAY SUPPORT VS ${prevM.shortLabel}`,
+                    val: `${dDelay > 0 ? '+' : ''}${dDelay} LC`,
+                    col: dDelay <= 0 ? '#4ADE80' : '#FB923C',
+                },
+            ];
+            const momGap = 12;
+            const momW = (histW - 28 - momGap * 2) / 3;
+            momCards.forEach((mc, i) => {
+                const mx = hTblX + i * (momW + momGap);
+                drawRoundedRectPath(ctx, mx, momY, momW, momH, 8);
+                ctx.fillStyle = '#0F172A';
+                ctx.fill();
+                ctx.strokeStyle = '#1E293B';
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '700 12px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(fitCanvasText(ctx, mc.lbl, momW - 14), mx + momW / 2, momY + momH * 0.34);
+
+                ctx.fillStyle = mc.col;
+                ctx.font = '900 20px "Inter", Arial, sans-serif';
+                ctx.fillText(mc.val, mx + momW / 2, momY + momH * 0.68);
+            });
+
+            // Right Card: 3-MONTH VENDOR SUPPORTING TREND & LC BREAKDOWN CHART
+            drawRoundedRectPath(ctx, chartX, midY, chartW, midH, 10);
+            ctx.fillStyle = '#111827';
+            ctx.fill();
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 1.6;
+            ctx.stroke();
+
+            ctx.fillStyle = '#FACC15';
+            ctx.font = '800 15.5px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('TREN 3 BULAN: ON-TIME / TERLAMBAT / DELAY SUPPORT & %', chartX + 16, midY + 24);
+
+            const pL = chartX + 54;
+            const pT = midY + 56;
+            const pW = chartW - 88;
+            const pH = midH - 122;
+            const maxBarTot = Math.max(10, ...mList.map((m) => m.total));
+
+            // Horizontal gridlines
+            for (let g = 0; g <= 4; g++) {
+                const gy = pT + (g / 4) * pH;
+                ctx.strokeStyle = '#1E293B';
+                ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(pL, gy); ctx.lineTo(pL + pW, gy); ctx.stroke();
+
+                const gv = Math.round(((4 - g) / 4) * maxBarTot);
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '600 12px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(fmtInt(gv), pL - 8, gy);
+            }
+
+            const slotW = pW / Math.max(1, mList.length);
+            const barW = Math.min(88, slotW * 0.44);
+            const linePts = [];
+
+            mList.forEach((m, i) => {
+                const cx = pL + slotW * (i + 0.5);
+                const bx = cx - barW / 2;
+                const baseY = pT + pH;
+
+                const hOn = (m.onTime / maxBarTot) * pH;
+                const hLate = (m.terlambat / maxBarTot) * pH;
+                const hDel = (m.belumSupport / maxBarTot) * pH;
+
+                // Stacked bar: OnTime bottom (green), Terlambat mid (red), DelaySupport top (orange)
+                ctx.fillStyle = '#16A34A';
+                ctx.fillRect(bx, baseY - hOn, barW, hOn);
+                ctx.fillStyle = '#DC2626';
+                ctx.fillRect(bx, baseY - hOn - hLate, barW, hLate);
+                ctx.fillStyle = '#EA580C';
+                ctx.fillRect(bx, baseY - hOn - hLate - hDel, barW, hDel);
+
+                ctx.fillStyle = '#CBD5E1';
+                ctx.font = '700 13px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${fmtInt(m.total)} LC`, cx, baseY - hOn - hLate - hDel - 12);
+
+                ctx.fillStyle = m.isCurrent ? '#FACC15' : '#E2E8F0';
+                ctx.font = '800 13.5px "Inter", Arial, sans-serif';
+                ctx.fillText(m.shortLabel, cx, baseY + 20);
+
+                // Pct line y-coord mapped cleanly to 0-100% over pH
+                const py = pT + pH - (Math.min(100, Math.max(0, m.supportingPct)) / 100) * pH;
+                linePts.push({ x: cx, y: py, pct: m.supportingPct });
+            });
+
+            // Overlay Gold Supporting % line + value badges
+            if (linePts.length > 0) {
+                ctx.strokeStyle = '#FACC15';
+                ctx.lineWidth = 3.5;
+                ctx.beginPath();
+                linePts.forEach((pt, i) => (i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)));
+                ctx.stroke();
+
+                linePts.forEach((pt) => {
+                    ctx.fillStyle = '#FACC15';
+                    ctx.beginPath(); ctx.arc(pt.x, pt.y, 6.5, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = '#0F172A'; ctx.lineWidth = 2; ctx.stroke();
+
+                    const badgeW = 66, badgeH = 22;
+                    const by = Math.max(pT - 12, pt.y - 28);
+                    drawRoundedRectPath(ctx, pt.x - badgeW / 2, by, badgeW, badgeH, 6);
+                    ctx.fillStyle = '#0F172A';
+                    ctx.fill();
+                    ctx.strokeStyle = '#FACC15';
+                    ctx.lineWidth = 1.4;
+                    ctx.stroke();
+                    ctx.fillStyle = '#FACC15';
+                    ctx.font = '800 12.5px "Inter", Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(pt.pct.toFixed(1) + '%', pt.x, by + badgeH / 2);
+                });
+            }
+
+            // Legend at bottom of chart
+            const legItems = [
+                { col: '#16A34A', txt: 'On-Time LC' },
+                { col: '#DC2626', txt: 'Terlambat LC' },
+                { col: '#EA580C', txt: 'Delay Support' },
+                { col: '#FACC15', txt: 'Supporting %' },
+            ];
+            let lx = chartX + 26;
+            const ly = midY + midH - 22;
+            legItems.forEach((lg) => {
+                ctx.fillStyle = lg.col;
+                ctx.fillRect(lx, ly - 6, 13, 13);
+                ctx.fillStyle = '#CBD5E1';
+                ctx.font = '700 12.5px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(lg.txt, lx + 18, ly);
+                lx += 155;
+            });
+
+            // Row 3: VENDOR PERFORMANCE % PER CARRIER (Current Month)
+            const tblBoxY = midY + midH + 14;
+            const tblBarH = 38;
+            ctx.fillStyle = '#7F1D1D';
+            ctx.fillRect(pad, tblBoxY, innerW, tblBarH);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '800 16px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`VENDOR PERFORMANCE % PER CARRIER — ${vnd.currentMonthLabel}`, pad + 14, tblBoxY + tblBarH / 2);
+
+            const maxCarriers = 9;
+            const visCarriers = (vnd.carrierList || []).slice(0, maxCarriers);
+            ctx.fillStyle = '#FCA5A5';
+            ctx.font = '700 14.5px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(`Menampilkan Top ${visCarriers.length} dari ${fmtInt((vnd.carrierList || []).length)} carrier aktif`, pad + innerW - 14, tblBoxY + tblBarH / 2);
+
+            const cCols = [
+                { hdr: 'NO', w: 66, al: 'center' },
+                { hdr: 'CARRIER', w: 504, al: 'left' },
+                { hdr: 'ON-TIME LC', w: 185, al: 'right' },
+                { hdr: 'TERLAMBAT LC', w: 185, al: 'right' },
+                { hdr: 'DELAY SUPPORT', w: 195, al: 'right' },
+                { hdr: 'TOTAL LC', w: 175, al: 'right' },
+                { hdr: 'ACHIEVEMENT %', w: 220, al: 'center' },
+                { hdr: 'STATUS', w: 230, al: 'center' },
+            ];
+            const hdrY = tblBoxY + tblBarH;
+            const hdrH = 38;
+            const cRowH = 47;
+
+            ctx.fillStyle = '#0F172A';
+            ctx.fillRect(pad, hdrY, innerW, hdrH);
+            let vx = pad;
+            ctx.font = '800 13px "Inter", Arial, sans-serif';
+            cCols.forEach((col) => {
+                ctx.fillStyle = '#FACC15';
+                ctx.textAlign = 'center';
+                ctx.fillText(col.hdr, vx + col.w / 2, hdrY + hdrH / 2);
+                ctx.strokeStyle = '#27272A';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(vx, hdrY, col.w, hdrH);
+                vx += col.w;
+            });
+
+            if (visCarriers.length === 0) {
+                ctx.fillStyle = '#111827';
+                ctx.fillRect(pad, hdrY + hdrH, innerW, 120);
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '700 18px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`Belum ada data Vendor Performance pada periode ${vnd.currentMonthLabel}`, pad + innerW / 2, hdrY + hdrH + 60);
+            } else {
+                const tableRows = visCarriers.map((d, idx) => {
+                    const stLbl = d.achievement >= 95 ? 'EXCELLENT' : d.achievement >= 85 ? 'GOOD' : 'NEED FOLLOW-UP';
+                    const stCol = d.achievement >= 95 ? '#4ADE80' : d.achievement >= 85 ? '#FACC15' : '#F87171';
+                    return [
+                        { v: String(idx + 1), col: '#94A3B8' },
+                        { v: d.carrier, col: '#F8FAFC', bold: true },
+                        { v: fmtInt(d.onTime), col: '#4ADE80', bold: true },
+                        { v: fmtInt(d.terlambat), col: d.terlambat > 0 ? '#F87171' : '#64748B', bold: d.terlambat > 0 },
+                        { v: fmtInt(d.belumSupport), col: d.belumSupport > 0 ? '#FB923C' : '#64748B', bold: d.belumSupport > 0 },
+                        { v: fmtInt(d.total), col: '#38BDF8', bold: true },
+                        { v: d.achievement.toFixed(2) + '%', col: stCol, bold: true },
+                        { v: stLbl, col: stCol, bold: true },
+                    ];
+                });
+
+                // GRAND TOTAL row
+                const gtStCol = cur.supportingPct >= 95 ? '#4ADE80' : cur.supportingPct >= 85 ? '#FACC15' : '#F87171';
+                tableRows.push([
+                    { v: '', col: '#FACC15', bg: '#0F172A' },
+                    { v: 'GRAND TOTAL (ALL CARRIERS BULAN INI)', col: '#FACC15', bold: true, bg: '#0F172A' },
+                    { v: fmtInt(cur.onTime), col: '#4ADE80', bold: true, bg: '#0F172A' },
+                    { v: fmtInt(cur.terlambat), col: '#F87171', bold: true, bg: '#0F172A' },
+                    { v: fmtInt(cur.belumSupport), col: '#FB923C', bold: true, bg: '#0F172A' },
+                    { v: fmtInt(cur.total), col: '#38BDF8', bold: true, bg: '#0F172A' },
+                    { v: cur.supportingPct.toFixed(2) + '%', col: gtStCol, bold: true, bg: '#0F172A' },
+                    { v: cur.supportingPct >= 90 ? 'ON TARGET' : 'BELOW TARGET', col: gtStCol, bold: true, bg: '#0F172A' },
+                ]);
+
+                tableRows.forEach((rowCells, rIdx) => {
+                    const ry = hdrY + hdrH + rIdx * cRowH;
+                    const rowBg = rIdx % 2 === 0 ? '#14151B' : '#0F1117';
+                    let rx = pad;
+                    rowCells.forEach((cell, cIdx) => {
+                        const col = cCols[cIdx];
+                        ctx.fillStyle = cell.bg || rowBg;
+                        ctx.fillRect(rx, ry, col.w, cRowH);
+                        ctx.strokeStyle = '#1F2937';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(rx, ry, col.w, cRowH);
+
+                        ctx.fillStyle = cell.col;
+                        ctx.font = `${cell.bold ? '700' : '500'} 13.5px "Inter", Arial, sans-serif`;
+                        const txt = fitCanvasText(ctx, cell.v, col.w - 14);
+                        if (col.al === 'center') {
+                            ctx.textAlign = 'center';
+                            ctx.fillText(txt, rx + col.w / 2, ry + cRowH / 2);
+                        } else if (col.al === 'right') {
+                            ctx.textAlign = 'right';
+                            ctx.fillText(txt, rx + col.w - 10, ry + cRowH / 2);
+                        } else {
+                            ctx.textAlign = 'left';
+                            ctx.fillText(txt, rx + 10, ry + cRowH / 2);
+                        }
+                        rx += col.w;
+                    });
+                });
+            }
+
+            return c.toDataURL('image/png');
+        }
+
+        function genLogisalesDashboardPanelImage(lgs) {
+            const W = 1800, H = 1234;
+            const c = createCanvas(W, H);
+            const ctx = c.getContext('2d');
+            if (!ctx) return c.toDataURL('image/png');
+
+            const pad = 20;
+            const innerW = W - pad * 2;
+
+            // Dark Outer Container
+            ctx.fillStyle = '#0D0D11';
+            ctx.fillRect(0, 0, W, H);
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(1.5, 1.5, W - 3, H - 3);
+
+            // Top Burgundy/Crimson Header (Kawan Lama Solusi Logisales Theme)
+            const hdrGrad = ctx.createLinearGradient(0, 0, W, 0);
+            hdrGrad.addColorStop(0, '#881337');
+            hdrGrad.addColorStop(1, '#A83A52');
+            ctx.fillStyle = hdrGrad;
+            ctx.fillRect(0, 0, W, 52);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '800 21px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('REPORT LOGISALES DELIVERY SYSTEM — PT. KAWAN LAMA SOLUSI', 22, 27);
+
+            // Subheader Strip
+            const subY = 62;
+            ctx.fillStyle = '#18181B';
+            ctx.fillRect(pad, subY, innerW, 38);
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(pad, subY, innerW, 38);
+            ctx.fillStyle = '#FACC15';
+            ctx.font = '700 15.5px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`PERIODE LAPORAN: ${lgs.startIso} s/d ${lgs.endIso} (${lgs.bulanLabel})   |   FORMULA SLA: TERKIRIM / (TERKIRIM + PENDING)   |   TARGET: 98.0%`, pad + 14, subY + 19);
+
+            // Row 1: 4 KPI Cards + Right SLA Gauge Card
+            const kY = 112;
+            const kH = 126;
+            const totalK4W = 1272;
+            const kGap = 14;
+            const k4W = (totalK4W - kGap * 3) / 4;
+
+            const orderBadge = lgs.prevTotal > 0
+                ? `${lgs.diffOrderPct >= 0 ? '▲ +' : '▼ '}${lgs.diffOrderPct.toFixed(1)}% vs ${lgs.prevMonthLabel} MTD`
+                : 'Total Unit Cargo';
+            const kpis = [
+                {
+                    t: 'TOTAL ORDER PENGIRIMAN',
+                    v: fmtInt(lgs.totalOrder),
+                    sub: orderBadge,
+                    col: '#F8FAFC',
+                    acc: '#A83A52',
+                },
+                {
+                    t: 'TERKIRIM TEPAT WAKTU',
+                    v: fmtInt(lgs.terkirim),
+                    sub: `Unit (SLA ${lgs.slaRate.toFixed(1)}%)`,
+                    col: '#4ADE80',
+                    acc: '#16A34A',
+                },
+                {
+                    t: 'PROSES / ON DELIVERY',
+                    v: fmtInt(lgs.proses),
+                    sub: 'Unit Armada Aktif',
+                    col: '#38BDF8',
+                    acc: '#0284C7',
+                },
+                {
+                    t: 'PENDING / KENDALA',
+                    v: fmtInt(lgs.pending),
+                    sub: 'Order Butuh Perhatian',
+                    col: lgs.pending > 0 ? '#FB923C' : '#4ADE80',
+                    acc: lgs.pending > 0 ? '#EA580C' : '#16A34A',
+                },
+            ];
+
+            kpis.forEach((kp, idx) => {
+                const kx = pad + idx * (k4W + kGap);
+                drawRoundedRectPath(ctx, kx, kY, k4W, kH, 10);
+                ctx.fillStyle = '#16181F';
+                ctx.fill();
+                ctx.strokeStyle = '#27272A';
+                ctx.lineWidth = 1.6;
+                ctx.stroke();
+
+                ctx.fillStyle = kp.acc;
+                ctx.fillRect(kx + 12, kY + 1, k4W - 24, 4);
+
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '800 13px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(kp.t, kx + k4W / 2, kY + 25);
+
+                ctx.fillStyle = kp.col;
+                ctx.font = '900 36px "Inter", Arial, sans-serif';
+                ctx.fillText(kp.v, kx + k4W / 2, kY + 66);
+
+                ctx.fillStyle = '#CBD5E1';
+                ctx.font = '700 12.5px "Inter", Arial, sans-serif';
+                ctx.fillText(fitCanvasText(ctx, kp.sub, k4W - 20), kx + k4W / 2, kY + 104);
+            });
+
+            // Right SLA Performance Gauge Card
+            const gaugeX = pad + totalK4W + 14;
+            const gaugeW = innerW - totalK4W - 14;
+            drawRoundedRectPath(ctx, gaugeX, kY, gaugeW, kH, 10);
+            ctx.fillStyle = '#16181F';
+            ctx.fill();
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 1.6;
+            ctx.stroke();
+
+            const slaOk = lgs.slaRate >= 95;
+            const slaCol = lgs.totalOrder === 0 ? '#64748B' : slaOk ? '#4ADE80' : '#FACC15';
+            const gCx = gaugeX + 78;
+            const gCy = kY + kH / 2;
+            const gR = 44;
+
+            ctx.lineWidth = 11;
+            ctx.strokeStyle = '#1E293B';
+            ctx.beginPath();
+            ctx.arc(gCx, gCy, gR, 0, Math.PI * 2);
+            ctx.stroke();
+
+            const pctSweep = Math.max(0, Math.min(1, lgs.slaRate / 100)) * Math.PI * 2;
+            if (pctSweep > 0) {
+                ctx.strokeStyle = slaCol;
+                ctx.beginPath();
+                ctx.arc(gCx, gCy, gR, -Math.PI / 2, -Math.PI / 2 + pctSweep);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '900 20px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(lgs.slaRate.toFixed(1) + '%', gCx, gCy - 4);
+            ctx.fillStyle = '#94A3B8';
+            ctx.font = '700 10.5px "Inter", Arial, sans-serif';
+            ctx.fillText('SLA AKTIF', gCx, gCy + 16);
+
+            const infoX = gaugeX + 142;
+            const infoW = gaugeW - 158;
+            ctx.fillStyle = '#FACC15';
+            ctx.font = '800 13.5px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('SLA PERFORMANCE GAUGE', infoX, kY + 25);
+
+            const pillTxt = lgs.totalOrder === 0 ? 'BELUM ADA DATA' : slaOk ? 'OPTIMAL (≥ 95.0%)' : 'WARNING (< 95.0%)';
+            drawRoundedRectPath(ctx, infoX, kY + 42, infoW, 28, 6);
+            ctx.fillStyle = slaOk ? 'rgba(22,163,74,0.22)' : 'rgba(234,179,8,0.18)';
+            ctx.fill();
+            ctx.strokeStyle = slaCol;
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+            ctx.fillStyle = slaCol;
+            ctx.font = '800 13px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(pillTxt, infoX + infoW / 2, kY + 56);
+
+            ctx.fillStyle = '#CBD5E1';
+            ctx.font = '700 12px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Capaian vs Target: ${lgs.slaRate.toFixed(1)}% / 98.0%`, infoX, kY + 88);
+            ctx.fillStyle = '#0F172A';
+            ctx.fillRect(infoX, kY + 101, infoW, 10);
+            ctx.fillStyle = slaCol;
+            ctx.fillRect(infoX, kY + 101, Math.min(1, lgs.slaRate / 98.0) * infoW, 10);
+
+            // Row 2: Left Daily Trend Chart + Right Status Donut
+            const midY = kY + kH + 14;
+            const midH = 340;
+            const trW = 1190;
+            const dnX = pad + trW + 14;
+            const dnW = innerW - trW - 14;
+
+            // Left: Daily Volume & SLA Trend Chart
+            drawRoundedRectPath(ctx, pad, midY, trW, midH, 10);
+            ctx.fillStyle = '#111827';
+            ctx.fill();
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 1.6;
+            ctx.stroke();
+
+            ctx.fillStyle = '#FACC15';
+            ctx.font = '800 15.5px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('TREN VOLUME PENGIRIMAN & SLA HARIAN (TGL 1 S/D H-1)', pad + 16, midY + 24);
+
+            const series = lgs.dailySeries || [];
+            const pL = pad + 54;
+            const pT = midY + 52;
+            const pW = trW - 108;
+            const pH = midH - 114;
+
+            if (series.length === 0) {
+                ctx.fillStyle = '#64748B';
+                ctx.font = '700 18px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`Belum ada data pengiriman pada periode ${lgs.startIso} s/d ${lgs.endIso}`, pL + pW / 2, pT + pH / 2);
+            } else {
+                const maxVol = Math.max(5, ...series.map((d) => d.total));
+                for (let g = 0; g <= 4; g++) {
+                    const gy = pT + (g / 4) * pH;
+                    ctx.strokeStyle = '#1E293B';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.moveTo(pL, gy); ctx.lineTo(pL + pW, gy); ctx.stroke();
+
+                    ctx.fillStyle = '#94A3B8';
+                    ctx.font = '600 11.5px "Inter", Arial, sans-serif';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(fmtInt(Math.round(((4 - g) / 4) * maxVol)), pL - 8, gy);
+
+                    ctx.textAlign = 'left';
+                    ctx.fillStyle = '#FDE047';
+                    ctx.fillText(Math.round(((4 - g) / 4) * 100) + '%', pL + pW + 8, gy);
+                }
+
+                const slotW = pW / series.length;
+                const barW = Math.min(34, Math.max(8, slotW * 0.52));
+                const slaPts = [];
+                const labelStep = Math.max(1, Math.ceil(series.length / 10));
+
+                series.forEach((d, i) => {
+                    const cx = pL + slotW * (i + 0.5);
+                    const bx = cx - barW / 2;
+                    const baseY = pT + pH;
+
+                    const hOk = (d.terkirim / maxVol) * pH;
+                    const hPr = (d.proses / maxVol) * pH;
+                    const hPd = (d.pending / maxVol) * pH;
+
+                    ctx.fillStyle = '#16A34A';
+                    ctx.fillRect(bx, baseY - hOk, barW, hOk);
+                    ctx.fillStyle = '#0284C7';
+                    ctx.fillRect(bx, baseY - hOk - hPr, barW, hPr);
+                    ctx.fillStyle = '#E11D48';
+                    ctx.fillRect(bx, baseY - hOk - hPr - hPd, barW, hPd);
+
+                    if (i % labelStep === 0 || i === series.length - 1) {
+                        ctx.fillStyle = '#CBD5E1';
+                        ctx.font = '700 11px "Inter", Arial, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(d.label, cx, baseY + 18);
+                    }
+
+                    const sy = pT + pH - (Math.min(100, Math.max(0, d.slaPct)) / 100) * pH;
+                    slaPts.push({ x: cx, y: sy, pct: d.slaPct });
+                });
+
+                ctx.strokeStyle = '#FACC15';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                slaPts.forEach((pt, i) => (i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)));
+                ctx.stroke();
+
+                slaPts.forEach((pt, i) => {
+                    ctx.fillStyle = '#FACC15';
+                    ctx.beginPath(); ctx.arc(pt.x, pt.y, 4.5, 0, Math.PI * 2); ctx.fill();
+                    if (i === slaPts.length - 1 || pt.pct < 95) {
+                        ctx.fillStyle = '#FACC15';
+                        ctx.font = '800 11px "Inter", Arial, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(pt.pct.toFixed(0) + '%', pt.x, Math.max(pT + 10, pt.y - 12));
+                    }
+                });
+            }
+
+            // Chart Legend
+            const lgsLeg = [
+                { col: '#16A34A', txt: 'Terkirim' },
+                { col: '#0284C7', txt: 'Proses Delivery' },
+                { col: '#E11D48', txt: 'Pending / Kendala' },
+                { col: '#FACC15', txt: 'SLA Rate %' },
+            ];
+            let lgX = pL;
+            const lgY = midY + midH - 19;
+            lgsLeg.forEach((item) => {
+                ctx.fillStyle = item.col;
+                ctx.fillRect(lgX, lgY - 6, 13, 13);
+                ctx.fillStyle = '#CBD5E1';
+                ctx.font = '700 12px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(item.txt, lgX + 18, lgY);
+                lgX += 170;
+            });
+
+            // Right: Status Distribution Donut Card
+            drawRoundedRectPath(ctx, dnX, midY, dnW, midH, 10);
+            ctx.fillStyle = '#111827';
+            ctx.fill();
+            ctx.strokeStyle = '#27272A';
+            ctx.lineWidth = 1.6;
+            ctx.stroke();
+
+            ctx.fillStyle = '#FACC15';
+            ctx.font = '800 15.5px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('DISTRIBUSI STATUS ORDER', dnX + 16, midY + 24);
+
+            const dCx = dnX + 148;
+            const dCy = midY + 184;
+            const dOuterR = 104;
+            const dInnerR = 66;
+            const slices = [
+                { lbl: 'Terkirim', val: lgs.terkirim, col: '#16A34A' },
+                { lbl: 'Proses', val: lgs.proses, col: '#0284C7' },
+                { lbl: 'Pending', val: lgs.pending, col: '#E11D48' },
+            ];
+            const dTot = Math.max(0, slices.reduce((s, x) => s + x.val, 0));
+
+            if (dTot === 0) {
+                ctx.fillStyle = '#1E293B';
+                ctx.beginPath(); ctx.arc(dCx, dCy, dOuterR, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#111827';
+                ctx.beginPath(); ctx.arc(dCx, dCy, dInnerR, 0, Math.PI * 2); ctx.fill();
+            } else {
+                let startA = -Math.PI / 2;
+                slices.forEach((sl) => {
+                    if (sl.val <= 0) return;
+                    const sweep = (sl.val / dTot) * Math.PI * 2;
+                    ctx.fillStyle = sl.col;
+                    ctx.beginPath();
+                    ctx.moveTo(dCx, dCy);
+                    ctx.arc(dCx, dCy, dOuterR, startA, startA + sweep);
+                    ctx.closePath();
+                    ctx.fill();
+                    startA += sweep;
+                });
+                ctx.fillStyle = '#111827';
+                ctx.beginPath(); ctx.arc(dCx, dCy, dInnerR, 0, Math.PI * 2); ctx.fill();
+            }
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '900 28px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(fmtInt(lgs.totalOrder), dCx, dCy - 6);
+            ctx.fillStyle = '#94A3B8';
+            ctx.font = '700 11.5px "Inter", Arial, sans-serif';
+            ctx.fillText('TOTAL ORDER', dCx, dCy + 18);
+
+            // Right legend pills inside Donut card
+            const rLegX = dnX + 278;
+            const rLegW = dnW - 294;
+            slices.forEach((sl, idx) => {
+                const ry = midY + 68 + idx * 82;
+                drawRoundedRectPath(ctx, rLegX, ry, rLegW, 68, 8);
+                ctx.fillStyle = '#16181F';
+                ctx.fill();
+                ctx.strokeStyle = '#1E293B';
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+
+                ctx.fillStyle = sl.col;
+                ctx.fillRect(rLegX, ry + 8, 5, 52);
+
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '700 12px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(sl.lbl.toUpperCase(), rLegX + 14, ry + 21);
+
+                const pStr = dTot > 0 ? ((sl.val / dTot) * 100).toFixed(1) + '%' : '0.0%';
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = '900 21px "Inter", Arial, sans-serif';
+                ctx.fillText(`${fmtInt(sl.val)} Unit`, rLegX + 14, ry + 48);
+
+                ctx.fillStyle = sl.col;
+                ctx.font = '800 14px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(pStr, rLegX + rLegW - 12, ry + 48);
+            });
+
+            // Row 3: Bottom Split — Left Regional Hub Table + Right Detail Pending Table
+            const botY = midY + midH + 14;
+            const hubTblW = 858;
+            const pendTblX = pad + hubTblW + 14;
+            const pendTblW = innerW - hubTblW - 14;
+            const barH = 38;
+            const hdrH = 38;
+            const rowH = 54;
+
+            // Left Bar: PERFORMA PER REGIONAL HUB
+            ctx.fillStyle = '#881337';
+            ctx.fillRect(pad, botY, hubTblW, barH);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '800 15.5px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('PERFORMA PER REGIONAL HUB', pad + 14, botY + barH / 2);
+
+            const visHubs = (lgs.hubList || []).slice(0, 8);
+            ctx.fillStyle = '#FDA4AF';
+            ctx.font = '700 13px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(`Top ${visHubs.length} dari ${fmtInt((lgs.hubList || []).length)} Hub`, pad + hubTblW - 14, botY + barH / 2);
+
+            const hubCols = [
+                { h: 'HUB / KOTA', w: 236, al: 'left' },
+                { h: 'TOTAL', w: 100, al: 'right' },
+                { h: 'TERKIRIM', w: 114, al: 'right' },
+                { h: 'PENDING', w: 108, al: 'right' },
+                { h: 'SLA %', w: 164, al: 'center' },
+                { h: 'STATUS', w: 136, al: 'center' },
+            ];
+            let hx = pad;
+            ctx.fillStyle = '#0F172A';
+            ctx.fillRect(pad, botY + barH, hubTblW, hdrH);
+            ctx.font = '800 12.5px "Inter", Arial, sans-serif';
+            hubCols.forEach((col) => {
+                ctx.fillStyle = '#FACC15';
+                ctx.textAlign = 'center';
+                ctx.fillText(col.h, hx + col.w / 2, botY + barH + hdrH / 2);
+                ctx.strokeStyle = '#27272A';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(hx, botY + barH, col.w, hdrH);
+                hx += col.w;
+            });
+
+            if (visHubs.length === 0) {
+                ctx.fillStyle = '#111827';
+                ctx.fillRect(pad, botY + barH + hdrH, hubTblW, 120);
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '700 16px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Belum ada data Hub Logisales', pad + hubTblW / 2, botY + barH + hdrH + 60);
+            } else {
+                const hRows = visHubs.map((hb) => ({
+                    bg: null,
+                    cells: [
+                        { v: hb.hub, col: '#F8FAFC', bold: true },
+                        { v: fmtInt(hb.total), col: '#E2E8F0', bold: true },
+                        { v: fmtInt(hb.terkirim), col: '#4ADE80', bold: true },
+                        { v: fmtInt(hb.gagal), col: hb.gagal > 0 ? '#FB7185' : '#64748B', bold: hb.gagal > 0 },
+                        { v: hb.sla.toFixed(1) + '%', col: hb.sla >= 95 ? '#4ADE80' : '#FACC15', bold: true, barPct: hb.sla },
+                        { v: hb.status, col: hb.sla >= 95 ? '#4ADE80' : '#FACC15', bold: true },
+                    ],
+                }));
+                hRows.push({
+                    bg: '#0F172A',
+                    cells: [
+                        { v: 'TOTAL / OVERALL', col: '#FACC15', bold: true },
+                        { v: fmtInt(lgs.totalOrder), col: '#FACC15', bold: true },
+                        { v: fmtInt(lgs.terkirim), col: '#4ADE80', bold: true },
+                        { v: fmtInt(lgs.pending), col: '#FB7185', bold: true },
+                        { v: lgs.slaRate.toFixed(1) + '%', col: lgs.slaRate >= 95 ? '#4ADE80' : '#FACC15', bold: true },
+                        { v: lgs.slaRate >= 95 ? 'OPTIMAL' : 'WARNING', col: lgs.slaRate >= 95 ? '#4ADE80' : '#FACC15', bold: true },
+                    ],
+                });
+
+                hRows.forEach((rw, rIdx) => {
+                    const ry = botY + barH + hdrH + rIdx * rowH;
+                    const bg = rw.bg || (rIdx % 2 === 0 ? '#14151B' : '#0F1117');
+                    let rx = pad;
+                    rw.cells.forEach((cell, cIdx) => {
+                        const col = hubCols[cIdx];
+                        ctx.fillStyle = bg;
+                        ctx.fillRect(rx, ry, col.w, rowH);
+                        ctx.strokeStyle = '#1F2937';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(rx, ry, col.w, rowH);
+
+                        if (cIdx === 4 && cell.barPct !== undefined) {
+                            ctx.fillStyle = cell.col;
+                            ctx.font = '800 14px "Inter", Arial, sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(cell.v, rx + col.w / 2, ry + 20);
+
+                            const bw = col.w - 30;
+                            ctx.fillStyle = '#0F172A';
+                            ctx.fillRect(rx + 15, ry + 36, bw, 7);
+                            ctx.fillStyle = cell.col;
+                            ctx.fillRect(rx + 15, ry + 36, Math.max(0, Math.min(1, cell.barPct / 100)) * bw, 7);
+                        } else {
+                            ctx.fillStyle = cell.col;
+                            ctx.font = `${cell.bold ? '700' : '500'} 13.5px "Inter", Arial, sans-serif`;
+                            const txt = fitCanvasText(ctx, cell.v, col.w - 14);
+                            if (col.al === 'center') {
+                                ctx.textAlign = 'center';
+                                ctx.fillText(txt, rx + col.w / 2, ry + rowH / 2);
+                            } else if (col.al === 'right') {
+                                ctx.textAlign = 'right';
+                                ctx.fillText(txt, rx + col.w - 10, ry + rowH / 2);
+                            } else {
+                                ctx.textAlign = 'left';
+                                ctx.fillText(txt, rx + 10, ry + rowH / 2);
+                            }
+                        }
+                        rx += col.w;
+                    });
+                });
+            }
+
+            // Right Bar: DETAIL ORDER PENDING / KENDALA
+            ctx.fillStyle = '#881337';
+            ctx.fillRect(pendTblX, botY, pendTblW, barH);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '800 15.5px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('DETAIL ORDER PENDING / KENDALA', pendTblX + 14, botY + barH / 2);
+
+            const pendList = lgs.pendingList || [];
+            ctx.fillStyle = '#FDA4AF';
+            ctx.font = '700 13px "Inter", Arial, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(`${fmtInt(pendList.length)} Order Pending`, pendTblX + pendTblW - 14, botY + barH / 2);
+
+            const pendCols = [
+                { h: 'TGL KIRIM', w: 118, al: 'center' },
+                { h: 'NO. ORDER', w: 152, al: 'left' },
+                { h: 'CUSTOMER', w: 242, al: 'left' },
+                { h: 'KETERANGAN / KENDALA', w: 254, al: 'left' },
+                { h: 'HUB', w: 122, al: 'center' },
+            ];
+            let px = pendTblX;
+            ctx.fillStyle = '#0F172A';
+            ctx.fillRect(pendTblX, botY + barH, pendTblW, hdrH);
+            ctx.font = '800 12.5px "Inter", Arial, sans-serif';
+            pendCols.forEach((col) => {
+                ctx.fillStyle = '#FACC15';
+                ctx.textAlign = 'center';
+                ctx.fillText(col.h, px + col.w / 2, botY + barH + hdrH / 2);
+                ctx.strokeStyle = '#27272A';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(px, botY + barH, col.w, hdrH);
+                px += col.w;
+            });
+
+            const visPend = pendList.slice(0, 8);
+            if (visPend.length === 0) {
+                ctx.fillStyle = '#111827';
+                ctx.fillRect(pendTblX, botY + barH + hdrH, pendTblW, 130);
+                ctx.fillStyle = '#4ADE80';
+                ctx.font = '800 16px "Inter", Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Tidak ada order pending/kendala pada periode ini', pendTblX + pendTblW / 2, botY + barH + hdrH + 65);
+            } else {
+                visPend.forEach((pd, rIdx) => {
+                    const ry = botY + barH + hdrH + rIdx * rowH;
+                    const bg = rIdx % 2 === 0 ? '#14151B' : '#0F1117';
+                    let rx = pendTblX;
+                    const cells = [
+                        { v: pd.tanggalKirim, col: '#CBD5E1', bold: false },
+                        { v: pd.noOrder, col: '#FACC15', bold: true },
+                        { v: pd.customer, col: '#F8FAFC', bold: true },
+                        { v: pd.alasan, col: '#FDA4AF', bold: false },
+                        { v: pd.hub, col: '#FB923C', bold: true },
+                    ];
+                    cells.forEach((cell, cIdx) => {
+                        const col = pendCols[cIdx];
+                        ctx.fillStyle = bg;
+                        ctx.fillRect(rx, ry, col.w, rowH);
+                        ctx.strokeStyle = '#1F2937';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(rx, ry, col.w, rowH);
+
+                        ctx.fillStyle = cell.col;
+                        ctx.font = `${cell.bold ? '700' : '500'} 13px "Inter", Arial, sans-serif`;
+                        const txt = fitCanvasText(ctx, cell.v, col.w - 14);
+                        if (col.al === 'center') {
+                            ctx.textAlign = 'center';
+                            ctx.fillText(txt, rx + col.w / 2, ry + rowH / 2);
+                        } else {
+                            ctx.textAlign = 'left';
+                            ctx.fillText(txt, rx + 9, ry + rowH / 2);
+                        }
+                        rx += col.w;
+                    });
+                });
+                if (pendList.length > visPend.length) {
+                    const noteY = botY + barH + hdrH + visPend.length * rowH + 18;
+                    ctx.fillStyle = '#FACC15';
+                    ctx.font = '700 13px "Inter", Arial, sans-serif';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(`* Menampilkan ${visPend.length} dari ${fmtInt(pendList.length)} order pending aktif`, pendTblX + pendTblW - 8, noteY);
+                }
+            }
+
+            return c.toDataURL('image/png');
+        }
+
         function addKpiCard(slide, x, y, w, h, title, value, gradTopHex, subText, subPillBg) {
             slide.addShape('roundRect', {
                 x, y, w, h,
@@ -22408,34 +24794,38 @@ setInterval(loadKonfirmasiVM, 600000);
             slide.addImage({ data: panelImg, x, y, w, h });
         }
 
-        function renderPlanLoadingTableSlide(slide, bgImg, titleText, subTitleText, rows) {
+        function renderPlanLoadingTableSlide(slide, bgImg, titleText, subTitleText, rows, pageMeta) {
             slide.background = { data: bgImg };
             slide.addText(titleText, {
-                x: 0.30, y: 0.20, w: 9.40, h: 0.34,
-                fontSize: 19, bold: true, fontFace: F_FONT, color: '0F172A',
+                x: 0.30, y: 0.16, w: 9.40, h: 0.30,
+                fontSize: 18, bold: true, fontFace: F_FONT, color: '0F172A',
             });
             slide.addText(subTitleText, {
-                x: 0.30, y: 0.52, w: 9.40, h: 0.20,
-                fontSize: 10.5, italic: true, fontFace: F_FONT, color: '334155',
+                x: 0.30, y: 0.45, w: 9.40, h: 0.19,
+                fontSize: 10, italic: true, fontFace: F_FONT, color: '334155',
             });
 
             // Dark table frame
-            slide.addShape('rect', { x: 0.24, y: 0.78, w: 9.52, h: 4.58, fill: { color: '111827' } });
+            slide.addShape('rect', { x: 0.24, y: 0.68, w: 9.52, h: 4.70, fill: { color: '111827' } });
 
             const headers = ['#', 'LC', 'SHIPPINGLINE', 'TYPE', 'CARRIER', 'STUFFING', 'JAM', 'JALUR', 'PLAN', 'SHIPPED', 'FIX CASE ID', 'ESTIMASI CASE ID'];
             const tblRows = [
                 headers.map((h) => ({
                     text: h,
-                    options: { fill: { color: '0F172A' }, color: 'FACC15', bold: true, fontSize: 5.8, align: 'center' },
+                    options: { fill: { color: '0F172A' }, color: 'FACC15', bold: true, fontSize: 5.2, align: 'center', valign: 'middle' },
                 })),
             ];
 
-            const maxRows = 25;
-            const visibleRows = rows.slice(0, maxRows);
+            const meta = pageMeta || { startNo: 1, page: 1, totalPages: 1, totalCount: rows.length, totalCbmAll: rows.reduce((s, r) => s + numVal(r.Z), 0) };
+            const visibleRows = rows.slice(0, 35);
+            const clipCell = (val, maxLen) => {
+                const s = safeStr(val);
+                return s.length > maxLen ? s.slice(0, maxLen - 1) + '…' : s;
+            };
 
             if (visibleRows.length === 0) {
                 tblRows.push([
-                    { text: 'Belum ada jadwal plan loading untuk tanggal ini.', options: { colspan: 12, color: '94A3B8', fontSize: 9, align: 'center', fill: { color: '1E293B' } } },
+                    { text: 'Belum ada jadwal plan loading untuk tanggal ini.', options: { colspan: 12, color: '94A3B8', fontSize: 9, align: 'center', valign: 'middle', fill: { color: '1E293B' } } },
                 ]);
             } else {
                 visibleRows.forEach((r, idx) => {
@@ -22448,19 +24838,20 @@ setInterval(loadKonfirmasiVM, 600000);
                     const cellOpts = (align) => ({
                         fill: { color: rowBg },
                         color: 'F1F5F9',
-                        fontSize: 5.5,
+                        fontSize: 4.8,
                         align: align || 'left',
+                        valign: 'middle',
                     });
 
                     tblRows.push([
-                        { text: String(idx + 1), options: cellOpts('center') },
-                        { text: safeStr(r.A), options: cellOpts('left') },
-                        { text: safeStr(r.I), options: cellOpts('left') },
-                        { text: safeStr(r.G), options: cellOpts('left') },
-                        { text: safeStr(r.D), options: cellOpts('left') },
-                        { text: safeStr(r.AO), options: cellOpts('center') },
-                        { text: safeStr(r.AP), options: cellOpts('center') },
-                        { text: safeStr(r.M), options: cellOpts('left') },
+                        { text: String(meta.startNo + idx), options: cellOpts('center') },
+                        { text: clipCell(r.A, 15), options: cellOpts('left') },
+                        { text: clipCell(r.I, 52), options: cellOpts('left') },
+                        { text: clipCell(r.G, 18), options: cellOpts('left') },
+                        { text: clipCell(r.D, 15), options: cellOpts('left') },
+                        { text: clipCell(r.AO, 12), options: cellOpts('center') },
+                        { text: clipCell(r.AP, 8), options: cellOpts('center') },
+                        { text: clipCell(r.M, 16), options: cellOpts('left') },
                         { text: fmtId(numVal(r.Z), 2), options: cellOpts('right') },
                         { text: fmtId(numVal(r.AY), 2), options: cellOpts('right') },
                         { text: fmtInt(numVal(r.AQ, true)), options: cellOpts('right') },
@@ -22470,17 +24861,45 @@ setInterval(loadKonfirmasiVM, 600000);
             }
 
             slide.addTable(tblRows, {
-                x: 0.28, y: 0.82, w: 9.44,
-                colW: [0.25, 0.72, 2.35, 0.90, 0.75, 0.65, 0.50, 0.80, 0.52, 0.52, 0.65, 0.83],
-                border: { pt: 0.4, color: '1F2937' },
-                margin: [1.2, 2.5, 1.2, 2.5],
+                x: 0.28, y: 0.72, w: 9.44,
+                colW: [0.27, 0.72, 2.33, 0.90, 0.75, 0.65, 0.50, 0.80, 0.52, 0.52, 0.65, 0.83],
+                rowH: visibleRows.length === 0 ? 0.30 : 0.118,
+                border: { pt: 0.35, color: '1F2937' },
+                margin: [1.0, 2.0, 1.0, 2.0],
+                autoPage: false,
                 fontFace: F_FONT,
             });
 
-            if (rows.length > maxRows) {
-                slide.addText(`* Menampilkan ${maxRows} dari ${rows.length} total jadwal loading (${fmtId(rows.reduce((s, r) => s + numVal(r.Z), 0), 2)} CBM).`, {
-                    x: 0.30, y: 5.20, w: 9.40, h: 0.16,
+            if (meta.totalPages > 1) {
+                const rangeEnd = meta.startNo + visibleRows.length - 1;
+                slide.addText(`* Halaman ${meta.page}/${meta.totalPages} — Menampilkan data ${meta.startNo}–${rangeEnd} dari ${meta.totalCount} total jadwal loading (Total: ${fmtId(meta.totalCbmAll, 2)} CBM).`, {
+                    x: 0.30, y: 5.19, w: 9.40, h: 0.16,
                     fontSize: 6.5, bold: true, fontFace: F_FONT, color: 'FACC15',
+                });
+            }
+        }
+
+        function renderPlanLoadingTableSlides(pptx, bgImg, baseTitle, baseSubTitle, rows) {
+            const ROWS_PER_SLIDE = 35;
+            const allRows = Array.isArray(rows) ? rows : [];
+            const totalCount = allRows.length;
+            const totalPages = Math.max(1, Math.ceil(totalCount / ROWS_PER_SLIDE));
+            const totalCbmAll = allRows.reduce((s, r) => s + numVal(r.Z), 0);
+
+            for (let page = 0; page < totalPages; page++) {
+                const startIdx = page * ROWS_PER_SLIDE;
+                const pageRows = allRows.slice(startIdx, startIdx + ROWS_PER_SLIDE);
+                const slide = pptx.addSlide();
+                const titleTxt = totalPages > 1 ? `${baseTitle} (${page + 1}/${totalPages})` : baseTitle;
+                const subTxt = totalPages > 1
+                    ? `${baseSubTitle} — Halaman ${page + 1} dari ${totalPages} (Data ${startIdx + 1}–${startIdx + pageRows.length} dari ${totalCount} jadwal)`
+                    : baseSubTitle;
+                renderPlanLoadingTableSlide(slide, bgImg, titleTxt, subTxt, pageRows, {
+                    startNo: startIdx + 1,
+                    page: page + 1,
+                    totalPages,
+                    totalCount,
+                    totalCbmAll,
                 });
             }
         }
@@ -22568,31 +24987,47 @@ setInterval(loadKonfirmasiVM, 600000);
 
                 // Bottom Highlights with clean breathing room
                 s2.addText('Highlights:', {
-                    x: 0.32, y: 4.74, w: 4.50, h: 0.20,
+                    x: 0.32, y: 4.70, w: 4.50, h: 0.19,
                     fontSize: 9.5, bold: true, italic: true, fontFace: F_FONT, color: '991B1B',
                 });
                 s2.addText(`Aktual volume outbound ${fmtId(snap.yesterday.cbmShipped, 2)} CBM (Plan: ${fmtId(snap.yesterday.cbmPlan, 2)} CBM, Fulfillment: ${snap.yesterday.cbmFulfillmentPct.toFixed(1)}%)`, {
-                    x: 0.32, y: 4.95, w: 4.55, h: 0.34,
-                    fontSize: 8.2, bold: true, fontFace: F_FONT, color: '0F172A', valign: 'top',
+                    x: 0.32, y: 4.90, w: 4.55, h: 0.50,
+                    fontSize: 8.0, bold: true, fontFace: F_FONT, color: '0F172A', valign: 'top',
                 });
 
+                const b4TodayRel = Math.round(Number((snap.today.caseBatches && snap.today.caseBatches[3]) || 0));
+                const b1TomorrowRel = Math.round(Number((snap.tomorrow.caseBatches && snap.tomorrow.caseBatches[0]) || 0));
+                const estReleaseToday = b4TodayRel + b1TomorrowRel;
+
                 s2.addText('Highlights:', {
-                    x: 5.18, y: 4.74, w: 4.50, h: 0.20,
+                    x: 5.18, y: 4.70, w: 4.50, h: 0.19,
                     fontSize: 9.5, bold: true, italic: true, fontFace: F_FONT, color: '991B1B',
                 });
-                s2.addText(`Plan Outbound ${fmtId(snap.today.cbmPlan, 2)} CBM (${fmtInt(snap.today.rows.length)} Armada / ${fmtInt(snap.today.casePlan)} Case ID)`, {
-                    x: 5.18, y: 4.95, w: 4.55, h: 0.34,
-                    fontSize: 8.2, bold: true, fontFace: F_FONT, color: '0F172A', valign: 'top',
+                s2.addText([
+                    {
+                        text: `Plan Outbound ${fmtId(snap.today.cbmPlan, 2)} CBM (${fmtInt(snap.today.rows.length)} Armada / ${fmtInt(snap.today.casePlan)} Case ID)\n`,
+                        options: { fontSize: 7.8, bold: true, color: '0F172A' },
+                    },
+                    {
+                        text: `Estimasi Release Case ID Hari Ini: ${fmtInt(estReleaseToday)} Case ID `,
+                        options: { fontSize: 7.8, bold: true, color: '0F4C81' },
+                    },
+                    {
+                        text: `(B4 Hari Ini: ${fmtInt(b4TodayRel)} • B1 Besok (${snap.tomorrow.dateIso}): ${fmtInt(b1TomorrowRel)})`,
+                        options: { fontSize: 7.4, bold: true, color: '334155' },
+                    },
+                ], {
+                    x: 5.18, y: 4.90, w: 4.55, h: 0.52,
+                    fontFace: F_FONT, valign: 'top',
                 });
             }
 
             // =========================================================================
-            // SLIDE 3: LIST PLAN LOADING HARI INI
+            // SLIDE 3: LIST PLAN LOADING HARI INI (35/slide + Auto Slide Lanjutan)
             // =========================================================================
             {
-                const s3 = pptx.addSlide();
-                renderPlanLoadingTableSlide(
-                    s3,
+                renderPlanLoadingTableSlides(
+                    pptx,
                     warmBg,
                     'List Plan Loading Hari ini',
                     `Daftar List Loading Outbound (${fmtDateNormal(snap.today.dateIso)})`,
@@ -22648,12 +25083,11 @@ setInterval(loadKonfirmasiVM, 600000);
             }
 
             // =========================================================================
-            // SLIDE 5: LIST PLAN LOADING BESOK
+            // SLIDE 5: LIST PLAN LOADING BESOK (35/slide + Auto Slide Lanjutan)
             // =========================================================================
             {
-                const s5 = pptx.addSlide();
-                renderPlanLoadingTableSlide(
-                    s5,
+                renderPlanLoadingTableSlides(
+                    pptx,
                     warmBg,
                     'List Plan Loading Besok',
                     `Daftar List Loading Outbound (${fmtDateNormal(snap.tomorrow.dateIso)})`,
@@ -22975,9 +25409,124 @@ setInterval(loadKonfirmasiVM, 600000);
                 });
             }
 
+            // =========================================================================
+            // SLIDE 10: REPORT 3 BULAN & TREND HUB GRW VS HUB ASTOR (MISS BULAN INI)
+            // =========================================================================
+            {
+                const sCmp = pptx.addSlide();
+                sCmp.background = { data: rightWedgeBg };
+                sCmp.addImage({ data: logoRed, x: 8.32, y: 0.12, w: 1.44, h: 0.384 });
+
+                sCmp.addText('REPORT 3 BULAN & TREND: HUB GRW VS HUB ASTOR', {
+                    x: 0.24, y: 0.16, w: 7.95, h: 0.36,
+                    fontSize: 17.5, bold: true, fontFace: F_FONT, color: '000000',
+                });
+
+                const comp = snap.hubAstor3Month;
+                const cmpPanelImg = genHubAstor3MonthPanelImage(comp);
+                sCmp.addImage({ data: cmpPanelImg, x: 0.22, y: 0.62, w: 6.92, h: 4.74 });
+
+                // Right Card: Dynamic 3-Month Comparison & Current Month Miss Summary
+                sCmp.addShape('roundRect', {
+                    x: 7.24, y: 0.62, w: 2.38, h: 4.74, rectRadius: 0.08,
+                    fill: { color: 'FFFFFF' }, line: { color: 'CBD5E1', width: 1.0 },
+                });
+                sCmp.addShape('rect', { x: 7.24, y: 0.62, w: 2.38, h: 0.30, fill: { color: '991B1B' } });
+                sCmp.addText('HIGHLIGHT GRW VS ASTOR', {
+                    x: 7.36, y: 0.65, w: 2.14, h: 0.24,
+                    fontSize: 8.8, bold: true, fontFace: F_FONT, color: 'FFFFFF', valign: 'middle',
+                });
+
+                const cCur = comp.current;
+                const cbmTrendLines = comp.months3
+                    .map((m) => `  - ${m.shortLabel}: GRW ${fmtId(m.grw.totalCbm, 1)} CBM (${fmtId(m.grw.avgCbmPerDay, 1)}/hari) | ASTOR ${fmtId(m.astor.totalCbm, 1)} (${fmtId(m.astor.avgCbmPerDay, 1)}/hari)`)
+                    .join('\n');
+                const slaTrendLines = comp.months3
+                    .map((m) => `  - ${m.shortLabel}: GRW ${m.grw.slaPct.toFixed(1)}% vs ASTOR ${m.astor.slaPct.toFixed(1)}%`)
+                    .join('\n');
+
+                const topGrwMiss = (comp.grwMissList || []).slice(0, 2)
+                    .map((r) => `GRW ${r.store} (Aging ${r.aging}, ${fmtId(r.cbm, 1)} CBM)`)
+                    .join('; ');
+                const topAstMiss = (comp.astorMissList || []).slice(0, 2)
+                    .map((r) => `ASTOR ${r.rtod} ${r.kota} (Aging ${r.aging})`)
+                    .join('; ');
+                const missBulanLine = ((comp.grwMissList || []).length + (comp.astorMissList || []).length) === 0
+                    ? `• Zero Miss HUB GRW & HUB ASTOR pada ${comp.currentMonthLabel} (SLA 100%).`
+                    : `• Miss ${cCur.shortLabel}: ${(comp.grwMissList || []).length} GRW (${fmtId(cCur.grw.missCbm, 1)} CBM) & ${(comp.astorMissList || []).length} ASTOR (${fmtId(cCur.astor.missCbm, 1)} CBM).` +
+                      (topGrwMiss || topAstMiss ? ` Detail: ${[topGrwMiss, topAstMiss].filter(Boolean).join(' | ')}.` : '');
+
+                const cmpHigh = [
+                    `• Tren CBM & Avg/Hari (3 Bulan):\n${cbmTrendLines}`,
+                    `• Tren SLA 3 Bulan:\n${slaTrendLines}`,
+                    `• Performa Bulan Ini (${comp.currentMonthLabel}, ${cCur.dayDivisor} hari): GRW Avg ${fmtId(cCur.grw.avgCbmPerDay, 2)} CBM/hari (SLA ${cCur.grw.slaPct.toFixed(1)}%) vs ASTOR Avg ${fmtId(cCur.astor.avgCbmPerDay, 2)} CBM/hari (SLA ${cCur.astor.slaPct.toFixed(1)}%).`,
+                    missBulanLine,
+                ];
+                sCmp.addText(cmpHigh.join('\n\n'), {
+                    x: 7.36, y: 1.00, w: 2.14, h: 4.24,
+                    fontSize: 7.5, fontFace: F_FONT, color: '0F172A', valign: 'top',
+                });
+            }
 
             // =========================================================================
-            // SLIDE 10: UPDATE OS DAN SLA FBI
+            // SLIDE 11: MONITORING VENDOR SUPPORTING & PERFORMANCE (3-MONTH HISTORICAL KPI)
+            // =========================================================================
+            {
+                const sVnd = pptx.addSlide();
+                sVnd.background = { data: rightWedgeBg };
+                sVnd.addImage({ data: logoRed, x: 8.32, y: 0.12, w: 1.44, h: 0.384 });
+
+                sVnd.addText('MONITORING VENDOR SUPPORTING & PERFORMANCE', {
+                    x: 0.24, y: 0.16, w: 7.95, h: 0.36,
+                    fontSize: 18.0, bold: true, fontFace: F_FONT, color: '000000',
+                });
+
+                const vnd = snap.vendor;
+                const vndPanelImg = genVendorDashboardPanelImage(vnd);
+                sVnd.addImage({ data: vndPanelImg, x: 0.22, y: 0.62, w: 6.92, h: 4.74 });
+
+                // Right Card: Dynamic Vendor Highlight & 3-Month Historical KPI Summary
+                sVnd.addShape('roundRect', {
+                    x: 7.24, y: 0.62, w: 2.38, h: 4.74, rectRadius: 0.08,
+                    fill: { color: 'FFFFFF' }, line: { color: 'CBD5E1', width: 1.0 },
+                });
+                sVnd.addShape('rect', { x: 7.24, y: 0.62, w: 2.38, h: 0.30, fill: { color: '991B1B' } });
+                sVnd.addText('HIGHLIGHT VENDOR', {
+                    x: 7.36, y: 0.65, w: 2.14, h: 0.24,
+                    fontSize: 9.0, bold: true, fontFace: F_FONT, color: 'FFFFFF', valign: 'middle',
+                });
+
+                const curM = vnd.current;
+                const prevM = vnd.prev;
+                const diffPct = curM.supportingPct - prevM.supportingPct;
+                const histLines = vnd.months3
+                    .map((m) => `  - ${m.shortLabel}: ${m.supportingPct.toFixed(1)}% (${fmtInt(m.onTime)}/${fmtInt(m.total)} LC | Late: ${fmtInt(m.terlambat)} | Delay Spt: ${fmtInt(m.belumSupport)})`)
+                    .join('\n');
+                const topCarr = vnd.carrierList && vnd.carrierList.length > 0 ? vnd.carrierList[0] : null;
+                const issueCarr = vnd.carrierList && vnd.carrierList.length > 0
+                    ? [...vnd.carrierList].sort((a, b) => (b.terlambat + b.belumSupport) - (a.terlambat + a.belumSupport))[0]
+                    : null;
+                const carrTxt = topCarr
+                    ? `• Carrier Utama: ${topCarr.carrier} (${fmtInt(topCarr.total)} LC, Achv ${topCarr.achievement.toFixed(1)}%)` +
+                      (issueCarr && (issueCarr.terlambat + issueCarr.belumSupport) > 0
+                          ? ` | Follow-up: ${issueCarr.carrier} (${issueCarr.terlambat} Late, ${issueCarr.belumSupport} Delay Spt).`
+                          : '.')
+                    : '• Belum ada aktivitas carrier pada periode bulan ini.';
+
+                const vndHigh = [
+                    `• Vendor Supporting (${vnd.currentMonthLabel} s/d H-1): ${curM.supportingPct.toFixed(1)}% — On-Time ${fmtInt(curM.onTime)} dari ${fmtInt(curM.total)} Completed LC (${diffPct >= 0 ? '+' : ''}${diffPct.toFixed(1)}% vs ${prevM.shortLabel}).`,
+                    `• Historical KPI 3 Bulan Terakhir:\n${histLines}`,
+                    `• Keterlambatan & Support: ${fmtInt(curM.terlambat)} Terlambat LC (Rerata ${vnd.avgDelayText}, Max ${vnd.maxDelayText}) & ${fmtInt(curM.belumSupport)} Delay Support LC.`,
+                    carrTxt,
+                ];
+                sVnd.addText(vndHigh.join('\n\n'), {
+                    x: 7.38, y: 1.02, w: 2.10, h: 4.22,
+                    fontSize: 7.8, fontFace: F_FONT, color: '0F172A', valign: 'top',
+                });
+            }
+
+            // =========================================================================
+            // SLIDE 11: UPDATE OS DAN SLA FBI
             // =========================================================================
             {
                 const s9 = pptx.addSlide();
@@ -23079,7 +25628,61 @@ setInterval(loadKonfirmasiVM, 600000);
             }
 
             // =========================================================================
-            // SLIDE 11: CLOSING — TERIMA KASIH
+            // SLIDE 12: REPORT LOGISALES DELIVERY SYSTEM — PT. KAWAN LAMA SOLUSI
+            // =========================================================================
+            {
+                const sLgs = pptx.addSlide();
+                sLgs.background = { data: rightWedgeBg };
+                sLgs.addImage({ data: logoRed, x: 8.32, y: 0.12, w: 1.44, h: 0.384 });
+
+                sLgs.addText('REPORT LOGISALES (PT. KAWAN LAMA SOLUSI)', {
+                    x: 0.24, y: 0.16, w: 7.95, h: 0.36,
+                    fontSize: 18.0, bold: true, fontFace: F_FONT, color: '000000',
+                });
+
+                const lgs = snap.logisales;
+                const lgsPanelImg = genLogisalesDashboardPanelImage(lgs);
+                sLgs.addImage({ data: lgsPanelImg, x: 0.22, y: 0.62, w: 6.92, h: 4.74 });
+
+                // Right Card: Dynamic Logisales Highlight
+                sLgs.addShape('roundRect', {
+                    x: 7.24, y: 0.62, w: 2.38, h: 4.74, rectRadius: 0.08,
+                    fill: { color: 'FFFFFF' }, line: { color: 'CBD5E1', width: 1.0 },
+                });
+                sLgs.addShape('rect', { x: 7.24, y: 0.62, w: 2.38, h: 0.30, fill: { color: '881337' } });
+                sLgs.addText('HIGHLIGHT LOGISALES', {
+                    x: 7.36, y: 0.65, w: 2.14, h: 0.24,
+                    fontSize: 9.0, bold: true, fontFace: F_FONT, color: 'FFFFFF', valign: 'middle',
+                });
+
+                const lgsSlaStatus = lgs.totalOrder === 0
+                    ? 'Belum ada data pengiriman'
+                    : (lgs.slaRate >= 98 ? 'Lampaui Target (≥98%)' : lgs.slaRate >= 95 ? 'Optimal (≥95%, Target 98%)' : 'Perlu Perhatian (<95%)');
+                const topHubTxt = lgs.hubList && lgs.hubList.length > 0
+                    ? `• Hub Volume Tertinggi: ${lgs.hubList[0].hub} (${fmtInt(lgs.hubList[0].total)} Order, SLA ${lgs.hubList[0].sla.toFixed(1)}%).`
+                    : '• Belum ada aktivitas Regional Hub pada periode ini.';
+                const pendTopTxt = lgs.pendingList && lgs.pendingList.length > 0
+                    ? `• Pending Utama (${fmtInt(lgs.pendingList.length)} Order):\n` +
+                      lgs.pendingList.slice(0, 2).map((p) => `  - ${p.noOrder} (${p.hub}): ${p.alasan.slice(0, 42)}`).join('\n')
+                    : '• Zero Order Pending/Kendala pada periode laporan ini.';
+                const momTxt = lgs.prevTotal > 0
+                    ? ` (${lgs.diffOrderPct >= 0 ? '+' : ''}${lgs.diffOrderPct.toFixed(1)}% vs ${lgs.prevMonthLabel} MTD: ${fmtInt(lgs.prevTotal)} Order)`
+                    : '';
+
+                const lgsHigh = [
+                    `• Periode ${lgs.startIso} s/d ${lgs.endIso}: Total ${fmtInt(lgs.totalOrder)} Order Pengiriman${momTxt}.`,
+                    `• SLA Logisales: ${lgs.slaRate.toFixed(1)}% (${lgsSlaStatus}) — Terkirim ${fmtInt(lgs.terkirim)} Unit, Proses ${fmtInt(lgs.proses)} Unit, Pending ${fmtInt(lgs.pending)} Order.`,
+                    topHubTxt,
+                    pendTopTxt,
+                ];
+                sLgs.addText(lgsHigh.join('\n\n'), {
+                    x: 7.38, y: 1.04, w: 2.10, h: 4.18,
+                    fontSize: 8.1, fontFace: F_FONT, color: '0F172A', valign: 'top',
+                });
+            }
+
+            // =========================================================================
+            // CLOSING — TERIMA KASIH
             // =========================================================================
             {
                 const s10 = pptx.addSlide();
@@ -23100,7 +25703,8 @@ setInterval(loadKonfirmasiVM, 600000);
                     x: 0.62, y: 4.97, w: 2.72, h: 0,
                     line: { color: 'FFFFFF', width: 1.0 },
                 });
-                s10.addText('11', {
+                const totalSlidesCount = (pptx && Array.isArray(pptx.slides) && pptx.slides.length) ? pptx.slides.length : 11;
+                s10.addText(String(totalSlidesCount), {
                     x: 8.90, y: 5.08, w: 0.45, h: 0.25,
                     fontSize: 10, bold: true, fontFace: F_FONT, color: '000000', align: 'right',
                 });
@@ -23175,10 +25779,16 @@ setInterval(loadKonfirmasiVM, 600000);
             }
             try {
                 setActionButtonsDisabled(true);
-                setSlidesStatus('<i class="fas fa-spinner fa-spin"></i> Mengumpulkan data 11 slide &amp; mengunggah ke Google Drive (Google Slides)...', 'info');
-                const [, fbiCache] = await Promise.all([ensurePptxGenJsLoaded(), ensureFbiLiveDataForPpt()]);
-                const snap = collectFullReportSnapshot(fbiCache);
+                setSlidesStatus('<i class="fas fa-spinner fa-spin"></i> Mengumpulkan data &amp; mengunggah slide ke Google Drive (Google Slides)...', 'info');
+                const [, , fbiCache, logisalesCache] = await Promise.all([
+                    ensurePptxGenJsLoaded(),
+                    ensureHubAstorLiveDataForPpt(),
+                    ensureFbiLiveDataForPpt(),
+                    ensureLogisalesLiveDataForPpt(),
+                ]);
+                const snap = collectFullReportSnapshot(fbiCache, logisalesCache);
                 const pptx = buildCombinedPptx(snap);
+                const slideTotal = (pptx && Array.isArray(pptx.slides) && pptx.slides.length) ? pptx.slides.length : 14;
                 const base64 = await pptx.write({ outputType: 'base64' });
 
                 const now = new Date();
@@ -23202,7 +25812,7 @@ setInterval(loadKonfirmasiVM, 600000);
                         outputFormat: 'google_slides_only',
                         convertToSlides: true,
                         keepPptx: false,
-                        slideCount: 11,
+                        slideCount: slideTotal,
                     }),
                 });
                 const rawText = await res.text();
@@ -23225,7 +25835,7 @@ setInterval(loadKonfirmasiVM, 600000);
                 if (badge) badge.textContent = 'SLIDES';
 
                 setSlidesStatus(
-                    `<i class="fas fa-check-circle"></i> Tersimpan sebagai <strong>Google Slides (11 Slide)</strong>: <strong>${escHtml(title)}</strong> (Folder: ${escHtml(folderName)})` +
+                    `<i class="fas fa-check-circle"></i> Tersimpan sebagai <strong>Google Slides (${slideTotal} Slide)</strong>: <strong>${escHtml(title)}</strong> (Folder: ${escHtml(folderName)})` +
                     (viewUrl ? ` — <a href="${escHtml(viewUrl)}" target="_blank" rel="noopener noreferrer" style="color:#ffd700; font-weight:800; text-decoration:underline;">Buka Google Slides di Drive</a>` : ''),
                     'success'
                 );
@@ -23240,15 +25850,21 @@ setInterval(loadKonfirmasiVM, 600000);
         window.downloadAhiPptxLocal = async function () {
             try {
                 setActionButtonsDisabled(true);
-                setSlidesStatus('<i class="fas fa-spinner fa-spin"></i> Mengumpulkan data 11 slide &amp; membuat file PowerPoint (.pptx)...', 'info');
-                const [, fbiCache] = await Promise.all([ensurePptxGenJsLoaded(), ensureFbiLiveDataForPpt()]);
-                const snap = collectFullReportSnapshot(fbiCache);
+                setSlidesStatus('<i class="fas fa-spinner fa-spin"></i> Mengumpulkan data &amp; membuat file PowerPoint (.pptx)...', 'info');
+                const [, , fbiCache, logisalesCache] = await Promise.all([
+                    ensurePptxGenJsLoaded(),
+                    ensureHubAstorLiveDataForPpt(),
+                    ensureFbiLiveDataForPpt(),
+                    ensureLogisalesLiveDataForPpt(),
+                ]);
+                const snap = collectFullReportSnapshot(fbiCache, logisalesCache);
                 const pptx = buildCombinedPptx(snap);
+                const slideTotal = (pptx && Array.isArray(pptx.slides) && pptx.slides.length) ? pptx.slides.length : 14;
                 const now = new Date();
                 const dateIso = snap.reportIso;
                 const stamp = `${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
                 await pptx.writeFile({ fileName: `Daily_Report_DC_AHI_Sidoarjo_${dateIso}_${stamp}.pptx` });
-                setSlidesStatus('<i class="fas fa-check-circle"></i> File PowerPoint 11 Slide (.pptx) berhasil dibuat &amp; diunduh!', 'success');
+                setSlidesStatus(`<i class="fas fa-check-circle"></i> File PowerPoint ${slideTotal} Slide (.pptx) berhasil dibuat &amp; diunduh!`, 'success');
             } catch (err) {
                 setSlidesStatus(`<i class="fas fa-exclamation-triangle"></i> Gagal membuat PPTX: ${escHtml(err && err.message ? err.message : 'Error')}`, 'error');
             } finally {
