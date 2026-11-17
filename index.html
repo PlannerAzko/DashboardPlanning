@@ -9456,6 +9456,7 @@
             AU: 46,       // JENIS ARMADA
             AV: 47,       // KOTA SUMMARY
             AW: 48,       // AGING LC
+            BK: 62,       // CBM HUB GRW
             G: 6,         // TYPE CONTAINER
             LAST_EDIT: 78 // Kolom CA (Waktu Edit Terakhir dari Script)
         };
@@ -15345,6 +15346,7 @@ function renderStoringPivotTable(filteredData) {
                         AU: values[COLUMNS.AU] || '',
                         AV: values[COLUMNS.AV] || '',
                         AW: values[COLUMNS.AW] || '0',
+                        BK: values[COLUMNS.BK] || '0',
                         G: values[COLUMNS.G] || '',
                         LAST_EDIT: values[COLUMNS.LAST_EDIT] || ''
                     });
@@ -20342,6 +20344,8 @@ setInterval(loadKonfirmasiVM, 600000);
                 cde: { plans: 0, cbm: 0 },
             };
 
+            let transitCbm = 0;
+
             rows.forEach((r) => {
                 const cPlan = numVal(r.Z);
                 const cShip = numVal(r.AY);
@@ -20351,6 +20355,7 @@ setInterval(loadKonfirmasiVM, 600000);
                 cbmShipped += cShip;
                 caseShipped += ciShip;
                 casePlan += ciPlan;
+                transitCbm += numVal(r.BK);
 
                 const sCust = numVal(r.BC);
                 const sGrw = numVal(r.BD);
@@ -20384,6 +20389,10 @@ setInterval(loadKonfirmasiVM, 600000);
                 else if (gVal.includes('CDD')) { armada.cdd.plans++; armada.cdd.cbm += cPlan; }
                 else if (gVal.includes('CDE')) { armada.cde.plans++; armada.cde.cbm += cPlan; }
             });
+
+            // CBM Transit diambil langsung dari sheet TARIKAN DATA WMS kolom BK (CBM HUB TRANSIT)
+            const bookingDcCbm = Math.max(0, cbmPlan - transitCbm);
+            const bookingDcActualCbm = Math.max(0, cbmShipped - transitCbm);
 
             const cityList = Object.entries(cityMap)
                 .map(([city, cbm]) => ({ city, cbm }))
@@ -20421,6 +20430,9 @@ setInterval(loadKonfirmasiVM, 600000);
                 cbmShipped,
                 cbmFulfillmentPct: cbmPlan > 0 ? (cbmShipped / cbmPlan) * 100 : 0,
                 cbmPlan,
+                transitCbm,
+                bookingDcCbm,
+                bookingDcActualCbm,
                 shift1,
                 shift2,
                 slaCust,
@@ -20937,7 +20949,8 @@ setInterval(loadKonfirmasiVM, 600000);
             const cbmCol = cbmIdx !== -1 ? cbmIdx : 8;
             let agingIdx = headers.findIndex((h) => h.toUpperCase() === 'AGING');
             if (agingIdx === -1) agingIdx = 9;
-            const noLcIdx = headers.findIndex((h) => h.toUpperCase().includes('NO LC'));
+            let noLcIdx = headers.findIndex((h) => h.toUpperCase().includes('NO LC'));
+            if (noLcIdx === -1) noLcIdx = 10;
 
             const grwDaySets = {};
             const astorDaySets = {};
@@ -23620,7 +23633,7 @@ setInterval(loadKonfirmasiVM, 600000);
                 { h: '#', w: 36, al: 'center' },
                 { h: 'TGL', w: 94, al: 'left' },
                 { h: 'STORE', w: 295, al: 'left' },
-                { h: 'LC PEMBAWA', w: 140, al: 'left' },
+                { h: 'NO. LC', w: 140, al: 'left' },
                 { h: 'AREA', w: 62, al: 'center' },
                 { h: 'CBM', w: 82, al: 'right' },
                 { h: 'AGING', w: 140, al: 'center' },
@@ -23634,7 +23647,7 @@ setInterval(loadKonfirmasiVM, 600000);
                     { v: String(idx + 1), col: '#94A3B8' },
                     { v: r.tgl, col: '#E2E8F0' },
                     { v: `${r.kode && r.kode !== '-' ? r.kode + ' ' : ''}${r.store}`, col: '#F8FAFC', bold: true },
-                    { v: r.lcPembawa, col: '#38BDF8' },
+                    { v: r.noLc || '-', col: '#38BDF8' },
                     { v: r.area, col: r.area === 'DK' ? '#38BDF8' : '#FBBF24', bold: true },
                     { v: fmtId(r.cbm, 2), col: '#FACC15', bold: true },
                     { v: String(r.aging), col: '#F87171', bold: true },
@@ -24986,39 +24999,61 @@ setInterval(loadKonfirmasiVM, 600000);
                 renderMainDashboardPanel(s2, snap.today, 5.10, 0.98, 4.64, 3.66, false);
 
                 // Bottom Highlights with clean breathing room
+                const yTransit = Number(snap.yesterday.transitCbm || 0);
+                const yBookingDc = snap.yesterday.bookingDcActualCbm != null
+                    ? snap.yesterday.bookingDcActualCbm
+                    : Math.max(0, Number(snap.yesterday.cbmShipped || 0) - yTransit);
+
                 s2.addText('Highlights:', {
-                    x: 0.32, y: 4.70, w: 4.50, h: 0.19,
-                    fontSize: 9.5, bold: true, italic: true, fontFace: F_FONT, color: '991B1B',
+                    x: 0.32, y: 4.68, w: 4.50, h: 0.18,
+                    fontSize: 9.2, bold: true, italic: true, fontFace: F_FONT, color: '991B1B', margin: 0,
                 });
-                s2.addText(`Aktual volume outbound ${fmtId(snap.yesterday.cbmShipped, 2)} CBM (Plan: ${fmtId(snap.yesterday.cbmPlan, 2)} CBM, Fulfillment: ${snap.yesterday.cbmFulfillmentPct.toFixed(1)}%)`, {
-                    x: 0.32, y: 4.90, w: 4.55, h: 0.50,
-                    fontSize: 8.0, bold: true, fontFace: F_FONT, color: '0F172A', valign: 'top',
+                s2.addText([
+                    {
+                        text: `Aktual volume outbound ${fmtId(snap.yesterday.cbmShipped, 2)} CBM (Plan: ${fmtId(snap.yesterday.cbmPlan, 2)} CBM, Fulfillment: ${snap.yesterday.cbmFulfillmentPct.toFixed(1)}%)\n`,
+                        options: { fontSize: 7.7, bold: true, color: '0F172A' },
+                    },
+                    {
+                        text: `Booking DC : ${fmtId(yBookingDc, 2)} CBM , Transit : ${fmtId(yTransit, 2)} CBM`,
+                        options: { fontSize: 7.7, bold: true, color: '0F172A' },
+                    },
+                ], {
+                    x: 0.32, y: 4.87, w: 4.58, h: 0.54,
+                    fontFace: F_FONT, valign: 'top', margin: 0, lineSpacingMultiple: 1.15,
                 });
 
+                const tTransit = Number(snap.today.transitCbm || 0);
+                const tBookingDc = snap.today.bookingDcCbm != null
+                    ? snap.today.bookingDcCbm
+                    : Math.max(0, Number(snap.today.cbmPlan || 0) - tTransit);
                 const b4TodayRel = Math.round(Number((snap.today.caseBatches && snap.today.caseBatches[3]) || 0));
                 const b1TomorrowRel = Math.round(Number((snap.tomorrow.caseBatches && snap.tomorrow.caseBatches[0]) || 0));
                 const estReleaseToday = b4TodayRel + b1TomorrowRel;
 
                 s2.addText('Highlights:', {
-                    x: 5.18, y: 4.70, w: 4.50, h: 0.19,
-                    fontSize: 9.5, bold: true, italic: true, fontFace: F_FONT, color: '991B1B',
+                    x: 5.18, y: 4.68, w: 4.50, h: 0.18,
+                    fontSize: 9.2, bold: true, italic: true, fontFace: F_FONT, color: '991B1B', margin: 0,
                 });
                 s2.addText([
                     {
                         text: `Plan Outbound ${fmtId(snap.today.cbmPlan, 2)} CBM (${fmtInt(snap.today.rows.length)} Armada / ${fmtInt(snap.today.casePlan)} Case ID)\n`,
-                        options: { fontSize: 7.8, bold: true, color: '0F172A' },
+                        options: { fontSize: 7.5, bold: true, color: '0F172A' },
+                    },
+                    {
+                        text: `Booking DC : ${fmtId(tBookingDc, 2)} CBM , Transit : ${fmtId(tTransit, 2)} CBM\n`,
+                        options: { fontSize: 7.5, bold: true, color: '0F172A' },
                     },
                     {
                         text: `Estimasi Release Case ID Hari Ini: ${fmtInt(estReleaseToday)} Case ID `,
-                        options: { fontSize: 7.8, bold: true, color: '0F4C81' },
+                        options: { fontSize: 7.5, bold: true, color: '0F4C81' },
                     },
                     {
                         text: `(B4 Hari Ini: ${fmtInt(b4TodayRel)} • B1 Besok (${snap.tomorrow.dateIso}): ${fmtInt(b1TomorrowRel)})`,
-                        options: { fontSize: 7.4, bold: true, color: '334155' },
+                        options: { fontSize: 7.2, bold: true, color: '334155' },
                     },
                 ], {
-                    x: 5.18, y: 4.90, w: 4.55, h: 0.52,
-                    fontFace: F_FONT, valign: 'top',
+                    x: 5.18, y: 4.87, w: 4.58, h: 0.55,
+                    fontFace: F_FONT, valign: 'top', margin: 0, lineSpacingMultiple: 1.12,
                 });
             }
 
