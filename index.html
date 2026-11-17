@@ -1690,10 +1690,31 @@
             box-shadow: 0 8px 22px rgba(0,0,0,0.42);
             contain: layout style;
         }
+        #fbi-dashboard-section,
+        .fbi-dashboard-header,
+        .fbi-kpi-row,
+        .fbi-header-row,
+        .fbi-logo-container,
+        .fbi-filter-card,
+        .fbi-charts-row,
+        .fbi-sla-row,
         .fbi-chatime-kpis,
         .fbi-chart-card,
         .fbi-sla-card {
             contain: layout style;
+        }
+        .fbi-filter-card select {
+            touch-action: manipulation;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease;
+        }
+        .fbi-filter-card select:focus {
+            border-color: #6a1b9a !important;
+            box-shadow: 0 0 0 3px rgba(106, 27, 154, 0.12);
+        }
+        .fbi-chart-canvas-wrap {
+            width: 100%;
+            flex-grow: 1;
+            position: relative;
         }
         .fbi-item-header {
             background: #2e2e5c;
@@ -3523,6 +3544,26 @@
         min-height: 280px !important;
     }
 
+    .fbi-kpi-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+        margin-bottom: 18px !important;
+    }
+
+    .fbi-header-row {
+        flex-direction: column !important;
+        gap: 14px !important;
+    }
+
+    .fbi-chatime-kpis,
+    .fbi-logo-container,
+    .fbi-filter-card {
+        width: 100% !important;
+        min-width: 0 !important;
+        flex: none !important;
+        box-sizing: border-box !important;
+    }
+
     .fbi-charts-row {
         flex-direction: column !important;
         gap: 16px !important;
@@ -3531,6 +3572,15 @@
     .fbi-chart-card {
         width: 100% !important;
         min-height: 340px !important;
+    }
+
+    .fbi-chart-canvas-wrap {
+        min-height: 270px !important;
+        height: 270px !important;
+    }
+
+    .fbi-sla-row {
+        gap: 14px !important;
     }
 
     #chatime-date-filter {
@@ -3677,9 +3727,14 @@
 
     .fbi-chart-card {
         width: 100% !important;
-        min-height: 320px !important;
+        min-height: 300px !important;
         padding: 14px 10px !important;
         box-sizing: border-box !important;
+    }
+
+    .fbi-chart-canvas-wrap {
+        min-height: 230px !important;
+        height: 230px !important;
     }
 
     .fbi-chart-card h4 {
@@ -4335,6 +4390,22 @@
     .kpi-label {
         font-size: 0.68rem !important;
         letter-spacing: 0.2px !important;
+    }
+
+    .fbi-chatime-kpis > div {
+        padding: 8px 6px !important;
+    }
+
+    .fbi-chatime-kpis > div > div:first-child {
+        font-size: 0.58rem !important;
+    }
+
+    .fbi-chatime-kpis > div > div:last-child {
+        font-size: 1.15rem !important;
+    }
+
+    .fbi-sla-value {
+        font-size: 1.85rem !important;
     }
 
     .table-section,
@@ -6350,7 +6421,7 @@
                             </div>
                             <div style="flex: 1; min-width: 120px; position: relative;">
                                 <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">TANGGAL STUFFING</label>
-                                <select id="chatime-date-filter" onchange="this.size=1; this.blur(); renderChatimeDashboard();" onfocus="if (!window.matchMedia('(pointer: coarse)').matches && window.innerWidth > 1024) this.size=6;" onblur="this.size=1;" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; color: #1e293b; position: absolute; z-index: 10;">
+                                <select id="chatime-date-filter" onchange="this.size=1; this.blur(); renderChatimeDashboard();" onfocus="if (!window.matchMedia('(pointer: coarse)').matches && window.innerWidth > 1024) this.size=6;" onblur="this.size=1;" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; color: #1e293b; position: absolute; z-index: 30;">
                                     <option value="ALL">All Dates</option>
                                 </select>
                                 <div class="chatime-select-spacer" style="height: 40px;"></div> <!-- Spacer to maintain layout when select expands -->
@@ -6368,8 +6439,8 @@
                                 <span>Real-time Order Tracking</span>
                             </div>
                             <div style="display: flex; gap: 12px;">
-                                <i class="fas fa-download" title="Export" style="cursor: pointer; color: #64748b;"></i>
-                                <i class="fas fa-expand-alt" title="Fullscreen" style="cursor: pointer; color: #64748b;"></i>
+                                <i class="fas fa-download" title="Export Ringkasan CSV" onclick="exportChatimeSummaryCSV()" style="cursor: pointer; color: #64748b; padding: 4px; transition: color 0.15s ease;" onmouseover="this.style.color='#6a1b9a'" onmouseout="this.style.color='#64748b'"></i>
+                                <i class="fas fa-expand-alt" title="Layar Penuh" onclick="toggleFullScreen()" style="cursor: pointer; color: #64748b; padding: 4px; transition: color 0.15s ease;" onmouseover="this.style.color='#6a1b9a'" onmouseout="this.style.color='#64748b'"></i>
                             </div>
                         </div>
                     </div>
@@ -6383,7 +6454,7 @@
                             <span style="width: 4px; height: 18px; background: #6a1b9a; border-radius: 2px;"></span>
                             Order Distribution By Region
                         </h4>
-                        <div style="width: 100%; flex-grow: 1; min-height: 300px; position: relative;">
+                        <div class="fbi-chart-canvas-wrap" style="width: 100%; flex-grow: 1; min-height: 300px; position: relative;">
                             <canvas id="chatimeDonutChart"></canvas>
                         </div>
                         <div id="donut-stats-legend" style="width: 100%; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f1f5f9; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
@@ -6397,7 +6468,7 @@
                             <span style="width: 4px; height: 18px; background: #4caf50; border-radius: 2px;"></span>
                             Case ID Status Breakdown
                         </h4>
-                        <div style="width: 100%; flex-grow: 1; min-height: 350px; position: relative;">
+                        <div class="fbi-chart-canvas-wrap" style="width: 100%; flex-grow: 1; min-height: 350px; position: relative;">
                             <canvas id="chatimeBarChart"></canvas>
                         </div>
                     </div>
@@ -9547,6 +9618,7 @@
         let PIVOT_CSV_URL = `https://docs.google.com/spreadsheets/d/${PIVOT_SHEET_ID}/export?format=csv&gid=${PIVOT_SHEET_GID}`;
         const PLANNER_CSV_URL = 'https://docs.google.com/spreadsheets/d/117EFwQPnkWdcEEsdG0mVC2stt68OjlCuEv4PmHZyNMY/export?format=csv&gid=2036643748';
         const ORDER_DIST_CSV_URL = 'https://docs.google.com/spreadsheets/d/1lRl-Noq63iovsyzOTEM_Dxw4rPOKDF6dsO9o387iHwk/export?format=csv&gid=1075426956';
+        const ORDER_DIST_GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_FBI}/gviz/tq?tqx=out:csv&gid=${SHEET_GID_FBI}&tq=${encodeURIComponent('select E,BA where BA is not null')}`;
         let HUB_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=199482130`;
         const USER_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_AHI}/export?format=csv&gid=1368870427`;
         
@@ -9826,6 +9898,9 @@
                     const nikEl = document.getElementById('login-nik');
                     if (nikEl) nikEl.focus();
                 }, 60);
+                setTimeout(() => {
+                    if (typeof prefetchFbiCoreData === 'function') prefetchFbiCoreData();
+                }, 400);
             } else {
                 // Langsung ke step 2 jika pilih Store
                 document.body.className = 'view-store';
@@ -9892,6 +9967,7 @@
                     // Show branch selection step (Step DC Branch)
                     document.getElementById('welcome-step-login').classList.add('hidden');
                     document.getElementById('welcome-step-dc-branch').classList.remove('hidden');
+                    if (typeof prefetchFbiCoreData === 'function') prefetchFbiCoreData();
                     
                     // Update welcome message in step 2
                     const step2Question = document.querySelector('#welcome-step-2 .welcome-question');
@@ -10025,6 +10101,10 @@
             rawFixKllData = [];
             rawSlaFbiData = [];
             window.__slaFbiParsedRows = [];
+            window.__slaFbiIndex = null;
+            window.__fbiDonutStatsCache = null;
+            window.__lastChatimeDomSig = '';
+            window.__lastChatimeChartSig = '';
             window.__csvTextCache = {};
             markAllDashSectionsDirty();
             window.__pivotDirty = true;
@@ -10067,9 +10147,10 @@
                 // Initial show FBI dashboard
                 showDashboardSection(selectedInitialSection || 'fbi-dashboard-section');
 
-                // Fetch FBI Schedule
+                // Fetch FBI Schedule, SLA & Order Distribution immediately
                 fetchFBIScheduleData();
                 fetchSlaFbiData();
+                fetchOrderDistData();
 
                 const step2Question = document.querySelector('#welcome-step-2 .welcome-question');
                 if (step2Question) {
@@ -10155,18 +10236,19 @@
             document.getElementById('welcome-step-dc-branch').classList.add('hidden');
             document.getElementById('welcome-step-2').classList.remove('hidden');
             
-            // Add a small delay to ensure URLs are set and UI is updated
+            // Launch data fetches immediately after state & DOM are updated
             setTimeout(() => {
                 fetchPivotData();
-                fetchHubData();
-                fetchAstorData();
                 if (branch === 'FBI') {
                     fetchPlannerData();
-                    fetchOrderDistData();
                     fetchFixKllData();
+                    setTimeout(() => { if (currentBranch === 'FBI') fetchData(); }, 250);
+                } else {
+                    fetchHubData();
+                    fetchAstorData();
+                    fetchData();
                 }
-                fetchData(); // Trigger main data fetch with new URL
-            }, 500);
+            }, 20);
         }
 
         function toggleFullScreen() {
@@ -10762,6 +10844,7 @@
             if (welcomeOverlay && branchStep) {
                 welcomeOverlay.classList.remove('hidden');
                 branchStep.classList.remove('hidden');
+                if (typeof prefetchFbiCoreData === 'function') prefetchFbiCoreData();
                 
                 // Hide other steps
                 ['welcome-step-1', 'welcome-step-login', 'welcome-step-2'].forEach(id => {
@@ -11318,193 +11401,268 @@
         }
 
         function renderChatimeCharts(donorStats, barStats) {
-            // Update Mini Stats Legend below Donut
+            const colorPalette = ['#007bff', '#00bcd4', '#e91e63', '#4caf50', '#ff9800', '#9c27b0', '#795548', '#607d8b'];
+            const labels = Object.keys(donorStats || {});
+            const donutData = labels.map(l => donorStats[l]);
+            const sortedLabels = ['Luar Pulau', 'Store DK', 'Luar Kota'];
+            const caseIdData = sortedLabels.map(l => barStats[l] ? barStats[l].total : 0);
+            const odData = sortedLabels.map(l => barStats[l] ? barStats[l].od : 0);
+
+            const chartSig = JSON.stringify({ labels, donutData, caseIdData, odData });
+            if (window.__lastChatimeChartSig === chartSig && chatimeDonutChart && chatimeBarChart) {
+                return;
+            }
+            window.__lastChatimeChartSig = chartSig;
+
+            // Update Mini Stats Legend below Donut (only rewrite DOM if changed)
             const legendEl = document.getElementById('donut-stats-legend');
             if (legendEl) {
-                // Determine colors for dynamic labels
-                const colorPalette = ['#007bff', '#00bcd4', '#e91e63', '#4caf50', '#ff9800', '#9c27b0', '#795548', '#607d8b'];
-                const labels = Object.keys(donorStats);
-                
-                legendEl.style.gridTemplateColumns = `repeat(${Math.min(labels.length, 4)}, 1fr)`;
-                
-                legendEl.innerHTML = labels.map((l, i) => `
-                    <div>
-                        <div style="color: ${colorPalette[i % colorPalette.length]}; font-size: 1.1rem; font-weight: 800;">${donorStats[l]}</div>
-                        <div style="color: #64748b; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">${l}</div>
-                    </div>
-                `).join('');
+                const legendSig = labels.map((l, i) => l + ':' + donutData[i]).join('|');
+                if (legendEl.dataset.sig !== legendSig) {
+                    legendEl.dataset.sig = legendSig;
+                    legendEl.style.gridTemplateColumns = `repeat(${Math.max(1, Math.min(labels.length, 4))}, 1fr)`;
+                    legendEl.innerHTML = labels.map((l, i) => `
+                        <div>
+                            <div style="color: ${colorPalette[i % colorPalette.length]}; font-size: 1.1rem; font-weight: 800;">${formatIndo(donorStats[l])}</div>
+                            <div style="color: #64748b; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">${l}</div>
+                        </div>
+                    `).join('');
+                }
             }
 
-            // 1. Donut Chart (Order Distribution By Region)
+            // 1. Donut Chart (Order Distribution By Region) - Instant in-place update without animation delay
             const donutCtx = document.getElementById('chatimeDonutChart');
             if (donutCtx) {
-                if (chatimeDonutChart) chatimeDonutChart.destroy();
-                
-                const labels = Object.keys(donorStats);
-                const data = labels.map(l => donorStats[l]);
-                const totalTotal = data.reduce((a, b) => a + b, 0);
-                const colorPalette = ['#007bff', '#00bcd4', '#e91e63', '#4caf50', '#ff9800', '#9c27b0', '#795548', '#607d8b'];
-                
-                chatimeDonutChart = new Chart(donutCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: labels.map((_, i) => colorPalette[i % colorPalette.length]),
-                            borderWidth: 4,
-                            borderColor: '#ffffff',
-                            hoverOffset: 15
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 150 },
-                        layout: { padding: 5 },
-                        cutout: '65%',
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            datalabels: {
-                                color: '#fff',
-                                font: { weight: '800', size: 12, family: "'Inter', sans-serif" },
-                                formatter: (value, ctx) => {
-                                    if (value === 0) return '';
-                                    let sum = 0;
-                                    ctx.dataset.data.forEach(v => sum += v);
-                                    const pct = (value * 100 / sum);
-                                    return pct < 5 ? '' : pct.toFixed(0) + "%";
+                const donutSig = labels.join('|') + '::' + donutData.join('|');
+                if (chatimeDonutChart && chatimeDonutChart.canvas === donutCtx) {
+                    if (chatimeDonutChart.__donutSig !== donutSig) {
+                        chatimeDonutChart.__donutSig = donutSig;
+                        chatimeDonutChart.data.labels = labels;
+                        chatimeDonutChart.data.datasets[0].data = donutData;
+                        chatimeDonutChart.data.datasets[0].backgroundColor = labels.map((_, i) => colorPalette[i % colorPalette.length]);
+                        chatimeDonutChart.update('none');
+                    }
+                } else {
+                    if (chatimeDonutChart) chatimeDonutChart.destroy();
+                    chatimeDonutChart = new Chart(donutCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: donutData,
+                                backgroundColor: labels.map((_, i) => colorPalette[i % colorPalette.length]),
+                                borderWidth: 4,
+                                borderColor: '#ffffff',
+                                hoverOffset: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: { duration: 0 },
+                            layout: { padding: 5 },
+                            cutout: '65%',
+                            plugins: {
+                                legend: { display: false },
+                                datalabels: {
+                                    color: '#fff',
+                                    font: { weight: '800', size: 12, family: "'Inter', sans-serif" },
+                                    formatter: (value, ctx) => {
+                                        if (value === 0) return '';
+                                        let sum = 0;
+                                        ctx.dataset.data.forEach(v => sum += v);
+                                        const pct = sum > 0 ? (value * 100 / sum) : 0;
+                                        return pct < 5 ? '' : pct.toFixed(0) + "%";
+                                    },
+                                    display: 'auto'
                                 },
-                                display: 'auto'
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                                titleFont: { size: 14, weight: 'bold' },
-                                bodyFont: { size: 13 },
-                                padding: 12,
-                                cornerRadius: 8,
-                                callbacks: {
-                                    label: function(context) {
-                                        const val = context.raw;
-                                        const pct = totalTotal > 0 ? ((val / totalTotal) * 100).toFixed(1) + '%' : '0%';
-                                        return ` ${context.label}: ${val} (${pct})`;
+                                tooltip: {
+                                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                    titleFont: { size: 14, weight: 'bold' },
+                                    bodyFont: { size: 13 },
+                                    padding: 12,
+                                    cornerRadius: 8,
+                                    callbacks: {
+                                        label: function(context) {
+                                            const val = context.raw;
+                                            const dsTotal = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const pct = dsTotal > 0 ? ((val / dsTotal) * 100).toFixed(1) + '%' : '0%';
+                                            return ` ${context.label}: ${formatIndo(val)} (${pct})`;
+                                        }
                                     }
                                 }
                             }
-                        }
-                    },
-                    plugins: [ChartDataLabels, {
-                        id: 'centerText',
-                        beforeDraw: function(chart) {
-                            const width = chart.width, height = chart.height, ctx = chart.ctx;
-                            ctx.restore();
-                            const fontSize = (height / 220).toFixed(2);
-                            ctx.font = `800 ${fontSize}em Inter`;
-                            ctx.textBaseline = "middle";
-                            ctx.fillStyle = "#64748b";
-                            const text = "TOTAL", textX = Math.round((width - ctx.measureText(text).width) / 2), textY = height / 2 - 10;
-                            ctx.fillText(text, textX, textY);
-                            ctx.font = `800 ${(fontSize * 2.2).toFixed(2)}em Inter`;
-                            ctx.fillStyle = "#1e293b";
-                            const val = totalTotal.toString(), valX = Math.round((width - ctx.measureText(val).width) / 2), valY = height / 2 + 20;
-                            ctx.fillText(val, valX, valY);
-                            ctx.save();
-                        }
-                    }]
+                        },
+                        plugins: [ChartDataLabels, {
+                            id: 'centerText',
+                            beforeDraw: function(chart) {
+                                const ctx = chart.ctx;
+                                const ca = chart.chartArea;
+                                const centerX = ca ? (ca.left + ca.right) / 2 : chart.width / 2;
+                                const centerY = ca ? (ca.top + ca.bottom) / 2 : chart.height / 2;
+                                const refHeight = ca ? (ca.bottom - ca.top) : chart.height;
+                                const dataArr = (chart.data && chart.data.datasets && chart.data.datasets[0] && chart.data.datasets[0].data) || [];
+                                const totalSum = dataArr.reduce((a, b) => a + (Number(b) || 0), 0);
+                                ctx.save();
+                                const fontSize = Math.max(0.65, refHeight / 220).toFixed(2);
+                                ctx.textBaseline = "middle";
+                                ctx.textAlign = "center";
+                                ctx.font = `800 ${(fontSize * 2.1).toFixed(2)}em Inter`;
+                                ctx.fillStyle = "#1e293b";
+                                const val = formatIndo(totalSum);
+                                ctx.fillText(val, Math.round(centerX), Math.round(centerY));
+                                ctx.restore();
+                            }
+                        }]
+                    });
+                    chatimeDonutChart.__donutSig = donutSig;
+                }
+            }
+
+            // 2. Bar Chart (Case ID Status Breakdown) - Update in-place to avoid destroy/recreate flicker
+            const barCtx = document.getElementById('chatimeBarChart');
+            if (barCtx) {
+                const barSig = caseIdData.join(',') + '|' + odData.join(',');
+                if (chatimeBarChart && chatimeBarChart.canvas === barCtx) {
+                    if (chatimeBarChart.__barSig !== barSig) {
+                        chatimeBarChart.__barSig = barSig;
+                        chatimeBarChart.data.labels = sortedLabels;
+                        chatimeBarChart.data.datasets[0].data = caseIdData;
+                        chatimeBarChart.data.datasets[1].data = odData;
+                        chatimeBarChart.update();
+                    }
+                } else {
+                    if (chatimeBarChart) chatimeBarChart.destroy();
+                    chatimeBarChart = new Chart(barCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: sortedLabels,
+                            datasets: [
+                                {
+                                    label: 'Total Case ID',
+                                    data: caseIdData,
+                                    backgroundColor: '#9c27b0',
+                                    borderRadius: 4,
+                                    barThickness: 24,
+                                    categoryPercentage: 0.8,
+                                    barPercentage: 0.9
+                                },
+                                {
+                                    label: 'Total Order',
+                                    data: odData,
+                                    backgroundColor: '#4caf50',
+                                    borderRadius: 4,
+                                    barThickness: 24,
+                                    categoryPercentage: 0.8,
+                                    barPercentage: 0.9
+                                }
+                            ]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: { duration: 150 },
+                            layout: { padding: { right: 50, top: 10 } },
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    align: 'end',
+                                    labels: {
+                                        boxWidth: 12,
+                                        usePointStyle: true,
+                                        pointStyle: 'rect',
+                                        color: '#475569',
+                                        padding: 20,
+                                        font: { weight: '700', size: 12, family: "'Inter', sans-serif" }
+                                    }
+                                },
+                                datalabels: {
+                                    anchor: 'end',
+                                    align: 'right',
+                                    color: (ctx) => ctx.dataset.backgroundColor,
+                                    font: { weight: '800', size: 12, family: "'Inter', sans-serif" },
+                                    formatter: (val) => val > 0 ? formatIndo(val) : '0',
+                                    display: true,
+                                    offset: 8
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    grid: { color: '#f1f5f9' },
+                                    border: { display: false },
+                                    ticks: { color: '#94a3b8', font: { size: 11, weight: '600' } }
+                                },
+                                y: {
+                                    grid: { display: false },
+                                    border: { display: false },
+                                    ticks: { color: '#334155', font: { weight: '700', size: 13, family: "'Inter', sans-serif" } }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                    chatimeBarChart.__barSig = barSig;
+                }
+            }
+        }
+
+        function exportChatimeSummaryCSV() {
+            const bulan = document.getElementById('chatime-bulan-filter')?.value || 'ALL';
+            const tanggal = document.getElementById('chatime-date-filter')?.value || 'ALL';
+            const area = document.getElementById('chatime-area-filter')?.value || 'ALL';
+            const getTxt = (id) => (document.getElementById(id)?.innerText || '0').replace(/\s+/g, ' ').trim();
+
+            const lines = [
+                ['LAPORAN RINGKASAN DC FBI SIDOARJO - MENU MAIN'],
+                ['Filter Bulan', bulan, 'Filter Tanggal', tanggal, 'Filter Area', area],
+                [],
+                ['METRIK KPI UTAMA', 'NILAI'],
+                ['Total Stores', getTxt('fbi-kpi-total-stores')],
+                ['Sudah Plan (Order)', getTxt('fbi-kpi-sudah-plan')],
+                ['Outstanding Order', getTxt('fbi-kpi-outstanding-aging')],
+                ['Belum Plan (Order)', getTxt('fbi-kpi-belum-plan')],
+                ['Total Order Release', getTxt('chatime-total-od')],
+                ['Total Case ID Released', getTxt('chatime-total-case-id')],
+                ['Total Case ID Shipped', getTxt('chatime-case-id-shipped')],
+                ['SLA GRW DK (H-1)', getTxt('fbi-main-sla-dk')],
+                ['SLA GRW LK (H-1)', getTxt('fbi-main-sla-lk')],
+                ['SLA Bulan Ini', getTxt('fbi-main-sla-current-month')],
+                []
+            ];
+
+            if (chatimeBarChart && chatimeBarChart.data && chatimeBarChart.data.labels) {
+                lines.push(['AREA', 'TOTAL CASE ID', 'TOTAL ORDER']);
+                chatimeBarChart.data.labels.forEach((lbl, idx) => {
+                    lines.push([lbl, chatimeBarChart.data.datasets[0].data[idx] || 0, chatimeBarChart.data.datasets[1].data[idx] || 0]);
+                });
+                lines.push([]);
+            }
+
+            if (window.__fbiDonutStatsCache) {
+                lines.push(['REGION', 'TOTAL ORDER']);
+                Object.keys(window.__fbiDonutStatsCache).forEach(reg => {
+                    lines.push([reg, window.__fbiDonutStatsCache[reg]]);
                 });
             }
 
-            // 2. Bar Chart (Case ID Status Breakdown)
-            const barCtx = document.getElementById('chatimeBarChart');
-            if (barCtx) {
-                if (chatimeBarChart) chatimeBarChart.destroy();
-                
-                const sortedLabels = ['Luar Pulau', 'Store DK', 'Luar Kota'];
-                const caseIdData = sortedLabels.map(l => barStats[l] ? barStats[l].total : 0);
-                const odData = sortedLabels.map(l => barStats[l] ? barStats[l].od : 0);
-                
-                chatimeBarChart = new Chart(barCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: sortedLabels,
-                        datasets: [
-                            {
-                                label: 'Total Case ID',
-                                data: caseIdData,
-                                backgroundColor: '#9c27b0',
-                                borderRadius: 4,
-                                barThickness: 24,
-                                categoryPercentage: 0.8,
-                                barPercentage: 0.9
-                            },
-                            {
-                                label: 'Total Order',
-                                data: odData,
-                                backgroundColor: '#4caf50',
-                                borderRadius: 4,
-                                barThickness: 24,
-                                categoryPercentage: 0.8,
-                                barPercentage: 0.9
-                            }
-                        ]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 150 },
-                        layout: { padding: { right: 50, top: 10 } },
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                                align: 'end',
-                                labels: {
-                                    boxWidth: 12,
-                                    usePointStyle: true,
-                                    pointStyle: 'rect',
-                                    color: '#475569',
-                                    padding: 20,
-                                    font: { weight: '700', size: 12, family: "'Inter', sans-serif" }
-                                }
-                            },
-                            datalabels: {
-                                anchor: 'end',
-                                align: 'right',
-                                color: (ctx) => ctx.dataset.backgroundColor,
-                                font: { weight: '800', size: 12, family: "'Inter', sans-serif" },
-                                formatter: (val) => val > 0 ? formatIndo(val) : '0',
-                                display: true,
-                                offset: 8
-                            }
-                        },
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                grid: { color: '#f1f5f9' },
-                                border: { display: false },
-                                ticks: { color: '#94a3b8', font: { size: 11, weight: '600' } }
-                            },
-                            y: {
-                                grid: { display: false },
-                                border: { display: false },
-                                ticks: { color: '#334155', font: { weight: '700', size: 13, family: "'Inter', sans-serif" } }
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
-            }
+            const csvContent = '\uFEFF' + lines.map(r => r.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(',')).join('\r\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `FBI_MAIN_${bulan}_${tanggal}_${area}.csv`.replace(/[^a-zA-Z0-9._-]+/g, '_');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
         async function fetchPlannerData(retries = 2) {
             if (!document.body.classList.contains('theme-purple')) return;
             try {
-                const response = await fetch(PLANNER_CSV_URL);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const csv = await response.text();
-                if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML (Google Login required or link not shared)');
+                const { text: csv } = await fetchSharedCSV(PLANNER_CSV_URL);
                 window.__csvTextCache = window.__csvTextCache || {};
                 const cacheKey = 'planner:' + PLANNER_CSV_URL;
                 if (window.__csvTextCache[cacheKey] === csv && rawPlannerData.length > 0) return;
@@ -11536,7 +11694,16 @@
 
         function buildSlaFbiParsedRows(rows) {
             const out = [];
-            if (!rows || rows.length <= 2) return out;
+            const byIso = {};
+            const byMonth = {};
+            const latestByBulanKey = {};
+            let maxYear = 0;
+            let maxMonth = 0;
+
+            if (!rows || rows.length <= 2) {
+                window.__slaFbiIndex = { byIso, byMonth, latestByBulanKey, maxYear, maxMonth };
+                return out;
+            }
             for (let i = 2; i < rows.length; i++) {
                 const row = rows[i];
                 if (!row || row.length < 5) continue;
@@ -11546,19 +11713,36 @@
                 if (!dObj || isNaN(dObj.getTime()) || dObj.getTime() === 0) continue;
                 const y = dObj.getFullYear();
                 const m = dObj.getMonth();
-                out.push({
-                    rowDate,
-                    dObj,
-                    isoDate: toISODate(dObj),
-                    year: y,
-                    month: m,
-                    bulanKey: MonthsID[m] + ' ' + y,
-                    dkOT: parseNumberWithComma(row[1] || '0'),
-                    dkDelay: parseNumberWithComma(row[2] || '0'),
-                    lkOT: parseNumberWithComma(row[3] || '0'),
-                    lkDelay: parseNumberWithComma(row[4] || '0')
-                });
+                const isoDate = toISODate(dObj);
+                const bulanKey = MonthsID[m] + ' ' + y;
+                const dkOT = parseNumberWithComma(row[1] || '0');
+                const dkDelay = parseNumberWithComma(row[2] || '0');
+                const lkOT = parseNumberWithComma(row[3] || '0');
+                const lkDelay = parseNumberWithComma(row[4] || '0');
+
+                const item = { rowDate, dObj, isoDate, year: y, month: m, bulanKey, dkOT, dkDelay, lkOT, lkDelay };
+                out.push(item);
+
+                if (!byIso[isoDate]) byIso[isoDate] = { dkOT: 0, dkDelay: 0, lkOT: 0, lkDelay: 0 };
+                byIso[isoDate].dkOT += dkOT;
+                byIso[isoDate].dkDelay += dkDelay;
+                byIso[isoDate].lkOT += lkOT;
+                byIso[isoDate].lkDelay += lkDelay;
+
+                const ymKey = y + '-' + m;
+                if (!byMonth[ymKey]) byMonth[ymKey] = { ot: 0, delay: 0 };
+                byMonth[ymKey].ot += dkOT + lkOT;
+                byMonth[ymKey].delay += dkDelay + lkDelay;
+
+                if (!latestByBulanKey[bulanKey] || dObj.getTime() > latestByBulanKey[bulanKey].getTime()) {
+                    latestByBulanKey[bulanKey] = dObj;
+                }
+                if (y * 12 + m > maxYear * 12 + maxMonth) {
+                    maxYear = y;
+                    maxMonth = m;
+                }
             }
+            window.__slaFbiIndex = { byIso, byMonth, latestByBulanKey, maxYear, maxMonth };
             return out;
         }
 
@@ -11739,18 +11923,77 @@
             if (allowedAreas.includes(selectedArea)) areaFilter.value = selectedArea;
         }
 
+        window.__sharedCsvFetches = window.__sharedCsvFetches || {};
+        async function fetchSharedCSV(url, maxAgeMs = 15000) {
+            window.__sharedCsvFetches = window.__sharedCsvFetches || {};
+            const entry = window.__sharedCsvFetches[url];
+            const now = Date.now();
+            if (entry) {
+                if (entry.promise) return entry.promise;
+                if (entry.result && (now - entry.ts) < maxAgeMs) return entry.result;
+            }
+            const p = (async () => {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const text = await response.text();
+                    if (text.trim().startsWith('<!DOCTYPE')) {
+                        throw new Error("Diterima format HTML, bukan CSV. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
+                    }
+                    const lastModified = response.headers.get('Last-Modified') || '';
+                    const result = { text, lastModified };
+                    window.__sharedCsvFetches[url] = { result, ts: Date.now() };
+                    return result;
+                } catch (err) {
+                    delete window.__sharedCsvFetches[url];
+                    throw err;
+                }
+            })();
+            window.__sharedCsvFetches[url] = { promise: p, ts: now };
+            return p;
+        }
+
+        function prefetchFbiCoreData() {
+            const fbiFullUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID_FBI}/export?format=csv&gid=${SHEET_GID_FBI}`;
+            [ORDER_DIST_GVIZ_URL, PLANNER_CSV_URL, FIX_KLL_CSV_URL, SLA_FBI_CSV_URL, fbiFullUrl].forEach(u => {
+                if (u) fetchSharedCSV(u, 30000).catch(() => {});
+            });
+        }
+
         async function fetchOrderDistData(retries = 2) {
             if (!document.body.classList.contains('theme-purple')) return;
             try {
-                const response = await fetch(ORDER_DIST_CSV_URL);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const csv = await response.text();
-                if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML');
+                // If full export CSV is already cached in memory, use it right away (0ms network wait)
+                const fullCached = window.__sharedCsvFetches && window.__sharedCsvFetches[ORDER_DIST_CSV_URL];
+                if (fullCached && fullCached.result && (Date.now() - fullCached.ts) < 20000) {
+                    const csvFull = fullCached.result.text;
+                    window.__csvTextCache = window.__csvTextCache || {};
+                    const ckFull = 'orderDistFull:' + ORDER_DIST_CSV_URL;
+                    if (window.__csvTextCache[ckFull] === csvFull && rawOrderDistData.length > 0) return;
+                    window.__csvTextCache[ckFull] = csvFull;
+                    parseOrderDistCSV(csvFull, 4, 52);
+                    return;
+                }
+
+                // Prefer compact 2-column gviz/tq query (~33 KB vs 2.7 MB full sheet)
+                let csv = '';
+                let orderIdx = 0;
+                let regionIdx = 1;
+                try {
+                    const res = await fetchSharedCSV(ORDER_DIST_GVIZ_URL);
+                    csv = res.text;
+                } catch (gvizErr) {
+                    const resFull = await fetchSharedCSV(ORDER_DIST_CSV_URL);
+                    csv = resFull.text;
+                    orderIdx = 4;
+                    regionIdx = 52;
+                }
+
                 window.__csvTextCache = window.__csvTextCache || {};
-                const cacheKey = 'orderDist:' + ORDER_DIST_CSV_URL;
+                const cacheKey = `orderDist:${orderIdx}:${regionIdx}`;
                 if (window.__csvTextCache[cacheKey] === csv && rawOrderDistData.length > 0) return;
                 window.__csvTextCache[cacheKey] = csv;
-                parseOrderDistCSV(csv);
+                parseOrderDistCSV(csv, orderIdx, regionIdx);
             } catch (error) {
                 console.error("Error fetching Order Dist data:", error);
                 if (retries > 0) setTimeout(() => fetchOrderDistData(retries - 1), 2000);
@@ -11760,10 +12003,7 @@
         async function fetchSlaFbiData() {
             if (!document.body.classList.contains('theme-purple')) return;
             try {
-                const res = await fetch(SLA_FBI_CSV_URL);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const csv = await res.text();
-                if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML');
+                const { text: csv } = await fetchSharedCSV(SLA_FBI_CSV_URL);
                 window.__csvTextCache = window.__csvTextCache || {};
                 const cacheKey = 'slaFbi:' + SLA_FBI_CSV_URL;
                 if (window.__csvTextCache[cacheKey] === csv && rawSlaFbiData.length > 0) return;
@@ -11782,15 +12022,81 @@
             } catch(e) { console.error('SLA FBI fetch error:', e); }
         }
 
-        function parseOrderDistCSV(csv) {
-            const rows = robustCSVParser(csv);
-            if (rows.length < 2) return;
-            
-            const data = rows.slice(1);
-            rawOrderDistData = data.map(row => ({
-                orderNo: (row[4] || '').trim(),
-                region: (row[52] || '').trim()
-            })).filter(d => d.region && d.region !== '');
+        function parseOrderDistCSV(csv, orderColIdx = 4, regionColIdx = 52) {
+            if (!csv) return;
+            const regionOrderMap = {};
+            const nextData = [];
+            const len = csv.length;
+            let rowIdx = 0;
+            let colIdx = 0;
+            let colOrder = '';
+            let colRegion = '';
+            let currentField = '';
+            let inQuotes = false;
+            let rowHasData = false;
+
+            const flushRow = () => {
+                if (rowIdx > 0) {
+                    if (colIdx === orderColIdx) colOrder = currentField.trim();
+                    else if (colIdx === regionColIdx) colRegion = currentField.trim();
+                    if (colRegion) {
+                        nextData.push({ orderNo: colOrder, region: colRegion });
+                        let set = regionOrderMap[colRegion];
+                        if (!set) {
+                            set = new Set();
+                            regionOrderMap[colRegion] = set;
+                        }
+                        if (colOrder) set.add(colOrder);
+                    }
+                }
+                rowIdx++;
+                colIdx = 0;
+                colOrder = '';
+                colRegion = '';
+                currentField = '';
+                rowHasData = false;
+            };
+
+            for (let i = 0; i < len; i++) {
+                const char = csv[i];
+                const nextChar = csv[i + 1];
+                if (char === '"') {
+                    rowHasData = true;
+                    if (inQuotes && nextChar === '"') {
+                        if (rowIdx > 0 && (colIdx === orderColIdx || colIdx === regionColIdx)) currentField += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    rowHasData = true;
+                    if (rowIdx > 0) {
+                        if (colIdx === orderColIdx) colOrder = currentField.trim();
+                        else if (colIdx === regionColIdx) colRegion = currentField.trim();
+                    }
+                    currentField = '';
+                    colIdx++;
+                } else if ((char === '\n' || (char === '\r' && nextChar === '\n')) && !inQuotes) {
+                    flushRow();
+                    if (char === '\r') i++;
+                } else {
+                    rowHasData = true;
+                    if (rowIdx > 0 && (colIdx === orderColIdx || colIdx === regionColIdx)) {
+                        currentField += char;
+                    }
+                }
+            }
+            if (rowHasData || colIdx > 0) {
+                flushRow();
+            }
+            if (rowIdx < 2) return;
+
+            rawOrderDistData = nextData;
+            const donutCache = {};
+            for (const region in regionOrderMap) {
+                donutCache[region] = regionOrderMap[region].size;
+            }
+            window.__fbiDonutStatsCache = donutCache;
 
             if (isSectionVisible('fbi-dashboard-section') || !window.__activeDashSection) {
                 window.__fbiKpiDirty = false;
@@ -11804,12 +12110,7 @@
         async function fetchFixKllData(retries = 2) {
             if (!document.body.classList.contains('theme-purple')) return;
             try {
-                const response = await fetch(FIX_KLL_CSV_URL);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const csv = await response.text();
-                if (csv.trim().startsWith('<!DOCTYPE')) {
-                    throw new Error('Received HTML (Google Login required or link not shared)');
-                }
+                const { text: csv } = await fetchSharedCSV(FIX_KLL_CSV_URL);
                 window.__csvTextCache = window.__csvTextCache || {};
                 const cacheKey = 'fixKll:' + FIX_KLL_CSV_URL;
                 if (window.__csvTextCache[cacheKey] === csv && rawFixKllData.length > 0) return;
@@ -11843,7 +12144,10 @@
 
         function renderChatimeDashboard() {
             if (!document.body.classList.contains('theme-purple')) return;
-            if (!rawPlannerData || rawPlannerData.length === 0) return;
+            const hasPlanner = !!(rawPlannerData && rawPlannerData.length > 0);
+            const hasOrderDist = !!(rawOrderDistData && rawOrderDistData.length > 0) || !!window.__fbiDonutStatsCache;
+            const hasSla = !!(window.__slaFbiParsedRows && window.__slaFbiParsedRows.length > 0);
+            if (!hasPlanner && !hasOrderDist && !hasSla) return;
             if (!isSectionVisible('fbi-dashboard-section') && window.__activeDashSection) {
                 window.__fbiChatimeDirty = true;
                 return;
@@ -11864,19 +12168,15 @@
 
             for (let i = 0; i < rawPlannerData.length; i++) {
                 const d = rawPlannerData[i];
-                const isoDate = d._isoDate !== undefined ? d._isoDate : toISODate(parseDate(d.stuffingDate));
-                const localMonthKey = d._bulanKey !== undefined ? d._bulanKey : (() => {
-                    const dt = parseDate(d.stuffingDate);
-                    return dt && dt.getTime() > 0 ? (MonthsID[dt.getMonth()] + ' ' + dt.getFullYear()) : '';
-                })();
+                const isoDate = d._isoDate || '';
+                const localMonthKey = d._bulanKey || '';
 
-                const matchBulan = bulanFilterVal === 'ALL' || !localMonthKey || localMonthKey === bulanFilterVal;
-                const matchDate = dateFilter === 'ALL' || isoDate === dateFilter;
-
-                if (matchBulan && matchDate) {
-                    if (barStats[d.area]) {
-                        barStats[d.area].total += d.caseId;
-                        barStats[d.area].od += d.orderRelease;
+                if ((bulanFilterVal === 'ALL' || !localMonthKey || localMonthKey === bulanFilterVal) &&
+                    (dateFilter === 'ALL' || isoDate === dateFilter)) {
+                    const bs = barStats[d.area];
+                    if (bs) {
+                        bs.total += d.caseId;
+                        bs.od += d.orderRelease;
                     }
                     if (areaFilter === 'ALL' || d.area === areaFilter) {
                         totalOrderRelease += d.orderRelease;
@@ -11889,39 +12189,31 @@
             if (rawFixKllData && rawFixKllData.length > 0) {
                 for (let i = 0; i < rawFixKllData.length; i++) {
                     const d = rawFixKllData[i];
-                    const isoDate = d._isoDate !== undefined ? d._isoDate : toISODate(parseDateCustom(d.tanggal) || parseDate(d.tanggal));
-                    const localMonthKey = d._bulanKey !== undefined ? d._bulanKey : (() => {
-                        const dt = parseDateCustom(d.tanggal) || parseDate(d.tanggal);
-                        return dt && dt.getTime() > 0 ? (MonthsID[dt.getMonth()] + ' ' + dt.getFullYear()) : '';
-                    })();
-
-                    const matchBulan = bulanFilterVal === 'ALL' || !localMonthKey || localMonthKey === bulanFilterVal;
-                    const matchDate = dateFilter === 'ALL' || isoDate === dateFilter;
-                    if (matchBulan && matchDate) {
+                    const isoDate = d._isoDate || '';
+                    const localMonthKey = d._bulanKey || '';
+                    if ((bulanFilterVal === 'ALL' || !localMonthKey || localMonthKey === bulanFilterVal) &&
+                        (dateFilter === 'ALL' || isoDate === dateFilter)) {
                         caseIdShippedCount += d.caseId;
                     }
                 }
             }
 
-            const odEl = document.getElementById('chatime-total-od');
-            const ciEl = document.getElementById('chatime-total-case-id');
-            const cisEl = document.getElementById('chatime-case-id-shipped');
-            if (odEl) odEl.innerText = formatIndo(totalOrderRelease);
-            if (ciEl) ciEl.innerText = formatIndo(totalCaseId);
-            if (cisEl) cisEl.innerText = formatIndo(caseIdShippedCount);
-
-            const regionOrderMap = {};
-            for (let i = 0; i < rawOrderDistData.length; i++) {
-                const d = rawOrderDistData[i];
-                if (!regionOrderMap[d.region]) regionOrderMap[d.region] = new Set();
-                if (d.orderNo) regionOrderMap[d.region].add(d.orderNo);
-            }
-            const donutStats = {};
-            for (const region in regionOrderMap) {
-                donutStats[region] = regionOrderMap[region].size;
+            let donutStats = window.__fbiDonutStatsCache;
+            if (!donutStats) {
+                const regionOrderMap = {};
+                for (let i = 0; i < rawOrderDistData.length; i++) {
+                    const d = rawOrderDistData[i];
+                    if (!regionOrderMap[d.region]) regionOrderMap[d.region] = new Set();
+                    if (d.orderNo) regionOrderMap[d.region].add(d.orderNo);
+                }
+                donutStats = {};
+                for (const region in regionOrderMap) {
+                    donutStats[region] = regionOrderMap[region].size;
+                }
+                window.__fbiDonutStatsCache = donutStats;
             }
 
-            // SLA GRW DK & LK calculation from cached parsed SLA FBI rows (H-1 logic)
+            // O(1) SLA GRW DK & LK calculation from pre-indexed SLA FBI rows (H-1 logic)
             let slaDkValue = 0;
             let slaLkValue = 0;
             let dkTotalOT = 0; let dkTotalDelay = 0;
@@ -11933,6 +12225,7 @@
             const slaRows = (window.__slaFbiParsedRows && window.__slaFbiParsedRows.length > 0)
                 ? window.__slaFbiParsedRows
                 : (rawSlaFbiData.length > 2 ? (window.__slaFbiParsedRows = buildSlaFbiParsedRows(rawSlaFbiData)) : []);
+            const slaIdx = window.__slaFbiIndex;
 
             const nowLocal = new Date();
             const curMonthIdx = nowLocal.getMonth();
@@ -11943,42 +12236,22 @@
             if (dateFilter !== 'ALL' && /^\d{4}-\d{2}-\d{2}$/.test(dateFilter)) {
                 const [y, m, d] = dateFilter.split('-').map(Number);
                 h1DateObj = new Date(y, m - 1, d - 1);
-            } else if (bulanFilterVal !== 'ALL' && bulanFilterVal !== curMonthKey && slaRows.length > 0) {
-                let latestPastDate = null;
-                for (let i = 0; i < slaRows.length; i++) {
-                    const r = slaRows[i];
-                    if (r.bulanKey === bulanFilterVal && (!latestPastDate || r.dObj.getTime() > latestPastDate.getTime())) {
-                        latestPastDate = r.dObj;
-                    }
-                }
-                if (latestPastDate) h1DateObj = latestPastDate;
+            } else if (bulanFilterVal !== 'ALL' && bulanFilterVal !== curMonthKey && slaIdx && slaIdx.latestByBulanKey[bulanFilterVal]) {
+                h1DateObj = slaIdx.latestByBulanKey[bulanFilterVal];
             }
 
             const targetH1Iso = toISODate(h1DateObj);
             const h1DisplayDate = `${h1DateObj.getDate()} ${IndonesianMonthsShort[h1DateObj.getMonth()]} ${h1DateObj.getFullYear()}`;
             let hasH1Row = false;
 
-            if (slaRows.length > 0) {
-                let hasCurrentCalData = false;
-                let maxYear = 0;
-                let maxMonth = 0;
-
-                for (let i = 0; i < slaRows.length; i++) {
-                    const r = slaRows[i];
-                    if (r.isoDate === targetH1Iso) {
-                        hasH1Row = true;
-                        dkTotalOT += r.dkOT;
-                        dkTotalDelay += r.dkDelay;
-                        lkTotalOT += r.lkOT;
-                        lkTotalDelay += r.lkDelay;
-                    }
-                    if (r.year === curYear && r.month === curMonthIdx) {
-                        hasCurrentCalData = true;
-                    }
-                    if (r.year * 12 + r.month > maxYear * 12 + maxMonth) {
-                        maxYear = r.year;
-                        maxMonth = r.month;
-                    }
+            if (slaRows.length > 0 && slaIdx) {
+                const dayAgg = slaIdx.byIso[targetH1Iso];
+                if (dayAgg) {
+                    hasH1Row = true;
+                    dkTotalOT = dayAgg.dkOT;
+                    dkTotalDelay = dayAgg.dkDelay;
+                    lkTotalOT = dayAgg.lkOT;
+                    lkTotalDelay = dayAgg.lkDelay;
                 }
 
                 const totalDK = dkTotalOT + dkTotalDelay;
@@ -11986,48 +12259,61 @@
                 slaDkValue = totalDK > 0 ? (dkTotalOT / totalDK * 100) : 0;
                 slaLkValue = totalLK > 0 ? (lkTotalOT / totalLK * 100) : 0;
 
-                const targetMonthIdx = hasCurrentCalData ? curMonthIdx : maxMonth;
-                const targetYear = hasCurrentCalData ? curYear : maxYear;
+                const curYmKey = curYear + '-' + curMonthIdx;
+                const hasCurrentCalData = !!slaIdx.byMonth[curYmKey];
+                const targetMonthIdx = hasCurrentCalData ? curMonthIdx : slaIdx.maxMonth;
+                const targetYear = hasCurrentCalData ? curYear : slaIdx.maxYear;
                 currentMonthLabel = IndonesianMonthsShort[targetMonthIdx] + ' ' + targetYear;
 
-                let monthlyOT = 0;
-                let monthlyDelay = 0;
-                for (let i = 0; i < slaRows.length; i++) {
-                    const r = slaRows[i];
-                    if (r.year === targetYear && r.month === targetMonthIdx) {
-                        monthlyOT += r.dkOT + r.lkOT;
-                        monthlyDelay += r.dkDelay + r.lkDelay;
-                    }
+                const monthAgg = slaIdx.byMonth[targetYear + '-' + targetMonthIdx];
+                if (monthAgg) {
+                    const totalMonthly = monthAgg.ot + monthAgg.delay;
+                    slaCurrentMonthValue = totalMonthly > 0 ? (monthAgg.ot / totalMonthly * 100) : 0;
                 }
-                const totalMonthly = monthlyOT + monthlyDelay;
-                slaCurrentMonthValue = totalMonthly > 0 ? (monthlyOT / totalMonthly * 100) : 0;
             }
 
-            const slaDkEl = document.getElementById('fbi-main-sla-dk');
-            const slaLkEl = document.getElementById('fbi-main-sla-lk');
-            const slaDkLabelEl = document.getElementById('fbi-main-sla-dk-label');
-            const slaLkLabelEl = document.getElementById('fbi-main-sla-lk-label');
-            const slaCurrentMonthEl = document.getElementById('fbi-main-sla-current-month');
-            const slaCurrentMonthLabelEl = document.getElementById('fbi-main-sla-current-month-label');
+            const domSig = [
+                totalOrderRelease, totalCaseId, caseIdShippedCount,
+                targetH1Iso, dkTotalOT, dkTotalDelay, lkTotalOT, lkTotalDelay,
+                slaCurrentMonthValue.toFixed(2), currentMonthLabel
+            ].join('|');
 
-            if (slaDkEl) slaDkEl.innerText = slaDkValue > 0 ? slaDkValue.toFixed(1) + '%' : '0%';
-            if (slaLkEl) slaLkEl.innerText = slaLkValue > 0 ? slaLkValue.toFixed(1) + '%' : '0%';
+            if (window.__lastChatimeDomSig !== domSig) {
+                window.__lastChatimeDomSig = domSig;
 
-            const dkTotalCount = dkTotalOT + dkTotalDelay;
-            const lkTotalCount = lkTotalOT + lkTotalDelay;
-            if (slaDkLabelEl) {
-                slaDkLabelEl.innerHTML = dkTotalCount > 0
-                    ? `Base on tanggal <strong style="color:#0f172a;">${h1DisplayDate}</strong> <span style="color:#0f766e;">(OT: ${formatIndo(dkTotalOT)} / ${formatIndo(dkTotalCount)})</span>`
-                    : `Base on tanggal <strong style="color:#0f172a;">${h1DisplayDate}</strong> <span style="color:#94a3b8;">${hasH1Row ? '(0 Order)' : '(Belum Ada Data)'}</span>`;
+                const odEl = document.getElementById('chatime-total-od');
+                const ciEl = document.getElementById('chatime-total-case-id');
+                const cisEl = document.getElementById('chatime-case-id-shipped');
+                if (odEl) odEl.innerText = formatIndo(totalOrderRelease);
+                if (ciEl) ciEl.innerText = formatIndo(totalCaseId);
+                if (cisEl) cisEl.innerText = formatIndo(caseIdShippedCount);
+
+                const slaDkEl = document.getElementById('fbi-main-sla-dk');
+                const slaLkEl = document.getElementById('fbi-main-sla-lk');
+                const slaDkLabelEl = document.getElementById('fbi-main-sla-dk-label');
+                const slaLkLabelEl = document.getElementById('fbi-main-sla-lk-label');
+                const slaCurrentMonthEl = document.getElementById('fbi-main-sla-current-month');
+                const slaCurrentMonthLabelEl = document.getElementById('fbi-main-sla-current-month-label');
+
+                if (slaDkEl) slaDkEl.innerText = slaDkValue > 0 ? slaDkValue.toFixed(1) + '%' : '0%';
+                if (slaLkEl) slaLkEl.innerText = slaLkValue > 0 ? slaLkValue.toFixed(1) + '%' : '0%';
+
+                const dkTotalCount = dkTotalOT + dkTotalDelay;
+                const lkTotalCount = lkTotalOT + lkTotalDelay;
+                if (slaDkLabelEl) {
+                    slaDkLabelEl.innerHTML = dkTotalCount > 0
+                        ? `Base on tanggal <strong style="color:#0f172a;">${h1DisplayDate}</strong> <span style="color:#0f766e;">(OT: ${formatIndo(dkTotalOT)} / ${formatIndo(dkTotalCount)})</span>`
+                        : `Base on tanggal <strong style="color:#0f172a;">${h1DisplayDate}</strong> <span style="color:#94a3b8;">${hasH1Row ? '(0 Order)' : '(Belum Ada Data)'}</span>`;
+                }
+                if (slaLkLabelEl) {
+                    slaLkLabelEl.innerHTML = lkTotalCount > 0
+                        ? `Base on tanggal <strong style="color:#0f172a;">${h1DisplayDate}</strong> <span style="color:#1d4ed8;">(OT: ${formatIndo(lkTotalOT)} / ${formatIndo(lkTotalCount)})</span>`
+                        : `Base on tanggal <strong style="color:#0f172a;">${h1DisplayDate}</strong> <span style="color:#94a3b8;">${hasH1Row ? '(0 Order)' : '(Belum Ada Data)'}</span>`;
+                }
+
+                if (slaCurrentMonthEl) slaCurrentMonthEl.innerText = slaCurrentMonthValue > 0 ? slaCurrentMonthValue.toFixed(1) + '%' : '0%';
+                if (slaCurrentMonthLabelEl) slaCurrentMonthLabelEl.innerText = 'Based on Month: ' + currentMonthLabel;
             }
-            if (slaLkLabelEl) {
-                slaLkLabelEl.innerHTML = lkTotalCount > 0
-                    ? `Base on tanggal <strong style="color:#0f172a;">${h1DisplayDate}</strong> <span style="color:#1d4ed8;">(OT: ${formatIndo(lkTotalOT)} / ${formatIndo(lkTotalCount)})</span>`
-                    : `Base on tanggal <strong style="color:#0f172a;">${h1DisplayDate}</strong> <span style="color:#94a3b8;">${hasH1Row ? '(0 Order)' : '(Belum Ada Data)'}</span>`;
-            }
-
-            if (slaCurrentMonthEl) slaCurrentMonthEl.innerText = slaCurrentMonthValue > 0 ? slaCurrentMonthValue.toFixed(1) + '%' : '0%';
-            if (slaCurrentMonthLabelEl) slaCurrentMonthLabelEl.innerText = 'Based on Month: ' + currentMonthLabel;
 
             renderChatimeCharts(donutStats, barStats);
         }
@@ -12196,13 +12482,7 @@
         async function fetchPivotData(retries = 2) {
             try {
                 const finalUrl = PIVOT_CSV_URL;
-                const response = await fetch(finalUrl);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const csv = await response.text();
-                
-                if (csv.trim().startsWith('<!DOCTYPE')) {
-                    throw new Error("Diterima format HTML. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
-                }
+                const { text: csv } = await fetchSharedCSV(finalUrl);
 
                 window.__csvTextCache = window.__csvTextCache || {};
                 const cacheKey = 'pivot:' + finalUrl;
@@ -12291,6 +12571,7 @@
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
+                if (line.charCodeAt(0) === 44 && line.startsWith(',,,,,,,,,,,,,,,,,,,,') && !/[A-Za-z1-9]/.test(line)) continue;
 
                 // Robust CSV parser
                 const values = [];
@@ -12398,13 +12679,7 @@
                 if (container) container.style.display = 'block';
                 
                 const finalUrl = HUB_CSV_URL;
-                const response = await fetch(finalUrl);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const csv = await response.text();
-                
-                if (csv.trim().startsWith('<!DOCTYPE')) {
-                    throw new Error("Diterima format HTML. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
-                }
+                const { text: csv } = await fetchSharedCSV(finalUrl);
 
                 window.__csvTextCache = window.__csvTextCache || {};
                 const cacheKey = 'hub:' + finalUrl;
@@ -15404,28 +15679,14 @@ function renderStoringPivotTable(filteredData) {
             // Remove timestamp suffix to see if it fixes NetworkError
             const finalUrl = CSV_URL;
             try {
-                const response = await fetch(finalUrl);
+                const { text: csv, lastModified: lastModifiedHeader } = await fetchSharedCSV(finalUrl);
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const csv = await response.text();
-                
-                // Mencoba mengambil waktu modifikasi terakhir dari header response
-                const lastModifiedHeader = response.headers.get('Last-Modified');
                 let lastUpdateDate = new Date();
-                
                 if (lastModifiedHeader) {
                     const parsedDate = new Date(lastModifiedHeader);
                     if (!isNaN(parsedDate.getTime())) {
                         lastUpdateDate = parsedDate;
                     }
-                }
-
-                // Cek apakah yang diterima benar-benar data (bukan halaman login HTML)
-                if (csv.trim().startsWith('<!DOCTYPE')) {
-                    throw new Error("Diterima format HTML, bukan CSV. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
                 }
 
                 window.__csvTextCache = window.__csvTextCache || {};
@@ -15502,10 +15763,30 @@ function renderStoringPivotTable(filteredData) {
             let currentRow = [];
             let currentField = '';
             let inQuotes = false;
+            const csvLen = csv.length;
 
-            for (let i = 0; i < csv.length; i++) {
+            for (let i = 0; i < csvLen; i++) {
                 const char = csv[i];
                 const nextChar = csv[i + 1];
+
+                if (!inQuotes && currentRow.length === 0 && currentField === '' && char === ',' && csv.startsWith(',,,,,,,,,,,,,,,,,,,,', i)) {
+                    let scan = i + 20;
+                    let isEmptyRow = true;
+                    while (scan < csvLen) {
+                        const sc = csv.charCodeAt(scan);
+                        if (sc === 10 || sc === 13) break;
+                        if (sc !== 44 && sc !== 48 && sc !== 46 && sc !== 32) {
+                            isEmptyRow = false;
+                            break;
+                        }
+                        scan++;
+                    }
+                    if (isEmptyRow) {
+                        if (scan < csvLen && csv.charCodeAt(scan) === 13 && csv.charCodeAt(scan + 1) === 10) scan++;
+                        i = scan;
+                        continue;
+                    }
+                }
 
                 if (char === '"') {
                     if (inQuotes && nextChar === '"') {
@@ -19756,7 +20037,7 @@ setInterval(() => { if (!document.hidden) loadKonfirmasiVM(); }, 600000);
         const BULAN_ID_UPPER = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
 
         let pptxLoadPromise = null;
-        let fbiLiveCache = { ts: 0, pivotRows: null, slaRows: null };
+        let fbiLiveCache = { ts: 0, pivotRows: null, slaRows: null, plannerRows: null, fixKllRows: null };
         let logisalesLiveCache = { ts: 0, items: null };
 
         function ensurePptxGenJsLoaded() {
@@ -20541,7 +20822,7 @@ setInterval(() => { if (!document.hidden) loadKonfirmasiVM(); }, 600000);
         // ---------- FBI Live Data On-Demand Fetch (Used When User is in AHI Mode) ----------
         async function ensureFbiLiveDataForPpt() {
             const now = Date.now();
-            if (fbiLiveCache.pivotRows && fbiLiveCache.slaRows && now - fbiLiveCache.ts < 60000) {
+            if (fbiLiveCache.pivotRows && fbiLiveCache.slaRows && fbiLiveCache.plannerRows && fbiLiveCache.fixKllRows && now - fbiLiveCache.ts < 60000) {
                 return fbiLiveCache;
             }
             const tasks = [];
@@ -20552,6 +20833,12 @@ setInterval(() => { if (!document.hidden) loadKonfirmasiVM(); }, 600000);
             const slaFbiUrl = typeof SLA_FBI_CSV_URL !== 'undefined'
                 ? SLA_FBI_CSV_URL
                 : 'https://docs.google.com/spreadsheets/d/1lRl-Noq63iovsyzOTEM_Dxw4rPOKDF6dsO9o387iHwk/export?format=csv&gid=1915084833';
+            const plannerUrl = typeof PLANNER_CSV_URL !== 'undefined'
+                ? PLANNER_CSV_URL
+                : 'https://docs.google.com/spreadsheets/d/117EFwQPnkWdcEEsdG0mVC2stt68OjlCuEv4PmHZyNMY/export?format=csv&gid=2036643748';
+            const fixKllUrl = typeof FIX_KLL_CSV_URL !== 'undefined'
+                ? FIX_KLL_CSV_URL
+                : 'https://docs.google.com/spreadsheets/d/138I1ZNvWKVog5tjdEiDpvEZnjkZFZmBA4Mk8grRwXhQ/export?format=csv&gid=2043444297';
 
             tasks.push(
                 fetch(orderDistUrl)
@@ -20573,6 +20860,68 @@ setInterval(() => { if (!document.hidden) loadKonfirmasiVM(); }, 600000);
                         .then((csv) => {
                             if (csv && !csv.trim().startsWith('<!DOCTYPE') && typeof robustCSVParser === 'function') {
                                 fbiLiveCache.slaRows = robustCSVParser(csv);
+                            }
+                        })
+                        .catch(() => {})
+                );
+            }
+
+            if (typeof rawPlannerData !== 'undefined' && rawPlannerData.length > 0) {
+                fbiLiveCache.plannerRows = rawPlannerData;
+            } else {
+                tasks.push(
+                    fetch(plannerUrl)
+                        .then((r) => (r.ok ? r.text() : ''))
+                        .then((csv) => {
+                            if (csv && !csv.trim().startsWith('<!DOCTYPE') && typeof robustCSVParser === 'function') {
+                                const rows = robustCSVParser(csv);
+                                if (rows.length >= 2) {
+                                    fbiLiveCache.plannerRows = rows.slice(1).map((row) => {
+                                        const stuffingDate = (row[0] || '').trim();
+                                        const area = (row[2] || '').trim();
+                                        if (!area) return null;
+                                        const dObj = typeof parseDate === 'function' ? parseDate(stuffingDate) : parseIsoLocal(stuffingDate);
+                                        const hasDate = !!(dObj && !isNaN(dObj.getTime()) && dObj.getTime() > 0);
+                                        return {
+                                            stuffingDate,
+                                            area,
+                                            orderRelease: typeof parseNumberWithComma === 'function' ? parseNumberWithComma(row[3]) : numVal(row[3]),
+                                            caseId: typeof parseNumberWithComma === 'function' ? parseNumberWithComma(row[4]) : numVal(row[4]),
+                                            _dObj: dObj,
+                                            _isoDate: (hasDate && typeof toISODate === 'function') ? toISODate(dObj) : toNormalizedIso(stuffingDate),
+                                        };
+                                    }).filter(Boolean);
+                                }
+                            }
+                        })
+                        .catch(() => {})
+                );
+            }
+
+            if (typeof rawFixKllData !== 'undefined' && rawFixKllData.length > 0) {
+                fbiLiveCache.fixKllRows = rawFixKllData;
+            } else {
+                tasks.push(
+                    fetch(fixKllUrl)
+                        .then((r) => (r.ok ? r.text() : ''))
+                        .then((csv) => {
+                            if (csv && !csv.trim().startsWith('<!DOCTYPE') && typeof robustCSVParser === 'function') {
+                                const rows = robustCSVParser(csv);
+                                if (rows.length >= 2) {
+                                    fbiLiveCache.fixKllRows = rows.slice(1).map((row) => {
+                                        const rawCaseId = (row[2] || '').trim();
+                                        const rawDate = (row[14] || '').trim();
+                                        const dObj = (typeof parseDateCustom === 'function' ? parseDateCustom(rawDate) : null)
+                                            || (typeof parseDate === 'function' ? parseDate(rawDate) : parseIsoLocal(rawDate));
+                                        const hasDate = !!(dObj && !isNaN(dObj.getTime()) && dObj.getTime() > 0);
+                                        return {
+                                            caseId: typeof parseNumberWithComma === 'function' ? parseNumberWithComma(rawCaseId) : numVal(rawCaseId),
+                                            tanggal: rawDate,
+                                            _dObj: dObj,
+                                            _isoDate: (hasDate && typeof toISODate === 'function') ? toISODate(dObj) : toNormalizedIso(rawDate),
+                                        };
+                                    });
+                                }
                             }
                         })
                         .catch(() => {})
@@ -21445,8 +21794,12 @@ setInterval(() => { if (!document.hidden) loadKonfirmasiVM(); }, 600000);
         }
 
         function computeFbiSnapshot(reportIso, fbiCache) {
-            const planner = typeof rawPlannerData !== 'undefined' ? rawPlannerData : [];
-            const fixKll = typeof rawFixKllData !== 'undefined' ? rawFixKllData : [];
+            const planner = (fbiCache && Array.isArray(fbiCache.plannerRows) && fbiCache.plannerRows.length > 0)
+                ? fbiCache.plannerRows
+                : (typeof rawPlannerData !== 'undefined' ? rawPlannerData : []);
+            const fixKll = (fbiCache && Array.isArray(fbiCache.fixKllRows) && fbiCache.fixKllRows.length > 0)
+                ? fbiCache.fixKllRows
+                : (typeof rawFixKllData !== 'undefined' ? rawFixKllData : []);
             const pivotRows = fbiCache && fbiCache.pivotRows ? fbiCache.pivotRows : [];
             const slaRows = fbiCache && fbiCache.slaRows ? fbiCache.slaRows : [];
 
@@ -21482,49 +21835,82 @@ setInterval(() => { if (!document.hidden) loadKonfirmasiVM(); }, 600000);
             const sudahPlan = uniqueSudah.size;
             const belumPlan = Math.max(0, totalOrder - sudahPlan);
 
-            // Order Release & Case ID Released (from Planner)
+            // Order Release, Case ID Released & Case ID Breakdown (from Planner)
             let orderRelease = 0, caseIdReleased = 0, caseIdShipped = 0;
             const barStats = {
                 'Luar Pulau': { total: 0, od: 0 },
                 'Store DK': { total: 0, od: 0 },
                 'Luar Kota': { total: 0, od: 0 },
             };
+            const matchBarKey = (areaStr) => {
+                if (barStats[areaStr]) return barStats[areaStr];
+                const up = String(areaStr || '').trim().toUpperCase();
+                if (up === 'LUAR PULAU') return barStats['Luar Pulau'];
+                if (up === 'STORE DK') return barStats['Store DK'];
+                if (up === 'LUAR KOTA') return barStats['Luar Kota'];
+                return null;
+            };
 
             planner.forEach((d) => {
-                const dObj = parseIsoLocal(d.stuffingDate);
-                const iso = toNormalizedIso(d.stuffingDate);
-                if (iso === reportIso || (dObj && dObj.getFullYear() === repDate.getFullYear() && dObj.getMonth() === repDate.getMonth() && planner.every((x) => toNormalizedIso(x.stuffingDate) !== reportIso))) {
-                    if (iso === reportIso) {
-                        orderRelease += d.orderRelease || 0;
-                        caseIdReleased += d.caseId || 0;
-                        if (barStats[d.area]) {
-                            barStats[d.area].total += d.caseId || 0;
-                            barStats[d.area].od += d.orderRelease || 0;
-                        }
+                const iso = d._isoDate || toNormalizedIso(d.stuffingDate);
+                if (iso === reportIso) {
+                    orderRelease += d.orderRelease || 0;
+                    caseIdReleased += d.caseId || 0;
+                    const bs = matchBarKey(d.area);
+                    if (bs) {
+                        bs.total += d.caseId || 0;
+                        bs.od += d.orderRelease || 0;
                     }
                 }
             });
 
-            // If Bar Stats are all 0 for exact day, fallback to report month aggregate so chart stays informative
-            const hasExactPlannerBar = Object.values(barStats).some((x) => x.total > 0 || x.od > 0);
-            if (!hasExactPlannerBar) {
+            // If no planner rows exist for exact reportIso, fallback to report month (or latest planner month)
+            const hasExactPlannerBar = orderRelease > 0 || caseIdReleased > 0 || Object.values(barStats).some((x) => x.total > 0 || x.od > 0);
+            let pUseY = repDate.getFullYear(), pUseM = repDate.getMonth();
+            if (!hasExactPlannerBar && planner.length > 0) {
+                const getDt = (rawObj, fallbackStr) => {
+                    if (rawObj._dObj && !isNaN(rawObj._dObj.getTime()) && rawObj._dObj.getTime() > 0) return rawObj._dObj;
+                    return parseIsoLocal(fallbackStr);
+                };
+                const hasRepMonthPlanner = planner.some((d) => {
+                    const dt = getDt(d, d.stuffingDate);
+                    return dt && dt.getFullYear() === pUseY && dt.getMonth() === pUseM;
+                });
+                if (!hasRepMonthPlanner) {
+                    let maxYm = -1;
+                    planner.forEach((d) => {
+                        const dt = getDt(d, d.stuffingDate);
+                        if (!dt) return;
+                        const ym = dt.getFullYear() * 12 + dt.getMonth();
+                        if (ym > maxYm) { maxYm = ym; pUseY = dt.getFullYear(); pUseM = dt.getMonth(); }
+                    });
+                }
                 planner.forEach((d) => {
-                    const dObj = parseIsoLocal(d.stuffingDate);
-                    if (dObj && dObj.getFullYear() === repDate.getFullYear() && dObj.getMonth() === repDate.getMonth()) {
+                    const dt = getDt(d, d.stuffingDate);
+                    if (dt && dt.getFullYear() === pUseY && dt.getMonth() === pUseM) {
                         orderRelease += d.orderRelease || 0;
                         caseIdReleased += d.caseId || 0;
-                        if (barStats[d.area]) {
-                            barStats[d.area].total += d.caseId || 0;
-                            barStats[d.area].od += d.orderRelease || 0;
+                        const bs = matchBarKey(d.area);
+                        if (bs) {
+                            bs.total += d.caseId || 0;
+                            bs.od += d.orderRelease || 0;
                         }
                     }
                 });
             }
 
             fixKll.forEach((d) => {
-                const iso = toNormalizedIso(d.tanggal);
+                const iso = d._isoDate || toNormalizedIso(d.tanggal);
                 if (iso === reportIso) caseIdShipped += d.caseId || 0;
             });
+            if (!hasExactPlannerBar && caseIdShipped === 0 && fixKll.length > 0) {
+                fixKll.forEach((d) => {
+                    const dt = (d._dObj && !isNaN(d._dObj.getTime()) && d._dObj.getTime() > 0) ? d._dObj : parseIsoLocal(d.tanggal);
+                    if (dt && dt.getFullYear() === pUseY && dt.getMonth() === pUseM) {
+                        caseIdShipped += d.caseId || 0;
+                    }
+                });
+            }
 
             // Region Donut Counts
             const regionCounts = Object.entries(regionOrderMap)
