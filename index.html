@@ -52,26 +52,6 @@
             overflow: hidden;
         }
 
-        /* Shine effect for header (GPU transform only) */
-        .header::after {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: 0;
-            width: 35%;
-            height: 200%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.18), transparent);
-            transform: translateX(-180%) rotate(30deg);
-            animation: shine 6s infinite;
-            pointer-events: none;
-        }
-
-        @keyframes shine {
-            0% { transform: translateX(-180%) rotate(30deg); }
-            22% { transform: translateX(420%) rotate(30deg); }
-            100% { transform: translateX(420%) rotate(30deg); }
-        }
-
         .header h1 {
             font-size: 2.5em;
             font-weight: bold;
@@ -86,13 +66,20 @@
             padding: 20px 12px;
             opacity: 0;
             transform: translateY(20px);
-            animation: pageLoad 1s ease-out forwards;
+            animation: pageLoad 0.45s ease-out forwards;
         }
         
         .dash-section {
             min-width: 0;
             box-sizing: border-box;
             max-width: 100%;
+        }
+
+        /* Pause all animations & transitions inside hidden sections to keep CPU/GPU idle */
+        .dash-section[style*="display: none"] *,
+        .dash-section[style*="display:none"] * {
+            animation: none !important;
+            transition: none !important;
         }
 
         @keyframes pageLoad {
@@ -1228,7 +1215,6 @@
             bottom: 50px;
             left: 50%;
             transform: translate3d(-50%, 0, 0);
-            will-change: transform;
             contain: layout style;
             display: flex;
             align-items: center;
@@ -1274,18 +1260,19 @@
             justify-content: center;
             padding: 8px 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background-color 0.15s ease, color 0.15s ease;
             border-radius: 40px;
             min-width: 70px;
             text-decoration: none;
             color: #718096;
             position: relative;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .bottom-nav-item i {
             font-size: 1.4rem;
             margin-bottom: 2px;
-            transition: all 0.3s;
+            transition: transform 0.18s ease;
         }
 
         .bottom-nav-item span {
@@ -1302,23 +1289,22 @@
 
         .bottom-nav-item.active {
             color: #ff3d3d;
-            background: rgba(255, 61, 61, 0.08);
-            box-shadow: 0 0 20px rgba(255, 61, 61, 0.15);
+            background: rgba(255, 61, 61, 0.1);
+            box-shadow: none;
         }
         
         .bottom-nav-item.active i {
-            transform: scale(1.1);
-            filter: drop-shadow(0 0 5px rgba(255, 61, 61, 0.3));
+            transform: scale(1.08);
         }
 
         body.theme-purple .bottom-nav-item.active {
-            background: rgba(106, 27, 154, 0.08);
+            background: rgba(106, 27, 154, 0.1);
             color: #6a1b9a;
-            box-shadow: 0 0 20px rgba(106, 27, 154, 0.15);
+            box-shadow: none;
         }
         
         body.theme-purple .bottom-nav-item.active i {
-            filter: drop-shadow(0 0 5px rgba(106, 27, 154, 0.3));
+            filter: none;
         }
 
         /* Sidebar adjustment - hide sidebar as we use bottom nav now */
@@ -1563,12 +1549,12 @@
             border-bottom-color: #00acc1;
         }
         body.theme-cyan .bottom-nav-item.active {
-            background: rgba(0, 172, 193, 0.08);
+            background: rgba(0, 172, 193, 0.1);
             color: #00acc1;
-            box-shadow: 0 0 20px rgba(0, 172, 193, 0.15);
+            box-shadow: none;
         }
         body.theme-cyan .bottom-nav-item.active i {
-            filter: drop-shadow(0 0 5px rgba(0, 172, 193, 0.3));
+            filter: none;
         }
         body.theme-cyan .kpi-card.red {
             background: linear-gradient(135deg, #0097a7 0%, #006064 100%);
@@ -1631,10 +1617,13 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             position: relative;
             overflow: hidden;
-            transition: transform 0.3s ease;
+            transition: transform 0.18s ease;
             border: 1px solid #ddd;
+            contain: layout style;
         }
-        .fbi-kpi-card:hover { transform: translateY(-5px); }
+        @media (hover: hover) {
+            .fbi-kpi-card:hover { transform: translateY(-4px); }
+        }
         .fbi-kpi-label {
             font-size: 0.85rem;
             color: #555;
@@ -1674,7 +1663,13 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.42);
+            contain: layout style;
+        }
+        .fbi-chatime-kpis,
+        .fbi-chart-card,
+        .fbi-sla-card {
+            contain: layout style;
         }
         .fbi-item-header {
             background: #2e2e5c;
@@ -1691,6 +1686,7 @@
             flex: 1;
             padding: 15px;
             position: relative;
+            overscroll-behavior: contain;
         }
         
         #fbi-google-map { height: 100%; width: 100%; border-radius: 8px; min-height: 400px; }
@@ -1714,7 +1710,14 @@
             border-bottom: 1px solid #222;
             color: #eee;
         }
-        .fbi-table tr:hover { background: rgba(255, 255, 255, 0.05); }
+        .fbi-table tbody tr,
+        .schedule-fbi-table tbody tr {
+            content-visibility: auto;
+            contain-intrinsic-size: auto 38px;
+        }
+        @media (hover: hover) {
+            .fbi-table tr:hover { background: rgba(255, 255, 255, 0.05); }
+        }
 
         /* Futuristic DC Cards */
         .dc-card-container {
@@ -2127,19 +2130,17 @@
             cursor: pointer;
             min-height: 45px;
             border: 1px solid #444;
-            transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
-                        box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: border-color 0.18s ease;
         }
 
         .multi-select-container:hover {
             border-color: #666;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
         }
 
-        /* Highlight container when dropdown is open */
-        .multi-select-container:has(.multi-select-options.show) {
+        /* Highlight container when dropdown is open (explicit class avoids slow :has() invalidation) */
+        .multi-select-container.is-open {
             border-color: #ffd700;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.15);
         }
 
         .multi-select-display {
@@ -2161,45 +2162,34 @@
             font-weight: 900;
             margin-left: 10px;
             color: #aaa;
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s;
+            transition: transform 0.18s ease, color 0.18s ease;
         }
 
         /* Rotate arrow when open */
-        .multi-select-container:has(.multi-select-options.show) .multi-select-display::after {
+        .multi-select-container.is-open .multi-select-display::after {
             transform: rotate(180deg);
             color: #ffd700;
         }
 
         .multi-select-options {
-            display: block; /* We keep display block but control visibility/opacity/transform for smooth transitions */
+            display: none;
             position: absolute;
-            top: calc(100% + 6px); /* Floating slightly below with an elegant gap */
+            top: calc(100% + 6px);
             left: 0;
             right: 0;
-            background-color: #242424; /* Slightly darker for better nested appearance */
-            border: 1px solid #444;
-            z-index: 3000; /* High enough to be on top of Leaflet maps */
+            background-color: #242424;
+            border: 1px solid #ffd700;
+            z-index: 3000;
             max-height: 280px;
             overflow-y: auto;
-            scrollbar-gutter: stable; /* Crucial! Prevents "shaking/vibration" layout shift when scrollbar appears */
+            overscroll-behavior: contain;
+            scrollbar-gutter: stable;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             border-radius: 8px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-8px) scale(0.97);
-            transform-origin: top center;
-            pointer-events: none;
-            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                        visibility 0.25s;
         }
 
         .multi-select-options.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-            border-color: #ffd700;
+            display: block;
         }
 
         .option-item {
@@ -2266,6 +2256,7 @@
             border-radius: 4px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            contain: layout style;
         }
 
         .table-header {
@@ -2280,7 +2271,25 @@
             max-height: 300px;
             overflow-y: auto;
             overflow-x: auto;
+            overscroll-behavior: contain;
             -webkit-overflow-scrolling: touch;
+            contain: layout style;
+        }
+
+        .table-content-large,
+        .table-content-extra,
+        .astor-outstanding-table-wrap {
+            overscroll-behavior: contain;
+            contain: layout style;
+        }
+
+        /* Lightweight scroll virtualization for large tables */
+        .table-content tbody tr,
+        .table-content-large tbody tr,
+        .table-content-extra tbody tr,
+        .astor-outstanding-table-wrap tbody tr {
+            content-visibility: auto;
+            contain-intrinsic-size: auto 38px;
         }
 
         table {
@@ -2328,8 +2337,10 @@
             border-bottom: 1px solid #333;
         }
 
-        table tbody tr:hover {
-            background-color: #3a3a3a;
+        @media (hover: hover) {
+            table tbody tr:hover {
+                background-color: #3a3a3a;
+            }
         }
 
         /* Summary Table Specific Styles */
@@ -2352,10 +2363,11 @@
         .summary-table tbody tr:nth-child(even) {
             background-color: #222;
         }
-        .summary-table tbody tr:hover {
-            background-color: #333;
-            box-shadow: inset 0 0 10px rgba(211, 47, 47, 0.2);
-            cursor: default;
+        @media (hover: hover) {
+            .summary-table tbody tr:hover {
+                background-color: #333;
+                cursor: default;
+            }
         }
 
         .kpi-container {
@@ -2375,30 +2387,17 @@
             border-radius: 8px;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: transform 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.28s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.28);
+            transition: transform 0.18s ease;
             position: relative;
             overflow: hidden;
+            contain: layout style;
         }
 
-        .kpi-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-
-        .kpi-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: 0.5s;
-        }
-
-        .kpi-card:hover::before {
-            left: 100%;
+        @media (hover: hover) {
+            .kpi-card:hover {
+                transform: translateY(-4px);
+            }
         }
 
         .kpi-card.yellow {
@@ -2566,12 +2565,13 @@
         }
 
         .schedule-fbi-table tbody tr {
-            transition: all 0.2s ease;
+            transition: background-color 0.15s ease;
         }
 
-        .schedule-fbi-table tbody tr:hover {
-            background: rgba(90, 24, 154, 0.15) !important;
-            box-shadow: inset 4px 0 0 #5a189a;
+        @media (hover: hover) {
+            .schedule-fbi-table tbody tr:hover {
+                background: rgba(90, 24, 154, 0.15) !important;
+            }
         }
 
         .schedule-fbi-table td {
@@ -3072,11 +3072,15 @@
     padding: 18px 15px;
     text-align: center;
     border-bottom: 3px solid #444;
-    transition: transform 0.2s;
+    transition: transform 0.18s ease;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     min-width: 0;
+    position: relative;
+    contain: layout style;
 }
-.astor-kpi-card:hover { transform: translateY(-4px); }
+@media (hover: hover) {
+    .astor-kpi-card:hover { transform: translateY(-3px); }
+}
 .astor-kpi-card.hit  { border-bottom-color: #2dd4bf; }
 .astor-kpi-card.miss { border-bottom-color: #f87171; }
 .astor-kpi-card.outstanding { border-bottom-color: #ffd700; }
@@ -3404,7 +3408,7 @@
     -webkit-overflow-scrolling: touch;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .main-content {
         display: flex !important;
         flex-direction: column !important;
@@ -3442,10 +3446,42 @@
         grid-template-columns: 1fr !important;
     }
 
-    .extra-section > div > * {
+    .extra-section {
+        margin-bottom: 40px !important;
+    }
+
+    .extra-section > div > *:first-child,
+    .extra-section > div > *:last-child {
         height: auto !important;
-        min-height: 320px !important;
-        max-height: 480px !important;
+        min-height: 300px !important;
+        max-height: 520px !important;
+    }
+
+    .kpi-container-four {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    #fbi-google-map {
+        height: 340px !important;
+        min-height: 280px !important;
+    }
+
+    .fbi-charts-row {
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+
+    .fbi-chart-card {
+        width: 100% !important;
+        min-height: 340px !important;
+    }
+
+    #chatime-date-filter {
+        position: static !important;
+    }
+
+    .chatime-select-spacer {
+        display: none !important;
     }
 }
 
@@ -3758,10 +3794,33 @@
         font-size: 0.75rem !important;
     }
 
+    .main-container-wrapper {
+        padding-bottom: 112px !important;
+    }
+
     .filter-section {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 10px !important;
         padding: 12px !important;
+    }
+
+    .daily-vendor-trend-container {
+        padding: 12px !important;
+    }
+
+    .daily-vendor-trend-container .table-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+    }
+
+    #konfirmasi-vm-container > div:nth-child(3) {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .pagination button {
+        min-height: 34px !important;
+        padding: 6px 12px !important;
     }
 
     .filter-group label {
@@ -6226,7 +6285,7 @@
                             </div>
                             <div style="flex: 1; min-width: 120px; position: relative;">
                                 <label style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">TANGGAL STUFFING</label>
-                                <select id="chatime-date-filter" onchange="this.size=1; this.blur(); renderChatimeDashboard();" onfocus="this.size=6;" onblur="this.size=1;" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; color: #1e293b; position: absolute; z-index: 10;">
+                                <select id="chatime-date-filter" onchange="this.size=1; this.blur(); renderChatimeDashboard();" onfocus="if (!window.matchMedia('(pointer: coarse)').matches && window.innerWidth > 1024) this.size=6;" onblur="this.size=1;" style="width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; outline: none; cursor: pointer; color: #1e293b; position: absolute; z-index: 10;">
                                     <option value="ALL">All Dates</option>
                                 </select>
                                 <div class="chatime-select-spacer" style="height: 40px;"></div> <!-- Spacer to maintain layout when select expands -->
@@ -6373,19 +6432,19 @@
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
                             <label style="font-size: 0.78em; color: #eee; font-weight: 500;">Pilih Hari:</label>
-                            <select id="fbi-filter-hari" onchange="renderFBIDashboard()" style="background: #1a1a1a; color: #fff; border: 1px solid #5a189a; padding: 4px 8px; border-radius: 4px; outline: none; font-size: 0.8em; cursor: pointer;">
+                            <select id="fbi-filter-hari" onchange="renderFBIScheduleAndOutstanding()" style="background: #1a1a1a; color: #fff; border: 1px solid #5a189a; padding: 4px 8px; border-radius: 4px; outline: none; font-size: 0.8em; cursor: pointer;">
                                 <option value="ALL">SEMUA HARI</option>
                             </select>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
                             <label style="font-size: 0.78em; color: #eee; font-weight: 500;">Shipping Line:</label>
-                            <select id="fbi-filter-shipping" onchange="renderFBIDashboard()" style="background: #1a1a1a; color: #fff; border: 1px solid #5a189a; padding: 4px 8px; border-radius: 4px; outline: none; font-size: 0.8em; cursor: pointer;">
+                            <select id="fbi-filter-shipping" onchange="renderFBIScheduleAndOutstanding()" style="background: #1a1a1a; color: #fff; border: 1px solid #5a189a; padding: 4px 8px; border-radius: 4px; outline: none; font-size: 0.8em; cursor: pointer;">
                                 <option value="ALL">SEMUA SHIPPING</option>
                             </select>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
                             <label style="font-size: 0.78em; color: #eee; font-weight: 500;">Pilih Wilayah:</label>
-                            <select id="fbi-filter-wilayah" onchange="renderFBIDashboard()" style="background: #1a1a1a; color: #fff; border: 1px solid #5a189a; padding: 4px 8px; border-radius: 4px; outline: none; font-size: 0.8em; cursor: pointer;">
+                            <select id="fbi-filter-wilayah" onchange="renderFBIScheduleAndOutstanding()" style="background: #1a1a1a; color: #fff; border: 1px solid #5a189a; padding: 4px 8px; border-radius: 4px; outline: none; font-size: 0.8em; cursor: pointer;">
                                 <option value="ALL">SEMUA WILAYAH</option>
                             </select>
                         </div>
@@ -6446,12 +6505,12 @@
                 }
                 .cine-dashboard::-webkit-scrollbar { display: none; }
                 .cine-bg { position: fixed; top:0; left:0; width:100vw; height:100vh; pointer-events: none; z-index: -1; overflow: hidden; }
-                .cine-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3; animation: floatOrb 20s infinite alternate ease-in-out; }
+                .cine-orb { position: absolute; border-radius: 50%; filter: blur(64px); opacity: 0.25; animation: floatOrb 20s infinite alternate ease-in-out; will-change: transform; }
                 .cine-orb:nth-child(1) { width: 40vw; height: 40vw; background: var(--c-blue); top: -10vw; left: -10vw; }
                 .cine-orb:nth-child(2) { width: 30vw; height: 30vw; background: var(--c-purple); bottom: -5vw; right: -5vw; animation-delay: -5s; }
                 @keyframes floatOrb { 0% { transform: translateY(0) translateX(0); } 100% { transform: translateY(100px) translateX(-100px); } }
                 
-                .cine-nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(10, 10, 15, 0.88); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 30px; display: flex; gap: 20px; z-index: 120; }
+                .cine-nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(10, 10, 15, 0.94); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 30px; display: flex; gap: 20px; z-index: 120; }
                 .cine-nav a { color: rgba(255,255,255,0.5); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.3s; cursor: pointer; }
                 .cine-nav a.active, .cine-nav a:hover { color: #fff; }
                 
@@ -6577,7 +6636,7 @@
                     }
                 }
                 
-                .cine-card { background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; position: relative; overflow: hidden; min-width: 0; box-sizing: border-box; }
+                .cine-card { background: rgba(16, 20, 32, 0.92); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; position: relative; overflow: hidden; min-width: 0; box-sizing: border-box; }
                 .cine-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
                 .cine-card-header { display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.7); font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
                 .cine-card-header i { color: var(--accent); font-size: 1.2rem; }
@@ -6733,10 +6792,13 @@
                     const root = document.getElementById('cine-dashboard-root');
                     if (!root) return;
 
-                    // Loader logic first, so it always finishes even on error
+                    // Loader logic first (only play once per session so tab switches feel instant)
                     const fill = document.getElementById('cine-loader-fill');
                     const loader = document.getElementById('cine-loader');
-                    if (fill && loader) {
+                    if (loader && window.__cineLoadedOnce) {
+                        loader.style.display = 'none';
+                    } else if (fill && loader) {
+                        window.__cineLoadedOnce = true;
                         fill.style.transition = 'none';
                         fill.style.width = '0%';
                         loader.style.display = 'flex'; loader.style.opacity = '1';
@@ -6869,8 +6931,8 @@
 
                                 const isBelumSpt = isBelumSupport(row);
                                 const dateVal = isBelumSpt ? (row.AU || '').trim() : (row.AO || '').trim();
-                                const dDate = parseDateCustom(dateVal) || parseDate(dateVal);
-                                if (dDate && !isNaN(dDate.getTime()) && dDate >= todayStart) {
+                                const dMs = (typeof parseDateCustomMs === 'function' ? parseDateCustomMs(dateVal) : null) ?? (typeof parseDateMs === 'function' ? parseDateMs(dateVal) : 0);
+                                if (dMs && dMs >= todayStart.getTime()) {
                                     return; // Exclude today and future records from the Trend tab KPIs (tgl 1 s/d H-1)
                                 }
 
@@ -6952,10 +7014,10 @@
                         }
     
                         // Check if we need to call renderHubTable and renderAstorSLA to compute latest values
-                        if (typeof renderHubTable === 'function' && typeof window.hubSlaRateLast === 'undefined' && typeof rawHubData !== 'undefined' && rawHubData.length > 0) {
+                        if (typeof renderHubTable === 'function' && (window.__hubDirty || typeof window.hubSlaRateLast === 'undefined') && typeof rawHubData !== 'undefined' && rawHubData.length > 0) {
                             renderHubTable();
                         }
-                        if (typeof renderAstorSLA === 'function' && typeof window.astorSlaRateLast === 'undefined' && typeof rawAstorData !== 'undefined' && rawAstorData.length > 0) {
+                        if (typeof renderAstorSLA === 'function' && (window.__astorDirty || typeof window.astorSlaRateLast === 'undefined') && typeof rawAstorData !== 'undefined' && rawAstorData.length > 0) {
                             renderAstorSLA();
                         }
 
@@ -7262,11 +7324,17 @@
                         }, { threshold: 0.5 });
                         sections.forEach(s => observer.observe(s));
 
+                        let cineScrollTicking = false;
                         root.addEventListener('scroll', () => {
-                            const maxScroll = root.scrollHeight - root.clientHeight;
-                            if (maxScroll <= 0) return;
-                            scrollBarFill.style.height = ((root.scrollTop / maxScroll) * 100) + '%';
-                        });
+                            if (cineScrollTicking) return;
+                            cineScrollTicking = true;
+                            requestAnimationFrame(() => {
+                                cineScrollTicking = false;
+                                const maxScroll = root.scrollHeight - root.clientHeight;
+                                if (maxScroll <= 0 || !scrollBarFill) return;
+                                scrollBarFill.style.height = ((root.scrollTop / maxScroll) * 100) + '%';
+                            });
+                        }, { passive: true });
 
                         navLinks.forEach(l => {
                             l.addEventListener('click', (e) => {
@@ -8609,7 +8677,7 @@
   ══════════════════════════════════════════ */
   async function fetchTransitData() {
     const tbody = document.getElementById('tr-tbody');
-    if (tbody) {
+    if (tbody && DATA.length === 0) {
       tbody.innerHTML = `<tr><td colspan="16" style="text-align:center;padding:30px;color:#7de0a4;">
         <i class="fas fa-spinner fa-spin" style="font-size:1.5em;display:block;margin-bottom:8px;"></i>
         Memuat jadwal transit dari spreadsheet...
@@ -8623,6 +8691,10 @@
       if (csv.trim().startsWith('<!DOCTYPE')) {
         throw new Error('Sheet belum di-share publik. Pastikan "Anyone with the link can view".');
       }
+      window.__csvTextCache = window.__csvTextCache || {};
+      const cacheKey = 'transit:' + TRANSIT_CSV_URL;
+      if (window.__csvTextCache[cacheKey] === csv && DATA.length > 0) return;
+      window.__csvTextCache[cacheKey] = csv;
       parseTransitCSV(csv);
     } catch (e) {
       console.error('Transit fetch error:', e);
@@ -8732,7 +8804,12 @@
 
     trPopulateFilters();
     trInitDaySelect();
-    trRenderTable('ALL');
+    if (typeof isSectionVisible === 'function' ? isSectionVisible('transit-schema-section') : true) {
+      window.__transitDirty = false;
+      trRenderTable('ALL');
+    } else {
+      window.__transitDirty = true;
+    }
   }
 
   /* ══════════════════════════════════════════
@@ -8768,6 +8845,7 @@
   }
 
   window.trRenderTable = function (filter) {
+    window.__transitDirty = false;
     window.trCurrentFilter = filter || 'ALL';
     const todayDay = (document.getElementById('tr-day-select')?.value) || getTodayDayName();
 
@@ -8879,7 +8957,7 @@
 
   /* ── Init + Auto-refresh ── */
   fetchTransitData();
-  setInterval(fetchTransitData, 60000);
+  setInterval(() => { if (!document.hidden) fetchTransitData(); }, 60000);
 
 })();
 </script>
@@ -9398,23 +9476,70 @@
 
         const MonthsID = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOPEMBER", "DESEMBER"];
 
+        window.__csvTextCache = window.__csvTextCache || {};
+        window.__dashDirty = { main: false, summary: false, partner: false, ahiSummary: false };
+        window.__fbiKpiDirty = false;
+        window.__fbiChatimeDirty = false;
+        window.__fbiPlanningDirty = false;
+        window.__fbiMapPopulated = false;
+        window.__slaFbiParsedRows = [];
+        window.__pivotDirty = false;
+        window.__hubDirty = false;
+        window.__astorDirty = false;
+        window.__transitDirty = false;
+        window.__vmDirty = false;
+        window.__activeDashSection = '';
+        window.__lastVendorModeActive = null;
+        window.__markersLayerGroup = null;
+
+        function isSectionVisible(sectionId) {
+            const el = document.getElementById(sectionId);
+            return !!(el && el.style.display !== 'none');
+        }
+
+        function markAllDashSectionsDirty() {
+            window.__dashDirty.main = true;
+            window.__dashDirty.summary = true;
+            window.__dashDirty.partner = true;
+            window.__dashDirty.ahiSummary = true;
+            window.__fbiKpiDirty = true;
+            window.__fbiChatimeDirty = true;
+            window.__fbiPlanningDirty = true;
+            window.vendorSupportingPercentLast = null;
+        }
+
+        const __parseDateMsCache = new Map();
+        function parseDateMs(s) {
+            if (!s) return 0;
+            if (s instanceof Date) return s.getTime();
+            const key = String(s);
+            if (__parseDateMsCache.has(key)) return __parseDateMsCache.get(key);
+            let ms = 0;
+            if (key.includes('-')) {
+                const d = new Date(key);
+                if (!isNaN(d)) ms = d.getTime();
+            } else if (key.includes('/')) {
+                const parts = key.split('/');
+                if (parts.length === 3) {
+                    let yr = parseInt(parts[2], 10);
+                    if (yr < 100) yr += 2000;
+                    const d = new Date(yr, parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+                    ms = isNaN(d) ? 0 : d.getTime();
+                }
+            }
+            if (!ms) {
+                const d = new Date(key);
+                ms = isNaN(d) ? 0 : d.getTime();
+            }
+            if (__parseDateMsCache.size > 10000) __parseDateMsCache.clear();
+            __parseDateMsCache.set(key, ms);
+            return ms;
+        }
+
         function parseDate(s) {
             if (!s) return new Date(0);
             if (s instanceof Date) return s;
-            if (s.includes('-')) {
-                const d = new Date(s);
-                if (!isNaN(d)) return d;
-            }
-            if (s.includes('/')) {
-                const parts = s.split('/');
-                if (parts.length === 3) {
-                   let yr = parseInt(parts[2]);
-                   if (yr < 100) yr += 2000;
-                   return new Date(yr, parts[1]-1, parts[0]);
-                }
-            }
-            const d = new Date(s);
-            return isNaN(d) ? new Date(0) : d;
+            return new Date(parseDateMs(s));
         }
 
         function toISODate(date) {
@@ -9801,16 +9926,33 @@
             configureBottomNavForBranch(branch);
             syncFloatingNavDock();
 
-            // Reset data to avoid showing stale data from previous branch
+            // Reset data & caches to avoid showing stale data from previous branch
             allData = [];
             rawPivotData = [];
             rawFBISchedule = [];
             rawHubData = [];
             rawAstorData = [];
+            rawPlannerData = [];
+            rawOrderDistData = [];
+            rawFixKllData = [];
+            rawSlaFbiData = [];
+            window.__slaFbiParsedRows = [];
+            window.__csvTextCache = {};
+            markAllDashSectionsDirty();
+            window.__pivotDirty = true;
+            window.__hubDirty = true;
+            window.__astorDirty = true;
+            window.__transitDirty = true;
+            window.__vmDirty = true;
+            window.__lastVendorModeActive = null;
             if (typeof closeOutstandingOdModal === 'function') closeOutstandingOdModal();
             if (typeof closeAhiSlidesModal === 'function') closeAhiSlidesModal();
             const bf = document.getElementById('chatime-bulan-filter');
             if (bf) bf.innerHTML = '<option value="ALL">SEMUA BULAN</option>';
+            ['chatime-date-filter', 'chatime-area-filter', 'fbi-filter-hari', 'fbi-filter-shipping', 'fbi-filter-wilayah'].forEach(fid => {
+                const fel = document.getElementById(fid);
+                if (fel) delete fel.dataset.optSig;
+            });
 
             if (branch === 'FBI') {
                 body.classList.remove('theme-cyan');
@@ -9930,9 +10072,11 @@
                 fetchPivotData();
                 fetchHubData();
                 fetchAstorData();
-                fetchPlannerData();
-                fetchOrderDistData();
-                fetchFixKllData();
+                if (branch === 'FBI') {
+                    fetchPlannerData();
+                    fetchOrderDistData();
+                    fetchFixKllData();
+                }
                 fetchData(); // Trigger main data fetch with new URL
             }, 500);
         }
@@ -10166,6 +10310,7 @@
                 attribution: '© OpenStreetMap contributors',
                 maxZoom: 19
             }).addTo(map);
+            window.__markersLayerGroup = L.layerGroup().addTo(map);
         }
 
         // Pivot Data Storage
@@ -10564,8 +10709,10 @@
                 sectionId = 'fbi-dashboard-section';
             }
 
+            window.__activeDashSection = sectionId;
+
             const sections = document.querySelectorAll('.dash-section');
-            sections.forEach(s => s.style.display = 'none');
+            sections.forEach(s => { s.style.display = 'none'; });
             
             // Remove active class from all nav items (bottom nav)
             const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
@@ -10584,9 +10731,6 @@
             // Global Header & Cinematic Dashboard logic
             const hdr = document.querySelector('.header');
             if (sectionId === 'ahi-summary-section') {
-                if (typeof initCinematicDashboard === 'function') {
-                    setTimeout(initCinematicDashboard, 100);
-                }
                 if (hdr) hdr.style.display = 'none';
             } else {
                 if (hdr) hdr.style.display = 'block';
@@ -10609,25 +10753,77 @@
 
                 const navItem = document.getElementById(navId);
                 if (navItem) navItem.classList.add('active');
-
-                // Trigger chart resize if visible
-                window.dispatchEvent(new Event('resize'));
                 
-                if (sectionId === 'fbi-dashboard-section' || sectionId === 'fbi-planning-section') {
-                    setTimeout(renderFBIDashboard, 100);
+                if (sectionId === 'fbi-dashboard-section') {
+                    if (window.__fbiKpiDirty) {
+                        window.__fbiKpiDirty = false;
+                        renderFBIHeaderKPIs();
+                    }
+                    if (window.__fbiChatimeDirty) {
+                        renderChatimeDashboard();
+                    }
+                } else if (sectionId === 'fbi-planning-section') {
+                    if (window.__fbiPlanningDirty) {
+                        renderFBIDashboard({ planningOnly: true });
+                    }
                 }
             }
-            
-            // Recalculate and update stuffing date options & filtered data dynamically based on active section
-            if (typeof updateStuffingDateOptions === 'function') {
-                updateStuffingDateOptions();
+
+            // Only re-filter when crossing into or out of supply-partner-section (different stuffingDate semantics)
+            const isVendorNow = (sectionId === 'supply-partner-section');
+            if (window.__lastVendorModeActive !== isVendorNow) {
+                window.__lastVendorModeActive = isVendorNow;
+                if (typeof updateStuffingDateOptions === 'function') {
+                    updateStuffingDateOptions();
+                }
+                if (typeof applyFilters === 'function') {
+                    applyFilters();
+                }
+            } else if (typeof flushDashSection === 'function') {
+                flushDashSection(sectionId);
             }
-            if (typeof applyFilters === 'function') {
-                applyFilters();
+
+            // Flush lazy standalone sections when opened
+            if (sectionId === 'outstanding-section' && window.__pivotDirty && typeof renderPivotTable === 'function') {
+                renderPivotTable();
+            } else if (sectionId === 'hub-astor-section') {
+                if (window.__hubDirty && typeof renderHubTable === 'function') renderHubTable();
+                if (window.__astorDirty && typeof renderAstorSLA === 'function') renderAstorSLA();
+            } else if (sectionId === 'transit-schema-section' && window.__transitDirty && typeof trRenderTable === 'function') {
+                trRenderTable(window.trCurrentFilter || 'ALL');
+            } else if (sectionId === 'supply-partner-section' && window.__vmDirty && typeof renderKonfirmasiVM === 'function') {
+                renderKonfirmasiVM();
             }
+
+            // Targeted resize only for active visualizers inside the newly shown tab
+            requestAnimationFrame(() => {
+                if (sectionId === 'main-dashboard-section' && map) {
+                    map.invalidateSize();
+                } else if (sectionId === 'fbi-dashboard-section') {
+                    if (chatimeDonutChart) chatimeDonutChart.resize();
+                    if (chatimeBarChart) chatimeBarChart.resize();
+                } else if (sectionId === 'fbi-planning-section') {
+                    if (fbiMap) fbiMap.invalidateSize();
+                    if (fbiChart) fbiChart.resize();
+                } else if (sectionId === 'summary-report-section') {
+                    if (slaChart) slaChart.resize();
+                    if (cbmRatioChart) cbmRatioChart.resize();
+                    if (slaChartDK) slaChartDK.resize();
+                    if (slaChartLK) slaChartLK.resize();
+                } else if (sectionId === 'supply-partner-section') {
+                    if (vendorResponseChart) vendorResponseChart.resize();
+                    if (agingTerlambatChart) agingTerlambatChart.resize();
+                    if (dailyVendorPerfChart) dailyVendorPerfChart.resize();
+                    if (typeof vmTrendChart !== 'undefined' && vmTrendChart) vmTrendChart.resize();
+                } else if (sectionId === 'hub-astor-section') {
+                    if (typeof astorChartBu !== 'undefined' && astorChartBu) astorChartBu.resize();
+                    if (typeof astorChartArea !== 'undefined' && astorChartArea) astorChartArea.resize();
+                    if (typeof astorChartAging !== 'undefined' && astorChartAging) astorChartAging.resize();
+                }
+            });
             
-            // Scroll to top of dashboard
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Instant scroll to top so tab transition feels crisp
+            window.scrollTo({ top: 0, behavior: 'auto' });
         }
 
         // FBI Dashboard Logic
@@ -10637,205 +10833,152 @@
         let chatimeDonutChart = null;
         let chatimeBarChart = null;
 
-        function renderFBIDashboard() {
-            const tbody = document.getElementById('fbi-outstanding-table-body');
-            
+        function renderFBIHeaderKPIs() {
+            if (!document.body.classList.contains('theme-purple')) return;
             if (!rawPivotData || rawPivotData.length === 0) {
                 updateVal('fbi-kpi-total-stores', '0');
                 updateVal('fbi-kpi-sudah-plan', '0');
                 updateVal('fbi-kpi-outstanding-aging', '0');
                 updateVal('fbi-kpi-belum-plan', '0');
-                if (tbody) tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">Memproses data...</td></tr>';
                 return;
             }
 
-            // 1. Calculate KPIs and Summary
-            // GANTI DENGAN INI:
-const uniqueStores = new Set();
-const uniqueOrders = new Set();
-const uniqueOrdersSudah = new Set();
-const uniqueOrdersBelum = new Set();
+            const uniqueStores = new Set();
+            const uniqueOrdersSudah = new Set();
 
-const coverageData = {}; // By Day for Chart
+            for (let i = 0; i < rawPivotData.length; i++) {
+                const row = rawPivotData[i];
+                const colI = row.rawColumns && row.rawColumns.I ? row.rawColumns.I.trim() : "";
+                const colBC = row.status ? row.status.trim() : "";
+                const colE = row.rawColumns && row.rawColumns.E ? row.rawColumns.E.trim() : "";
+                const colF = row.rawColumns && row.rawColumns.F ? row.rawColumns.F.trim() : "";
+                const orderId = colE || colF;
 
-rawPivotData.forEach(row => {
-    const colI = row.rawColumns && row.rawColumns.I ? row.rawColumns.I.trim() : "";
-    const colBC = row.status ? row.status.trim() : ""; // Column BC
-
-    // PERBAIKAN: pakai Column E sebagai primary, Column F sebagai fallback
-    const colE = row.rawColumns && row.rawColumns.E ? row.rawColumns.E.trim() : "";
-    const colF = row.rawColumns && row.rawColumns.F ? row.rawColumns.F.trim() : "";
-    const orderId = colE || colF; // ambil yang ada nilainya
-
-    const date = row.stuffingDate || 'No Date';
-
-    if (colI) {
-        uniqueStores.add(colI.toUpperCase());
-    }
-    
-    if (orderId) {
-        uniqueOrders.add(orderId);
-        if (colBC.toUpperCase() === 'SUDAH PLAN') {
-            uniqueOrdersSudah.add(orderId);
-        }
-        if (colBC.toUpperCase() === 'BELUM PLAN') {
-            uniqueOrdersBelum.add(orderId);
-        }
-    }
-
-    // Coverage per Hari (based on Stuffing Date/Tanggal)
-    if (!coverageData[date]) coverageData[date] = 0;
-    coverageData[date] += row.cbm;
-});
-
-// Hitung dari rawOrderDistData — sumber yang sama dengan Donut Chart
-const uniqueOrdersFromDist = new Set();
-const uniqueOrdersSudahDist = new Set();
-const uniqueOrdersBelumDist = new Set();
-
-rawOrderDistData.forEach(d => {
-    if (!d.orderNo) return;
-    uniqueOrdersFromDist.add(d.orderNo);
-});
-
-// Sudah Plan & Belum Plan tetap dari rawPivotData (karena ada kolom status BC)
-// tapi pakai rawOrderDistData sebagai referensi total yang benar
-// Hitung selisih: Belum Plan = Total - Sudah Plan
-const totalOrder = uniqueOrdersFromDist.size;           // 273 (dari rawOrderDistData)
-const sudahPlan  = uniqueOrdersSudah.size;              // 175 (dari rawPivotData)
-const belumPlan  = totalOrder - sudahPlan;              // 273 - 175 = 98
-
-// Update KPI DOM
-updateVal('fbi-kpi-total-stores', uniqueStores.size);
-updateVal('fbi-kpi-sudah-plan', formatIndo(sudahPlan));
-updateVal('fbi-kpi-outstanding-aging', formatIndo(totalOrder));
-updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
-
-            // Render Chatime Dashboard (independent now)
-            renderChatimeDashboard();
-
-            // 2. Render Outstanding Table (Filtered by FBI Schedule filters)
-            if (tbody) {
-                const hariFilter = document.getElementById('fbi-filter-hari')?.value || 'ALL';
-                const shipFilter = document.getElementById('fbi-filter-shipping')?.value || 'ALL';
-                const wilFilter = document.getElementById('fbi-filter-wilayah')?.value || 'ALL';
-
-                // Get list of valid SiteCodes based on FBI Schedule filters
-                const scheduledSiteCodes = new Set();
-                rawFBISchedule.forEach(s => {
-                    const stopVal = s.stops[hariFilter];
-                    const stopNum = parseInt(stopVal);
-                    
-                    let match = true;
-                    if (hariFilter !== 'ALL' && (isNaN(stopNum) || stopNum <= 0)) match = false;
-                    if (shipFilter !== 'ALL' && (s.shippingLine || '').trim().toUpperCase() !== shipFilter) match = false;
-                    if (wilFilter !== 'ALL' && s.wilayah.trim().toUpperCase() !== wilFilter) match = false;
-                    
-                    if (match) {
-                        scheduledSiteCodes.add((s.siteCode || '').trim());
-                    }
-                });
-
-                const outstandingStoresMap = {};
-                
-                const monthNamesIndo = {
-                    'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'mei': 4, 'may': 4,
-                    'jun': 5, 'jul': 6, 'agu': 7, 'aug': 7, 'sep': 8,
-                    'okt': 9, 'oct': 9, 'nov': 10, 'des': 11, 'dec': 11
-                };
-
-                const parseRobustDate = (dateStr) => {
-                    if (!dateStr) return null;
-                    const s = dateStr.toString().trim().toLowerCase();
-                    if (!s) return null;
-                    let d = new Date(s);
-                    if (!isNaN(d.getTime())) return d;
-                    const parts = s.split(/[\/\-\s]+/);
-                    if (parts.length >= 2) {
-                        let day = parseInt(parts[0]);
-                        let mon = -1;
-                        let yr = parts.length >= 3 ? parseInt(parts[2]) : new Date().getFullYear();
-                        const mPart = parts[1].substring(0, 3);
-                        if (monthNamesIndo.hasOwnProperty(mPart)) mon = monthNamesIndo[mPart];
-                        else mon = parseInt(parts[1]) - 1;
-                        if (yr < 100) yr += 2000;
-                        if (!isNaN(day) && mon >= 0 && mon <= 11 && !isNaN(yr)) {
-                            const result = new Date(yr, mon, day);
-                            return isNaN(result.getTime()) ? null : result;
-                        }
-                    }
-                    return null;
-                };
-
-                rawPivotData.forEach(row => {
-                    const statusStr = (row.status || '').toUpperCase().trim();
-                    if (!statusStr.includes('BELUM PLAN')) return;
-
-                    // Group by StoreBooking (same as schedule table for consistency)
-                    const siteCode = (row.storeBooking || row.rawColumns.I || 'UNKNOWN').trim();
-                    
-                    // Filter Sync: Only show if this SiteCode exists in the currently filtered schedule
-                    if (hariFilter !== 'ALL' || shipFilter !== 'ALL' || wilFilter !== 'ALL') {
-                        if (!scheduledSiteCodes.has(siteCode)) return;
-                    }
-
-                    if (!outstandingStoresMap[siteCode]) {
-                        outstandingStoresMap[siteCode] = {
-                            siteCode: siteCode,
-                            description: row.storeBookingName || 'Unknown Store',
-                            orders: new Set(),
-                            dates: new Set(),
-                            totalCbm: 0
-                        };
-                    }
-                    
-                    const orderId = row.rawColumns.E || row.rawColumns.F || (Math.random().toString());
-                    outstandingStoresMap[siteCode].orders.add(orderId);
-                    outstandingStoresMap[siteCode].totalCbm += (row.cbm || 0);
-                    if (row.stuffingDate) outstandingStoresMap[siteCode].dates.add(row.stuffingDate);
-                });
-
-                const tableData = Object.values(outstandingStoresMap).sort((a, b) => b.orders.size - a.orders.size);
-                
-                tbody.innerHTML = tableData.map(item => {
-                    const dateList = Array.from(item.dates).join(', ');
-                    return `
-                        <tr>
-                            <td style="color: #ffd700; font-weight: bold; font-size: 0.9em;">${item.siteCode}</td>
-                            <td style="font-size: 0.85em;">
-                                ${item.description}
-                            </td>
-                            <td style="text-align: center; font-weight: bold; color: #4ade80;">${item.orders.size}</td>
-                        </tr>
-                    `;
-                }).join('') || '<tr><td colspan="3" style="text-align:center; padding: 20px; color: #888;">Tidak ada order Belum Plan sesuai filter</td></tr>';
+                if (colI) uniqueStores.add(colI.toUpperCase());
+                if (orderId && colBC.toUpperCase() === 'SUDAH PLAN') {
+                    uniqueOrdersSudah.add(orderId);
+                }
             }
 
-            // 3. Render SCHEDULE DELIVERY FBI Table
-            renderFBIScheduleTable();
+            const uniqueOrdersFromDist = new Set();
+            for (let i = 0; i < rawOrderDistData.length; i++) {
+                const d = rawOrderDistData[i];
+                if (d && d.orderNo) uniqueOrdersFromDist.add(d.orderNo);
+            }
 
-            // 4. Update Map & Chart
-            initFBIMap();
-            // Trend Case ID Harian from rawPlannerData
+            const totalOrder = uniqueOrdersFromDist.size;
+            const sudahPlan  = uniqueOrdersSudah.size;
+            const belumPlan  = totalOrder - sudahPlan;
+
+            updateVal('fbi-kpi-total-stores', uniqueStores.size);
+            updateVal('fbi-kpi-sudah-plan', formatIndo(sudahPlan));
+            updateVal('fbi-kpi-outstanding-aging', formatIndo(totalOrder));
+            updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
+        }
+
+        function renderFBIScheduleAndOutstanding() {
+            const tbody = document.getElementById('fbi-outstanding-table-body');
+            if (tbody) {
+                if (!rawPivotData || rawPivotData.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">Memproses data...</td></tr>';
+                } else {
+                    const hariFilter = document.getElementById('fbi-filter-hari')?.value || 'ALL';
+                    const shipFilter = document.getElementById('fbi-filter-shipping')?.value || 'ALL';
+                    const wilFilter = document.getElementById('fbi-filter-wilayah')?.value || 'ALL';
+
+                    const scheduledSiteCodes = new Set();
+                    const hasSchedFilter = (hariFilter !== 'ALL' || shipFilter !== 'ALL' || wilFilter !== 'ALL');
+                    if (hasSchedFilter) {
+                        rawFBISchedule.forEach(s => {
+                            const stopVal = s.stops[hariFilter];
+                            const stopNum = parseInt(stopVal);
+                            if (hariFilter !== 'ALL' && (isNaN(stopNum) || stopNum <= 0)) return;
+                            if (shipFilter !== 'ALL' && (s.shippingLine || '').trim().toUpperCase() !== shipFilter) return;
+                            if (wilFilter !== 'ALL' && (s.wilayah || '').trim().toUpperCase() !== wilFilter) return;
+                            scheduledSiteCodes.add((s.siteCode || '').trim());
+                        });
+                    }
+
+                    const outstandingStoresMap = {};
+                    for (let idx = 0; idx < rawPivotData.length; idx++) {
+                        const row = rawPivotData[idx];
+                        const statusStr = (row.status || '').toUpperCase().trim();
+                        if (!statusStr.includes('BELUM PLAN')) continue;
+
+                        const siteCode = (row.storeBooking || (row.rawColumns && row.rawColumns.I) || 'UNKNOWN').trim();
+                        if (hasSchedFilter && !scheduledSiteCodes.has(siteCode)) continue;
+
+                        let entry = outstandingStoresMap[siteCode];
+                        if (!entry) {
+                            entry = {
+                                siteCode: siteCode,
+                                description: row.storeBookingName || 'Unknown Store',
+                                orders: new Set()
+                            };
+                            outstandingStoresMap[siteCode] = entry;
+                        }
+
+                        const orderId = (row.rawColumns && (row.rawColumns.E || row.rawColumns.F)) || ('__row_' + idx);
+                        entry.orders.add(orderId);
+                    }
+
+                    const tableData = Object.values(outstandingStoresMap).sort((a, b) => b.orders.size - a.orders.size);
+                    if (tableData.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: #888;">Tidak ada order Belum Plan sesuai filter</td></tr>';
+                    } else {
+                        const rowsHtml = [];
+                        for (let i = 0; i < tableData.length; i++) {
+                            const item = tableData[i];
+                            rowsHtml.push(`<tr><td style="color: #ffd700; font-weight: bold; font-size: 0.9em;">${item.siteCode}</td><td style="font-size: 0.85em;">${item.description}</td><td style="text-align: center; font-weight: bold; color: #4ade80;">${item.orders.size}</td></tr>`);
+                        }
+                        tbody.innerHTML = rowsHtml.join('');
+                    }
+                }
+            }
+
+            renderFBIScheduleTable();
+        }
+
+        function renderFBITrendChart() {
             const trendData = {};
-            rawPlannerData.forEach(d => {
-                const dateObj = parseDate(d.stuffingDate);
-                const isoDate = toISODate(dateObj);
+            for (let i = 0; i < rawPlannerData.length; i++) {
+                const d = rawPlannerData[i];
+                const isoDate = d._isoDate || toISODate(parseDate(d.stuffingDate));
                 if (isoDate && !isoDate.startsWith('2025')) {
                     trendData[isoDate] = (trendData[isoDate] || 0) + (d.caseId || 0);
                 }
-            });
+            }
 
-            const sortedTrendKeys = Object.keys(trendData).sort((a, b) => new Date(a) - new Date(b));
-            // Only take the last 7 days
+            const sortedTrendKeys = Object.keys(trendData).sort();
             const last7Keys = sortedTrendKeys.slice(-7);
-            
-            const finalTrendData = last7Keys.map(key => ({
-                label: key,
-                value: trendData[key]
-            }));
-
+            const finalTrendData = last7Keys.map(key => ({ label: key, value: trendData[key] }));
             renderFBIChart(finalTrendData);
+        }
+
+        function renderFBIDashboard(opts) {
+            if (!document.body.classList.contains('theme-purple')) return;
+            const planningOnly = !!(opts && opts.planningOnly);
+            const visDash = isSectionVisible('fbi-dashboard-section');
+            const visPlan = isSectionVisible('fbi-planning-section');
+
+            if (!planningOnly) {
+                if (visDash || !window.__activeDashSection) {
+                    window.__fbiKpiDirty = false;
+                    renderFBIHeaderKPIs();
+                } else {
+                    window.__fbiKpiDirty = true;
+                }
+                renderChatimeDashboard();
+            }
+
+            if (visPlan) {
+                window.__fbiPlanningDirty = false;
+                renderFBIScheduleAndOutstanding();
+                if (!(opts && opts.skipMap)) initFBIMap();
+                if (!(opts && opts.skipChart)) renderFBITrendChart();
+            } else {
+                window.__fbiPlanningDirty = true;
+            }
         }
 
         function syncFBIDropdowns() {
@@ -10849,48 +10992,57 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             const currentShip = shippingFilter.value;
             const currentWil = wilayahFilter.value;
 
-            // Filter raw schedule by day first to see what's available
-            const availableRows = rawFBISchedule.filter(s => {
-                if (hariFilter === 'ALL') return true;
-                const stopVal = s.stops[hariFilter];
-                const stopNum = parseInt(stopVal);
-                return !isNaN(stopNum) && stopNum > 0;
-            });
-
             const uniqueShipping = new Set();
             const uniqueWilayah = new Set();
-            availableRows.forEach(s => {
+            for (let i = 0; i < rawFBISchedule.length; i++) {
+                const s = rawFBISchedule[i];
+                if (hariFilter !== 'ALL') {
+                    const stopNum = parseInt(s.stops[hariFilter]);
+                    if (isNaN(stopNum) || stopNum <= 0) continue;
+                }
                 if (s.shippingLine) uniqueShipping.add(s.shippingLine.trim().toUpperCase());
                 if (s.wilayah) uniqueWilayah.add(s.wilayah.trim().toUpperCase());
-            });
-
-            // Update Shipping Filter
-            shippingFilter.innerHTML = '<option value="ALL">SEMUA SHIPPING</option>';
-            Array.from(uniqueShipping).sort().forEach(w => {
-                const opt = document.createElement('option');
-                opt.value = w;
-                opt.textContent = w;
-                shippingFilter.appendChild(opt);
-            });
-            if (uniqueShipping.has(currentShip)) {
-                shippingFilter.value = currentShip;
-            } else {
-                shippingFilter.value = 'ALL';
             }
 
-            // Update Wilayah Filter
-            wilayahFilter.innerHTML = '<option value="ALL">SEMUA WILAYAH</option>';
-            Array.from(uniqueWilayah).sort().forEach(w => {
-                const opt = document.createElement('option');
-                opt.value = w;
-                opt.textContent = w;
-                wilayahFilter.appendChild(opt);
-            });
-            if (uniqueWilayah.has(currentWil)) {
-                wilayahFilter.value = currentWil;
-            } else {
-                wilayahFilter.value = 'ALL';
+            const sortedShip = Array.from(uniqueShipping).sort();
+            const shipSig = sortedShip.join('|');
+            if (shippingFilter.dataset.optSig !== shipSig) {
+                const fragS = document.createDocumentFragment();
+                const allS = document.createElement('option');
+                allS.value = 'ALL';
+                allS.textContent = 'SEMUA SHIPPING';
+                fragS.appendChild(allS);
+                sortedShip.forEach(w => {
+                    const opt = document.createElement('option');
+                    opt.value = w;
+                    opt.textContent = w;
+                    fragS.appendChild(opt);
+                });
+                shippingFilter.innerHTML = '';
+                shippingFilter.appendChild(fragS);
+                shippingFilter.dataset.optSig = shipSig;
             }
+            shippingFilter.value = uniqueShipping.has(currentShip) ? currentShip : 'ALL';
+
+            const sortedWil = Array.from(uniqueWilayah).sort();
+            const wilSig = sortedWil.join('|');
+            if (wilayahFilter.dataset.optSig !== wilSig) {
+                const fragW = document.createDocumentFragment();
+                const allW = document.createElement('option');
+                allW.value = 'ALL';
+                allW.textContent = 'SEMUA WILAYAH';
+                fragW.appendChild(allW);
+                sortedWil.forEach(w => {
+                    const opt = document.createElement('option');
+                    opt.value = w;
+                    opt.textContent = w;
+                    fragW.appendChild(opt);
+                });
+                wilayahFilter.innerHTML = '';
+                wilayahFilter.appendChild(fragW);
+                wilayahFilter.dataset.optSig = wilSig;
+            }
+            wilayahFilter.value = uniqueWilayah.has(currentWil) ? currentWil : 'ALL';
         }
 
         function renderFBIScheduleTable() {
@@ -10964,16 +11116,16 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 return stopA - stopB;
             });
 
-            let html = '';
+            const rowsHtml = [];
             let totalSudah = { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 };
             let totalBelum = { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 };
             const scheduleItemsForCopy = [];
             const seenCopySites = new Set();
 
             if (filteredSchedule.length === 0) {
-                html = '<tr><td colspan="16" style="text-align:center; padding:20px; color:#bbb;">Tidak ada jadwal pengiriman untuk filter yang dipilih</td></tr>';
+                rowsHtml.push('<tr><td colspan="16" style="text-align:center; padding:20px; color:#bbb;">Tidak ada jadwal pengiriman untuk filter yang dipilih</td></tr>');
             } else {
-                filteredSchedule.forEach((s, index) => {
+                filteredSchedule.forEach((s) => {
                     const stats = pivotBySite[s.siteCode] || {
                         sudah: { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 },
                         belum: { "0": 0, "1-3": 0, "4-7": 0, "7UP": 0, total: 0 }
@@ -10994,28 +11146,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
 
                     const stopVal = s.stops[hariFilter] || '-';
 
-                    html += `
-                        <tr style="border-bottom: 1px solid #222;">
-                            <td style="text-align:center; color:#ffd700; font-weight:bold;">${stopVal}</td>
-                            <td style="text-align:center; font-weight:bold; color:#ffd700;">${s.siteCode}</td>
-                            <td style="font-size:0.85em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:250px;" title="${s.storeDesc}">${s.storeDesc}</td>
-                            <td style="text-align:center; color:#ffd700; font-size:0.9em;">${s.shippingLine || '-'}</td>
-                            <td style="text-align:center; color:#4ade80; font-size:0.9em;">${s.wilayah || '-'}</td>
-                            <td style="text-align:center; color:#2dd4bf; font-size:0.9em;">${s.city || '-'}</td>
-                            
-                            <td style="text-align:center; color:#4ade80;">${stats.sudah["0"] > 0 ? formatIndo(stats.sudah["0"]) : '-'}</td>
-                            <td style="text-align:center; color:#4ade80;">${stats.sudah["1-3"] > 0 ? formatIndo(stats.sudah["1-3"]) : '-'}</td>
-                            <td style="text-align:center; color:#4ade80;">${stats.sudah["4-7"] > 0 ? formatIndo(stats.sudah["4-7"]) : '-'}</td>
-                            <td style="text-align:center; color:#4ade80;">${stats.sudah["7UP"] > 0 ? formatIndo(stats.sudah["7UP"]) : '-'}</td>
-                            <td style="text-align:center; font-weight:bold; background: rgba(74, 222, 128, 0.1);">${formatIndo(stats.sudah.total)}</td>
-
-                            <td style="text-align:center; color:#fb7185;">${stats.belum["0"] > 0 ? formatIndo(stats.belum["0"]) : '-'}</td>
-                            <td style="text-align:center; color:#fb7185;">${stats.belum["1-3"] > 0 ? formatIndo(stats.belum["1-3"]) : '-'}</td>
-                            <td style="text-align:center; color:#fb7185;">${stats.belum["4-7"] > 0 ? formatIndo(stats.belum["4-7"]) : '-'}</td>
-                            <td style="text-align:center; color:#fb7185;">${stats.belum["7UP"] > 0 ? formatIndo(stats.belum["7UP"]) : '-'}</td>
-                            <td style="text-align:center; font-weight:bold; background: rgba(251, 113, 133, 0.1);">${formatIndo(stats.belum.total)}</td>
-                        </tr>
-                    `;
+                    rowsHtml.push(`<tr style="border-bottom: 1px solid #222;"><td style="text-align:center; color:#ffd700; font-weight:bold;">${stopVal}</td><td style="text-align:center; font-weight:bold; color:#ffd700;">${s.siteCode}</td><td style="font-size:0.85em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:250px;" title="${s.storeDesc}">${s.storeDesc}</td><td style="text-align:center; color:#ffd700; font-size:0.9em;">${s.shippingLine || '-'}</td><td style="text-align:center; color:#4ade80; font-size:0.9em;">${s.wilayah || '-'}</td><td style="text-align:center; color:#2dd4bf; font-size:0.9em;">${s.city || '-'}</td><td style="text-align:center; color:#4ade80;">${stats.sudah["0"] > 0 ? formatIndo(stats.sudah["0"]) : '-'}</td><td style="text-align:center; color:#4ade80;">${stats.sudah["1-3"] > 0 ? formatIndo(stats.sudah["1-3"]) : '-'}</td><td style="text-align:center; color:#4ade80;">${stats.sudah["4-7"] > 0 ? formatIndo(stats.sudah["4-7"]) : '-'}</td><td style="text-align:center; color:#4ade80;">${stats.sudah["7UP"] > 0 ? formatIndo(stats.sudah["7UP"]) : '-'}</td><td style="text-align:center; font-weight:bold; background: rgba(74, 222, 128, 0.1);">${formatIndo(stats.sudah.total)}</td><td style="text-align:center; color:#fb7185;">${stats.belum["0"] > 0 ? formatIndo(stats.belum["0"]) : '-'}</td><td style="text-align:center; color:#fb7185;">${stats.belum["1-3"] > 0 ? formatIndo(stats.belum["1-3"]) : '-'}</td><td style="text-align:center; color:#fb7185;">${stats.belum["4-7"] > 0 ? formatIndo(stats.belum["4-7"]) : '-'}</td><td style="text-align:center; color:#fb7185;">${stats.belum["7UP"] > 0 ? formatIndo(stats.belum["7UP"]) : '-'}</td><td style="text-align:center; font-weight:bold; background: rgba(251, 113, 133, 0.1);">${formatIndo(stats.belum.total)}</td></tr>`);
 
                     Object.keys(totalSudah).forEach(k => {
                         totalSudah[k] += stats.sudah[k];
@@ -11023,22 +11154,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                     });
                 });
 
-                // Grand Total Row
-                html += `
-                    <tr style="background: #1a1a1a; font-weight: bold; border-top: 2px solid #333;">
-                        <td colspan="6" style="text-align:right; padding:10px; color:#ffd700;">GRAND TOTAL:</td>
-                        <td style="text-align:center; color:#4ade80;">${formatIndo(totalSudah["0"])}</td>
-                        <td style="text-align:center; color:#4ade80;">${formatIndo(totalSudah["1-3"])}</td>
-                        <td style="text-align:center; color:#4ade80;">${formatIndo(totalSudah["4-7"])}</td>
-                        <td style="text-align:center; color:#4ade80;">${formatIndo(totalSudah["7UP"])}</td>
-                        <td style="text-align:center; color:#ffd700; background:rgba(255,215,0,0.1);">${formatIndo(totalSudah.total)}</td>
-                        <td style="text-align:center; color:#fb7185;">${formatIndo(totalBelum["0"])}</td>
-                        <td style="text-align:center; color:#fb7185;">${formatIndo(totalBelum["1-3"])}</td>
-                        <td style="text-align:center; color:#fb7185;">${formatIndo(totalBelum["4-7"])}</td>
-                        <td style="text-align:center; color:#fb7185;">${formatIndo(totalBelum["7UP"])}</td>
-                        <td style="text-align:center; color:#ffd700; background:rgba(255,215,0,0.1);">${formatIndo(totalBelum.total)}</td>
-                    </tr>
-                `;
+                rowsHtml.push(`<tr style="background: #1a1a1a; font-weight: bold; border-top: 2px solid #333;"><td colspan="6" style="text-align:right; padding:10px; color:#ffd700;">GRAND TOTAL:</td><td style="text-align:center; color:#4ade80;">${formatIndo(totalSudah["0"])}</td><td style="text-align:center; color:#4ade80;">${formatIndo(totalSudah["1-3"])}</td><td style="text-align:center; color:#4ade80;">${formatIndo(totalSudah["4-7"])}</td><td style="text-align:center; color:#4ade80;">${formatIndo(totalSudah["7UP"])}</td><td style="text-align:center; color:#ffd700; background:rgba(255,215,0,0.1);">${formatIndo(totalSudah.total)}</td><td style="text-align:center; color:#fb7185;">${formatIndo(totalBelum["0"])}</td><td style="text-align:center; color:#fb7185;">${formatIndo(totalBelum["1-3"])}</td><td style="text-align:center; color:#fb7185;">${formatIndo(totalBelum["4-7"])}</td><td style="text-align:center; color:#fb7185;">${formatIndo(totalBelum["7UP"])}</td><td style="text-align:center; color:#ffd700; background:rgba(255,215,0,0.1);">${formatIndo(totalBelum.total)}</td></tr>`);
             }
 
             window.currentFbiScheduleItems = scheduleItemsForCopy;
@@ -11050,7 +11166,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 renderFbiStoreCodeModalContent();
             }
 
-            hBody.innerHTML = html;
+            hBody.innerHTML = rowsHtml.join('');
         }
 
         function updateVal(id, val) {
@@ -11087,6 +11203,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: { duration: 150 },
                     plugins: {
                         legend: { display: false },
                         datalabels: { display: false }
@@ -11155,6 +11272,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        animation: { duration: 150 },
                         layout: { padding: 5 },
                         cutout: '65%',
                         plugins: {
@@ -11248,6 +11366,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                         indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
+                        animation: { duration: 150 },
                         layout: { padding: { right: 50, top: 10 } },
                         plugins: {
                             legend: {
@@ -11292,11 +11411,16 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
         }
 
         async function fetchPlannerData(retries = 2) {
+            if (!document.body.classList.contains('theme-purple')) return;
             try {
                 const response = await fetch(PLANNER_CSV_URL);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csv = await response.text();
                 if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML (Google Login required or link not shared)');
+                window.__csvTextCache = window.__csvTextCache || {};
+                const cacheKey = 'planner:' + PLANNER_CSV_URL;
+                if (window.__csvTextCache[cacheKey] === csv && rawPlannerData.length > 0) return;
+                window.__csvTextCache[cacheKey] = csv;
                 parsePlannerCSV(csv);
             } catch (error) {
                 console.error("Error fetching Planner data:", error);
@@ -11306,26 +11430,79 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             }
         }
 
+        function parseLocalSlaDateCached(str) {
+            if (!str) return new Date(0);
+            const s = String(str).trim();
+            const isoMatch = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+            if (isoMatch) {
+                return new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10));
+            }
+            const slashMatch = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+            if (slashMatch) {
+                let yr = parseInt(slashMatch[3], 10);
+                if (yr < 100) yr += 2000;
+                return new Date(yr, parseInt(slashMatch[2], 10) - 1, parseInt(slashMatch[1], 10));
+            }
+            return parseDate(s);
+        }
+
+        function buildSlaFbiParsedRows(rows) {
+            const out = [];
+            if (!rows || rows.length <= 2) return out;
+            for (let i = 2; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row || row.length < 5) continue;
+                const rowDate = (row[0] || '').trim();
+                if (!rowDate) continue;
+                const dObj = parseLocalSlaDateCached(rowDate);
+                if (!dObj || isNaN(dObj.getTime()) || dObj.getTime() === 0) continue;
+                const y = dObj.getFullYear();
+                const m = dObj.getMonth();
+                out.push({
+                    rowDate,
+                    dObj,
+                    isoDate: toISODate(dObj),
+                    year: y,
+                    month: m,
+                    bulanKey: MonthsID[m] + ' ' + y,
+                    dkOT: parseNumberWithComma(row[1] || '0'),
+                    dkDelay: parseNumberWithComma(row[2] || '0'),
+                    lkOT: parseNumberWithComma(row[3] || '0'),
+                    lkDelay: parseNumberWithComma(row[4] || '0')
+                });
+            }
+            return out;
+        }
+
         function parsePlannerCSV(csv) {
             const rows = robustCSVParser(csv);
             if (rows.length < 2) return;
-            
-            // Expected Column Mapping from user request:
-            // A=0: TANGGAL STUFFING
-            // C=2: AREA FILTER
-            // D=3: TOTAL ORDER RELEASE / OUTSTANDING (OD)
-            // E=4: TOTAL CASE ID
-            
-            const data = rows.slice(1); // skip headers
-            rawPlannerData = data.map(row => ({
-                stuffingDate: (row[0] || '').trim(),
-                area: (row[2] || '').trim(),
-                orderRelease: parseNumberWithComma(row[3]),
-                caseId: parseNumberWithComma(row[4])
-            })).filter(d => d.area && d.area !== '');
+
+            const data = rows.slice(1);
+            rawPlannerData = data.map(row => {
+                const stuffingDate = (row[0] || '').trim();
+                const area = (row[2] || '').trim();
+                if (!area) return null;
+                const dObj = parseDate(stuffingDate);
+                const hasDate = !!(dObj && !isNaN(dObj.getTime()) && dObj.getTime() > 0);
+                return {
+                    stuffingDate,
+                    area,
+                    orderRelease: parseNumberWithComma(row[3]),
+                    caseId: parseNumberWithComma(row[4]),
+                    _dObj: dObj,
+                    _isoDate: toISODate(dObj),
+                    _bulanKey: hasDate ? (MonthsID[dObj.getMonth()] + ' ' + dObj.getFullYear()) : ''
+                };
+            }).filter(Boolean);
 
             populatePlannerFilters();
             renderChatimeDashboard();
+            if (isSectionVisible('fbi-planning-section')) {
+                renderFBITrendChart();
+            } else {
+                window.__fbiPlanningDirty = true;
+            }
         }
 
         function parseDDMMYYYY(str) {
@@ -11350,18 +11527,24 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             const selectedDate = dateFilter.value;
             const selectedArea = areaFilter.value;
 
-            // Date options: Filter out 2025 and sort chronologically DESC (Newest first)
             const dateMap = {};
-            rawPlannerData.forEach(d => {
-                const dateObj = parseDate(d.stuffingDate);
-                const isoDate = toISODate(dateObj);
+            for (let i = 0; i < rawPlannerData.length; i++) {
+                const d = rawPlannerData[i];
+                const dObj = d._dObj || parseDate(d.stuffingDate);
+                const isoDate = d._isoDate || toISODate(dObj);
                 if (isoDate && !isoDate.startsWith('2025')) {
-                    dateMap[isoDate] = dateObj;
+                    dateMap[isoDate] = dObj;
                 }
-            });
-            
-            // Tambahkan juga tanggal dari SLA FBI agar dropdown lengkap
-            if (rawSlaFbiData.length > 2) {
+            }
+
+            if (window.__slaFbiParsedRows && window.__slaFbiParsedRows.length > 0) {
+                for (let i = 0; i < window.__slaFbiParsedRows.length; i++) {
+                    const r = window.__slaFbiParsedRows[i];
+                    if (r.isoDate && !dateMap[r.isoDate] && !r.isoDate.startsWith('2025')) {
+                        dateMap[r.isoDate] = r.dObj;
+                    }
+                }
+            } else if (rawSlaFbiData.length > 2) {
                 for (let i = 2; i < rawSlaFbiData.length; i++) {
                     const dStr = (rawSlaFbiData[i][0] || '').trim();
                     if (dStr) {
@@ -11374,98 +11557,111 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 }
             }
 
-            // Populate Bulan dropdown option list if empty/unpopulated
             if (bulanFilter && bulanFilter.options.length <= 1) {
                 const bulanMap = {};
                 Object.values(dateMap).forEach(dateObj => {
                     const key = MonthsID[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
-                    const sortKey = dateObj.getFullYear() * 100 + dateObj.getMonth();
-                    bulanMap[key] = sortKey;
+                    bulanMap[key] = dateObj.getFullYear() * 100 + dateObj.getMonth();
                 });
 
-                bulanFilter.innerHTML = '<option value="ALL">SEMUA BULAN</option>';
-                Object.keys(bulanMap)
-                    .sort((a, b) => bulanMap[b] - bulanMap[a])
-                    .forEach(b => {
-                        const o = document.createElement('option');
-                        o.value = b;
-                        o.textContent = b;
-                        bulanFilter.appendChild(o);
-                    });
+                const sortedBulanKeys = Object.keys(bulanMap).sort((a, b) => bulanMap[b] - bulanMap[a]);
+                const fragB = document.createDocumentFragment();
+                const allOptB = document.createElement('option');
+                allOptB.value = 'ALL';
+                allOptB.textContent = 'SEMUA BULAN';
+                fragB.appendChild(allOptB);
+                sortedBulanKeys.forEach(b => {
+                    const o = document.createElement('option');
+                    o.value = b;
+                    o.textContent = b;
+                    fragB.appendChild(o);
+                });
+                bulanFilter.innerHTML = '';
+                bulanFilter.appendChild(fragB);
 
-                // Default to current month if dynamic, otherwise default to most recent month
                 const now = new Date();
                 const targetSortKey = now.getFullYear() * 100 + now.getMonth();
-                const matchKey = Object.keys(bulanMap).find(k => bulanMap[k] === targetSortKey);
-
+                const matchKey = sortedBulanKeys.find(k => bulanMap[k] === targetSortKey);
                 if (matchKey) {
                     bulanFilter.value = matchKey;
+                } else if (sortedBulanKeys.length > 0) {
+                    bulanFilter.value = sortedBulanKeys[0];
                 } else {
-                    const sortedBulanKeys = Object.keys(bulanMap).sort((a, b) => bulanMap[b] - bulanMap[a]);
-                    if (sortedBulanKeys.length > 0) {
-                        bulanFilter.value = sortedBulanKeys[0];
-                    } else {
-                        bulanFilter.value = 'ALL';
-                    }
+                    bulanFilter.value = 'ALL';
                 }
             }
 
             const selectedBulan = bulanFilter ? bulanFilter.value : 'ALL';
 
-            // Filter date keys by the selected Month
             const filteredDates = Object.keys(dateMap).filter(isoD => {
                 if (selectedBulan === 'ALL') return true;
                 const dObj = dateMap[isoD];
-                const key = MonthsID[dObj.getMonth()] + ' ' + dObj.getFullYear();
-                return key === selectedBulan;
+                return (MonthsID[dObj.getMonth()] + ' ' + dObj.getFullYear()) === selectedBulan;
             });
 
-            const sortedDates = filteredDates.sort((a, b) => dateMap[b] - dateMap[a]);
+            const sortedDates = filteredDates.sort((a, b) => (a < b ? 1 : a > b ? -1 : 0));
+            const dateSig = sortedDates.join('|');
+            if (dateFilter.dataset.optSig !== dateSig) {
+                const fragD = document.createDocumentFragment();
+                const allOptD = document.createElement('option');
+                allOptD.value = 'ALL';
+                allOptD.textContent = 'All Dates';
+                fragD.appendChild(allOptD);
+                sortedDates.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.textContent = d;
+                    fragD.appendChild(opt);
+                });
+                dateFilter.innerHTML = '';
+                dateFilter.appendChild(fragD);
+                dateFilter.dataset.optSig = dateSig;
+            }
 
-            dateFilter.innerHTML = '<option value="ALL">All Dates</option>';
-            sortedDates.forEach(d => {
-                const opt = document.createElement('option');
-                opt.value = d;
-                opt.textContent = d;
-                dateFilter.appendChild(opt);
-            });
-
-            // Default selection logic:
             if (sortedDates.includes(selectedDate)) {
                 dateFilter.value = selectedDate;
             } else if (sortedDates.length > 0) {
-                // Try today's date in ISO format
                 const todayIso = toISODate(new Date());
-                
                 if (sortedDates.includes(todayIso)) {
                     dateFilter.value = todayIso;
-                } else if (selectedDate === 'ALL') {
-                    dateFilter.value = 'ALL';
                 } else {
-                    dateFilter.value = 'ALL'; // Safer fallback to see all days for selected Month
+                    dateFilter.value = 'ALL';
                 }
             } else {
                 dateFilter.value = 'ALL';
             }
 
-            // Area options: Restricted to "Luar Pulau", "Luar Kota", "Store DK"
             const allowedAreas = ['Luar Pulau', 'Luar Kota', 'Store DK'];
-            areaFilter.innerHTML = '<option value="ALL">All Areas</option>';
-            allowedAreas.forEach(a => {
-                const opt = document.createElement('option');
-                opt.value = a;
-                opt.textContent = a;
-                areaFilter.appendChild(opt);
-            });
+            if (areaFilter.dataset.optSig !== 'FIXED') {
+                const fragA = document.createDocumentFragment();
+                const allOptA = document.createElement('option');
+                allOptA.value = 'ALL';
+                allOptA.textContent = 'All Areas';
+                fragA.appendChild(allOptA);
+                allowedAreas.forEach(a => {
+                    const opt = document.createElement('option');
+                    opt.value = a;
+                    opt.textContent = a;
+                    fragA.appendChild(opt);
+                });
+                areaFilter.innerHTML = '';
+                areaFilter.appendChild(fragA);
+                areaFilter.dataset.optSig = 'FIXED';
+            }
             if (allowedAreas.includes(selectedArea)) areaFilter.value = selectedArea;
         }
 
         async function fetchOrderDistData(retries = 2) {
+            if (!document.body.classList.contains('theme-purple')) return;
             try {
                 const response = await fetch(ORDER_DIST_CSV_URL);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csv = await response.text();
                 if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML');
+                window.__csvTextCache = window.__csvTextCache || {};
+                const cacheKey = 'orderDist:' + ORDER_DIST_CSV_URL;
+                if (window.__csvTextCache[cacheKey] === csv && rawOrderDistData.length > 0) return;
+                window.__csvTextCache[cacheKey] = csv;
                 parseOrderDistCSV(csv);
             } catch (error) {
                 console.error("Error fetching Order Dist data:", error);
@@ -11474,13 +11670,27 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
         }
 
         async function fetchSlaFbiData() {
+            if (!document.body.classList.contains('theme-purple')) return;
             try {
                 const res = await fetch(SLA_FBI_CSV_URL);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const csv = await res.text();
+                if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML');
+                window.__csvTextCache = window.__csvTextCache || {};
+                const cacheKey = 'slaFbi:' + SLA_FBI_CSV_URL;
+                if (window.__csvTextCache[cacheKey] === csv && rawSlaFbiData.length > 0) return;
+                window.__csvTextCache[cacheKey] = csv;
                 rawSlaFbiData = robustCSVParser(csv);
+                window.__slaFbiParsedRows = buildSlaFbiParsedRows(rawSlaFbiData);
                 populateFilters();
-                updateCharts();
+                if (isSectionVisible('summary-report-section')) {
+                    window.__dashDirty.summary = false;
+                    updateCharts();
+                } else {
+                    window.__dashDirty.summary = true;
+                }
+                populatePlannerFilters();
+                renderChatimeDashboard();
             } catch(e) { console.error('SLA FBI fetch error:', e); }
         }
 
@@ -11488,20 +11698,23 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             const rows = robustCSVParser(csv);
             if (rows.length < 2) return;
             
-            // Expected Column Mapping from user request (In spreadsheet 1075426956):
-            // E=4: Order Number (Unique check)
-            // BA=52: Region (Breakdown)
-            
             const data = rows.slice(1);
             rawOrderDistData = data.map(row => ({
                 orderNo: (row[4] || '').trim(),
                 region: (row[52] || '').trim()
             })).filter(d => d.region && d.region !== '');
-            
+
+            if (isSectionVisible('fbi-dashboard-section') || !window.__activeDashSection) {
+                window.__fbiKpiDirty = false;
+                renderFBIHeaderKPIs();
+            } else {
+                window.__fbiKpiDirty = true;
+            }
             renderChatimeDashboard();
         }
 
         async function fetchFixKllData(retries = 2) {
+            if (!document.body.classList.contains('theme-purple')) return;
             try {
                 const response = await fetch(FIX_KLL_CSV_URL);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -11509,6 +11722,10 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 if (csv.trim().startsWith('<!DOCTYPE')) {
                     throw new Error('Received HTML (Google Login required or link not shared)');
                 }
+                window.__csvTextCache = window.__csvTextCache || {};
+                const cacheKey = 'fixKll:' + FIX_KLL_CSV_URL;
+                if (window.__csvTextCache[cacheKey] === csv && rawFixKllData.length > 0) return;
+                window.__csvTextCache[cacheKey] = csv;
                 parseFixKllCSV(csv);
             } catch (error) {
                 console.error("Error fetching FIX KLL data:", error);
@@ -11523,66 +11740,79 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             rawFixKllData = data.map(row => {
                 const rawCaseId = (row[2] || '').trim();
                 const rawDate = (row[14] || '').trim();
+                const dObj = parseDateCustom(rawDate) || parseDate(rawDate);
+                const hasDate = !!(dObj && !isNaN(dObj.getTime()) && dObj.getTime() > 0);
                 return {
                     caseId: parseNumberWithComma(rawCaseId),
-                    tanggal: rawDate
+                    tanggal: rawDate,
+                    _dObj: dObj,
+                    _isoDate: toISODate(dObj),
+                    _bulanKey: hasDate ? (MonthsID[dObj.getMonth()] + ' ' + dObj.getFullYear()) : ''
                 };
             });
             renderChatimeDashboard();
         }
 
         function renderChatimeDashboard() {
+            if (!document.body.classList.contains('theme-purple')) return;
             if (!rawPlannerData || rawPlannerData.length === 0) return;
+            if (!isSectionVisible('fbi-dashboard-section') && window.__activeDashSection) {
+                window.__fbiChatimeDirty = true;
+                return;
+            }
+            window.__fbiChatimeDirty = false;
 
             const bulanFilterVal = document.getElementById('chatime-bulan-filter')?.value || 'ALL';
             const dateFilter = document.getElementById('chatime-date-filter')?.value || 'ALL';
             const areaFilter = document.getElementById('chatime-area-filter')?.value || 'ALL';
 
-            const filtered = rawPlannerData.filter(d => {
-                const dateObj = parseDate(d.stuffingDate);
-                const isoDate = toISODate(dateObj);
+            let totalOrderRelease = 0;
+            let totalCaseId = 0;
+            const barStats = {
+                'Store DK': { total: 0, od: 0 },
+                'Luar Kota': { total: 0, od: 0 },
+                'Luar Pulau': { total: 0, od: 0 }
+            };
 
-                // 1. Filter by local Bulan filter
-                let matchBulan = true;
-                if (bulanFilterVal !== 'ALL' && dateObj && dateObj.getTime() > 0) {
-                    const localMonthKey = MonthsID[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
-                    matchBulan = (localMonthKey === bulanFilterVal);
-                }
+            for (let i = 0; i < rawPlannerData.length; i++) {
+                const d = rawPlannerData[i];
+                const isoDate = d._isoDate !== undefined ? d._isoDate : toISODate(parseDate(d.stuffingDate));
+                const localMonthKey = d._bulanKey !== undefined ? d._bulanKey : (() => {
+                    const dt = parseDate(d.stuffingDate);
+                    return dt && dt.getTime() > 0 ? (MonthsID[dt.getMonth()] + ' ' + dt.getFullYear()) : '';
+                })();
 
-                // 2. Filter by Date
+                const matchBulan = bulanFilterVal === 'ALL' || !localMonthKey || localMonthKey === bulanFilterVal;
                 const matchDate = dateFilter === 'ALL' || isoDate === dateFilter;
 
-                // 3. Filter by Area
-                const matchArea = areaFilter === 'ALL' || d.area === areaFilter;
+                if (matchBulan && matchDate) {
+                    if (barStats[d.area]) {
+                        barStats[d.area].total += d.caseId;
+                        barStats[d.area].od += d.orderRelease;
+                    }
+                    if (areaFilter === 'ALL' || d.area === areaFilter) {
+                        totalOrderRelease += d.orderRelease;
+                        totalCaseId += d.caseId;
+                    }
+                }
+            }
 
-                return matchBulan && matchDate && matchArea;
-            });
-
-            // KPIs
-            const totalOrderRelease = filtered.reduce((sum, d) => sum + d.orderRelease, 0);
-            const totalCaseId = filtered.reduce((sum, d) => sum + d.caseId, 0);
-
-            // CASE ID SHIPPED calculation from rawFixKllData
             let caseIdShippedCount = 0;
             if (rawFixKllData && rawFixKllData.length > 0) {
-                rawFixKllData.forEach(d => {
-                    const dateObj = parseDateCustom(d.tanggal) || parseDate(d.tanggal);
-                    const isoDate = toISODate(dateObj);
+                for (let i = 0; i < rawFixKllData.length; i++) {
+                    const d = rawFixKllData[i];
+                    const isoDate = d._isoDate !== undefined ? d._isoDate : toISODate(parseDateCustom(d.tanggal) || parseDate(d.tanggal));
+                    const localMonthKey = d._bulanKey !== undefined ? d._bulanKey : (() => {
+                        const dt = parseDateCustom(d.tanggal) || parseDate(d.tanggal);
+                        return dt && dt.getTime() > 0 ? (MonthsID[dt.getMonth()] + ' ' + dt.getFullYear()) : '';
+                    })();
 
-                    // 1. Filter by local Bulan
-                    let matchBulan = true;
-                    if (bulanFilterVal !== 'ALL' && dateObj && dateObj.getTime() > 0) {
-                        const localMonthKey = MonthsID[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
-                        matchBulan = (localMonthKey === bulanFilterVal);
-                    }
-
-                    // 2. Filter by Date
+                    const matchBulan = bulanFilterVal === 'ALL' || !localMonthKey || localMonthKey === bulanFilterVal;
                     const matchDate = dateFilter === 'ALL' || isoDate === dateFilter;
-
                     if (matchBulan && matchDate) {
                         caseIdShippedCount += d.caseId;
                     }
-                });
+                }
             }
 
             const odEl = document.getElementById('chatime-total-od');
@@ -11592,94 +11822,45 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             if (ciEl) ciEl.innerText = formatIndo(totalCaseId);
             if (cisEl) cisEl.innerText = formatIndo(caseIdShippedCount);
 
-            // Chart Data 1: Order Distribution (Unique count of orderNo per region)
             const regionOrderMap = {};
-            rawOrderDistData.forEach(d => {
+            for (let i = 0; i < rawOrderDistData.length; i++) {
+                const d = rawOrderDistData[i];
                 if (!regionOrderMap[d.region]) regionOrderMap[d.region] = new Set();
                 if (d.orderNo) regionOrderMap[d.region].add(d.orderNo);
-            });
-            
+            }
             const donutStats = {};
             for (const region in regionOrderMap) {
                 donutStats[region] = regionOrderMap[region].size;
             }
 
-            // Chart Data 2: Bar Chart (Planner source - remains as is, filtered by selected date and month)
-            const barStats = {
-                'Store DK': { total: 0, od: 0 },
-                'Luar Kota': { total: 0, od: 0 },
-                'Luar Pulau': { total: 0, od: 0 }
-            };
-            
-            const areaDateFiltered = rawPlannerData.filter(d => {
-                const dateObj = parseDate(d.stuffingDate);
-                const isoDate = toISODate(dateObj);
-
-                // Filter by local Bulan
-                let matchBulan = true;
-                if (bulanFilterVal !== 'ALL' && dateObj && dateObj.getTime() > 0) {
-                    const localMonthKey = MonthsID[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
-                    matchBulan = (localMonthKey === bulanFilterVal);
-                }
-
-                return (dateFilter === 'ALL' || isoDate === dateFilter) && matchBulan;
-            });
-            areaDateFiltered.forEach(d => {
-                if (barStats[d.area]) {
-                    barStats[d.area].total += d.caseId;
-                    barStats[d.area].od += d.orderRelease;
-                }
-            });
-
-            // SLA GRW DK & LK calculation from rawSlaFbiData (H-1 logic)
+            // SLA GRW DK & LK calculation from cached parsed SLA FBI rows (H-1 logic)
             let slaDkValue = 0;
             let slaLkValue = 0;
             let dkTotalOT = 0; let dkTotalDelay = 0;
             let lkTotalOT = 0; let lkTotalDelay = 0;
-
             let slaCurrentMonthValue = 0;
             let currentMonthLabel = '—';
 
             const IndonesianMonthsShort = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const slaRows = (window.__slaFbiParsedRows && window.__slaFbiParsedRows.length > 0)
+                ? window.__slaFbiParsedRows
+                : (rawSlaFbiData.length > 2 ? (window.__slaFbiParsedRows = buildSlaFbiParsedRows(rawSlaFbiData)) : []);
 
-            // Helper to parse date strings safely in local timezone
-            const parseLocalSlaDate = (str) => {
-                if (!str) return new Date(0);
-                const s = String(str).trim();
-                const isoMatch = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-                if (isoMatch) {
-                    return new Date(parseInt(isoMatch[1]), parseInt(isoMatch[2]) - 1, parseInt(isoMatch[3]));
-                }
-                const slashMatch = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
-                if (slashMatch) {
-                    let yr = parseInt(slashMatch[3]);
-                    if (yr < 100) yr += 2000;
-                    return new Date(yr, parseInt(slashMatch[2]) - 1, parseInt(slashMatch[1]));
-                }
-                return parseDate(s);
-            };
-
-            // Determine H-1 target date:
-            // - If a specific Delivery Date is selected (e.g. 2026-11-13), H-1 is selectedDate - 1 day (2026-11-12).
-            // - If 'ALL' is selected, H-1 is today - 1 day (or latest date in selected archive month if viewing a past month).
             const nowLocal = new Date();
-            const curMonthKey = MonthsID[nowLocal.getMonth()] + ' ' + nowLocal.getFullYear();
-            let h1DateObj = new Date(nowLocal.getFullYear(), nowLocal.getMonth(), nowLocal.getDate() - 1);
+            const curMonthIdx = nowLocal.getMonth();
+            const curYear = nowLocal.getFullYear();
+            const curMonthKey = MonthsID[curMonthIdx] + ' ' + curYear;
+            let h1DateObj = new Date(curYear, curMonthIdx, nowLocal.getDate() - 1);
 
             if (dateFilter !== 'ALL' && /^\d{4}-\d{2}-\d{2}$/.test(dateFilter)) {
                 const [y, m, d] = dateFilter.split('-').map(Number);
                 h1DateObj = new Date(y, m - 1, d - 1);
-            } else if (bulanFilterVal !== 'ALL' && bulanFilterVal !== curMonthKey && rawSlaFbiData.length > 2) {
-                // Find the latest date inside the chosen past month
+            } else if (bulanFilterVal !== 'ALL' && bulanFilterVal !== curMonthKey && slaRows.length > 0) {
                 let latestPastDate = null;
-                for (let i = 2; i < rawSlaFbiData.length; i++) {
-                    const rDate = (rawSlaFbiData[i][0] || '').trim();
-                    if (!rDate) continue;
-                    const dObj = parseLocalSlaDate(rDate);
-                    if (isNaN(dObj.getTime()) || dObj.getTime() === 0) continue;
-                    const key = MonthsID[dObj.getMonth()] + ' ' + dObj.getFullYear();
-                    if (key === bulanFilterVal && (!latestPastDate || dObj.getTime() > latestPastDate.getTime())) {
-                        latestPastDate = dObj;
+                for (let i = 0; i < slaRows.length; i++) {
+                    const r = slaRows[i];
+                    if (r.bulanKey === bulanFilterVal && (!latestPastDate || r.dObj.getTime() > latestPastDate.getTime())) {
+                        latestPastDate = r.dObj;
                     }
                 }
                 if (latestPastDate) h1DateObj = latestPastDate;
@@ -11689,23 +11870,27 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             const h1DisplayDate = `${h1DateObj.getDate()} ${IndonesianMonthsShort[h1DateObj.getMonth()]} ${h1DateObj.getFullYear()}`;
             let hasH1Row = false;
 
-            if (rawSlaFbiData.length > 2) {
-                for (let i = 2; i < rawSlaFbiData.length; i++) {
-                    const row = rawSlaFbiData[i];
-                    if (row.length < 5) continue;
-                    const rowDate = (row[0] || '').trim();
-                    if (!rowDate) continue;
+            if (slaRows.length > 0) {
+                let hasCurrentCalData = false;
+                let maxYear = 0;
+                let maxMonth = 0;
 
-                    const dObj = parseLocalSlaDate(rowDate);
-                    const isoDate = toISODate(dObj);
-
-                    if (isoDate !== targetH1Iso) continue;
-
-                    hasH1Row = true;
-                    dkTotalOT += parseNumberWithComma(row[1] || '0');
-                    dkTotalDelay += parseNumberWithComma(row[2] || '0');
-                    lkTotalOT += parseNumberWithComma(row[3] || '0');
-                    lkTotalDelay += parseNumberWithComma(row[4] || '0');
+                for (let i = 0; i < slaRows.length; i++) {
+                    const r = slaRows[i];
+                    if (r.isoDate === targetH1Iso) {
+                        hasH1Row = true;
+                        dkTotalOT += r.dkOT;
+                        dkTotalDelay += r.dkDelay;
+                        lkTotalOT += r.lkOT;
+                        lkTotalDelay += r.lkDelay;
+                    }
+                    if (r.year === curYear && r.month === curMonthIdx) {
+                        hasCurrentCalData = true;
+                    }
+                    if (r.year * 12 + r.month > maxYear * 12 + maxMonth) {
+                        maxYear = r.year;
+                        maxMonth = r.month;
+                    }
                 }
 
                 const totalDK = dkTotalOT + dkTotalDelay;
@@ -11713,57 +11898,19 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 slaDkValue = totalDK > 0 ? (dkTotalOT / totalDK * 100) : 0;
                 slaLkValue = totalLK > 0 ? (lkTotalOT / totalLK * 100) : 0;
 
-                // --- Calculate "SLA Bulan Sekarang" ---
-                const now = new Date();
-                const curMonthIdx = now.getMonth();
-                const curYear = now.getFullYear();
-
-                let hasCurrentCalData = false;
-                let maxYear = 0;
-                let maxMonth = 0;
-                for (let i = 2; i < rawSlaFbiData.length; i++) {
-                    const row = rawSlaFbiData[i];
-                    if (row.length < 5) continue;
-                    const rowDate = (row[0] || '').trim();
-                    if (!rowDate) continue;
-                    const dObj = parseLocalSlaDate(rowDate);
-                    if (isNaN(dObj.getTime()) || dObj.getTime() === 0) continue;
-
-                    const y = dObj.getFullYear();
-                    const m = dObj.getMonth();
-                    if (y === curYear && m === curMonthIdx) {
-                        hasCurrentCalData = true;
-                    }
-                    const val = y * 12 + m;
-                    if (val > maxYear * 12 + maxMonth) {
-                        maxYear = y;
-                        maxMonth = m;
-                    }
-                }
-
                 const targetMonthIdx = hasCurrentCalData ? curMonthIdx : maxMonth;
                 const targetYear = hasCurrentCalData ? curYear : maxYear;
-
                 currentMonthLabel = IndonesianMonthsShort[targetMonthIdx] + ' ' + targetYear;
 
                 let monthlyOT = 0;
                 let monthlyDelay = 0;
-                for (let i = 2; i < rawSlaFbiData.length; i++) {
-                    const row = rawSlaFbiData[i];
-                    if (row.length < 5) continue;
-                    const rowDate = (row[0] || '').trim();
-                    if (!rowDate) continue;
-                    const dObj = parseLocalSlaDate(rowDate);
-                    if (isNaN(dObj.getTime()) || dObj.getTime() === 0) continue;
-
-                    if (dObj.getFullYear() === targetYear && dObj.getMonth() === targetMonthIdx) {
-                        monthlyOT += parseNumberWithComma(row[1] || '0'); // dk OT
-                        monthlyDelay += parseNumberWithComma(row[2] || '0'); // dk Delay
-                        monthlyOT += parseNumberWithComma(row[3] || '0'); // lk OT
-                        monthlyDelay += parseNumberWithComma(row[4] || '0'); // lk Delay
+                for (let i = 0; i < slaRows.length; i++) {
+                    const r = slaRows[i];
+                    if (r.year === targetYear && r.month === targetMonthIdx) {
+                        monthlyOT += r.dkOT + r.lkOT;
+                        monthlyDelay += r.dkDelay + r.lkDelay;
                     }
                 }
-
                 const totalMonthly = monthlyOT + monthlyDelay;
                 slaCurrentMonthValue = totalMonthly > 0 ? (monthlyOT / totalMonthly * 100) : 0;
             }
@@ -11800,76 +11947,81 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
         function initFBIMap() {
             const mapEl = document.getElementById('fbi-google-map');
             if (!mapEl) return;
-        
+
             if (!fbiMap) {
-                // Initialize Leaflet Map with OpenStreetMap tiles (No API Key required)
                 fbiMap = L.map('fbi-google-map').setView([-5.0, 115.0], 5);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap contributors',
                     maxZoom: 19
                 }).addTo(fbiMap);
                 fbiMarkersLayer = L.layerGroup().addTo(fbiMap);
-            } else {
-                if (fbiMarkersLayer) fbiMarkersLayer.clearLayers();
+                window.__fbiMapPopulated = false;
             }
-            setTimeout(() => {
-                if (fbiMap) fbiMap.invalidateSize();
-            }, 150);
-        
-            // Wilayah FBI coverage markers
-        const wilayahData = [
-            { name: 'Bali',        lat: -8.4095,  lng: 115.1889, count: 22 },
-            { name: 'Surabaya',    lat: -7.2575,  lng: 112.7521, count: 16 },
-            { name: 'Sidoarjo',    lat: -7.4478,  lng: 112.7183, count: 4  },
-            { name: 'Mojokerto',   lat: -7.4722,  lng: 112.4336, count: 2  },
-            { name: 'Lamongan',    lat: -7.1178,  lng: 112.4153, count: 1  },
-            { name: 'Gresik',      lat: -7.1539,  lng: 112.6561, count: 2  },
-            { name: 'Malang',      lat: -7.9666,  lng: 112.6326, count: 9  },
-            { name: 'Pasuruan',    lat: -7.6457,  lng: 112.9075, count: 1  },
-            { name: 'Madiun',      lat: -7.6298,  lng: 111.5239, count: 2  },
-            { name: 'Kediri',      lat: -7.8169,  lng: 112.0114, count: 1  },
-            { name: 'Tuban',       lat: -6.8944,  lng: 111.9533, count: 1  },
-            { name: 'Jember',      lat: -8.1724,  lng: 113.7000, count: 1  },
-            { name: 'Banyuwangi',  lat: -8.2192,  lng: 114.3691, count: 1  },
-            { name: 'Maluku',      lat: -3.6954,  lng: 128.1814, count: 2  },
-            { name: 'Lombok',      lat: -8.6363,  lng: 116.3150, count: 3  },
-            { name: 'Kupang',      lat: -10.1639, lng: 123.5812, count: 1  },
-            { name: 'Sorong',      lat: -0.8651,  lng: 131.2502, count: 1  },
-            { name: 'Abepura',       lat: -4.2699,  lng: 138.0804, count: 1  },
-            { name: 'Manado',      lat: 1.4748,   lng: 124.8228, count: 1  },
-            { name: 'Makassar',    lat: -5.1477,  lng: 119.4327, count: 2  },
-            { name: 'Gorontalo',   lat: 0.5435,   lng: 123.0568, count: 1  },
-            { name: 'Kendari',     lat: -3.9456,  lng: 122.5144, count: 3  },
-            { name: 'Palu',        lat: -0.8917,  lng: 119.8707, count: 3  },
-        ];
 
-        wilayahData.forEach(w => {
-            const radius = Math.min(Math.max(w.count * 2, 8), 28);
-            L.circleMarker([w.lat, w.lng], {
-                radius: radius,
-                fillColor: '#ba68c8',
-                color: '#fff',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.85
-            }).addTo(fbiMarkersLayer)
-              .bindPopup(`<strong>${w.name}</strong><br/>Jumlah: ${w.count}`);
-        });
-    }
+            if (!window.__fbiMapPopulated && fbiMarkersLayer) {
+                window.__fbiMapPopulated = true;
+                const wilayahData = [
+                    { name: 'Bali',        lat: -8.4095,  lng: 115.1889, count: 22 },
+                    { name: 'Surabaya',    lat: -7.2575,  lng: 112.7521, count: 16 },
+                    { name: 'Sidoarjo',    lat: -7.4478,  lng: 112.7183, count: 4  },
+                    { name: 'Mojokerto',   lat: -7.4722,  lng: 112.4336, count: 2  },
+                    { name: 'Lamongan',    lat: -7.1178,  lng: 112.4153, count: 1  },
+                    { name: 'Gresik',      lat: -7.1539,  lng: 112.6561, count: 2  },
+                    { name: 'Malang',      lat: -7.9666,  lng: 112.6326, count: 9  },
+                    { name: 'Pasuruan',    lat: -7.6457,  lng: 112.9075, count: 1  },
+                    { name: 'Madiun',      lat: -7.6298,  lng: 111.5239, count: 2  },
+                    { name: 'Kediri',      lat: -7.8169,  lng: 112.0114, count: 1  },
+                    { name: 'Tuban',       lat: -6.8944,  lng: 111.9533, count: 1  },
+                    { name: 'Jember',      lat: -8.1724,  lng: 113.7000, count: 1  },
+                    { name: 'Banyuwangi',  lat: -8.2192,  lng: 114.3691, count: 1  },
+                    { name: 'Maluku',      lat: -3.6954,  lng: 128.1814, count: 2  },
+                    { name: 'Lombok',      lat: -8.6363,  lng: 116.3150, count: 3  },
+                    { name: 'Kupang',      lat: -10.1639, lng: 123.5812, count: 1  },
+                    { name: 'Sorong',      lat: -0.8651,  lng: 131.2502, count: 1  },
+                    { name: 'Abepura',     lat: -4.2699,  lng: 138.0804, count: 1  },
+                    { name: 'Manado',      lat: 1.4748,   lng: 124.8228, count: 1  },
+                    { name: 'Makassar',    lat: -5.1477,  lng: 119.4327, count: 2  },
+                    { name: 'Gorontalo',   lat: 0.5435,   lng: 123.0568, count: 1  },
+                    { name: 'Kendari',     lat: -3.9456,  lng: 122.5144, count: 3  },
+                    { name: 'Palu',        lat: -0.8917,  lng: 119.8707, count: 3  }
+                ];
 
-        async function fetchFBIScheduleData() {
+                wilayahData.forEach(w => {
+                    const radius = Math.min(Math.max(w.count * 2, 8), 28);
+                    L.circleMarker([w.lat, w.lng], {
+                        radius: radius,
+                        fillColor: '#ba68c8',
+                        color: '#fff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.85
+                    }).addTo(fbiMarkersLayer)
+                      .bindPopup(`<strong>${w.name}</strong><br/>Jumlah: ${w.count}`);
+                });
+            }
+        }
+
+        async function fetchFBIScheduleData(retries = 2) {
+            if (!document.body.classList.contains('theme-purple')) return;
             try {
                 const response = await fetch(SHEET_URL_SCHEDULE);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const csv = await response.text();
+                if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML');
+                window.__csvTextCache = window.__csvTextCache || {};
+                const cacheKey = 'fbiSchedule:' + SHEET_URL_SCHEDULE;
+                if (window.__csvTextCache[cacheKey] === csv && rawFBISchedule.length > 0) return;
+                window.__csvTextCache[cacheKey] = csv;
                 parseFBIScheduleCSV(csv);
             } catch (error) {
                 console.error("Error fetching FBI Schedule:", error);
+                if (retries > 0) setTimeout(() => fetchFBIScheduleData(retries - 1), 2000);
             }
         }
 
         function parseFBIScheduleCSV(csv) {
             const lines = csv.split('\n');
-            if (lines.length < 3) return; 
+            if (lines.length < 3) return;
 
             const rows = lines.map(line => {
                 const result = [];
@@ -11897,7 +12049,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             }
 
             rawFBISchedule = data.map(row => {
-                if (!row[1] || row[1] === '') return null; 
+                if (!row[1] || row[1] === '') return null;
                 const stops = {};
                 dayHeaders.forEach(h => {
                     stops[h.name] = row[h.index] || '';
@@ -11915,30 +12067,42 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             // Populate Day Filter for FBI
             const hariFilter = document.getElementById('fbi-filter-hari');
             if (hariFilter) {
-                // Clear existing except ALL if needed, but here we replace
-                hariFilter.innerHTML = '<option value="ALL">SEMUA HARI</option>';
-                dayHeaders.forEach(h => {
-                    const opt = document.createElement('option');
-                    opt.value = h.name;
-                    opt.textContent = h.name;
-                    hariFilter.appendChild(opt);
-                });
+                const prevHari = hariFilter.value;
+                const daySig = dayHeaders.map(h => h.name).join('|');
+                if (hariFilter.dataset.optSig !== daySig) {
+                    const fragH = document.createDocumentFragment();
+                    const allOpt = document.createElement('option');
+                    allOpt.value = 'ALL';
+                    allOpt.textContent = 'SEMUA HARI';
+                    fragH.appendChild(allOpt);
+                    dayHeaders.forEach(h => {
+                        const opt = document.createElement('option');
+                        opt.value = h.name;
+                        opt.textContent = h.name;
+                        fragH.appendChild(opt);
+                    });
+                    hariFilter.innerHTML = '';
+                    hariFilter.appendChild(fragH);
+                    hariFilter.dataset.optSig = daySig;
 
-                // Auto-select Tomorrow's Day
-                const tomorrow = new Date(Date.now() + 86400000);
-                const hariIndo = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
-                const tomorrowDay = hariIndo[tomorrow.getDay()];
-                
-                // Try to find matching option
-                const hasMatch = dayHeaders.some(h => h.name.includes(tomorrowDay));
-                if (hasMatch) {
+                    // Auto-select Tomorrow's Day on first populate
+                    const tomorrow = new Date(Date.now() + 86400000);
+                    const hariIndo = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
+                    const tomorrowDay = hariIndo[tomorrow.getDay()];
                     const bestMatch = dayHeaders.find(h => h.name.includes(tomorrowDay));
-                    hariFilter.value = bestMatch.name;
+                    if (bestMatch) hariFilter.value = bestMatch.name;
+                } else if (prevHari) {
+                    hariFilter.value = prevHari;
                 }
             }
 
             syncFBIDropdowns();
-            renderFBIScheduleTable();
+            if (isSectionVisible('fbi-planning-section')) {
+                window.__fbiPlanningDirty = false;
+                renderFBIScheduleAndOutstanding();
+            } else {
+                window.__fbiPlanningDirty = true;
+            }
         }
 
         async function fetchPivotData(retries = 2) {
@@ -11951,6 +12115,11 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 if (csv.trim().startsWith('<!DOCTYPE')) {
                     throw new Error("Diterima format HTML. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
                 }
+
+                window.__csvTextCache = window.__csvTextCache || {};
+                const cacheKey = 'pivot:' + finalUrl;
+                if (window.__csvTextCache[cacheKey] === csv && rawPivotData.length > 0) return;
+                window.__csvTextCache[cacheKey] = csv;
                 
                 parsePivotCSV(csv);
             } catch (error) {
@@ -12121,7 +12290,13 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             populatePivotAreaFilter();
             populateAllocationBBFilter();
             populateAllocationStatusFilter();
-            renderPivotTable();
+
+            if (isSectionVisible('outstanding-section')) {
+                window.__pivotDirty = false;
+                renderPivotTable();
+            } else {
+                window.__pivotDirty = true;
+            }
             
             // Trigger FBI dashboard refresh if in FBI view
             if (document.body.classList.contains('theme-purple')) {
@@ -12142,6 +12317,11 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
                 if (csv.trim().startsWith('<!DOCTYPE')) {
                     throw new Error("Diterima format HTML. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
                 }
+
+                window.__csvTextCache = window.__csvTextCache || {};
+                const cacheKey = 'hub:' + finalUrl;
+                if (window.__csvTextCache[cacheKey] === csv && rawHubData.length > 0) return;
+                window.__csvTextCache[cacheKey] = csv;
                 
                 parseHubCSV(csv);
             } catch (error) {
@@ -12215,7 +12395,12 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             }
 
             populateHubFilters(loadingOptions, nolcOptions);
-            renderHubTable();
+            if (isSectionVisible('hub-astor-section') || isSectionVisible('ahi-summary-section')) {
+                window.__hubDirty = false;
+                renderHubTable();
+            } else {
+                window.__hubDirty = true;
+            }
         }
 
         function populateHubFilters(loadOpts, lcOpts) {
@@ -12289,6 +12474,7 @@ updateVal('fbi-kpi-belum-plan', formatIndo(belumPlan));
             }
         }
 function renderHubTable() {
+    window.__hubDirty = false;
     const head = document.getElementById('hub-summary-head');
     const tbody = document.getElementById('hub-summary-body');
     const container = document.getElementById('hub-summary-container');
@@ -14597,6 +14783,7 @@ Tim Planner DC Sidoarjo`;
         }
 
         function renderPivotTable() {
+            window.__pivotDirty = false;
             const tbody = document.getElementById('pivot-table-body');
             const priorityBody = document.getElementById('planning-priority-body');
             const priorityContainer = document.getElementById('planning-priority-container');
@@ -15153,6 +15340,19 @@ function renderStoringPivotTable(filteredData) {
                     throw new Error("Diterima format HTML, bukan CSV. Pastikan Google Sheet sudah di-share 'Anyone with the link can view'.");
                 }
 
+                window.__csvTextCache = window.__csvTextCache || {};
+                const cacheKey = 'main:' + finalUrl;
+                if (window.__csvTextCache[cacheKey] === csv && allData.length > 0) {
+                    const loader = document.getElementById('init-loader');
+                    if (loader && !loader.classList.contains('hidden')) {
+                        if (typeof finishInitProgress === 'function') finishInitProgress();
+                        loader.classList.add('hidden');
+                        if (typeof initClockTimer !== 'undefined') clearInterval(initClockTimer);
+                    }
+                    return;
+                }
+                window.__csvTextCache[cacheKey] = csv;
+
                 parseCSV(csv);
                 populateFilters();
                 
@@ -15171,15 +15371,18 @@ function renderStoringPivotTable(filteredData) {
                 const statusEl = document.getElementById('system-status');
                 if (statusEl) statusEl.innerText = "MEMUAT DATA SELESAI — SIAP DIGUNAKAN";
 
-                // Hide Initial Loader
-                setTimeout(() => {
-                    const loader = document.getElementById('init-loader');
-                    if (loader) {
-                        loader.onclick = toggleFullScreen;
-                        loader.classList.add('hidden');
-                        if (typeof initClockTimer !== 'undefined') clearInterval(initClockTimer);
-                    }
-                }, 5000); // Give 5 seconds total to view cards and finish animation
+                // Hide Initial Loader (hanya sekali di awal agar tidak menjadwalkan timer ulang saat polling)
+                const initLoaderEl = document.getElementById('init-loader');
+                if (initLoaderEl && !initLoaderEl.classList.contains('hidden')) {
+                    setTimeout(() => {
+                        const loader = document.getElementById('init-loader');
+                        if (loader) {
+                            loader.onclick = toggleFullScreen;
+                            loader.classList.add('hidden');
+                            if (typeof initClockTimer !== 'undefined') clearInterval(initClockTimer);
+                        }
+                    }, 5000);
+                }
             } catch (error) {
                 console.error('Error fetching data from URL:', finalUrl);
                 console.error('Error details:', error);
@@ -15465,7 +15668,7 @@ function renderStoringPivotTable(filteredData) {
                 }
             }
 
-            const options = Array.from(stuffingDateSet).sort((a, b) => parseDate(b) - parseDate(a));
+            const options = Array.from(stuffingDateSet).sort((a, b) => parseDateMs(b) - parseDateMs(a));
             
             // Sync selected filters with new options
             selectedFilters.stuffingDate = selectedFilters.stuffingDate.filter(date => options.includes(date));
@@ -15494,9 +15697,24 @@ function renderStoringPivotTable(filteredData) {
             
             if (!optionsContainer || !displayElement) return;
 
-            // Simpan state yang sedang terpilih sebelum dikosongkan
             const previouslySelected = selectedFilters[filterId] || [];
-            
+            const prevSet = new Set(previouslySelected);
+            const sig = options.join('\u0001');
+
+            if (optionsContainer.dataset.optSig === sig) {
+                const existingCheckboxes = optionsContainer.querySelectorAll(`.${filterId}-checkbox`);
+                const allCb = optionsContainer.querySelector(`#${filterId}-all`);
+                let allChecked = existingCheckboxes.length > 0;
+                existingCheckboxes.forEach(cb => {
+                    const shouldCheck = prevSet.has(cb.value);
+                    if (cb.checked !== shouldCheck) cb.checked = shouldCheck;
+                    if (!shouldCheck) allChecked = false;
+                });
+                if (allCb) allCb.checked = allChecked;
+                return;
+            }
+
+            optionsContainer.dataset.optSig = sig;
             optionsContainer.innerHTML = '';
 
             // Add "Select All" option
@@ -15509,19 +15727,21 @@ function renderStoringPivotTable(filteredData) {
             optionsContainer.appendChild(selectAllDiv);
 
             const allCheckbox = selectAllDiv.querySelector('input');
+            const frag = document.createDocumentFragment();
 
             options.forEach(option => {
                 if (option) {
-                    const isChecked = previouslySelected.includes(option);
+                    const isChecked = prevSet.has(option);
                     const div = document.createElement('div');
                     div.className = 'option-item';
                     div.innerHTML = `
                         <input type="checkbox" value="${option}" id="${filterId}-${option}" class="${filterId}-checkbox" ${isChecked ? 'checked' : ''}>
                         <label for="${filterId}-${option}">${option}</label>
                     `;
-                    optionsContainer.appendChild(div);
+                    frag.appendChild(div);
                 }
             });
+            optionsContainer.appendChild(frag);
 
             // Event Listeners for checkboxes
             const checkboxes = optionsContainer.querySelectorAll(`.${filterId}-checkbox`);
@@ -15547,11 +15767,15 @@ function renderStoringPivotTable(filteredData) {
             // Gunakan onclick untuk memastikan hanya ada SATU listener (mencegah bug klik ganda)
             displayElement.onclick = (e) => {
                 e.stopPropagation();
-                // Close other dropdowns
                 document.querySelectorAll('.multi-select-options').forEach(opt => {
                     if (opt.id !== `${filterId}-options`) opt.classList.remove('show');
                 });
-                optionsContainer.classList.toggle('show');
+                document.querySelectorAll('.multi-select-container.is-open').forEach(c => {
+                    if (!c.contains(optionsContainer)) c.classList.remove('is-open');
+                });
+                const isOpenNow = optionsContainer.classList.toggle('show');
+                const parentContainer = optionsContainer.closest('.multi-select-container');
+                if (parentContainer) parentContainer.classList.toggle('is-open', isOpenNow);
             };
         }
 
@@ -15587,8 +15811,11 @@ function renderStoringPivotTable(filteredData) {
 
         // Close dropdowns when clicking outside
         document.addEventListener('click', () => {
-            document.querySelectorAll('.multi-select-options').forEach(opt => {
+            document.querySelectorAll('.multi-select-options.show').forEach(opt => {
                 opt.classList.remove('show');
+            });
+            document.querySelectorAll('.multi-select-container.is-open').forEach(c => {
+                c.classList.remove('is-open');
             });
         });
 
@@ -15648,19 +15875,51 @@ function renderStoringPivotTable(filteredData) {
             return '';
         }
 
-        // Update Dashboard
-function updateDashboard() {
-    try {
-        updateKPIs();
-        applyBatchColors();
-                updateCRMTable();
-                updateShippingTable();
-                updateMap();
-                updateCharts();
-                updateExtraSection();
-                updateCarrierAgingTable();
-                updateVendorPerformanceTable();
-                initCinematicDashboard();
+        function flushDashSection(sectionId) {
+            if (!sectionId) return;
+            try {
+                if (sectionId === 'main-dashboard-section' && window.__dashDirty.main) {
+                    window.__dashDirty.main = false;
+                    updateKPIs();
+                    applyBatchColors();
+                    updateCRMTable();
+                    updateShippingTable();
+                    updateMap();
+                } else if (sectionId === 'summary-report-section' && window.__dashDirty.summary) {
+                    window.__dashDirty.summary = false;
+                    updateCharts();
+                } else if (sectionId === 'supply-partner-section' && window.__dashDirty.partner) {
+                    window.__dashDirty.partner = false;
+                    updateExtraSection();
+                    updateCarrierAgingTable();
+                    updateVendorPerformanceTable();
+                } else if (sectionId === 'ahi-summary-section' && window.__dashDirty.ahiSummary) {
+                    window.__dashDirty.ahiSummary = false;
+                    initCinematicDashboard();
+                }
+            } catch (error) {
+                console.error("Error flushing section " + sectionId + ":", error);
+            }
+        }
+
+        // Update Dashboard (hanya merender section yang sedang terlihat)
+        function updateDashboard() {
+            try {
+                markAllDashSectionsDirty();
+                const visibleMain = isSectionVisible('main-dashboard-section');
+                const visibleSummary = isSectionVisible('summary-report-section');
+                const visiblePartner = isSectionVisible('supply-partner-section');
+                const visibleAhiSummary = isSectionVisible('ahi-summary-section');
+
+                if (visibleMain) flushDashSection('main-dashboard-section');
+                if (visibleSummary) flushDashSection('summary-report-section');
+                if (visiblePartner) flushDashSection('supply-partner-section');
+                if (visibleAhiSummary) flushDashSection('ahi-summary-section');
+
+                // Fallback sebelum masuk tab spesifik (mis. saat welcome screen masih terbuka)
+                if (!visibleMain && !visibleSummary && !visiblePartner && !visibleAhiSummary && !window.__activeDashSection) {
+                    flushDashSection('main-dashboard-section');
+                }
             } catch (error) {
                 console.error("Error updating dashboard:", error);
             }
@@ -15784,6 +16043,9 @@ function updateDashboard() {
             const excludedCarriers = ['1D-INTERNAL (SDA)', 'AHI', 'DUMMY-LK-EKSP', 'DUMMY'];
 
             const isVendor = isVendorActive();
+            const todayEnd = new Date();
+            todayEnd.setHours(23, 59, 59, 999);
+            const todayEndMs = todayEnd.getTime();
 
             filteredData.forEach(row => {
                 const carrier = (row.D || '').trim();
@@ -15817,12 +16079,9 @@ function updateDashboard() {
                     grandTotal++;
                 } else {
                     // Skip tomorrow's/future (H+1) on time records
-                    const isVendor = isVendorActive();
                     const dateVal = isVendor ? (row.AU || '').trim() : (row.AO || '').trim();
-                    const dDate = parseDateCustom(dateVal) || parseDate(dateVal);
-                    const today = new Date();
-                    today.setHours(23, 59, 59, 999);
-                    if (dDate && !isNaN(dDate.getTime()) && dDate > today) {
+                    const dMs = parseDateCustomMs(dateVal) ?? parseDateMs(dateVal);
+                    if (dMs && dMs > todayEndMs) {
                         return; // Exclude H+1 on-time record
                     }
 
@@ -16111,7 +16370,7 @@ function updateDashboard() {
             return {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 800, easing: 'easeOutQuart' },
+                animation: { duration: 150, easing: 'easeOutQuart' },
                 layout: { padding: { top: 32, bottom: 8, left: 12, right: 20 } },
                 scales: {
                     y: {
@@ -16247,7 +16506,7 @@ function updateDashboard() {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: { duration: 800, easing: 'easeOutQuart' },
+                    animation: { duration: 150, easing: 'easeOutQuart' },
                     layout: {
                         padding: { top: 25, bottom: 8, left: 10, right: 15 }
                     },
@@ -16465,13 +16724,14 @@ function updateDashboard() {
             if (!ketVendor.includes('BELUM SUPPORT')) return false;
 
             // Exclusion for difference < 3 days between ADD DATE (O) and LOAD DATE (Q)
-            const dO = parseDateCustom(row.O);
-            const dQ = parseDateCustom(row.Q);
-            if (dO && dQ) {
-                const dateO = new Date(dO.getFullYear(), dO.getMonth(), dO.getDate());
-                const dateQ = new Date(dQ.getFullYear(), dQ.getMonth(), dQ.getDate());
-                const diffMs = Math.abs(dateQ.getTime() - dateO.getTime());
-                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const msO = parseDateCustomMs(row.O);
+            const msQ = parseDateCustomMs(row.Q);
+            if (msO !== null && msQ !== null) {
+                const dO = new Date(msO);
+                const dQ = new Date(msQ);
+                const dateO = Date.UTC(dO.getFullYear(), dO.getMonth(), dO.getDate());
+                const dateQ = Date.UTC(dQ.getFullYear(), dQ.getMonth(), dQ.getDate());
+                const diffDays = Math.floor(Math.abs(dateQ - dateO) / 86400000);
                 if (diffDays < 3) {
                     return false;
                 }
@@ -16480,90 +16740,78 @@ function updateDashboard() {
             return true;
         }
 
-        function parseDateCustom(str) {
-    if (!str) return null;
-    str = String(str).trim();
-    if (!str || str === '-' || str === '0') return null;
+        const __parseDateCustomMsCache = new Map();
+        function parseDateCustomMs(str) {
+            if (!str) return null;
+            str = String(str).trim();
+            if (!str || str === '-' || str === '0') return null;
+            if (__parseDateCustomMsCache.has(str)) return __parseDateCustomMsCache.get(str);
 
-    // Coba parse langsung dulu (handles ISO format: 2026-06-05 11:01:00)
-    let parts = str.split(/[\sT]+/);
-    let datePart = parts[0];
-    let timePart = parts[1] || '00:00:00';
-    
-    let dParts = datePart.split(/[-/]/);
-    let tParts = timePart.split(':');
-    
-    if (dParts.length === 3) {
-        let year, month, day;
-        
-        if (dParts[0].length === 4) {
-            // Format: YYYY-MM-DD (ISO)
-            year  = parseInt(dParts[0], 10);
-            month = parseInt(dParts[1], 10) - 1;
-            day   = parseInt(dParts[2], 10);
-        } else {
-            // Format M/D/YYYY atau D/M/YYYY
-            // Deteksi: jika bagian ke-1 (bulan/hari) > 12, pasti format D/M/YYYY
-            // Jika bagian ke-0 > 12, pasti format M/D/YYYY
-            const p0 = parseInt(dParts[0], 10);
-            const p1 = parseInt(dParts[1], 10);
-            let yr   = parseInt(dParts[2], 10);
-            if (yr < 100) yr += 2000;
-            
-            if (p0 > 12) {
-                // p0 pasti hari, p1 pasti bulan → D/M/YYYY
-                day   = p0;
-                month = p1 - 1;
-                year  = yr;
-            } else if (p1 > 12) {
-                // p1 pasti hari, p0 pasti bulan → M/D/YYYY
-                month = p0 - 1;
-                day   = p1;
-                year  = yr;
+            let result = null;
+            let parts = str.split(/[\sT]+/);
+            let datePart = parts[0];
+            let timePart = parts[1] || '00:00:00';
+            let dParts = datePart.split(/[-/]/);
+            let tParts = timePart.split(':');
+
+            if (dParts.length === 3) {
+                let year, month, day;
+                if (dParts[0].length === 4) {
+                    year = parseInt(dParts[0], 10);
+                    month = parseInt(dParts[1], 10) - 1;
+                    day = parseInt(dParts[2], 10);
+                } else {
+                    const p0 = parseInt(dParts[0], 10);
+                    const p1 = parseInt(dParts[1], 10);
+                    let yr = parseInt(dParts[2], 10);
+                    if (yr < 100) yr += 2000;
+                    if (p0 > 12) {
+                        day = p0; month = p1 - 1; year = yr;
+                    } else {
+                        month = p0 - 1; day = p1; year = yr;
+                    }
+                }
+                let hour = parseInt(tParts[0], 10) || 0;
+                let minute = parseInt(tParts[1], 10) || 0;
+                let second = parseInt(tParts[2], 10) || 0;
+                const d = new Date(year, month, day, hour, minute, second);
+                result = isNaN(d.getTime()) ? null : d.getTime();
             } else {
-                // Ambiguous: default ke M/D/YYYY karena Google Sheets pakai format ini
-                month = p0 - 1;
-                day   = p1;
-                year  = yr;
+                const d = new Date(str);
+                result = isNaN(d.getTime()) ? null : d.getTime();
             }
+
+            if (__parseDateCustomMsCache.size > 10000) __parseDateCustomMsCache.clear();
+            __parseDateCustomMsCache.set(str, result);
+            return result;
         }
-        
-        let hour   = parseInt(tParts[0], 10) || 0;
-        let minute = parseInt(tParts[1], 10) || 0;
-        let second = parseInt(tParts[2], 10) || 0;
-        
-        const d = new Date(year, month, day, hour, minute, second);
-        return isNaN(d.getTime()) ? null : d;
-    }
-    
-    const d = new Date(str);
-    return isNaN(d.getTime()) ? null : d;
-}
+
+        function parseDateCustom(str) {
+            const ms = parseDateCustomMs(str);
+            return ms === null ? null : new Date(ms);
+        }
 
         function isTerlambat(row) {
             if (isBelumSupport(row)) return false;
             
-            // Check Q and BJ columns
-            const dateQ = parseDateCustom(row.Q);
-            const dateBJ = parseDateCustom(row.BJ);
+            const msQ = parseDateCustomMs(row.Q);
+            const msBJ = parseDateCustomMs(row.BJ);
             
-            if (dateQ && dateBJ) {
-                const diffMs = dateBJ.getTime() - dateQ.getTime();
-                return diffMs > 0;
+            if (msQ !== null && msBJ !== null) {
+                return (msBJ - msQ) > 0;
             }
             
-            // Fallback to aging
             const aging = parseInt(row.AW) || 0;
             return aging > 0;
         }
 
         function getDelayHours(row) {
-            const dateQ = parseDateCustom(row.Q);
-            const dateBJ = parseDateCustom(row.BJ);
-            if (dateQ && dateBJ) {
-                const diffMs = dateBJ.getTime() - dateQ.getTime();
+            const msQ = parseDateCustomMs(row.Q);
+            const msBJ = parseDateCustomMs(row.BJ);
+            if (msQ !== null && msBJ !== null) {
+                const diffMs = msBJ - msQ;
                 if (diffMs > 0) {
-                    return diffMs / (1000 * 60 * 60);
+                    return diffMs / 3600000;
                 }
             }
             const agingDays = parseInt(row.AW) || 0;
@@ -16571,19 +16819,18 @@ function updateDashboard() {
         }
 
         function getDelayHoursText(row) {
-            const dateQ = parseDateCustom(row.Q);
-            const dateBJ = parseDateCustom(row.BJ);
-            if (dateQ && dateBJ) {
-                const diffMs = dateBJ.getTime() - dateQ.getTime();
+            const msQ = parseDateCustomMs(row.Q);
+            const msBJ = parseDateCustomMs(row.BJ);
+            if (msQ !== null && msBJ !== null) {
+                const diffMs = msBJ - msQ;
                 if (diffMs > 0) {
-                    const totalMinutes = Math.floor(diffMs / (1000 * 60));
+                    const totalMinutes = Math.floor(diffMs / 60000);
                     const hours = Math.floor(totalMinutes / 60);
                     const minutes = totalMinutes % 60;
                     const pad = (num) => String(num).padStart(2, '0');
                     return `${hours} Jam ${pad(minutes)} Menit`;
                 }
             }
-            // Fallback: tampilkan aging dalam HARI (bukan dikali 24)
             const aging = parseInt(row.AW) || 0;
             return aging > 0 ? aging + ' Hari' : '-';
         }
@@ -16601,10 +16848,8 @@ function updateDashboard() {
                     valA = getDelayHours(a);
                     valB = getDelayHours(b);
                 } else if (key === 'Q' || key === 'O') {
-                    const dA = parseDateCustom(a[key]);
-                    const dB = parseDateCustom(b[key]);
-                    valA = dA ? dA.getTime() : 0;
-                    valB = dB ? dB.getTime() : 0;
+                    valA = parseDateCustomMs(a[key]) ?? 0;
+                    valB = parseDateCustomMs(b[key]) ?? 0;
                 } else {
                     valA = String(a[key] || '').toLowerCase();
                     valB = String(b[key] || '').toLowerCase();
@@ -16666,6 +16911,11 @@ function updateDashboard() {
                 '5 Hari': 0,
                 '> 5 Hari': 0
             };
+
+            const isVendor = isVendorActive();
+            const todayEnd = new Date();
+            todayEnd.setHours(23, 59, 59, 999);
+            const todayEndMs = todayEnd.getTime();
 
             filteredData.forEach(row => {
                 const carrier = (row.D || '').trim().toUpperCase();
@@ -16773,12 +17023,9 @@ function updateDashboard() {
                     }
                 } else {
                     // Skip tomorrow's/future (H+1) on time records
-                    const isVendor = isVendorActive();
                     const dateVal = isVendor ? (row.AU || '').trim() : (row.AO || '').trim();
-                    const dDate = parseDateCustom(dateVal) || parseDate(dateVal);
-                    const today = new Date();
-                    today.setHours(23, 59, 59, 999);
-                    if (dDate && !isNaN(dDate.getTime()) && dDate > today) {
+                    const dMs = parseDateCustomMs(dateVal) ?? parseDateMs(dateVal);
+                    if (dMs && dMs > todayEndMs) {
                         return; // Exclude H+1 on-time record
                     }
 
@@ -16832,6 +17079,8 @@ function updateDashboard() {
             const dailyAgg = {};
             const excludedCarriers = ['1D-INTERNAL (SDA)', 'AHI', 'DUMMY-LK-EKSP', 'DUMMY'];
 
+            const todayStartMs = todayStart.getTime();
+
             dataForTrend.forEach(row => {
                 const carrier = (row.D || '').trim();
                 if (!carrier || carrier === '-' || carrier === 'CARRIER') return;
@@ -16845,8 +17094,8 @@ function updateDashboard() {
                 
                 if (!dateVal || dateVal === '-' || dateVal === '0') return;
 
-                const dDate = parseDateCustom(dateVal) || parseDate(dateVal);
-                if (dDate && !isNaN(dDate.getTime()) && dDate >= todayStart) {
+                const dMs = parseDateCustomMs(dateVal) ?? parseDateMs(dateVal);
+                if (dMs && dMs >= todayStartMs) {
                     return; // Exclude today (H-0) and future records from daily trend
                 }
 
@@ -16867,12 +17116,13 @@ function updateDashboard() {
             // Filter out empty states or no dates in agg, and ensure it does not exceed yesterday (H-1)
             const sortedDates = Object.keys(dailyAgg).filter(d => {
                 if (!d) return false;
-                const dDate = parseDateCustom(d) || parseDate(d);
-                if (!dDate || isNaN(dDate.getTime())) return true;
-                if (dDate >= todayStart) return false;
+                const dMs = parseDateCustomMs(d) ?? parseDateMs(d);
+                if (!dMs) return true;
+                if (dMs >= todayStartMs) return false;
 
                 // Ensure the date belongs to the currently active/selected month (if any month is selected)
                 if (selectedFilters.bulan.length > 0) {
+                    const dDate = new Date(dMs);
                     const dMonthNameID = MonthsID[dDate.getMonth()]; // e.g. "MEI", "APRIL"
                     const MonthsEN = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
                     const dMonthNameEN = MonthsEN[dDate.getMonth()]; // e.g. "MAY", "APRIL"
@@ -16887,9 +17137,9 @@ function updateDashboard() {
 
                 return true;
             }).sort((a, b) => {
-                const dA = parseDateCustom(a) || parseDate(a);
-                const dB = parseDateCustom(b) || parseDate(b);
-                return dA - dB;
+                const msA = parseDateCustomMs(a) ?? parseDateMs(a);
+                const msB = parseDateCustomMs(b) ?? parseDateMs(b);
+                return msA - msB;
             });
 
             const achievementData = [];
@@ -16921,8 +17171,8 @@ function updateDashboard() {
 
                 const isBelumSpt = isBelumSupport(row);
                 const dateVal = isBelumSpt ? (row.AU || '').trim() : (row.AO || '').trim();
-                const dDate = parseDateCustom(dateVal) || parseDate(dateVal);
-                if (dDate && !isNaN(dDate.getTime()) && dDate >= todayStart) {
+                const dMs = parseDateCustomMs(dateVal) ?? parseDateMs(dateVal);
+                if (dMs && dMs >= todayStartMs) {
                     return; // Exclude today and future records from the Trend tab KPIs
                 }
 
@@ -17064,7 +17314,7 @@ function updateDashboard() {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    devicePixelRatio: Math.max(window.devicePixelRatio || 1, 2), // Pastikan rendering resolusi tinggi agar tajam saat di-zoom out
+                    devicePixelRatio: Math.min(Math.max(window.devicePixelRatio || 1, 1.5), 2),
                     animation: { duration: 0 },
                     layout: {
                         padding: {
@@ -17814,7 +18064,12 @@ function updateKPIs() {
 
         // Update Map - More accurate city locations
         function updateMap() {
-            markers.forEach(marker => map.removeLayer(marker));
+            if (!map) return;
+            if (!window.__markersLayerGroup) {
+                window.__markersLayerGroup = L.layerGroup().addTo(map);
+            } else {
+                window.__markersLayerGroup.clearLayers();
+            }
             markers = [];
 
             const kotaCount = {};
@@ -17831,14 +18086,10 @@ function updateKPIs() {
             });
 
             Object.keys(kotaCount).forEach(kota => {
-                // Try to find coordinates from the mapping
                 let coords = kotaKoordinat[kota];
-                
-                // If not found, try trimmed version
                 if (!coords && kota.trim()) {
                     coords = kotaKoordinat[kota.trim()];
                 }
-                
                 if (coords) {
                     const count = kotaCount[kota];
                     const cbm = kotaCBM[kota];
@@ -17850,7 +18101,7 @@ function updateKPIs() {
                         weight: 2,
                         opacity: 1,
                         fillOpacity: 0.8
-                    }).bindPopup(`<strong>${kota}</strong><br/>Jumlah: ${count}<br/>CBM: ${cbm.toFixed(2)}`).addTo(map);
+                    }).bindPopup(`<strong>${kota}</strong><br/>Jumlah: ${count}<br/>CBM: ${cbm.toFixed(2)}`).addTo(window.__markersLayerGroup);
                     markers.push(marker);
                 }
             });
@@ -17889,22 +18140,22 @@ function updateKPIs() {
 
         // Event Listeners (Removed old listeners, logic handled in checkboxes)
         
-        // Auto-refresh every 1 minute
-        setInterval(fetchData, 60000);
-        setInterval(fetchPlannerData, 60000);
-        setInterval(fetchOrderDistData, 60000);
-        setInterval(fetchFixKllData, 60000);
-        setInterval(() => {
-            if (document.body.classList.contains('theme-purple')) fetchSlaFbiData();
-        }, 60000);
+        // Auto-refresh every 1 minute (skip while tab is backgrounded, gate FBI sheets to theme-purple only)
+        setInterval(() => { if (!document.hidden) fetchData(); }, 60000);
+        setInterval(() => { if (!document.hidden && document.body.classList.contains('theme-purple')) fetchPlannerData(); }, 60000);
+        setInterval(() => { if (!document.hidden && document.body.classList.contains('theme-purple')) fetchOrderDistData(); }, 60000);
+        setInterval(() => { if (!document.hidden && document.body.classList.contains('theme-purple')) fetchFixKllData(); }, 60000);
+        setInterval(() => { if (!document.hidden && document.body.classList.contains('theme-purple')) fetchSlaFbiData(); }, 60000);
 
         // Initialize
         initMap();
         fetchData();
-        fetchPlannerData();
-        fetchOrderDistData();
-        fetchFixKllData();
-        if (document.body.classList.contains('theme-purple')) fetchSlaFbiData();
+        if (document.body.classList.contains('theme-purple')) {
+            fetchPlannerData();
+            fetchOrderDistData();
+            fetchFixKllData();
+            fetchSlaFbiData();
+        }
         // ===== ASTOR SLA & OUTSTANDING ENGINE =====
 const ASTOR_GID     = '1345578811';
 let ASTOR_CSV_URL_DYNAMIC = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${ASTOR_GID}`;
@@ -17965,6 +18216,10 @@ async function fetchAstorData(retries = 2) {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const csv = await res.text();
         if (csv.trim().startsWith('<!DOCTYPE')) throw new Error('Received HTML');
+        window.__csvTextCache = window.__csvTextCache || {};
+        const cacheKey = 'astor:' + ASTOR_CSV_URL_DYNAMIC;
+        if (window.__csvTextCache[cacheKey] === csv && rawAstorData.length > 0) return;
+        window.__csvTextCache[cacheKey] = csv;
         parseAstorCSV(csv);
     } catch(e) {
         console.error('Astor fetch error:', e);
@@ -18007,10 +18262,15 @@ function parseAstorCSV(csv) {
             sla = 'MISS';
         }
 
+        const tglStr = row[ACOL.TGL] || '';
+        const parsedTgl = tglStr ? parseTgl(tglStr) : null;
+        const bulanLabel = parsedTgl ? parsedTgl.toLocaleString('id-ID', { month: 'long', year: 'numeric' }) : '';
+
         rawAstorData.push({
-        tgl: row[ACOL.TGL]||'', rtod: row[ACOL.RTOD]||'', lc: row[ACOL.LC]||'',
+        tgl: tglStr, rtod: row[ACOL.RTOD]||'', lc: row[ACOL.LC]||'',
         bu, kota: row[ACOL.KOTA]||'', region: row[ACOL.REGION]||'',
-        area, stuffing, aging, cbm, sla
+        area, stuffing, aging, cbm, sla,
+        bulanLabel
     });
     });
 
@@ -18018,7 +18278,7 @@ function parseAstorCSV(csv) {
     rawAstorData.forEach(r => {
         const d = parseTgl(r.tgl);
         if (!d) return;
-        const key = d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+        const key = r.bulanLabel || d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
         const sortKey = d.getFullYear() * 100 + d.getMonth();
         bulanMap[key] = sortKey;
     });
@@ -18086,7 +18346,12 @@ function parseAstorCSV(csv) {
             buFilter.value = 'ALL';
         }
     }
-    renderAstorSLA();
+    if (isSectionVisible('hub-astor-section') || isSectionVisible('ahi-summary-section')) {
+        window.__astorDirty = false;
+        renderAstorSLA();
+    } else {
+        window.__astorDirty = true;
+    }
 }
     
     let selectedAstorTgl = [];
@@ -18136,7 +18401,12 @@ function populateMultiSelectAstor(filterId, options, label) {
         document.querySelectorAll('.multi-select-options').forEach(opt => {
             if (opt.id !== `${filterId}-options`) opt.classList.remove('show');
         });
-        optionsContainer.classList.toggle('show');
+        document.querySelectorAll('.multi-select-container.is-open').forEach(c => {
+            if (!c.contains(optionsContainer)) c.classList.remove('is-open');
+        });
+        const isOpenNow = optionsContainer.classList.toggle('show');
+        const parentContainer = optionsContainer.closest('.multi-select-container');
+        if (parentContainer) parentContainer.classList.toggle('is-open', isOpenNow);
     };
 }
 
@@ -18159,6 +18429,7 @@ function updateAstorTglState(filterId, label) {
 }
 
 function renderAstorSLA() {
+    window.__astorDirty = false;
     const buF   = (document.getElementById('astor-bu-filter')||{}).value   || 'ALL';
     const areaF = (document.getElementById('astor-area-filter')||{}).value || 'ALL';
     const agingF = (document.getElementById('astor-aging-filter')||{}).value || 'ALL';
@@ -18171,24 +18442,9 @@ const data = rawAstorData.filter(r => {
     const matchBu   = buF==='ALL'   || r.bu===buF;
     const matchArea = areaF==='ALL' || r.area===areaF;
     
-   let matchBulan = true;
-    if (bulanF !== 'ALL' && r.tgl) {
-        const months = {
-            'jan':0,'feb':1,'mar':2,'apr':3,'mei':4,'may':4,
-            'jun':5,'jul':6,'agu':7,'aug':7,'sep':8,'okt':9,'oct':9,'nov':10,'des':11,'dec':11
-        };
-        const parts = r.tgl.trim().split(/\s+/);
-        if (parts.length === 3) {
-            const day = parseInt(parts[0]);
-            const monthKey = parts[1].toLowerCase().substring(0,3);
-            const year = parseInt(parts[2]) + (parseInt(parts[2]) < 100 ? 2000 : 0);
-            const month = months[monthKey];
-            if (!isNaN(day) && month !== undefined && !isNaN(year)) {
-                const d = new Date(year, month, day);
-                const label = d.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
-                matchBulan = label === bulanF;
-            }
-        }
+    let matchBulan = true;
+    if (bulanF !== 'ALL' && r.bulanLabel) {
+        matchBulan = r.bulanLabel === bulanF;
     }
     
     const matchTgl = tglF==='ALL' || r.tgl===tglF;
@@ -18548,6 +18804,7 @@ const data = rawAstorData.filter(r => {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: { duration: 150 },
             categoryPercentage: 0.72,
             barPercentage: 0.85,
             layout: { padding: { top: 25, bottom: 5, left: 5, right: 5 } },
@@ -18641,7 +18898,7 @@ const data = rawAstorData.filter(r => {
                 backgroundColor:['#38bdf8','#34d399','#fbbf24','#f87171','#a78bfa','#fb923c'],
                 borderColor:'#1a1a1a', borderWidth:3 }]
         },
-        options:{ responsive:true, maintainAspectRatio:false,
+        options:{ responsive:true, maintainAspectRatio:false, animation:{ duration: 150 },
             plugins:{ 
                 legend:{position:'bottom',labels:{color:'#cbd5e1',font:{size:11,weight:'600'},padding:12}},
                 tooltip: {
@@ -18689,7 +18946,7 @@ const data = rawAstorData.filter(r => {
             datasets:[{ label:'Outstanding', data:bVals,
                 backgroundColor:['#2dd4bf','#fbbf24','#f87171','#b91c1c'], borderRadius:6 }]
         },
-        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, animation:{ duration: 150 },
             layout:{ padding:{ right: 90 } },
             plugins:{ 
                 legend:{display:false},
@@ -18789,7 +19046,7 @@ function sortAstorOS(key) {
 
 // Fetch & auto-refresh
 fetchAstorData();
-setInterval(fetchAstorData, 60000);
+setInterval(() => { if (!document.hidden) fetchAstorData(); }, 60000);
             // ===== BATCH TARGET FETCH =====
 function fetchBatchTargets() {
     // Target hardcoded: B1=198, B2=133, B3=80, B4=84
@@ -18923,7 +19180,7 @@ function formatVMTime(addDateStr) {
 
 async function loadKonfirmasiVM(retries = 2) {
     const tbody = document.getElementById('vm-tbody-el');
-    if (tbody) {
+    if (tbody && rawKonfirmasiVM.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7"
             style="text-align:center;padding:30px;color:#ffd700;">
             <i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i>
@@ -18941,6 +19198,11 @@ async function loadKonfirmasiVM(retries = 2) {
         if (csv.trim().startsWith('<!DOCTYPE')) {
             throw new Error('Sheet belum di-share publik (received HTML).');
         }
+
+        window.__csvTextCache = window.__csvTextCache || {};
+        const cacheKey = 'vm:' + url;
+        if (window.__csvTextCache[cacheKey] === csv && rawKonfirmasiVM.length > 0) return;
+        window.__csvTextCache[cacheKey] = csv;
 
         // Gunakan robustCSVParser yang sudah ada di dashboard
         const allRows = robustCSVParser(csv);
@@ -18981,7 +19243,12 @@ if (!status) continue; // baris yang kolom I-nya kosong/bukan HIT/MISS dilewati
         }
 
         populateVMLoadDateFilter();
-        renderKonfirmasiVM();
+        if (isSectionVisible('supply-partner-section')) {
+            window.__vmDirty = false;
+            renderKonfirmasiVM();
+        } else {
+            window.__vmDirty = true;
+        }
 
     } catch (error) {
         console.error('Error loading Konfirmasi VM:', error);
@@ -19030,6 +19297,7 @@ function getVMFiltered() {
 }
 
 function renderKonfirmasiVM() {
+    window.__vmDirty = false;
     const data = getVMFiltered();
 
     // Hitung KPI
@@ -19385,7 +19653,7 @@ function renderVMChart(data) {
 // Auto-load saat section Vendor dibuka
 // Panggil manual pertama kali, auto-refresh setiap 60 detik
 loadKonfirmasiVM();
-setInterval(loadKonfirmasiVM, 600000);
+setInterval(() => { if (!document.hidden) loadKonfirmasiVM(); }, 600000);
 // ===== END REKAP KONFIRMASI VM =====
     </script>
     <script>
@@ -20653,7 +20921,8 @@ setInterval(loadKonfirmasiVM, 600000);
             const storeIdx = headers.findIndex((h) => h.toUpperCase().includes('STORE NAME') || h.toUpperCase().includes('NAMA STORE'));
             let agingIdx = headers.findIndex((h) => h.toUpperCase() === 'AGING');
             if (agingIdx === -1) agingIdx = 9;
-            const noLcIdx = headers.findIndex((h) => h.toUpperCase().includes('NO LC'));
+            let noLcIdx = headers.findIndex((h) => h.toUpperCase().includes('NO LC'));
+            if (noLcIdx === -1) noLcIdx = 10;
             let statusArmadaIdx = headers.findIndex((h) => h.toUpperCase().includes('STATUS ARMADA'));
             if (statusArmadaIdx === -1) statusArmadaIdx = 15;
             const cbmIdx = headers.findIndex((h) => h.toUpperCase().includes('TOTAL CBM') || h.toUpperCase() === 'CBM');
@@ -20686,7 +20955,8 @@ setInterval(loadKonfirmasiVM, 600000);
                 const stN = String(row[13] || '').toUpperCase();
                 const isLoaded = stK.includes('SUDAH LOADING') || stK.includes('SUDAH MUAT') || stN.includes('SUDAH LOADING') || stN.includes('SUDAH MUAT');
                 const ag = parseInt(row[agingIdx], 10) || 0;
-                const hasLc = noLcIdx !== -1 && String(row[noLcIdx] || '').trim() !== '';
+                const noLcRaw = String(row[noLcIdx] || '').trim();
+                const hasLc = noLcRaw !== '' && noLcRaw !== '-';
                 const arm = String(row[statusArmadaIdx] || '').toUpperCase();
                 const isComing = arm.includes('SUDAH DATANG') || arm.includes('TERJALURKAN');
                 const isNotComing = arm.includes('BELUM DATANG');
@@ -20723,7 +20993,8 @@ setInterval(loadKonfirmasiVM, 600000);
                     k18: row[7] || '',
                     totalCbm: cbm,
                     aging: ag,
-                    noLc: noLcIdx !== -1 ? (row[noLcIdx] || '') : '',
+                    noLc: noLcRaw,
+                    hasLc,
                     ketLoading: row[13] || '',
                     planLoading: row[planLoadCol] || '',
                     statusArmada: row[statusArmadaIdx] || '',
@@ -20732,6 +21003,7 @@ setInterval(loadKonfirmasiVM, 600000);
             });
 
             rows.sort((a, b) => {
+                if (a.hasLc !== b.hasLc) return a.hasLc ? 1 : -1;
                 if (a.isLoaded !== b.isLoaded) return a.isLoaded ? 1 : -1;
                 return b.aging - a.aging;
             });
@@ -20779,6 +21051,7 @@ setInterval(loadKonfirmasiVM, 600000);
             let hit = 0, miss = 0, os = 0, osCbm = 0;
             let sudahCbm = 0, belumCbm = 0, rtSudah = 0, rtBelum = 0;
             const osList = [];
+            const osBelumLcList = [];
 
             raw.forEach((r) => {
                 if (buVal !== 'ALL' && r.bu !== buVal) return;
@@ -20814,6 +21087,9 @@ setInterval(loadKonfirmasiVM, 600000);
                     os++;
                     osCbm += r.cbm;
                     osList.push(r);
+                    if (!hasLc) {
+                        osBelumLcList.push(r);
+                    }
                     if (r.aging <= 3) bucket['0-3']++;
                     else if (r.aging <= 7) bucket['4-7']++;
                     else if (r.aging <= 14) bucket['8-14']++;
@@ -20830,6 +21106,7 @@ setInterval(loadKonfirmasiVM, 600000);
             });
 
             osList.sort((a, b) => b.aging - a.aging);
+            osBelumLcList.sort((a, b) => b.aging - a.aging);
             const slaTot = hit + miss;
             const slaPct = slaTot > 0 ? (hit / slaTot) * 100 : 0;
             const lineOs = osCbm / LINE_FACTOR;
@@ -20864,6 +21141,7 @@ setInterval(loadKonfirmasiVM, 600000);
                 byArea,
                 bucket,
                 osList,
+                osBelumLcList,
                 LINE_FACTOR,
             };
         }
@@ -22058,9 +22336,10 @@ setInterval(loadKonfirmasiVM, 600000);
             };
             const totBacklog = Math.max(0, Number(os.totalBacklog || 0));
             const totBelum = Math.max(0, Number(os.belumPlan || 0));
-            const sisaNonNewBelum = Math.max(0, totBelum - Number(bd.newStoreAllCbm || 0));
-            const pctNewVsBelum = totBelum > 0 ? ((bd.newStoreAllCbm / totBelum) * 100).toFixed(1) : '0.0';
-            const pctSisaVsBelum = totBelum > 0 ? ((sisaNonNewBelum / totBelum) * 100).toFixed(1) : '0.0';
+            const newStoreBelum = Math.max(0, Number(bd.newStoreBelumCbm || 0));
+            const nonNewBelum = Math.max(0, Number(bd.nonNewStoreBelumCbm || 0));
+            const pctNewVsBelum = totBelum > 0 ? ((newStoreBelum / totBelum) * 100).toFixed(1) : '0.0';
+            const pctNonNewVsBelum = totBelum > 0 ? ((nonNewBelum / totBelum) * 100).toFixed(1) : '0.0';
 
             // Dark Outer Container
             ctx.fillStyle = '#0F1117';
@@ -22138,8 +22417,8 @@ setInterval(loadKonfirmasiVM, 600000);
             drawBdCard(
                 pad + (kw + gap) * 2,
                 'CBM SELAIN NEW STORE BELUM PLAN',
-                `${fmtId(sisaNonNewBelum, 2)} CBM`,
-                `${fmtInt(bd.nonNewStoreBelumCount)} Store (${pctSisaVsBelum}%) | Tabel Belum Plan: ${fmtId(bd.nonNewStoreBelumCbm, 2)}`,
+                `${fmtId(nonNewBelum, 2)} CBM`,
+                `${fmtInt(bd.nonNewStoreBelumCount)} Store (${pctNonNewVsBelum}%) | All: ${fmtId(bd.nonNewStoreAllCbm, 2)}`,
                 '#16A34A', '#14532D', false
             );
             drawBdCard(
@@ -22165,7 +22444,7 @@ setInterval(loadKonfirmasiVM, 600000);
             ctx.fillStyle = '#FACC15';
             ctx.font = '800 14.2px "Inter", Arial, sans-serif';
             ctx.fillText(
-                `TOTAL CBM BELUM PLAN (${fmtId(os.belumPlan, 2)} CBM) − NEW STORE (${fmtId(bd.newStoreAllCbm, 2)} CBM) = SELAIN NEW STORE BELUM PLAN (${fmtId(sisaNonNewBelum, 2)} CBM)`,
+                `TOTAL CBM BELUM PLAN (${fmtId(os.belumPlan, 2)} CBM) = BELUM PLAN NEW STORE (${fmtId(newStoreBelum, 2)} CBM) + SELAIN NEW STORE BELUM PLAN (${fmtId(nonNewBelum, 2)} CBM)`,
                 W / 2,
                 eqY + 17
             );
@@ -22564,14 +22843,15 @@ setInterval(loadKonfirmasiVM, 600000);
             ctx.fillStyle = '#FACC15';
             ctx.font = '800 16.5px "Inter", Arial, sans-serif';
             ctx.textAlign = 'left';
-            ctx.fillText('DETAIL MONITORING HUB GRW (PRIORITAS BELUM LOADING & AGING TERTINGGI)', pad + 14, tblBoxY + tblBarH / 2);
+            ctx.fillText('DETAIL MONITORING HUB GRW (PRIORITAS BELUM PLAN & AGING TERTINGGI)', pad + 14, tblBoxY + tblBarH / 2);
 
             const maxRows = 12;
             const visRows = (hub.rows || []).slice(0, maxRows);
+            const belumPlanCount = (hub.rows || []).filter((r) => !r.hasLc).length;
             ctx.fillStyle = '#FCA5A5';
             ctx.font = '700 15px "Inter", Arial, sans-serif';
             ctx.textAlign = 'right';
-            ctx.fillText(`Menampilkan ${visRows.length} dari ${fmtInt(hub.rows.length)} record`, pad + innerW - 14, tblBoxY + tblBarH / 2);
+            ctx.fillText(`Belum Plan: ${fmtInt(belumPlanCount)} | Menampilkan ${visRows.length} dari ${fmtInt(hub.rows.length)} record`, pad + innerW - 14, tblBoxY + tblBarH / 2);
 
             const cols = [
                 { hdr: '#', w: 40, al: 'center' },
@@ -22634,7 +22914,7 @@ setInterval(loadKonfirmasiVM, 600000);
                         { v: safeStr(r.k18, ''), col: '#CBD5E1' },
                         { v: fmtId(r.totalCbm, 2), col: '#FACC15', bold: true },
                         { v: String(r.aging), col: r.aging > 5 ? '#F87171' : r.aging >= 4 ? '#FBBF24' : '#4ADE80', bold: true },
-                        { v: safeStr(r.noLc, '-'), col: '#38BDF8' },
+                        { v: r.hasLc ? safeStr(r.noLc, '-') : 'BELUM PLAN', col: r.hasLc ? '#38BDF8' : '#F87171', bold: !r.hasLc },
                         { v: safeStr(r.ketLoading, '-'), col: r.isLoaded ? '#4ADE80' : '#F87171', bold: true },
                         { v: safeStr(r.planLoading, '-'), col: '#E2E8F0' },
                         { v: safeStr(r.statusArmada, '-'), col: '#E2E8F0' },
@@ -22979,14 +23259,15 @@ setInterval(loadKonfirmasiVM, 600000);
             ctx.fillStyle = '#FACC15';
             ctx.font = '800 16px "Inter", Arial, sans-serif';
             ctx.textAlign = 'left';
-            ctx.fillText('DETAIL OUTSTANDING ORDER ASTOR', pad + 14, osBoxY + osBarH / 2);
+            ctx.fillText('DETAIL OUTSTANDING ORDER ASTOR (BELUM ADA NO. LC & AGING TERTINGGI)', pad + 14, osBoxY + osBarH / 2);
 
             const maxOs = 9;
-            const visOs = (ast.osList || []).slice(0, maxOs);
+            const osBelumRows = ast.osBelumLcList || [];
+            const visOs = osBelumRows.slice(0, maxOs);
             ctx.fillStyle = '#FCA5A5';
             ctx.font = '700 15px "Inter", Arial, sans-serif';
             ctx.textAlign = 'right';
-            ctx.fillText(`${fmtInt(ast.os)} ORDER${ast.os > maxOs ? ` (Top ${maxOs} Aging Tertinggi)` : ''}`, pad + innerW - 14, osBoxY + osBarH / 2);
+            ctx.fillText(`${fmtInt(osBelumRows.length)} ORDER BELUM NO. LC${osBelumRows.length > maxOs ? ` (Top ${maxOs} Aging Tertinggi)` : ''} | Total OS: ${fmtInt(ast.os)}`, pad + innerW - 14, osBoxY + osBarH / 2);
 
             const osCols = [
                 { h: '#', w: 40, al: 'center' },
@@ -23025,7 +23306,7 @@ setInterval(loadKonfirmasiVM, 600000);
                 ctx.fillStyle = '#2DD4BF';
                 ctx.font = '700 18px "Inter", Arial, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('Tidak ada outstanding ASTOR — semua sudah terstuffing!', pad + innerW / 2, osHdrY + osHdrH + 60);
+                ctx.fillText(ast.os === 0 ? 'Tidak ada outstanding ASTOR — semua sudah terstuffing!' : 'Semua outstanding ASTOR sudah memiliki Nomor LC!', pad + innerW / 2, osHdrY + osHdrH + 60);
             } else {
                 visOs.forEach((r, idx) => {
                     const ry = osHdrY + osHdrH + idx * osRowH;
@@ -23034,7 +23315,7 @@ setInterval(loadKonfirmasiVM, 600000);
                         { v: String(idx + 1), col: '#94A3B8' },
                         { v: safeStr(r.tgl, '-'), col: '#E2E8F0' },
                         { v: safeStr(r.rtod, '-'), col: '#FFFFFF', bold: true },
-                        { v: safeStr(r.lc, '-'), col: '#38BDF8' },
+                        { v: 'BELUM ADA LC', col: '#F87171', bold: true },
                         { v: safeStr(r.bu, '-'), col: '#FACC15', bold: true },
                         { v: safeStr(r.kota, '-'), col: '#F8FAFC', bold: true },
                         { v: safeStr(r.region, '-'), col: '#CBD5E1' },
@@ -25321,9 +25602,10 @@ setInterval(loadKonfirmasiVM, 600000);
                 const os = snap.outstanding;
                 const bd = os.breakdown || {};
                 const totBelum = Math.max(0, Number(os.belumPlan || 0));
-                const sisaNonNewBelum = Math.max(0, totBelum - Number(bd.newStoreAllCbm || 0));
-                const pctNewVsBelum = totBelum > 0 ? ((bd.newStoreAllCbm / totBelum) * 100).toFixed(1) : '0.0';
-                const pctSisaVsBelum = totBelum > 0 ? ((sisaNonNewBelum / totBelum) * 100).toFixed(1) : '0.0';
+                const newStoreBelum = Math.max(0, Number(bd.newStoreBelumCbm || 0));
+                const nonNewBelum = Math.max(0, Number(bd.nonNewStoreBelumCbm || 0));
+                const pctNewVsBelum = totBelum > 0 ? ((newStoreBelum / totBelum) * 100).toFixed(1) : '0.0';
+                const pctNonNewVsBelum = totBelum > 0 ? ((nonNewBelum / totBelum) * 100).toFixed(1) : '0.0';
 
                 s7bd.addText('BREAKDOWN BACKLOG BELUM PLAN', {
                     x: 0.28, y: 0.20, w: 7.40, h: 0.30,
@@ -25350,8 +25632,8 @@ setInterval(loadKonfirmasiVM, 600000);
 
                 const bdHigh = [
                     `• Jumlah Store di Monitoring Order Aging: ${fmtInt(bd.totalAgingStores)} Store (${fmtInt(bd.newStoreCount)} Store Area NEW STORE & ${fmtInt(bd.nonNewStoreCount)} Store Selain New Store).`,
-                    `• Total All Backlog (${fmtId(os.totalBacklog, 2)} CBM):\n• Total Belum Plan (${fmtId(os.belumPlan, 2)} CBM):`,
-                    `- New Store: ${fmtId(bd.newStoreAllCbm, 2)} CBM (${pctNewVsBelum}%)\n- Selain New Store: ${fmtId(sisaNonNewBelum, 2)} CBM (${pctSisaVsBelum}%)`,
+                    `• Total All Backlog: ${fmtId(os.totalBacklog, 2)} CBM\n• Total Belum Plan: ${fmtId(os.belumPlan, 2)} CBM`,
+                    `- New Store (All): ${fmtId(bd.newStoreAllCbm, 2)} CBM (Belum Plan: ${fmtId(newStoreBelum, 2)} CBM / ${pctNewVsBelum}%)\n- Selain New Store (Belum Plan): ${fmtId(nonNewBelum, 2)} CBM (${pctNonNewVsBelum}%)`,
                     `• Store aktif Belum Plan: ${fmtInt(bd.newStoreBelumCount)} New Store & ${fmtInt(bd.nonNewStoreBelumCount)} Store Reguler.`,
                 ];
                 s7bd.addText(bdHigh.join('\n\n'), {
